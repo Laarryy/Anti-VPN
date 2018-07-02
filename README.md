@@ -14,7 +14,7 @@ https://github.com/egg82/AntiVPN/blob/master/src/main/resources/config.yml
 /avpnreload - Reloads the plugin configuration. This will disconnect and reconnect (if appropriate) any services configured in the config.yml file.
 
 # Permissions
-avpn.admin - allows access to the /avpnreload command
+avpn.admin - allows access to the /avpnreload command\
 avpn.bypass - players with this node bypass the filter entirely
 
 # Legal
