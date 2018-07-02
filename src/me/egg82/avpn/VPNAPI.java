@@ -1,5 +1,6 @@
 package me.egg82.avpn;
 
+import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
@@ -168,20 +169,20 @@ public class VPNAPI {
 			}
 			
 			if (source.equalsIgnoreCase("getipintel")) {
-				Double result = GetIPIntelAPI.getResult(ip);
-				if (result != null) {
-					bool = (result.doubleValue() >= ServiceLocator.getService(ConfigRegistry.class).getRegister("sources.getipintel.threshold", Number.class).doubleValue()) ? Boolean.TRUE : Boolean.FALSE;
+				Optional<Double> result = GetIPIntelAPI.getResult(ip);
+				if (result.isPresent()) {
+					bool = (result.get().doubleValue() >= ServiceLocator.getService(ConfigRegistry.class).getRegister("sources.getipintel.threshold", Number.class).doubleValue()) ? Boolean.TRUE : Boolean.FALSE;
 				}
 			} else if (source.equalsIgnoreCase("vpnblocker")) {
-				bool = VPNBlockerAPI.isVPN(ip);
+				bool = VPNBlockerAPI.isVPN(ip).orElse(null);
 			} else if (source.equalsIgnoreCase("ipdetector")) {
-				bool = IPDetectorAPI.isVPN(ip);
+				bool = IPDetectorAPI.isVPN(ip).orElse(null);
 			} else if (source.equalsIgnoreCase("iphub")) {
-				bool = IPHubAPI.isVPN(ip);
+				bool = IPHubAPI.isVPN(ip).orElse(null);
 			} else if (source.equalsIgnoreCase("proxycheck")) {
-				bool = ProxyCheckAPI.isVPN(ip);
+				bool = ProxyCheckAPI.isVPN(ip).orElse(null);
 			} else if (source.equalsIgnoreCase("shodan")) {
-				bool = ShodanAPI.isVPN(ip);
+				bool = ShodanAPI.isVPN(ip).orElse(null);
 			}
 			
 			if (bool != null) {

@@ -1,6 +1,6 @@
 name: AntiVPN
 main: me.egg82.avpn.AntiVPN
-version: 1.0.0
+version: 1.0.1
 author: egg82
 description: Get the best; save money on overpriced plugins and block VPN users!
 commands:

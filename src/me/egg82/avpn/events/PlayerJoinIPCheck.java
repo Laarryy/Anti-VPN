@@ -28,6 +28,13 @@ public class PlayerJoinIPCheck extends LowEventHandler<PlayerJoinEvent> {
 	
 	//private
 	protected void onExecute(long elapsedMilliseconds) {
+		if (!Config.kick) {
+			if (Config.debug) {
+				ServiceLocator.getService(BasePlugin.class).printInfo("Plugin set to API-only. Ignoring " + event.getPlayer().getName());
+			}
+			return;
+		}
+		
 		if (event.getPlayer().hasPermission(PermissionsType.BYPASS)) {
 			if (Config.debug) {
 				ServiceLocator.getService(BasePlugin.class).printInfo(event.getPlayer().getName() + " bypasses check. Ignoring.");

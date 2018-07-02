@@ -117,6 +117,10 @@ public class AntiVPN extends BasePlugin {
 		if (Config.debug) {
 			printInfo((Config.async) ? "Async enabled" : "Async disabled");
 		}
+		Config.kick = ServiceLocator.getService(ConfigRegistry.class).getRegister("kick", Boolean.class).booleanValue();
+		if (Config.debug) {
+			printInfo((Config.kick) ? "Set to kick" : "Set to API-only");
+		}
 	}
 	
 	public void onEnable() {

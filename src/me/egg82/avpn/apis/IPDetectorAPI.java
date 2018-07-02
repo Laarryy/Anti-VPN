@@ -2,6 +2,7 @@ package me.egg82.avpn.apis;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import org.json.simple.JSONObject;
 
@@ -18,10 +19,10 @@ public class IPDetectorAPI {
 	}
 	
 	//public
-	public static Boolean isVPN(String ip) {
+	public static Optional<Boolean> isVPN(String ip) {
 		String key = ServiceLocator.getService(ConfigRegistry.class).getRegister("sources.ipdetector.key", String.class);
 		if (key == null || key.isEmpty()) {
-			return null;
+			return Optional.empty();
 		}
 		
 		Map<String, String> headers = new HashMap<String, String>();
@@ -29,11 +30,11 @@ public class IPDetectorAPI {
 		
 		JSONObject json = WebUtil.getJson("https://api.ipdetector.info/" + ip, headers);
 		if (json == null) {
-			return null;
+			return Optional.empty();
 		}
 		
 		int goodIp = ((Integer) json.get("goodIp")).intValue();
-		return (goodIp == 0) ? Boolean.TRUE : Boolean.FALSE;
+		return Optional.of((goodIp == 0) ? Boolean.TRUE : Boolean.FALSE);
 	}
 	
 	//private

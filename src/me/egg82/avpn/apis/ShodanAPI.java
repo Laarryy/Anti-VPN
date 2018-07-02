@@ -1,5 +1,7 @@
 package me.egg82.avpn.apis;
 
+import java.util.Optional;
+
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -16,33 +18,33 @@ public class ShodanAPI {
 	}
 	
 	//public
-	public static Boolean isVPN(String ip) {
+	public static Optional<Boolean> isVPN(String ip) {
 		String key = ServiceLocator.getService(ConfigRegistry.class).getRegister("sources.shodan.key", String.class);
 		if (key == null || key.isEmpty()) {
-			return null;
+			return Optional.empty();
 		}
 		
 		JSONObject json = WebUtil.getJson("https://api.shodan.io/shodan/host/" + ip + "?key=" + ip + key);
 		if (json == null) {
-			return null;
+			return Optional.empty();
 		}
 		
 		JSONArray tags = (JSONArray) json.get("tags");
 		if (tags == null) {
-			return null;
+			return Optional.empty();
 		}
 		
 		if (tags.size() == 0) {
-			return Boolean.FALSE;
+			return Optional.of(Boolean.FALSE);
 		}
 		for (Object tag : tags) {
 			String t = (String) tag;
 			if (t.equalsIgnoreCase("vpn")) {
-				return Boolean.TRUE;
+				return Optional.of(Boolean.TRUE);
 			}
 		}
 		
-		return Boolean.FALSE;
+		return Optional.of(Boolean.FALSE);
 	}
 	
 	//private

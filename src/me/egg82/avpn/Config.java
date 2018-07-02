@@ -9,6 +9,7 @@ public class Config {
 	public static volatile boolean debug = false;
 	public static volatile String kickMessage = null;
 	public static volatile boolean async = true;
+	public static volatile boolean kick = true;
 	
 	//constructor
 	public Config() {

@@ -91,6 +91,10 @@ public class AVPNReloadCommand extends CommandHandler {
 		if (Config.debug) {
 			ServiceLocator.getService(BasePlugin.class).printInfo((Config.async) ? "Async enabled" : "Async disabled");
 		}
+		Config.kick = ServiceLocator.getService(ConfigRegistry.class).getRegister("kick", Boolean.class).booleanValue();
+		if (Config.debug) {
+			ServiceLocator.getService(BasePlugin.class).printInfo((Config.kick) ? "Set to kick" : "Set to API-only");
+		}
 		
 		// Memory caches
 		ServiceLocator.removeServices(IPRegistry.class);

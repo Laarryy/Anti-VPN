@@ -2,6 +2,7 @@ package me.egg82.avpn.apis;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import org.json.simple.JSONObject;
 
@@ -18,10 +19,10 @@ public class IPHubAPI {
 	}
 	
 	//public
-	public static Boolean isVPN(String ip) {
+	public static Optional<Boolean> isVPN(String ip) {
 		String key = ServiceLocator.getService(ConfigRegistry.class).getRegister("sources.iphub.key", String.class);
 		if (key == null || key.isEmpty()) {
-			return null;
+			return Optional.empty();
 		}
 		
 		int blockType = ServiceLocator.getService(ConfigRegistry.class).getRegister("sources.iphub.block", Number.class).intValue();
@@ -31,11 +32,11 @@ public class IPHubAPI {
 		
 		JSONObject json = WebUtil.getJson("https://v2.api.iphub.info/ip/" + ip, headers);
 		if (json == null) {
-			return null;
+			return Optional.empty();
 		}
 		
 		int block = ((Number) json.get("block")).intValue();
-		return (block == blockType) ? Boolean.TRUE : Boolean.FALSE;
+		return Optional.of((block == blockType) ? Boolean.TRUE : Boolean.FALSE);
 	}
 	
 	//private
