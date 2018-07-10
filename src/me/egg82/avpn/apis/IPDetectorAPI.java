@@ -33,7 +33,7 @@ public class IPDetectorAPI {
 			return Optional.empty();
 		}
 		
-		int goodIp = ((Integer) json.get("goodIp")).intValue();
+		int goodIp = ((Number) json.get("goodIp")).intValue();
 		return Optional.of((goodIp == 0) ? Boolean.TRUE : Boolean.FALSE);
 	}
 	

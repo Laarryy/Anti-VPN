@@ -47,35 +47,41 @@ sources:
   # This should be as high as possible to avoid rate-limits but as low as possible to ensure results are always up-to-date and accurate
   cacheTime: 6hours
   # The order to try results in
-  order: 'getipintel,vpnblocker,ipdetector,iphub,proxycheck,shodan'
+  order: 'getipintel,proxycheck,iphub,vpnblocker,ipdetector,shodan'
   # https://www.getipintel.net/
+  # Detected Nord VPN and Cryptostorm Jul 10, 2018
   getipintel:
     enabled: true
     # Contact e-mail in case things go wrong. Required
     contact: 'admin@yoursite.com'
     # Threshold above which an IP is considered "bad"
     threshold: 0.98
+  # https://proxycheck.io
+  # Detected Nord VPN and Cryptostorm Jul 10, 2018
+  proxycheck:
+    enabled: true
+    # Optional API key to use
+    key: ''
+  # https://iphub.info/
+  # Detected Nord VPN and Cryptostorm Jul 10, 2018
+  iphub:
+    enabled: false
+    # API key to use (Required for this service, free one available at https://iphub.info/apiKey/newFree )
+    key: ''
+    # The block type at which an IP is considered "bad"
+    block: 1
   # https://vpnblocker.net/usage
+  # Detected Nord VPN, did not detect Cryptostorm Jul 10, 2018
   vpnblocker:
     enabled: true
     # Optional API key to use
     key: ''
   # https://ipdetector.info
+  # Detected Nord VPN, did not detect Cryptostorm Jul 10, 2018
   ipdetector:
-    enabled: false
-    # API key to use (Required for this service)
-    key: ''
-  iphub:
-    enabled: false
-    # API key to use (Required for this service)
-    key: ''
-    # The block type at which an IP is considered "bad"
-    block: 1
-  # https://proxycheck.io
-  proxycheck:
     enabled: true
     # Optional API key to use
-    key: ''
+    key: 'free'
   # https://www.shodan.io/
   # WARNING: This service utilizes EXTREMELY primitive checks and can return incorrect results
   shodan:
