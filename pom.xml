@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <artifactId>AntiVPN</artifactId>
-  <version>1.0.3</version>
+  <version>1.0.4</version>
   <name>AntiVPN</name>
   <build>
     <sourceDirectory>src</sourceDirectory>
@@ -115,16 +115,22 @@
     </repository>
   </repositories>
   <dependencies>
-    <dependency>
+    <!-- <dependency>
       <groupId>org.bukkit</groupId>
       <artifactId>bukkit</artifactId>
       <version>1.12.2-R0.1-SNAPSHOT</version>
+      <scope>provided</scope>
+    </dependency> -->
+    <dependency>
+      <groupId>org.bukkit</groupId>
+      <artifactId>bukkit</artifactId>
+      <version>1.13-pre5-R0.1-SNAPSHOT</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>ninja.egg82.lib</groupId>
       <artifactId>bukkit</artifactId>
-      <version>1.0.6</version>
+      <version>1.1.7</version>
     </dependency>
     <dependency>
       <groupId>ninja.egg82.lib</groupId>

@@ -9,11 +9,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 
 public class WebUtil {
 	//vars
-	private static JSONParser parser = new JSONParser();
 	
 	//constructor
 	public WebUtil() {
@@ -71,7 +69,7 @@ public class WebUtil {
 			in.close();
 			
 			if (code == 200) {
-				return (JSONObject) parser.parse(builder.toString());
+				return JSONUtil.parseObject(builder.toString());
 			}
 		} catch (Exception ex) {
 			return null;
