@@ -1,0 +1,10 @@
+name: AntiVPN
+main: me.egg82.avpn.AntiVPN
+version: 2.0.4
+author: egg82
+description: Get the best; save money on overpriced plugins and block VPN users!
+commands:
+  avpnreload:
+    description: Reloads the plugin
+    usage: /avpnreload
+    permission: avpn.admin

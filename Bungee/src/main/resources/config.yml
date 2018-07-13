@@ -1,0 +1,104 @@
+# This is the backing data for everything
+# SQL is used as long-term storage and cross-network updates every few seconds
+# Try to use an SQL source each server has access to, if possible
+# You may choose to use MySQL or SQLite
+# An SQL database of SOME description is required
+sql:
+  # The type of database to use. May be either MySQL or SQLite
+  type: 'sqlite'
+  # Number of connections to use. Cannot be lower than 1
+  # Recommended 2+ for parallel queries
+  threads: 2
+  mysql:
+    address: '127.0.0.1'
+    port: 3306
+    user: ''
+    pass: ''
+    database: 'avpn'
+  sqlite:
+    file: 'avpn.db'
+
+# Redis is used as a cache so lookups can be VERY fast
+# This is used in both the expensive and non-expensive lookups
+# It also provides the ability to push instant updates across the network
+# Redis is entirely optional
+redis:
+  enabled: false
+  address: ''
+  port: 6379
+  pass: ''
+
+# Rabbit is used to push instant updates across the network
+# If you don't have/use Redis you can use this to update faster than SQL
+# Even if you use Redis, this can be used as a backup source
+# Rabbit is entirely optional
+rabbit:
+  enabled: false
+  address: ''
+  port: 5672
+  user: 'guest'
+  pass: 'guest'
+
+# Where VPN-checking sources are defined
+# Beware the more sources that are included (and fail) the worse the performance and the more the lag
+sources:
+  # The amount of time to globally cache results across all sources
+  # This should be as high as possible to avoid rate-limits but as low as possible to ensure results are always up-to-date and accurate
+  cacheTime: 6hours
+  # The order to try results in
+  order: 'getipintel,proxycheck,iphub,vpnblocker,ipdetector,shodan'
+  # https://www.getipintel.net/
+  # Detected Nord VPN and Cryptostorm Jul 10, 2018
+  getipintel:
+    enabled: true
+    # Contact e-mail in case things go wrong. Required
+    contact: 'admin@yoursite.com'
+    # Threshold above which an IP is considered "bad"
+    threshold: 0.98
+  # https://proxycheck.io
+  # Detected Nord VPN and Cryptostorm Jul 10, 2018
+  proxycheck:
+    enabled: true
+    # Optional API key to use
+    key: ''
+  # https://iphub.info/
+  # Detected Nord VPN and Cryptostorm Jul 10, 2018
+  iphub:
+    enabled: false
+    # API key to use (Required for this service, free one available at https://iphub.info/apiKey/newFree )
+    key: ''
+    # The block type at which an IP is considered "bad"
+    block: 1
+  # https://vpnblocker.net/usage
+  # Detected Nord VPN, did not detect Cryptostorm Jul 10, 2018
+  vpnblocker:
+    enabled: true
+    # Optional API key to use
+    key: ''
+  # https://ipdetector.info
+  # Detected Nord VPN, did not detect Cryptostorm Jul 10, 2018
+  ipdetector:
+    enabled: true
+    # Optional API key to use
+    key: 'free'
+  # https://www.shodan.io/
+  # WARNING: This service utilizes EXTREMELY primitive checks and can return incorrect results
+  shodan:
+    enabled: false
+    # API key to use (Required for this service)
+    key: ''
+
+# The amount of time before in-memory caches expire after non-use
+# This prevents many sequential lookups from using more expensive networking constantly
+cacheTime: 1minute
+# The message to kick VPN users with
+kickMessage: '&cPlease disconnect from your proxy or VPN before re-joining!'
+# When true, logs some extra output to the console so you can see if/why things might be failing
+debug: false
+# When true, checks are done off the player login thread
+# You may want to set this to false in cases where you want to be absolutely sure you kick VPN users immediately
+# In most cases, this should be set to true because using the login thread can cause slower player logins
+async: true
+# When true, will kick players found to be using VPNs
+# Disable this is you intend to use your own kicking/tagging systems using the API
+kick: true
