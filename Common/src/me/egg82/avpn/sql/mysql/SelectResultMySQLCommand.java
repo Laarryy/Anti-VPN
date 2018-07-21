@@ -43,7 +43,7 @@ public class SelectResultMySQLCommand extends Command {
 	
 	//private
 	protected void onExecute(long elapsedMilliseconds) {
-		query = sql.parallelQuery("SELECT `value`, `created` FROM `antivpn` WHERE `ip`=? AND CURRENT_TIMESTAMP() > `created` + INTERVAL ? * 0.001 SECOND;", ip, Long.valueOf(Config.sourceCacheTime));
+		query = sql.parallelQuery("SELECT `value`, `created` FROM `antivpn` WHERE `ip`=? AND CURRENT_TIMESTAMP() <= `created` + INTERVAL ? * 0.001 SECOND;", ip, Long.valueOf(Config.sourceCacheTime));
 	}
 	
 	private void onSQLData(SQLEventArgs e) {

@@ -43,7 +43,7 @@ public class SelectResultSQLiteCommand extends Command {
 	
 	//private
 	protected void onExecute(long elapsedMilliseconds) {
-		query = sql.parallelQuery("SELECT `value`, `created` FROM `antivpn` WHERE `ip`=? AND CURRENT_TIMESTAMP > DATETIME(`created`, ?);", ip, "+" + Math.floorDiv(Config.sourceCacheTime, 1000L) + " seconds");
+		query = sql.parallelQuery("SELECT `value`, `created` FROM `antivpn` WHERE `ip`=? AND CURRENT_TIMESTAMP <= DATETIME(`created`, ?);", ip, "+" + Math.floorDiv(Config.sourceCacheTime, 1000L) + " seconds");
 	}
 	
 	private void onSQLData(SQLEventArgs e) {

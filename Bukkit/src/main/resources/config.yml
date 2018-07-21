@@ -96,10 +96,11 @@ cacheTime: 1minute
 kickMessage: '&cPlease disconnect from your proxy or VPN before re-joining!'
 # When true, logs some extra output to the console so you can see if/why things might be failing
 debug: false
-# When true, checks are done off the main server thread
-# You may want to set this to false in cases where you want to be absolutely sure you kick VPN users immediately
-# In most cases, this should be set to true because using the main thread can cause a lag spike when a player logs in
-async: true
+# When true, non-prefetch checks are done off the main server thread
+# It used to be the case that disabling this option would cause lag spikes on the main server thread
+# This is no longer the case and is now more of a "legacy" option
+# It is recommended this be set to false
+async: false
 # When true, will kick players found to be using VPNs
 # Disable this is you intend to use your own kicking/tagging systems using the API
 kick: true

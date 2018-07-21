@@ -60,6 +60,12 @@ public class IPCacheUtil {
 			return;
 		}
 		
+		// Preemptively add to internal cache to hopefully avoid race conditions. We'll update it again later
+		// Since current time is only being used for expirations this is relatively safe to do
+		// This wouldn't work for other plugins that rely on known "good" times
+		IExpiringRegistry<String, Boolean> ipRegistry = ServiceLocator.getService(IPRegistry.class);
+		ipRegistry.setRegister(ip, Boolean.valueOf(value));
+		
 		// Preemptively add to Redis to hopefully avoid race conditions. We'll update it again later
 		try (Jedis redis = RedisUtil.getRedis()) {
 			if (redis != null) {
