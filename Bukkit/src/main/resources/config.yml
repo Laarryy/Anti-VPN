@@ -47,7 +47,7 @@ sources:
   # This should be as high as possible to avoid rate-limits but as low as possible to ensure results are always up-to-date and accurate
   cacheTime: 6hours
   # The order to try results in
-  order: 'getipintel,proxycheck,iphub,vpnblocker,ipdetector,shodan'
+  order: 'getipintel,ipqualityscore,proxycheck,iphub,vpnblocker,ipdetector,shodan'
   # https://www.getipintel.net/
   # Detected Nord VPN and Cryptostorm Jul 10, 2018
   getipintel:
@@ -56,6 +56,14 @@ sources:
     contact: 'admin@yoursite.com'
     # Threshold above which an IP is considered "bad"
     threshold: 0.98
+  # https://www.ipqualityscore.com/
+  # Detected Nord VPN and Cryptostorm Jul 21, 2018
+  ipqualityscore:
+    enabled: false
+    # API key to use (Required for this service, free one available at https://www.ipqualityscore.com/create-account )
+    key: ''
+    # Threshold above which an IP is considered "bad"
+    threshold: 0.65
   # https://proxycheck.io
   # Detected Nord VPN and Cryptostorm Jul 10, 2018
   proxycheck:
