@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <artifactId>AntiVPN-Bungee</artifactId>
-  <version>2.1.5</version>
+  <version>2.1.6</version>
   <name>AntiVPN</name>
   <build>
     <sourceDirectory>src</sourceDirectory>
@@ -43,30 +43,92 @@
                     <exclude>junit/**</exclude>
                     <exclude>org/junit/**</exclude>
 					<exclude>org/hamcrest/**</exclude>
+					<exclude>edu/umd/cs/findbugs/**</exclude>
+                    <exclude>org/checkerframework/**</exclude>
+                    <exclude>afu/**</exclude>
+                    <exclude>org/codehaus/mojo/animal_sniffer/**</exclude>
+                    <exclude>com/google/common/**</exclude>
+                    <exclude>com/google/gson/**</exclude>
+                    <exclude>org/yaml/**</exclude>
                   </excludes>
                 </filter>
               </filters>
               <minimizeJar>false</minimizeJar>
               <relocations>
                 <relocation>
+                  <pattern>com.github</pattern>
+                  <shadedPattern>me.egg82.avpn.extern.com.github</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>com.google</pattern>
+                  <shadedPattern>me.egg82.avpn.extern.com.google</shadedPattern>
+                  <excludes>
+                    <exclude>com.google.common.*</exclude>
+                    <exclude>com.google.gson.*</exclude>
+                  </excludes>
+                </relocation>
+                <relocation>
+                  <pattern>com.googlecode</pattern>
+                  <shadedPattern>me.egg82.avpn.extern.com.googlecode</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>com.rabbitmq</pattern>
+                  <shadedPattern>me.egg82.avpn.extern.com.rabbitmq</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>com.rollbar</pattern>
+                  <shadedPattern>me.egg82.avpn.extern.com.rollbar</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>com.zaxxer</pattern>
+                  <shadedPattern>me.egg82.avpn.extern.com.zaxxer</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>it.unimi</pattern>
+                  <shadedPattern>me.egg82.avpn.extern.it.unimi</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>javassist</pattern>
+                  <shadedPattern>me.egg82.avpn.extern.javassist</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>javax.annotation</pattern>
+                  <shadedPattern>me.egg82.avpn.extern.javax.annotation</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>net.jodah</pattern>
+                  <shadedPattern>me.egg82.avpn.extern.net.jodah</shadedPattern>
+                </relocation>
+                <relocation>
                   <pattern>ninja.egg82</pattern>
                   <shadedPattern>me.egg82.avpn.lib.ninja.egg82</shadedPattern>
                 </relocation>
                 <relocation>
-                  <pattern>me.egg82.extern</pattern>
-                  <shadedPattern>me.egg82.avpn.extern</shadedPattern>
+                  <pattern>ninja.leaping</pattern>
+                  <shadedPattern>me.egg82.avpn.extern.ninja.leaping</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>org.apache</pattern>
+                  <shadedPattern>me.egg82.avpn.extern.org.apache</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>org.bouncycastle</pattern>
+                  <shadedPattern>me.egg82.avpn.extern.org.bouncycastle</shadedPattern>
+                  <excludes>
+                    <exclude>org.bouncycastle.x509.*</exclude>
+                  </excludes>
+                </relocation>
+                <relocation>
+                  <pattern>org.json</pattern>
+                  <shadedPattern>me.egg82.avpn.extern.org.json</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>org.reflections</pattern>
+                  <shadedPattern>me.egg82.avpn.extern.org.reflections</shadedPattern>
                 </relocation>
                 <relocation>
                   <pattern>redis.clients</pattern>
                   <shadedPattern>me.egg82.avpn.extern.redis.clients</shadedPattern>
-                </relocation>
-                <relocation>
-                  <pattern>org.apache.commons</pattern>
-                  <shadedPattern>me.egg82.avpn.extern.org.apache.commons</shadedPattern>
-                </relocation>
-                <relocation>
-                  <pattern>org.json.simple</pattern>
-                  <shadedPattern>me.egg82.avpn.extern.org.json.simple</shadedPattern>
                 </relocation>
               </relocations>
             </configuration>
@@ -84,82 +146,85 @@
       <id>egg82-ninja</id>
       <url>https://www.myget.org/F/egg82-java/maven/</url>
     </repository>
+    <repository>
+      <id>sponge</id>
+      <url>https://repo.spongepowered.org/maven/</url>
+    </repository>
   </repositories>
   <dependencies>
     <dependency>
       <groupId>net.md-5</groupId>
       <artifactId>bungeecord-api</artifactId>
-      <version>1.12-SNAPSHOT</version>
+      <version>1.13-SNAPSHOT</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>ninja.egg82.plugins</groupId>
       <artifactId>AntiVPN</artifactId>
-      <version>2.1.5</version>
+      <version>2.1.6</version>
     </dependency>
     <dependency>
       <groupId>ninja.egg82.lib</groupId>
       <artifactId>bungee</artifactId>
-      <version>1.0.6</version>
+      <version>1.0.8</version>
     </dependency>
     <dependency>
       <groupId>ninja.egg82.lib</groupId>
       <artifactId>plugin-common</artifactId>
-      <version>1.0.6</version>
+      <version>1.0.8</version>
       <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.spongepowered</groupId>
+      <artifactId>configurate-yaml</artifactId>
+      <version>3.5</version>
     </dependency>
     <dependency>
       <groupId>ninja.egg82.lib</groupId>
       <artifactId>sql-lib</artifactId>
-      <version>2.0.8</version>
+      <version>2.0.9</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>ninja.egg82.lib</groupId>
       <artifactId>extended-sql-lib</artifactId>
-      <version>1.0.6</version>
+      <version>1.0.7</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>ninja.egg82.lib</groupId>
       <artifactId>exception-lib</artifactId>
-      <version>2.0.7</version>
+      <version>2.0.8</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>ninja.egg82.lib</groupId>
       <artifactId>util-lib</artifactId>
-      <version>1.1.1</version>
+      <version>1.1.2</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>ninja.egg82.lib</groupId>
       <artifactId>collections-lib</artifactId>
-      <version>1.2.1</version>
+      <version>1.2.2</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>ninja.egg82.lib</groupId>
       <artifactId>extended-collections-lib</artifactId>
-      <version>1.0.3</version>
+      <version>1.0.4</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>ninja.egg82.lib</groupId>
       <artifactId>service-lib</artifactId>
-      <version>1.0.1</version>
+      <version>1.0.2</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>ninja.egg82.lib</groupId>
       <artifactId>threading-lib</artifactId>
-      <version>1.0.2</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>redis.clients</groupId>
-      <artifactId>jedis</artifactId>
-      <version>2.9.0</version>
+      <version>1.0.3</version>
       <scope>provided</scope>
     </dependency>
   </dependencies>

@@ -4,7 +4,7 @@ import java.util.Optional;
 
 import org.json.simple.JSONObject;
 
-import me.egg82.avpn.registries.CoreConfigRegistry;
+import me.egg82.avpn.Configuration;
 import me.egg82.avpn.utils.WebUtil;
 import ninja.egg82.patterns.ServiceLocator;
 
@@ -21,7 +21,7 @@ public class VPNBlockerAPI implements IFetchAPI {
 		return "vpnblocker";
 	}
 	public Optional<Boolean> getResult(String ip) {
-		String key = ServiceLocator.getService(CoreConfigRegistry.class).getRegister("sources.vpnblocker.key", String.class);
+		String key = ServiceLocator.getService(Configuration.class).getNode("sources", "vpnblocker", "key").getString();
 		
 		JSONObject json = WebUtil.getJson("http" + ((key != null && !key.isEmpty()) ? "s" : "") + "://api.vpnblocker.net/v2/json/" + ip + ((key != null && !key.isEmpty()) ? "/" + key : ""));
 		if (json == null) {

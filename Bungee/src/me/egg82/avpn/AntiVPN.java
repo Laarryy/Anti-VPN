@@ -1,5 +1,6 @@
 package me.egg82.avpn;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -9,11 +10,11 @@ import java.util.function.BiConsumer;
 import java.util.logging.Level;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.common.reflect.TypeToken;
 
 import me.egg82.avpn.core.RedisSubscriber;
 import me.egg82.avpn.debug.BungeeDebugPrinter;
 import me.egg82.avpn.debug.IDebugPrinter;
-import me.egg82.avpn.registries.CoreConfigRegistry;
 import me.egg82.avpn.sql.mysql.FetchQueueMySQLCommand;
 import me.egg82.avpn.sql.sqlite.ClearDataSQLiteCommand;
 import me.egg82.avpn.utils.RedisUtil;
@@ -21,8 +22,6 @@ import net.md_5.bungee.api.ChatColor;
 import ninja.egg82.bungeecord.BasePlugin;
 import ninja.egg82.bungeecord.processors.CommandProcessor;
 import ninja.egg82.bungeecord.processors.EventProcessor;
-import ninja.egg82.bungeecord.services.ConfigRegistry;
-import ninja.egg82.bungeecord.utils.YamlUtil;
 import ninja.egg82.enums.BaseSQLType;
 import ninja.egg82.events.CompleteEventArgs;
 import ninja.egg82.exceptionHandlers.GameAnalyticsExceptionHandler;
@@ -31,11 +30,10 @@ import ninja.egg82.exceptionHandlers.RollbarExceptionHandler;
 import ninja.egg82.exceptionHandlers.builders.GameAnalyticsBuilder;
 import ninja.egg82.exceptionHandlers.builders.RollbarBuilder;
 import ninja.egg82.patterns.ServiceLocator;
-import ninja.egg82.patterns.registries.IVariableRegistry;
+import ninja.egg82.plugin.enums.SenderType;
 import ninja.egg82.plugin.messaging.IMessageHandler;
 import ninja.egg82.plugin.utils.PluginReflectUtil;
 import ninja.egg82.sql.ISQL;
-import ninja.egg82.utils.FileUtil;
 import ninja.egg82.utils.ThreadUtil;
 import ninja.egg82.utils.TimeUtil;
 import redis.clients.jedis.Jedis;
@@ -81,18 +79,18 @@ public class AntiVPN extends BasePlugin {
 		PluginReflectUtil.addServicesFromPackage("me.egg82.avpn.registries", true);
 		PluginReflectUtil.addServicesFromPackage("me.egg82.avpn.lists", true);
 		
-		ServiceLocator.getService(ConfigRegistry.class).load(YamlUtil.getOrLoadDefaults(getDataFolder().getAbsolutePath() + FileUtil.DIRECTORY_SEPARATOR_CHAR + "config.yml", "config.yml", true));
-		IVariableRegistry<String> configRegistry = ServiceLocator.getService(ConfigRegistry.class);
-		IVariableRegistry<String> coreRegistry = ServiceLocator.getService(CoreConfigRegistry.class);
-		for (String key : configRegistry.getKeys()) {
-			coreRegistry.setRegister(key, configRegistry.getRegister(key));
-		}
+		Configuration config = ConfigLoader.getConfig("config.yml", "config.yml");
 		
-		Config.debug = ServiceLocator.getService(ConfigRegistry.class).getRegister("debug", Boolean.class).booleanValue();
+		Config.debug = config.getNode("debug").getBoolean();
 		if (Config.debug) {
 			ServiceLocator.getService(IDebugPrinter.class).printInfo("Debug enabled");
 		}
-		String[] sources = ServiceLocator.getService(ConfigRegistry.class).getRegister("sources.order", String.class).split(",\\s?");
+		List<String> sources = null;
+		try {
+			sources = config.getNode("sources", "order").getList(TypeToken.of(String.class));
+		} catch (Exception ex) {
+			sources = new ArrayList<String>();
+		}
 		Set<String> sourcesOrdered = new LinkedHashSet<String>();
 		for (String source : sources) {
 			if (Config.debug) {
@@ -102,32 +100,29 @@ public class AntiVPN extends BasePlugin {
 		}
 		for (Iterator<String> i = sourcesOrdered.iterator(); i.hasNext();) {
 			String source = i.next();
-			if (!ServiceLocator.getService(ConfigRegistry.class).hasRegister("sources." + source + ".enabled")) {
-				if (Config.debug) {
-					ServiceLocator.getService(IDebugPrinter.class).printInfo(source + " does not have an \"enabled\" flag. Assuming disabled. Removing.");
-				}
-				i.remove();
-				continue;
-			}
-			if (!ServiceLocator.getService(ConfigRegistry.class).getRegister("sources." + source + ".enabled", Boolean.class).booleanValue()) {
+			if (!config.getNode("sources", source, "enabled").getBoolean()) {
 				if (Config.debug) {
 					ServiceLocator.getService(IDebugPrinter.class).printInfo(source + " is disabled. Removing.");
 				}
 				i.remove();
-				continue;
 			}
 		}
 		Config.sources = ImmutableSet.copyOf(sourcesOrdered);
-		Config.sourceCacheTime = TimeUtil.getTime(ServiceLocator.getService(ConfigRegistry.class).getRegister("sources.cacheTime", String.class));
+		try {
+			Config.ignore = ImmutableSet.copyOf(config.getNode("ignore").getList(TypeToken.of(String.class)));
+		} catch (Exception ex) {
+			Config.ignore = ImmutableSet.of();
+		}
+		Config.sourceCacheTime = TimeUtil.getTime(config.getNode("sources", "cacheTime").getString("6hours"));
 		if (Config.debug) {
 			ServiceLocator.getService(IDebugPrinter.class).printInfo("Source cache time: " + TimeUtil.timeToHoursMinsSecs(Config.sourceCacheTime));
 		}
-		Config.kickMessage = ServiceLocator.getService(ConfigRegistry.class).getRegister("kickMessage", String.class);
-		Config.async = ServiceLocator.getService(ConfigRegistry.class).getRegister("async", Boolean.class).booleanValue();
+		Config.kickMessage = config.getNode("kickMessage").getString("");
+		Config.async = config.getNode("async").getBoolean();
 		if (Config.debug) {
 			ServiceLocator.getService(IDebugPrinter.class).printInfo((Config.async) ? "Async enabled" : "Async disabled");
 		}
-		Config.kick = ServiceLocator.getService(ConfigRegistry.class).getRegister("kick", Boolean.class).booleanValue();
+		Config.kick = config.getNode("kick").getBoolean(true);
 		if (Config.debug) {
 			ServiceLocator.getService(IDebugPrinter.class).printInfo((Config.kick) ? "Set to kick" : "Set to API-only");
 		}
@@ -146,8 +141,8 @@ public class AntiVPN extends BasePlugin {
 		}
 		
 		Loaders.loadRedis();
-		Loaders.loadRabbit();
-		Loaders.loadStorage();
+		MessagingLoader.loadMessaging(getDescription().getName(), null, getServerId(), SenderType.PROXY);
+		Loaders.loadStorage(getDescription().getName(), getClass().getClassLoader(), getDataFolder());
 		
 		numCommands = ServiceLocator.getService(CommandProcessor.class).addHandlersFromPackage("me.egg82.avpn.commands", PluginReflectUtil.getCommandMapFromPackage("me.egg82.avpn.commands", false, null, "Command"), false);
 		numEvents = ServiceLocator.getService(EventProcessor.class).addHandlersFromPackage("me.egg82.avpn.events");
@@ -258,10 +253,10 @@ public class AntiVPN extends BasePlugin {
 	};
 	
 	private void enableMessage() {
-		printInfo(ChatColor.AQUA + "AntiVPN enabled.");
-		printInfo(ChatColor.GREEN + "[Version " + getDescription().getVersion() + "] " + ChatColor.RED + numCommands + " commands " + ChatColor.LIGHT_PURPLE + numEvents + " events " + ChatColor.BLUE + numMessages + " message handlers");
+		printInfo(ChatColor.GREEN + "Enabled.");
+		printInfo(ChatColor.AQUA + "[Version " + getDescription().getVersion() + "] " + ChatColor.DARK_GREEN + numCommands + " commands " + ChatColor.LIGHT_PURPLE + numEvents + " events " + ChatColor.BLUE + numMessages + " message handlers");
 	}
 	private void disableMessage() {
-		printInfo(ChatColor.GREEN + "--== " + ChatColor.LIGHT_PURPLE + "AntiVPN Disabled" + ChatColor.GREEN + " ==--");
+		printInfo(ChatColor.RED + "Disabled");
 	}
 }

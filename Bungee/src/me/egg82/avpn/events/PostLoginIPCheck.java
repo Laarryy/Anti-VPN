@@ -14,12 +14,12 @@ import ninja.egg82.patterns.ServiceLocator;
 import ninja.egg82.plugin.handlers.events.async.LowAsyncEventHandler;
 import ninja.egg82.utils.ThreadUtil;
 
-public class PlayerJoinIPCheck extends LowAsyncEventHandler<PostLoginEvent> {
+public class PostLoginIPCheck extends LowAsyncEventHandler<PostLoginEvent> {
 	//vars
 	private VPNAPI api = VPNAPI.getInstance();
 	
 	//constructor
-	public PlayerJoinIPCheck() {
+	public PostLoginIPCheck() {
 		super();
 	}
 	
@@ -44,6 +44,13 @@ public class PlayerJoinIPCheck extends LowAsyncEventHandler<PostLoginEvent> {
 		String ip = getIp(event.getPlayer());
 		
 		if (ip == null || ip.isEmpty()) {
+			return;
+		}
+		
+		if (Config.ignore.contains(ip)) {
+			if (Config.debug) {
+				ServiceLocator.getService(IDebugPrinter.class).printInfo(event.getPlayer().getName() + " is using an ignored ip \"" + ip + "\". Ignoring.");
+			}
 			return;
 		}
 		

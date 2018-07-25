@@ -6,7 +6,7 @@ import java.util.Optional;
 
 import org.json.simple.JSONObject;
 
-import me.egg82.avpn.registries.CoreConfigRegistry;
+import me.egg82.avpn.Configuration;
 import me.egg82.avpn.utils.WebUtil;
 import ninja.egg82.patterns.ServiceLocator;
 
@@ -23,12 +23,12 @@ public class IPHubAPI implements IFetchAPI {
 		return "iphub";
 	}
 	public Optional<Boolean> getResult(String ip) {
-		String key = ServiceLocator.getService(CoreConfigRegistry.class).getRegister("sources.iphub.key", String.class);
+		String key = ServiceLocator.getService(Configuration.class).getNode("sources", "iphub", "key").getString();
 		if (key == null || key.isEmpty()) {
 			return Optional.empty();
 		}
 		
-		int blockType = ServiceLocator.getService(CoreConfigRegistry.class).getRegister("sources.iphub.block", Number.class).intValue();
+		int blockType = ServiceLocator.getService(Configuration.class).getNode("sources", "iphub", "block").getInt(1);
 		
 		Map<String, String> headers = new HashMap<String, String>();
 		headers.put("X-Key", key);

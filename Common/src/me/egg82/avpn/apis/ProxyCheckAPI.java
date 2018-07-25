@@ -4,7 +4,7 @@ import java.util.Optional;
 
 import org.json.simple.JSONObject;
 
-import me.egg82.avpn.registries.CoreConfigRegistry;
+import me.egg82.avpn.Configuration;
 import me.egg82.avpn.utils.WebUtil;
 import ninja.egg82.patterns.ServiceLocator;
 
@@ -21,7 +21,7 @@ public class ProxyCheckAPI implements IFetchAPI {
 		return "proxycheck";
 	}
 	public Optional<Boolean> getResult(String ip) {
-		String key = ServiceLocator.getService(CoreConfigRegistry.class).getRegister("sources.proxycheck.key", String.class);
+		String key = ServiceLocator.getService(Configuration.class).getNode("sources", "proxycheck", "key").getString();
 		
 		JSONObject json = WebUtil.getJson("https://proxycheck.io/v2/" + ip + "?vpn=1" + ((key != null && !key.isEmpty()) ? "&key=" + key : ""));
 		if (json == null) {

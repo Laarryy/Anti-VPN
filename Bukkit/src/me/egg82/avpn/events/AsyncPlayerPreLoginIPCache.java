@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 
+import me.egg82.avpn.Config;
 import me.egg82.avpn.VPNAPI;
 import me.egg82.avpn.registries.UUIDIPRegistry;
 import ninja.egg82.patterns.ServiceLocator;
@@ -35,6 +36,10 @@ public class AsyncPlayerPreLoginIPCache extends EventHandler<AsyncPlayerPreLogin
 		}
 		
 		uuidIpRegistry.setRegister(event.getUniqueId(), ip);
+		
+		if (Config.ignore.contains(ip)) {
+			return;
+		}
 		
 		api.isVPN(ip, true); // Calling this will cache the result internally, even if the value is unused
 	}

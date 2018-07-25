@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <artifactId>AntiVPN-Bukkit</artifactId>
-  <version>2.1.5</version>
+  <version>2.1.6</version>
   <name>AntiVPN</name>
   <build>
     <sourceDirectory>src</sourceDirectory>
@@ -42,31 +42,124 @@
                     <exclude>**/*.txt</exclude>
                     <exclude>junit/**</exclude>
                     <exclude>org/junit/**</exclude>
-					<exclude>org/hamcrest/**</exclude>
+                    <exclude>org/hamcrest/**</exclude>
+                    <exclude>edu/umd/cs/findbugs/**</exclude>
+                    <exclude>org/checkerframework/**</exclude>
+                    <exclude>afu/**</exclude>
+                    <exclude>com/google/common/**</exclude>
+                    <exclude>org/codehaus/mojo/animal_sniffer/**</exclude>
+                    <exclude>org/apache/commons/codec/**</exclude>
+                    <exclude>org/apache/commons/io/**</exclude>
+                    <exclude>org/apache/commons/lang/**</exclude>
+                    <exclude>org/apache/commons/lang3/**</exclude>
+                    <exclude>org/json/simple/**</exclude>
+                    <exclude>org/yaml/**</exclude>
+                  </excludes>
+                </filter>
+                <filter>
+                  <!-- 1.11 compatibility -->
+                  <artifact>ninja.egg82.lib:*</artifact>
+                  <excludes>
+                    <exclude>org/reflections/**</exclude>
+                  </excludes>
+                </filter>
+                <filter>
+                  <!-- 1.11 compatibility -->
+                  <artifact>ninja.egg82.plugins:AntiVPN</artifact>
+                  <excludes>
+                    <exclude>org/reflections/**</exclude>
                   </excludes>
                 </filter>
               </filters>
               <minimizeJar>false</minimizeJar>
               <relocations>
                 <relocation>
+                  <pattern>com.github</pattern>
+                  <shadedPattern>me.egg82.avpn.extern.com.github</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>com.google</pattern>
+                  <shadedPattern>me.egg82.avpn.extern.com.google</shadedPattern>
+                  <excludes>
+                    <exclude>com.google.common.*</exclude>
+                  </excludes>
+                </relocation>
+                <relocation>
+                  <pattern>com.googlecode</pattern>
+                  <shadedPattern>me.egg82.avpn.extern.com.googlecode</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>com.rabbitmq</pattern>
+                  <shadedPattern>me.egg82.avpn.extern.com.rabbitmq</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>com.rollbar</pattern>
+                  <shadedPattern>me.egg82.avpn.extern.com.rollbar</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>com.zaxxer</pattern>
+                  <shadedPattern>me.egg82.avpn.extern.com.zaxxer</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>it.unimi</pattern>
+                  <shadedPattern>me.egg82.avpn.extern.it.unimi</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>javassist</pattern>
+                  <shadedPattern>me.egg82.avpn.extern.javassist</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>javax.annotation</pattern>
+                  <shadedPattern>me.egg82.avpn.extern.javax.annotation</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>net.jodah</pattern>
+                  <shadedPattern>me.egg82.avpn.extern.net.jodah</shadedPattern>
+                </relocation>
+                <relocation>
+                  <!-- 1.11 compatibility -->
+                  <pattern>net.jcip</pattern>
+                  <shadedPattern>me.egg82.avpn.extern.net.jcip</shadedPattern>
+                </relocation>
+                <relocation>
                   <pattern>ninja.egg82</pattern>
                   <shadedPattern>me.egg82.avpn.lib.ninja.egg82</shadedPattern>
                 </relocation>
                 <relocation>
-                  <pattern>me.egg82.extern</pattern>
-                  <shadedPattern>me.egg82.avpn.extern</shadedPattern>
-                </relocation>
-                <relocation>
-                  <pattern>redis.clients</pattern>
-                  <shadedPattern>me.egg82.avpn.extern.redis.clients</shadedPattern>
+                  <pattern>ninja.leaping</pattern>
+                  <shadedPattern>me.egg82.avpn.extern.ninja.leaping</shadedPattern>
                 </relocation>
                 <relocation>
                   <pattern>org.apache.commons</pattern>
                   <shadedPattern>me.egg82.avpn.extern.org.apache.commons</shadedPattern>
+                  <excludes>
+                    <exclude>org.apache.commons.codec.*</exclude>
+                    <exclude>org.apache.commons.io.*</exclude>
+                    <exclude>org.apache.commons.lang.*</exclude>
+                    <exclude>org.apache.commons.lang3.*</exclude>
+                  </excludes>
                 </relocation>
                 <relocation>
-                  <pattern>org.json.simple</pattern>
-                  <shadedPattern>me.egg82.avpn.extern.org.json.simple</shadedPattern>
+                  <pattern>org.bouncycastle</pattern>
+                  <shadedPattern>me.egg82.avpn.extern.org.bouncycastle</shadedPattern>
+                  <excludes>
+                    <exclude>org.bouncycastle.x509.*</exclude>
+                  </excludes>
+                </relocation>
+                <relocation>
+                  <pattern>org.json</pattern>
+                  <shadedPattern>me.egg82.avpn.extern.org.json</shadedPattern>
+                  <excludes>
+                    <exclude>org.json.simple.*</exclude>
+                  </excludes>
+                </relocation>
+                <relocation>
+                  <pattern>org.reflections</pattern>
+                  <shadedPattern>me.egg82.avpn.extern.org.reflections</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>redis.clients</pattern>
+                  <shadedPattern>me.egg82.avpn.extern.redis.clients</shadedPattern>
                 </relocation>
               </relocations>
             </configuration>
@@ -84,6 +177,10 @@
       <id>egg82-ninja</id>
       <url>https://www.myget.org/F/egg82-java/maven/</url>
     </repository>
+    <repository>
+      <id>sponge</id>
+      <url>https://repo.spongepowered.org/maven/</url>
+    </repository>
   </repositories>
   <dependencies>
     <!-- <dependency>
@@ -95,71 +192,81 @@
     <dependency>
       <groupId>org.bukkit</groupId>
       <artifactId>bukkit</artifactId>
-      <version>1.13-pre5-R0.1-SNAPSHOT</version>
+      <version>1.13-pre7-R0.1-SNAPSHOT</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>ninja.egg82.plugins</groupId>
       <artifactId>AntiVPN</artifactId>
-      <version>2.1.5</version>
+      <version>2.1.6</version>
     </dependency>
     <dependency>
       <groupId>ninja.egg82.lib</groupId>
-      <artifactId>bukkit</artifactId>
-      <version>1.1.10</version>
+      <artifactId>bukkit-1.12</artifactId>
+      <version>1.1.12</version>
+    </dependency>
+    <dependency>
+      <groupId>ninja.egg82.lib</groupId>
+      <artifactId>bukkit-1.13</artifactId>
+      <version>1.1.12</version>
     </dependency>
     <dependency>
       <groupId>ninja.egg82.lib</groupId>
       <artifactId>plugin-common</artifactId>
-      <version>1.0.6</version>
+      <version>1.0.8</version>
       <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.spongepowered</groupId>
+      <artifactId>configurate-yaml</artifactId>
+      <version>3.5</version>
     </dependency>
     <dependency>
       <groupId>ninja.egg82.lib</groupId>
       <artifactId>sql-lib</artifactId>
-      <version>2.0.8</version>
+      <version>2.0.9</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>ninja.egg82.lib</groupId>
       <artifactId>extended-sql-lib</artifactId>
-      <version>1.0.6</version>
+      <version>1.0.7</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>ninja.egg82.lib</groupId>
       <artifactId>exception-lib</artifactId>
-      <version>2.0.7</version>
+      <version>2.0.8</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>ninja.egg82.lib</groupId>
       <artifactId>util-lib</artifactId>
-      <version>1.1.1</version>
+      <version>1.1.2</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>ninja.egg82.lib</groupId>
       <artifactId>collections-lib</artifactId>
-      <version>1.2.1</version>
+      <version>1.2.2</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>ninja.egg82.lib</groupId>
       <artifactId>extended-collections-lib</artifactId>
-      <version>1.0.3</version>
+      <version>1.0.4</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>ninja.egg82.lib</groupId>
       <artifactId>service-lib</artifactId>
-      <version>1.0.1</version>
+      <version>1.0.2</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>ninja.egg82.lib</groupId>
       <artifactId>threading-lib</artifactId>
-      <version>1.0.2</version>
+      <version>1.0.3</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -167,6 +274,12 @@
       <artifactId>jedis</artifactId>
       <version>2.9.0</version>
       <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <!-- 1.11 compatibility -->
+      <groupId>org.reflections</groupId>
+      <artifactId>reflections</artifactId>
+      <version>0.9.10</version>
     </dependency>
   </dependencies>
   <description>AntiVPN for Bukkit/Spigot</description>

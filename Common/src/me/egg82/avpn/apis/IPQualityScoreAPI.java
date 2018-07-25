@@ -4,7 +4,7 @@ import java.util.Optional;
 
 import org.json.simple.JSONObject;
 
-import me.egg82.avpn.registries.CoreConfigRegistry;
+import me.egg82.avpn.Configuration;
 import me.egg82.avpn.utils.WebUtil;
 import ninja.egg82.patterns.ServiceLocator;
 
@@ -21,7 +21,7 @@ public class IPQualityScoreAPI implements IFetchAPI {
 		return "ipqualityscore";
 	}
 	public Optional<Boolean> getResult(String ip) {
-		String key = ServiceLocator.getService(CoreConfigRegistry.class).getRegister("sources.ipqualityscore.key", String.class);
+		String key = ServiceLocator.getService(Configuration.class).getNode("sources", "ipqualityscore", "key").getString();
 		if (key == null || key.isEmpty()) {
 			return Optional.empty();
 		}
@@ -53,7 +53,7 @@ public class IPQualityScoreAPI implements IFetchAPI {
 			return Optional.empty();
 		}
 		
-		return Optional.of((retVal >= ServiceLocator.getService(CoreConfigRegistry.class).getRegister("sources.ipqualityscore.threshold", Number.class).doubleValue()) ? Boolean.TRUE : Boolean.FALSE);
+		return Optional.of((retVal >= ServiceLocator.getService(Configuration.class).getNode("sources", "ipqualityscore", "threshold").getDouble()) ? Boolean.TRUE : Boolean.FALSE);
 	}
 	
 	//private

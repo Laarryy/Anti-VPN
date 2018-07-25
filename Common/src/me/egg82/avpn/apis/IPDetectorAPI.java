@@ -6,7 +6,7 @@ import java.util.Optional;
 
 import org.json.simple.JSONObject;
 
-import me.egg82.avpn.registries.CoreConfigRegistry;
+import me.egg82.avpn.Configuration;
 import me.egg82.avpn.utils.WebUtil;
 import ninja.egg82.patterns.ServiceLocator;
 
@@ -23,7 +23,7 @@ public class IPDetectorAPI implements IFetchAPI {
 		return "ipdetector";
 	}
 	public Optional<Boolean> getResult(String ip) {
-		String key = ServiceLocator.getService(CoreConfigRegistry.class).getRegister("sources.ipdetector.key", String.class);
+		String key = ServiceLocator.getService(Configuration.class).getNode("sources", "ipdetector", "key").getString();
 		if (key == null || key.isEmpty()) {
 			return Optional.empty();
 		}

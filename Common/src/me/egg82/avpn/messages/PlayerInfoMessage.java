@@ -22,7 +22,7 @@ public class PlayerInfoMessage extends AsyncMessageHandler {
 	//private
 	@SuppressWarnings("resource")
 	protected void onExecute(long elapsedMilliseconds) {
-		if (!channelName.equals("AntiVPNIPInfo")) {
+		if (!channelName.equals("anti-vpn-ip-info")) {
 			return;
 		}
 		

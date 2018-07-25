@@ -5,6 +5,7 @@ import java.io.DataOutputStream;
 
 import ninja.egg82.exceptionHandlers.IExceptionHandler;
 import ninja.egg82.patterns.ServiceLocator;
+import ninja.egg82.plugin.messaging.IMessageHandler;
 import ninja.egg82.plugin.utils.ChannelUtil;
 
 public class IPChannelUtil {
@@ -20,6 +21,9 @@ public class IPChannelUtil {
 		if (ip == null) {
 			throw new IllegalArgumentException("ip cannot be null.");
 		}
+		if (ServiceLocator.getService(IMessageHandler.class) == null) {
+			return;
+		}
 		
 		ByteArrayOutputStream stream = new ByteArrayOutputStream();
 		DataOutputStream out = new DataOutputStream(stream);
@@ -34,8 +38,8 @@ public class IPChannelUtil {
 			return;
 		}
 		
-		ChannelUtil.broadcastToProxies("AntiVPNIPInfo", stream.toByteArray());
-		ChannelUtil.broadcastToServers("AntiVPNIPInfo", stream.toByteArray());
+		ChannelUtil.broadcastToProxies("anti-vpn-ip-info", stream.toByteArray());
+		ChannelUtil.broadcastToServers("anti-vpn-ip-info", stream.toByteArray());
 	}
 	
 	//private

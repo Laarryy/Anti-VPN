@@ -3,11 +3,10 @@ package me.egg82.avpn.sql.mysql;
 import java.util.UUID;
 import java.util.function.BiConsumer;
 
-import me.egg82.avpn.registries.CoreConfigRegistry;
+import me.egg82.avpn.Configuration;
 import ninja.egg82.events.SQLEventArgs;
 import ninja.egg82.exceptionHandlers.IExceptionHandler;
 import ninja.egg82.patterns.ServiceLocator;
-import ninja.egg82.patterns.registries.IVariableRegistry;
 import ninja.egg82.patterns.Command;
 import ninja.egg82.sql.ISQL;
 
@@ -35,9 +34,9 @@ public class CreateTablesMySQLCommand extends Command {
 	
 	//private
 	protected void onExecute(long elapsedMilliseconds) {
-		IVariableRegistry<String> configRegistry = ServiceLocator.getService(CoreConfigRegistry.class);
-		mainQuery = sql.query("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema=? AND table_name='antivpn';", configRegistry.getRegister("sql.mysql.database", String.class));
-		queueQuery = sql.query("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema=? AND table_name='antivpn_queue';", configRegistry.getRegister("sql.mysql.database", String.class));
+		Configuration config = ServiceLocator.getService(Configuration.class);
+		mainQuery = sql.query("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema=? AND table_name='antivpn';", config.getNode("sql", "mysql", "database").getString());
+		queueQuery = sql.query("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema=? AND table_name='antivpn_queue';", config.getNode("sql", "mysql", "database").getString());
 	}
 	private void onSQLData(SQLEventArgs e) {
 		if (e.getUuid().equals(mainQuery)) {

@@ -51,6 +51,13 @@ public class PlayerLoginIPCheck extends LowEventHandler<PlayerLoginEvent> {
 			return;
 		}
 		
+		if (Config.ignore.contains(ip)) {
+			if (Config.debug) {
+				ServiceLocator.getService(IDebugPrinter.class).printInfo(event.getPlayer().getName() + " is using an ignored ip \"" + ip + "\". Ignoring.");
+			}
+			return;
+		}
+		
 		if (Config.async) {
 			ThreadUtil.submit(new Runnable() {
 				public void run() {
