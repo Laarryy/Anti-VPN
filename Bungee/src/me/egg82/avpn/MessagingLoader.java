@@ -59,7 +59,7 @@ public class MessagingLoader {
 			}
 		}
 		
-		ServiceLocator.getService(IMessageHandler.class).createChannel("anti-vpn-ip-info");
+		ServiceLocator.getService(IMessageHandler.class).createChannel("avpn-ip-info");
 	}
 	
 	//private

@@ -38,8 +38,8 @@ public class IPChannelUtil {
 			return;
 		}
 		
-		ChannelUtil.broadcastToProxies("anti-vpn-ip-info", stream.toByteArray());
-		ChannelUtil.broadcastToServers("anti-vpn-ip-info", stream.toByteArray());
+		ChannelUtil.broadcastToProxies("avpn-ip-info", stream.toByteArray());
+		ChannelUtil.broadcastToServers("avpn-ip-info", stream.toByteArray());
 	}
 	
 	//private
