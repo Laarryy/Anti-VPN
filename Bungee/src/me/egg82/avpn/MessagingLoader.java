@@ -28,7 +28,7 @@ public class MessagingLoader {
 			throw new IllegalArgumentException("serverId cannot be empty.");
 		}
 		
-		if (serverName == null || serverName.isEmpty() || serverName.equalsIgnoreCase("unknown") || serverName.equalsIgnoreCase("unconfigured") || serverName.equalsIgnoreCase("unnamed") || serverName.equalsIgnoreCase("default")) {
+		if (serverName == null || serverName.isEmpty() || serverName.equalsIgnoreCase("unknown") || serverName.equalsIgnoreCase("unknown server") || serverName.equalsIgnoreCase("unconfigured") || serverName.equalsIgnoreCase("unnamed") || serverName.equalsIgnoreCase("default")) {
 			serverName = null;
 		}
 		
