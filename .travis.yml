@@ -1,1 +1,9 @@
 language: java
+deploy:
+  provider: releases
+  api_key:
+    secure: HeAIyyATXYVZXEuV6SMZp7hu9sp3mQyedi17cIBdOHXXR1ngG0inoTN70d3NHdOQmHv9SZMBKt83jIemAcE6hVTfAgVBZ9VjxgFIuSRKbrXYYlM05cPW8l/rUCzLXDjtHKODuPoZ70HISxShFnZJu30bg0RPVx+m+L/ioKxDmbHixWGFFe6UlKN5+V5y5Ndniv9H9ZryQSMIKPpMh+87taHCo0VGaDrdDcQJrwNYI7/IvRc3CInO6ccIShxaXRkSW5TXEcyjZNtvmSqGSQue1IwVYS4oqNAeWAmcxmpEOUCEgsjBR2DAI5RYyALFZ1ZCiumIdv2KpGAyQyqo+Ztg92R8oXSO1oz8D1XG10LHUo/bvocHwhi8opS+Scqxz4t/iOW7XOAtrBw0y18iNV81FCHr1fZ+QEN3pmH49zhrP4ZsaRUuDCWtELmMh4TtmxVx27hOiw0vwL1CmyRf4kGphSw+/znleChdbLCUYO6rUC77axKDrOkccey8/LhVK95hIoArXMzdzQY9b6DElzBCrDkUu3GIFxFSVQNFB2NdngvJLmTQMbSnTXh1l5/G8Ciy16HT0M0OpvvVDN83bZV5bgUXS6/aqch71UYpLtnt4t12wlZ3MvTS0/mx2O6Z4sRBB3nU1sW7SjdW8WQy04Srv8H3I5F5Z/LV2WCvL/VGdVs=
+  file-glob: true
+  file: '*/target/AntiVPN-*.jar'
+  on:
+    repo: egg82/AntiVPN
