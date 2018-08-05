@@ -10,8 +10,8 @@ import me.egg82.avpn.core.UpdateEventArgs;
 import me.egg82.avpn.registries.IPRegistry;
 import me.egg82.avpn.sql.mysql.UpdateDataMySQLCommand;
 import me.egg82.avpn.sql.sqlite.UpdateDataSQLiteCommand;
+import ninja.egg82.analytics.exceptions.IExceptionHandler;
 import ninja.egg82.enums.BaseSQLType;
-import ninja.egg82.exceptionHandlers.IExceptionHandler;
 import ninja.egg82.patterns.ServiceLocator;
 import ninja.egg82.patterns.registries.IExpiringRegistry;
 import ninja.egg82.plugin.messaging.IMessageHandler;
@@ -121,7 +121,10 @@ public class IPCacheUtil {
 				try {
 					latch.await();
 				} catch (Exception ex) {
-					ServiceLocator.getService(IExceptionHandler.class).silentException(ex);
+					IExceptionHandler handler = ServiceLocator.getService(IExceptionHandler.class);
+					if (handler != null) {
+						handler.sendException(ex);
+					}
 					ex.printStackTrace();
 				}
 				

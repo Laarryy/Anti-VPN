@@ -7,7 +7,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.function.BiConsumer;
+import java.util.logging.Handler;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -21,16 +23,14 @@ import me.egg82.avpn.debug.IDebugPrinter;
 import me.egg82.avpn.sql.mysql.FetchQueueMySQLCommand;
 import me.egg82.avpn.sql.sqlite.ClearDataSQLiteCommand;
 import me.egg82.avpn.utils.RedisUtil;
+import ninja.egg82.analytics.exceptions.GameAnalyticsExceptionHandler;
+import ninja.egg82.analytics.exceptions.IExceptionHandler;
+import ninja.egg82.analytics.exceptions.RollbarExceptionHandler;
 import ninja.egg82.bukkit.BasePlugin;
 import ninja.egg82.bukkit.processors.CommandProcessor;
 import ninja.egg82.bukkit.processors.EventProcessor;
 import ninja.egg82.enums.BaseSQLType;
 import ninja.egg82.events.CompleteEventArgs;
-import ninja.egg82.exceptionHandlers.GameAnalyticsExceptionHandler;
-import ninja.egg82.exceptionHandlers.IExceptionHandler;
-import ninja.egg82.exceptionHandlers.RollbarExceptionHandler;
-import ninja.egg82.exceptionHandlers.builders.GameAnalyticsBuilder;
-import ninja.egg82.exceptionHandlers.builders.RollbarBuilder;
 import ninja.egg82.patterns.ServiceLocator;
 import ninja.egg82.plugin.enums.SenderType;
 import ninja.egg82.plugin.messaging.IMessageHandler;
@@ -55,16 +55,8 @@ public class AntiVPN extends BasePlugin {
 	public AntiVPN() {
 		super();
 		
-		getLogger().setLevel(Level.WARNING);
-		IExceptionHandler oldExceptionHandler = ServiceLocator.getService(IExceptionHandler.class);
-		ServiceLocator.removeServices(IExceptionHandler.class);
-		
-		ServiceLocator.provideService(RollbarExceptionHandler.class, false);
 		exceptionHandler = ServiceLocator.getService(IExceptionHandler.class);
-		oldExceptionHandler.disconnect();
-		exceptionHandler.connect(new RollbarBuilder("dccf7919d6204dfea740702ad41ee08c", "production", version, getServerId()), "AntiVPN");
-		exceptionHandler.setUnsentExceptions(oldExceptionHandler.getUnsentExceptions());
-		exceptionHandler.setUnsentLogs(oldExceptionHandler.getUnsentLogs());
+		getLogger().setLevel(Level.WARNING);
 	}
 	
 	//public
@@ -128,6 +120,8 @@ public class AntiVPN extends BasePlugin {
 	public void onEnable() {
 		super.onEnable();
 		
+		swapExceptionHandlers(new RollbarExceptionHandler("dccf7919d6204dfea740702ad41ee08c", "production", version, getServerId(), getName()));
+		
 		List<IMessageHandler> services = ServiceLocator.removeServices(IMessageHandler.class);
 		for (IMessageHandler handler : services) {
 			try {
@@ -161,7 +155,9 @@ public class AntiVPN extends BasePlugin {
 		enableMessage();
 		
 		ThreadUtil.rename(getName());
-		ThreadUtil.schedule(checkExceptionLimitReached, 60L * 60L * 1000L);
+		if (exceptionHandler.hasLimit()) {
+			ThreadUtil.schedule(checkExceptionLimitReached, 2L * 60L * 1000L);
+		}
 		ThreadUtil.schedule(onFetchQueueThread, 10L * 1000L);
 	}
 	@SuppressWarnings("resource")
@@ -191,6 +187,8 @@ public class AntiVPN extends BasePlugin {
 		
 		ServiceLocator.getService(CommandProcessor.class).clear();
 		ServiceLocator.getService(EventProcessor.class).clear();
+		
+		exceptionHandler.close();
 		
 		disableMessage();
 	}
@@ -226,7 +224,10 @@ public class AntiVPN extends BasePlugin {
 			try {
 				latch.await();
 			} catch (Exception ex) {
-				ServiceLocator.getService(IExceptionHandler.class).silentException(ex);
+				IExceptionHandler handler = ServiceLocator.getService(IExceptionHandler.class);
+				if (handler != null) {
+					handler.sendException(ex);
+				}
 			}
 			
 			ThreadUtil.schedule(onFetchQueueThread, 10L * 1000L);
@@ -235,20 +236,35 @@ public class AntiVPN extends BasePlugin {
 	private Runnable checkExceptionLimitReached = new Runnable() {
 		public void run() {
 			if (exceptionHandler.isLimitReached()) {
-				IExceptionHandler oldExceptionHandler = ServiceLocator.getService(IExceptionHandler.class);
-				ServiceLocator.removeServices(IExceptionHandler.class);
-				
-				ServiceLocator.provideService(GameAnalyticsExceptionHandler.class, false);
-				exceptionHandler = ServiceLocator.getService(IExceptionHandler.class);
-				oldExceptionHandler.disconnect();
-				exceptionHandler.connect(new GameAnalyticsBuilder("10b55aa4f41d64ff258f9c66a5fbf9ec", "3794acfebab1122e852d73bbf505c37f42bf3f41", version, getServerId()), getName());
-				exceptionHandler.setUnsentExceptions(oldExceptionHandler.getUnsentExceptions());
-				exceptionHandler.setUnsentLogs(oldExceptionHandler.getUnsentLogs());
+				swapExceptionHandlers(new GameAnalyticsExceptionHandler("10b55aa4f41d64ff258f9c66a5fbf9ec", "3794acfebab1122e852d73bbf505c37f42bf3f41", version, getServerId(), getName()));
 			}
 			
-			ThreadUtil.schedule(checkExceptionLimitReached, 60L * 60L * 1000L);
+			if (exceptionHandler.hasLimit()) {
+				ThreadUtil.schedule(checkExceptionLimitReached, 10L * 60L * 1000L);
+			}
 		}
 	};
+	
+	private void swapExceptionHandlers(IExceptionHandler newHandler) {
+		List<IExceptionHandler> oldHandlers = ServiceLocator.removeServices(IExceptionHandler.class);
+		
+		exceptionHandler = newHandler;
+		ServiceLocator.provideService(exceptionHandler);
+		
+		Logger logger = getLogger();
+		if (exceptionHandler instanceof Handler) {
+			logger.addHandler((Handler) exceptionHandler);
+		}
+		
+		for (IExceptionHandler handler : oldHandlers) {
+			if (handler instanceof Handler) {
+				logger.removeHandler((Handler) handler);
+			}
+			
+			handler.close();
+			exceptionHandler.addLogs(handler.getUnsentLogs());
+		}
+	}
 	
 	private void enableMessage() {
 		printInfo(ChatColor.GREEN + "Enabled.");

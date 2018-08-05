@@ -3,7 +3,7 @@ package me.egg82.avpn.utils;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 
-import ninja.egg82.exceptionHandlers.IExceptionHandler;
+import ninja.egg82.analytics.exceptions.IExceptionHandler;
 import ninja.egg82.patterns.ServiceLocator;
 import ninja.egg82.plugin.messaging.IMessageHandler;
 import ninja.egg82.plugin.utils.ChannelUtil;
@@ -33,7 +33,10 @@ public class IPChannelUtil {
 			out.writeBoolean(value);
 			out.writeLong(created);
 		} catch (Exception ex) {
-			ServiceLocator.getService(IExceptionHandler.class).silentException(ex);
+			IExceptionHandler handler = ServiceLocator.getService(IExceptionHandler.class);
+			if (handler != null) {
+				handler.sendException(ex);
+			}
 			ex.printStackTrace();
 			return;
 		}

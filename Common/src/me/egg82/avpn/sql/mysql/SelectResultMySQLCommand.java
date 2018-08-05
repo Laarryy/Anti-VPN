@@ -6,8 +6,8 @@ import java.util.function.BiConsumer;
 
 import me.egg82.avpn.Config;
 import me.egg82.avpn.core.ResultEventArgs;
+import ninja.egg82.analytics.exceptions.IExceptionHandler;
 import ninja.egg82.events.SQLEventArgs;
-import ninja.egg82.exceptionHandlers.IExceptionHandler;
 import ninja.egg82.patterns.ServiceLocator;
 import ninja.egg82.patterns.events.EventHandler;
 import ninja.egg82.patterns.Command;
@@ -61,7 +61,10 @@ public class SelectResultMySQLCommand extends Command {
 					// Add new data
 					retVal = new ResultEventArgs(ip, value, created);
 				} catch (Exception ex) {
-					ServiceLocator.getService(IExceptionHandler.class).silentException(ex);
+					IExceptionHandler handler = ServiceLocator.getService(IExceptionHandler.class);
+					if (handler != null) {
+						handler.sendException(ex);
+					}
 					ex.printStackTrace();
 					lastEx = ex;
 				}
@@ -86,7 +89,10 @@ public class SelectResultMySQLCommand extends Command {
 			return;
 		}
 		
-		ServiceLocator.getService(IExceptionHandler.class).silentException(e.getSQLError().ex);
+		IExceptionHandler handler = ServiceLocator.getService(IExceptionHandler.class);
+		if (handler != null) {
+			handler.sendException(e.getSQLError().ex);
+		}
 		// Wrap in a new exception and print to console. We wrap so we know where the error actually comes from
 		new Exception(e.getSQLError().ex).printStackTrace();
 		

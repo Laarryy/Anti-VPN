@@ -4,7 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 
 import me.egg82.avpn.utils.IPCacheUtil;
-import ninja.egg82.exceptionHandlers.IExceptionHandler;
+import ninja.egg82.analytics.exceptions.IExceptionHandler;
 import ninja.egg82.patterns.ServiceLocator;
 import ninja.egg82.plugin.handlers.async.AsyncMessageHandler;
 import ninja.egg82.plugin.messaging.IMessageHandler;
@@ -43,7 +43,10 @@ public class PlayerInfoMessage extends AsyncMessageHandler {
 			value = in.readBoolean();
 			created = in.readLong();
 		} catch (Exception ex) {
-			ServiceLocator.getService(IExceptionHandler.class).silentException(ex);
+			IExceptionHandler handler = ServiceLocator.getService(IExceptionHandler.class);
+			if (handler != null) {
+				handler.sendException(ex);
+			}
 			ex.printStackTrace();
 			throw new RuntimeException(ex);
 		}

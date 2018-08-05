@@ -4,10 +4,10 @@ import java.util.UUID;
 import java.util.function.BiConsumer;
 
 import me.egg82.avpn.Config;
+import ninja.egg82.analytics.exceptions.IExceptionHandler;
 import ninja.egg82.enums.BaseSQLType;
 import ninja.egg82.events.CompleteEventArgs;
 import ninja.egg82.events.SQLEventArgs;
-import ninja.egg82.exceptionHandlers.IExceptionHandler;
 import ninja.egg82.patterns.ServiceLocator;
 import ninja.egg82.patterns.Command;
 import ninja.egg82.sql.ISQL;
@@ -56,7 +56,10 @@ public class ClearDataSQLiteCommand extends Command {
 			return;
 		}
 		
-		ServiceLocator.getService(IExceptionHandler.class).silentException(e.getSQLError().ex);
+		IExceptionHandler handler = ServiceLocator.getService(IExceptionHandler.class);
+		if (handler != null) {
+			handler.sendException(e.getSQLError().ex);
+		}
 		// Wrap in a new exception and print to console. We wrap so we know where the error actually comes from
 		new Exception(e.getSQLError().ex).printStackTrace();
 		

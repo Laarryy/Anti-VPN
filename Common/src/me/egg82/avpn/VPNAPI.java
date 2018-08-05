@@ -15,8 +15,8 @@ import me.egg82.avpn.sql.sqlite.SelectResultSQLiteCommand;
 import me.egg82.avpn.utils.IPCacheUtil;
 import me.egg82.avpn.utils.RedisUtil;
 import me.egg82.avpn.utils.ValidationUtil;
+import ninja.egg82.analytics.exceptions.IExceptionHandler;
 import ninja.egg82.enums.BaseSQLType;
-import ninja.egg82.exceptionHandlers.IExceptionHandler;
 import ninja.egg82.patterns.ServiceLocator;
 import ninja.egg82.patterns.registries.IExpiringRegistry;
 import ninja.egg82.patterns.registries.IRegistry;
@@ -39,7 +39,10 @@ public class VPNAPI {
 				IFetchAPI api = clazz.newInstance();
 				apis.setRegister(api.getName(), api);
 			} catch (Exception ex) {
-				ServiceLocator.getService(IExceptionHandler.class).silentException(ex);
+				IExceptionHandler handler = ServiceLocator.getService(IExceptionHandler.class);
+				if (handler != null) {
+					handler.sendException(ex);
+				}
 				throw new RuntimeException("Cannot initialize API service.", ex);
 			}
 		}
@@ -129,7 +132,10 @@ public class VPNAPI {
 		try {
 			latch.await();
 		} catch (Exception ex) {
-			ServiceLocator.getService(IExceptionHandler.class).silentException(ex);
+			IExceptionHandler handler = ServiceLocator.getService(IExceptionHandler.class);
+			if (handler != null) {
+				handler.sendException(ex);
+			}
 			ex.printStackTrace();
 		}
 		
