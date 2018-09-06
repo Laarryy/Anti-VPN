@@ -1,6 +1,6 @@
 name: AntiVPN
 main: me.egg82.avpn.AntiVPN
-version: 2.1.9
+version: 2.1.10
 author: egg82
 api-version: 1.13
 description: Get the best; save money on overpriced plugins and block VPN users!
@@ -8,4 +8,12 @@ commands:
   avpnreload:
     description: Reloads the plugin
     usage: /avpnreload
+    permission: avpn.admin
+  avpntest:
+    description: Test an IP through the various (enabled) services. Note that this forces a check so will use credits every time it's run.
+    usage: /avpntest <ip>
+    permission: avpn.admin
+  avpnscore:
+    description: Scores a particular source based on a pre-made list of known good and bad IPs. Note that this forces a check so will use credits every time it's run.
+    usage: /avpnscore <source>
     permission: avpn.admin

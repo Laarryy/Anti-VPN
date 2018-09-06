@@ -1,9 +1,14 @@
 package me.egg82.avpn;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
+
+import com.google.common.collect.ImmutableMap;
 
 import me.egg82.avpn.apis.IFetchAPI;
 import me.egg82.avpn.core.ResultEventArgs;
@@ -51,6 +56,79 @@ public class VPNAPI {
 	//public
 	public static VPNAPI getInstance() {
 		return api;
+	}
+	
+	public ImmutableMap<String, Optional<Boolean>> test(String ip) {
+	    if (ip == null) {
+            throw new IllegalArgumentException("ip cannot be null.");
+        }
+        if (!ValidationUtil.isValidIp(ip)) {
+            return ImmutableMap.of();
+        }
+        
+        Map<String, Optional<Boolean>> retVal = new LinkedHashMap<String, Optional<Boolean>>();
+        
+        for (String source : Config.sources) {
+            IFetchAPI api = apis.getRegister(source);
+            if (api == null) {
+                if (Config.debug) {
+                    ServiceLocator.getService(IDebugPrinter.class).printInfo(source + " has a bad API.");
+                }
+                continue;
+            }
+            
+            retVal.put(source, api.getResult(ip));
+        }
+        
+        return ImmutableMap.copyOf(retVal);
+	}
+	
+	public double consensus(String ip) {
+	    if (ip == null) {
+            throw new IllegalArgumentException("ip cannot be null.");
+        }
+        if (!ValidationUtil.isValidIp(ip)) {
+            return 0.0d;
+        }
+        
+        double servicesCount = 0.0d;
+        double currentValue = 0.0d;
+        
+        for (String source : Config.sources) {
+            IFetchAPI api = apis.getRegister(source);
+            if (api == null) {
+                continue;
+            }
+            
+            Boolean bool = api.getResult(ip).orElse(null);
+            if (bool == null) {
+                continue;
+            }
+            
+            servicesCount++;
+            currentValue += (bool.booleanValue()) ? 1.0d : 0.0d;
+        }
+        
+        return currentValue / servicesCount;
+    }
+	
+	public Optional<Boolean> getResult(String ip, String sourceName) {
+	    if (ip == null) {
+            throw new IllegalArgumentException("ip cannot be null.");
+        }
+	    if (sourceName == null) {
+            throw new IllegalArgumentException("sourceName cannot be null.");
+        }
+	    if (!ValidationUtil.isValidIp(ip)) {
+            return Optional.empty();
+        }
+	    
+	    IFetchAPI api = apis.getRegister(sourceName);
+        if (api == null) {
+            return Optional.empty();
+        }
+        
+        return api.getResult(ip);
 	}
 	
 	public boolean isVPN(String ip) {

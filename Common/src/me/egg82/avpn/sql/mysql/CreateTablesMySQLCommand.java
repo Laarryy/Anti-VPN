@@ -63,8 +63,8 @@ public class CreateTablesMySQLCommand extends Command {
 				"CREATE TABLE `antivpn_queue` ("
 						+ "`ip` VARCHAR(45) NOT NULL,"
 						+ "`value` BOOLEAN NOT NULL,"
-						+ "`created` TIMESTAMP NOT NULL,"
-						+ "`updated` TIMESTAMP NOT NULL"
+						+ "`created` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,"
+						+ "`updated` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP"
 				+ ");"
 			);
 			finalQuery = sql.query("ALTER TABLE `antivpn_queue` ADD UNIQUE (`ip`);");

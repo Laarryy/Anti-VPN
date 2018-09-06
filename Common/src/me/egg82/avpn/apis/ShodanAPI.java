@@ -27,7 +27,7 @@ public class ShodanAPI implements IFetchAPI {
 			return Optional.empty();
 		}
 		
-		JSONObject json = WebUtil.getJson("https://api.shodan.io/shodan/host/" + ip + "?key=" + ip + key);
+		JSONObject json = WebUtil.getJson("https://api.shodan.io/shodan/host/" + ip + "?key=" + key);
 		if (json == null) {
 			return Optional.empty();
 		}

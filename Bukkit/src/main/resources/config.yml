@@ -36,7 +36,7 @@ redis:
 messaging:
   # The type of messaging to use
   # Values can be 'bungee' ('default') or 'rabbit'
-  # If 'default' or 'bungee' is selected, please be sure to use TC++ for BungeeCord!
+  # If 'default' or 'bungee' is selected, please be sure to use AntiVPN for BungeeCord!
   type: 'bungee'
   # Values to fill in if using Rabbit messaging
   rabbit:
@@ -53,15 +53,41 @@ sources:
   cacheTime: '6hours'
   # The order to try results in
   order:
+    - 'iphub'
+    - 'proxycheck'
     - 'getipintel'
     - 'ipqualityscore'
-    - 'proxycheck'
-    - 'iphub'
-    - 'vpnblocker'
     - 'ipdetector'
+    - 'vpnblocker'
     - 'shodan'
+  # https://iphub.info/
+  # Results updated Sep 6, 2018
+  # Error rate: 0%
+  # NordVPN detection rate: 90.48%
+  # Cryptostorm detection rate: 90%
+  # False-flagged homes: 20%
+  iphub:
+    enabled: false
+    # API key to use (Required for this service, free one available at https://iphub.info/apiKey/newFree )
+    key: ''
+    # The block type at which an IP is considered "bad"
+    block: 1
+  # https://proxycheck.io
+  # Results updated Sep 6, 2018
+  # Error rate: 5%
+  # NordVPN detection rate: 85.71%
+  # Cryptostorm detection rate: 94.74%
+  # False-flagged homes: 10%
+  proxycheck:
+    enabled: true
+    # Optional API key to use
+    key: ''
   # https://www.getipintel.net/
-  # Detected Nord VPN and Cryptostorm Jul 10, 2018
+  # Results updated Sep 6, 2018
+  # Error rate: 5%
+  # NordVPN detection rate: 90.48%
+  # Cryptostorm detection rate: 100%
+  # False-flagged homes: 40%
   getipintel:
     enabled: true
     # Contact e-mail in case things go wrong. Required
@@ -69,41 +95,40 @@ sources:
     # Threshold above which an IP is considered "bad"
     threshold: 0.98
   # https://www.ipqualityscore.com/
-  # Detected Nord VPN and Cryptostorm Jul 21, 2018
+  # Results updated Sep 6, 2018
+  # Error rate: 0%
+  # NordVPN detection rate: 90.48%
+  # Cryptostorm detection rate: 85%
+  # False-flagged homes: 40%
   ipqualityscore:
     enabled: false
     # API key to use (Required for this service, free one available at https://www.ipqualityscore.com/create-account )
     key: ''
     # Threshold above which an IP is considered "bad"
     threshold: 0.65
-  # https://proxycheck.io
-  # Detected Nord VPN and Cryptostorm Jul 10, 2018
-  proxycheck:
-    enabled: true
-    # Optional API key to use
-    key: ''
-  # https://iphub.info/
-  # Detected Nord VPN and Cryptostorm Jul 10, 2018
-  iphub:
-    enabled: false
-    # API key to use (Required for this service, free one available at https://iphub.info/apiKey/newFree )
-    key: ''
-    # The block type at which an IP is considered "bad"
-    block: 1
-  # https://vpnblocker.net/usage
-  # Detected Nord VPN, did not detect Cryptostorm Jul 10, 2018
-  vpnblocker:
-    enabled: true
-    # Optional API key to use
-    key: ''
   # https://ipdetector.info
-  # Detected Nord VPN, did not detect Cryptostorm Jul 10, 2018
+  # Error rate: 0%
+  # NordVPN detection rate: 61.9%
+  # Cryptostorm detection rate: 90%
+  # False-flagged homes: 0%
   ipdetector:
     enabled: true
     # Optional API key to use
     key: 'free'
+  # https://vpnblocker.net/usage
+  # Error rate: 0%
+  # NordVPN detection rate: 66.67%
+  # Cryptostorm detection rate: 70%
+  # False-flagged homes: 10%
+  vpnblocker:
+    enabled: true
+    # Optional API key to use
+    key: ''
   # https://www.shodan.io/
-  # WARNING: This service utilizes EXTREMELY primitive checks and can return incorrect results
+  # Error rate: 94.52%
+  # NordVPN detection rate: 89.47%
+  # Cryptostorm detection rate: 0%
+  # False-flagged homes: 0%
   shodan:
     enabled: false
     # API key to use (Required for this service)
