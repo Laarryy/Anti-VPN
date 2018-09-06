@@ -7,14 +7,18 @@ Simply drop the jar into your "plugins" folder. The auto-generated config should
 ### Multiple servers / Large networks
 Drop the jar into the plugins folder and configure the "sql" section to use MySQL instead of SQLite. RabbitMQ and/or Redis are optional but highly recommended if you have multiple servers.
 
-# Config
-https://github.com/egg82/AntiVPN/blob/master/src/main/resources/config.yml
+# Configs
+Bukkit: https://github.com/egg82/AntiVPN/blob/master/Bukkit/src/main/resources/config.yml
+
+Bungee: https://github.com/egg82/AntiVPN/blob/master/Bungee/src/main/resources/config.yml
 
 # Commands
 /avpnreload - Reloads the plugin configuration. This will disconnect and reconnect (if appropriate) any services configured in the config.yml file.
+/avpntest <ip> - Test an IP through the various (enabled) services. Note that this forces a check so will use credits every time it's run.
+/avpnscore <source> - Scores a particular source based on a pre-made list of known good and bad IPs. Note that this forces a check so will use credits every time it's run.
 
 # Permissions
-avpn.admin - allows access to the /avpnreload command\
+avpn.admin - allows access to the /avpnreload, /avpntest, and /avpnscore commands
 avpn.bypass - players with this node bypass the filter entirely
 
 # Legal
@@ -35,9 +39,18 @@ https://www.myget.org/feed/egg82-java/package/maven/ninja.egg82.plugins/AntiVPN
     VPNAPI.getInstance();
     ...
     boolean isVPN(String ip);
+    ImmutableMap<String, Optional<Boolean>> test(String ip);
+    double consensus(String ip);
+    Optional<Boolean> getResult(String ip, String sourceName);
 
-### Example - detect if a player is using a VPN (this example is redundant as the plugin does this already)
+### Example - detect if a player is using a VPN
     VPNAPI api = VPNAPI.getInstance();
     if (api.isVPN(playerIp)) {
-        // Kick the player
+        // Do something
+    }
+### Example - See which services detect a given IP as a VPN
+    VPNAPI api = VPNAPI.getInstance();
+    ImmutableMap<String, Optional<Boolean>> response = api.test(ip);
+    for (Entry<String, Optional<Boolean>> kvp : response) {
+        // Do something
     }
