@@ -14,15 +14,19 @@ Bungee: https://github.com/egg82/AntiVPN/blob/master/Bungee/src/main/resources/c
 
 # Commands
 /avpnreload - Reloads the plugin configuration. This will disconnect and reconnect (if appropriate) any services configured in the config.yml file.
+
 /avpntest <ip> - Test an IP through the various (enabled) services. Note that this forces a check so will use credits every time it's run.
+
 /avpnscore <source> - Scores a particular source based on a pre-made list of known good and bad IPs. Note that this forces a check so will use credits every time it's run.
 
 # Permissions
 avpn.admin - allows access to the /avpnreload, /avpntest, and /avpnscore commands
+
 avpn.bypass - players with this node bypass the filter entirely
 
 # Legal
 According to the [GDPR](https://eugdprcompliant.com/), [you must specify that you are storing IP information to your players in a privacy policy](https://news.ycombinator.com/item?id=16479995) when using this plugin (actually you need that if you're running a vanilla server without this plugin because of server logs). Depending on how data provided from this API is used, [you may be required to manually remove some data](https://ec.europa.eu/info/law/law-topic/data-protection/reform/rules-business-and-organisations/dealing-citizens/do-we-always-have-delete-personal-data-if-person-asks_en) from the databases.
+
 __Disclaimer__: I am a plugin developer, not a lawyer. This information is provided as a "best guess" and is not legal advice.
 
 # API / Developer Usage
