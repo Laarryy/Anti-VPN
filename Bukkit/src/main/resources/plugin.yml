@@ -17,3 +17,7 @@ commands:
     description: Scores a particular source based on a pre-made list of known good and bad IPs. Note that this forces a check so will use credits every time it's run.
     usage: /avpnscore <source>
     permission: avpn.admin
+  avpncheck:
+    description: Check an IP using the default system. This will return exactly the same value as any other API call.
+    usage: /avpncheck <ip>
+    permission: avpn.admin

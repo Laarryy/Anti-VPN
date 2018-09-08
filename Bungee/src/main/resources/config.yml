@@ -155,6 +155,12 @@ async: true
 # When true, will kick players found to be using VPNs
 # Disable this is you intend to use your own kicking/tagging systems using the API
 kick: true
+# When zero or above, will use a "consensus" algorithm instead of a "cascade" algorithm
+# Cascade: Will try each enabled API in order and use the first one that returns a value
+# Consensus: Will try each enabled API at once and then compare the ratio of results to the value below
+# For example, if you set "consensus" to 0.6 then at least 60% of the APIs must agree that the IP is a VPN
+# This value can range between 0 and 1 (or less than zero to use cascade)
+consensus: -1.0
 
 # Config version, no touchy plz
-version: 2.0
+version: 2.1

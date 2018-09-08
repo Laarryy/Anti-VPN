@@ -17,10 +17,12 @@ Bungee: https://github.com/egg82/AntiVPN/blob/master/Bungee/src/main/resources/c
 
 /avpntest <ip> - Test an IP through the various (enabled) services. Note that this forces a check so will use credits every time it's run.
 
+/avpncheck <ip> - Check an IP using the default system. This will return exactly the same value as any other API call.
+
 /avpnscore <source> - Scores a particular source based on a pre-made list of known good and bad IPs. Note that this forces a check so will use credits every time it's run.
 
 # Permissions
-avpn.admin - allows access to the /avpnreload, /avpntest, and /avpnscore commands
+avpn.admin - allows access to the /avpnreload, /avpntest, /avpncheck, and /avpnscore commands
 
 avpn.bypass - players with this node bypass the filter entirely
 
@@ -31,30 +33,62 @@ __Disclaimer__: I am a plugin developer, not a lawyer. This information is provi
 
 # API / Developer Usage
 ### Maven
-    <repository>
-      <id>egg82-ninja</id>
-      <url>https://www.myget.org/F/egg82-java/maven/</url>
-    </repository>
+```XML
+<repository>
+    <id>egg82-ninja</id>
+    <url>https://www.myget.org/F/egg82-java/maven/</url>
+</repository>
+```
 
 ### Latest Repo
 https://www.myget.org/feed/egg82-java/package/maven/ninja.egg82.plugins/AntiVPN
 
 ### API usage
-    VPNAPI.getInstance();
-    ...
-    boolean isVPN(String ip);
-    ImmutableMap<String, Optional<Boolean>> test(String ip);
-    double consensus(String ip);
-    Optional<Boolean> getResult(String ip, String sourceName);
+```Java
+VPNAPI.getInstance();
+...
+boolean isVPN(String ip, [boolean expensive]);
+ImmutableMap<String, Optional<Boolean>> test(String ip); // WARNING: Does not cache results
+double consensus(String ip, [boolean expensive]);
+Optional<Boolean> getResult(String ip, String sourceName); // WARNING: Does not cache results
+```
 
-### Example - detect if a player is using a VPN
-    VPNAPI api = VPNAPI.getInstance();
-    if (api.isVPN(playerIp)) {
-        // Do something
-    }
+### Example - Detect if a player is using a VPN (cascade)
+```Java
+VPNAPI api = VPNAPI.getInstance();
+if (api.isVPN(playerIp)) {
+    // Do something
+}
+```
+
+### Example - Detect if a player is using a VPN (consensus)
+```Java
+VPNAPI api = VPNAPI.getInstance();
+if (api.consensus(playerIp) >= threshold) { // Anywhere from 0.0 to 1.0
+    // Do something
+}
+```
+
 ### Example - See which services detect a given IP as a VPN
-    VPNAPI api = VPNAPI.getInstance();
-    ImmutableMap<String, Optional<Boolean>> response = api.test(ip);
-    for (Entry<String, Optional<Boolean>> kvp : response) {
-        // Do something
-    }
+```Java
+VPNAPI api = VPNAPI.getInstance();
+ImmutableMap<String, Optional<Boolean>> response = api.test(ip);
+for (Entry<String, Optional<Boolean>> kvp : response) {
+    // Do something
+}
+```
+
+### Example - Get the most updated result from a specified provider
+```Java
+VPNAPI api = VPNAPI.getInstance();
+Optional<Boolean> result = api.getResult(playerIp);
+if (!result.isPresent()) {
+    // Error- ran out of credits, too many attempts, etc etc
+    return;
+}
+if (result.get().booleanValue()) {
+    // Do something
+} else {
+    // Do something else
+}
+```

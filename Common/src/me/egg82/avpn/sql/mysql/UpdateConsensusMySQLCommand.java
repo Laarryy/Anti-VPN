@@ -4,16 +4,16 @@ import java.sql.Timestamp;
 import java.util.UUID;
 import java.util.function.BiConsumer;
 
-import me.egg82.avpn.core.UpdateEventArgs;
+import me.egg82.avpn.core.UpdateConsensusEventArgs;
 import me.egg82.avpn.utils.ValidationUtil;
 import ninja.egg82.analytics.exceptions.IExceptionHandler;
 import ninja.egg82.events.SQLEventArgs;
+import ninja.egg82.patterns.Command;
 import ninja.egg82.patterns.ServiceLocator;
 import ninja.egg82.patterns.events.EventHandler;
-import ninja.egg82.patterns.Command;
 import ninja.egg82.sql.ISQL;
 
-public class UpdateDataMySQLCommand extends Command {
+public class UpdateConsensusMySQLCommand extends Command {
     // vars
     private ISQL sql = ServiceLocator.getService(ISQL.class);
 
@@ -22,15 +22,15 @@ public class UpdateDataMySQLCommand extends Command {
     private UUID finalQuery = null;
 
     private String ip = null;
-    private boolean value = false;
+    private double value = 0.0d;
 
     private BiConsumer<Object, SQLEventArgs> sqlError = (s, e) -> onSQLError(e);
     private BiConsumer<Object, SQLEventArgs> sqlData = (s, e) -> onSQLData(e);
 
-    private EventHandler<UpdateEventArgs> updated = new EventHandler<UpdateEventArgs>();
+    private EventHandler<UpdateConsensusEventArgs> updated = new EventHandler<UpdateConsensusEventArgs>();
 
     // constructor
-    public UpdateDataMySQLCommand(String ip, boolean value) {
+    public UpdateConsensusMySQLCommand(String ip, double value) {
         super();
 
         this.ip = ip;
@@ -41,7 +41,7 @@ public class UpdateDataMySQLCommand extends Command {
     }
 
     // public
-    public EventHandler<UpdateEventArgs> onUpdated() {
+    public EventHandler<UpdateConsensusEventArgs> onUpdated() {
         return updated;
     }
 
@@ -53,13 +53,13 @@ public class UpdateDataMySQLCommand extends Command {
             return;
         }
 
-        insertQuery = sql.query("INSERT INTO `antivpn` (`ip`, `value`) VALUES(?, ?) ON DUPLICATE KEY UPDATE `value`=?, `created`=CURRENT_TIMESTAMP();", ip, Integer.valueOf((value) ? 1 : 0),
-            Integer.valueOf((value) ? 1 : 0));
+        insertQuery = sql.query("INSERT INTO `antivpn_consensus` (`ip`, `value`) VALUES(?, ?) ON DUPLICATE KEY UPDATE `value`=?, `created`=CURRENT_TIMESTAMP();", ip, Double.valueOf(value),
+            Double.valueOf(value));
     }
 
     private void onSQLData(SQLEventArgs e) {
         if (e.getUuid().equals(insertQuery)) {
-            selectQuery = sql.parallelQuery("SELECT `created` FROM `antivpn` WHERE `ip`=?;", ip);
+            selectQuery = sql.parallelQuery("SELECT `created` FROM `antivpn_consensus` WHERE `ip`=?;", ip);
         } else if (e.getUuid().equals(selectQuery)) {
             Exception lastEx = null;
 
@@ -80,13 +80,13 @@ public class UpdateDataMySQLCommand extends Command {
             }
 
             if (created != null) {
-                finalQuery = sql.parallelQuery("INSERT INTO `antivpn_queue` (`ip`, `value`, `created`, `updated`) VALUES(?, ?, ?, ?) ON DUPLICATE KEY UPDATE `updated`=?;", ip,
-                    Integer.valueOf((value) ? 1 : 0), created, updated, updated);
-                onUpdated().invoke(this, new UpdateEventArgs(ip, value, created.getTime()));
+                finalQuery = sql.parallelQuery("INSERT INTO `antivpn_consensus_queue` (`ip`, `value`, `created`, `updated`) VALUES(?, ?, ?, ?) ON DUPLICATE KEY UPDATE `updated`=?;", ip,
+                    Double.valueOf(value), created, updated, updated);
+                onUpdated().invoke(this, new UpdateConsensusEventArgs(ip, value, created.getTime()));
             } else {
                 sql.onError().detatch(sqlError);
                 sql.onData().detatch(sqlError);
-                onUpdated().invoke(this, UpdateEventArgs.EMPTY);
+                onUpdated().invoke(this, UpdateConsensusEventArgs.EMPTY);
             }
 
             if (lastEx != null) {
@@ -117,7 +117,7 @@ public class UpdateDataMySQLCommand extends Command {
         }
 
         if (e.getUuid().equals(insertQuery) || e.getUuid().equals(selectQuery)) {
-            onUpdated().invoke(this, UpdateEventArgs.EMPTY);
+            onUpdated().invoke(this, UpdateConsensusEventArgs.EMPTY);
         }
 
         throw new RuntimeException(e.getSQLError().ex);

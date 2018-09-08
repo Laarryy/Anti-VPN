@@ -1,19 +1,19 @@
-package me.egg82.avpn.sql.sqlite;
+package me.egg82.avpn.sql.mysql;
 
 import java.sql.Timestamp;
 import java.util.UUID;
 import java.util.function.BiConsumer;
 
 import me.egg82.avpn.Config;
-import me.egg82.avpn.core.ResultEventArgs;
+import me.egg82.avpn.core.ConsensusResultEventArgs;
 import ninja.egg82.analytics.exceptions.IExceptionHandler;
 import ninja.egg82.events.SQLEventArgs;
+import ninja.egg82.patterns.Command;
 import ninja.egg82.patterns.ServiceLocator;
 import ninja.egg82.patterns.events.EventHandler;
-import ninja.egg82.patterns.Command;
 import ninja.egg82.sql.ISQL;
 
-public class SelectResultSQLiteCommand extends Command {
+public class SelectConsensusMySQLCommand extends Command {
     // vars
     private ISQL sql = ServiceLocator.getService(ISQL.class);
 
@@ -24,10 +24,10 @@ public class SelectResultSQLiteCommand extends Command {
     private BiConsumer<Object, SQLEventArgs> sqlError = (s, e) -> onSQLError(e);
     private BiConsumer<Object, SQLEventArgs> sqlData = (s, e) -> onSQLData(e);
 
-    private EventHandler<ResultEventArgs> onData = new EventHandler<ResultEventArgs>();
+    private EventHandler<ConsensusResultEventArgs> onData = new EventHandler<ConsensusResultEventArgs>();
 
     // constructor
-    public SelectResultSQLiteCommand(String ip) {
+    public SelectConsensusMySQLCommand(String ip) {
         super();
 
         this.ip = ip;
@@ -37,30 +37,30 @@ public class SelectResultSQLiteCommand extends Command {
     }
 
     // public
-    public EventHandler<ResultEventArgs> onData() {
+    public EventHandler<ConsensusResultEventArgs> onData() {
         return onData;
     }
 
     // private
     protected void onExecute(long elapsedMilliseconds) {
-        query = sql.parallelQuery("SELECT `value`, `created` FROM `antivpn` WHERE `ip`=? AND CURRENT_TIMESTAMP <= DATETIME(`created`, ?);", ip,
-            "+" + Math.floorDiv(Config.sourceCacheTime, 1000L) + " seconds");
+        query = sql.parallelQuery("SELECT `value`, `created` FROM `antivpn_consensus` WHERE `ip`=? AND CURRENT_TIMESTAMP() <= `created` + INTERVAL ? * 0.001 SECOND;", ip,
+            Long.valueOf(Config.sourceCacheTime));
     }
 
     private void onSQLData(SQLEventArgs e) {
         if (e.getUuid().equals(query)) {
             Exception lastEx = null;
 
-            ResultEventArgs retVal = null;
+            ConsensusResultEventArgs retVal = null;
             // Iterate rows
             for (Object[] o : e.getData().data) {
                 try {
                     // Grab all data and convert to more useful object types
-                    Boolean value = (((Number) o[0]).intValue() == 0) ? Boolean.FALSE : Boolean.TRUE;
-                    long created = Timestamp.valueOf((String) o[1]).getTime();
+                    Double value = Double.valueOf(((Number) o[0]).doubleValue());
+                    long created = ((Timestamp) o[1]).getTime();
 
                     // Add new data
-                    retVal = new ResultEventArgs(ip, value, created);
+                    retVal = new ConsensusResultEventArgs(ip, value, created);
                 } catch (Exception ex) {
                     IExceptionHandler handler = ServiceLocator.getService(IExceptionHandler.class);
                     if (handler != null) {
@@ -74,7 +74,11 @@ public class SelectResultSQLiteCommand extends Command {
             sql.onError().detatch(sqlError);
             sql.onData().detatch(sqlError);
 
-            onData.invoke(this, retVal);
+            if (retVal != null) {
+                onData.invoke(this, retVal);
+            } else {
+                onData.invoke(this, ConsensusResultEventArgs.EMPTY);
+            }
 
             if (lastEx != null) {
                 throw new RuntimeException(lastEx);
@@ -98,7 +102,7 @@ public class SelectResultSQLiteCommand extends Command {
         sql.onError().detatch(sqlError);
         sql.onData().detatch(sqlError);
 
-        onData.invoke(this, null);
+        onData.invoke(this, ConsensusResultEventArgs.EMPTY);
 
         throw new RuntimeException(e.getSQLError().ex);
     }

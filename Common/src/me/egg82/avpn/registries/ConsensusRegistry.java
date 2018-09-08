@@ -8,13 +8,12 @@ import ninja.egg82.patterns.ServiceLocator;
 import ninja.egg82.patterns.registries.ExpiringRegistry;
 import ninja.egg82.utils.TimeUtil;
 
-public class IPRegistry extends ExpiringRegistry<String, Boolean> {
+public class ConsensusRegistry extends ExpiringRegistry<String, Double> {
     // vars
 
     // constructor
-    public IPRegistry() {
-        super(String.class, Boolean.class, TimeUtil.getTime(ServiceLocator.getService(Configuration.class).getNode("cacheTime").getString("1minute")), TimeUnit.MILLISECONDS,
-            ExpirationPolicy.ACCESSED);
+    public ConsensusRegistry() {
+        super(String.class, Double.class, TimeUtil.getTime(ServiceLocator.getService(Configuration.class).getNode("cacheTime").getString("1minute")), TimeUnit.MILLISECONDS, ExpirationPolicy.ACCESSED);
     }
 
     // public

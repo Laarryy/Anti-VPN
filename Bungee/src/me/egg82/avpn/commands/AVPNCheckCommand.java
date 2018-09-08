@@ -1,10 +1,6 @@
 package me.egg82.avpn.commands;
 
-import java.util.Map.Entry;
-import java.util.Optional;
-
-import com.google.common.collect.ImmutableMap;
-
+import me.egg82.avpn.Config;
 import me.egg82.avpn.VPNAPI;
 import me.egg82.avpn.utils.ValidationUtil;
 import net.md_5.bungee.api.ChatColor;
@@ -14,12 +10,12 @@ import ninja.egg82.patterns.ServiceLocator;
 import ninja.egg82.plugin.handlers.async.AsyncCommandHandler;
 import ninja.egg82.utils.ThreadUtil;
 
-public class AVPNTestCommand extends AsyncCommandHandler {
+public class AVPNCheckCommand extends AsyncCommandHandler {
     // vars
     private VPNAPI api = VPNAPI.getInstance();
 
     // constructor
-    public AVPNTestCommand() {
+    public AVPNCheckCommand() {
         super();
     }
 
@@ -43,16 +39,16 @@ public class AVPNTestCommand extends AsyncCommandHandler {
             return;
         }
 
-        sender.sendMessage(ChatColor.YELLOW + "Test starting..");
+        sender.sendMessage(ChatColor.YELLOW + "Checking IP..");
         ThreadUtil.submit(new Runnable() {
             public void run() {
-                ImmutableMap<String, Optional<Boolean>> map = api.test(args[0]);
-                for (Entry<String, Optional<Boolean>> kvp : map.entrySet()) {
-                    Boolean bool = kvp.getValue().orElse(null);
-                    sender.sendMessage(ChatColor.YELLOW + kvp.getKey() + ": "
-                        + ((bool == null) ? ChatColor.YELLOW + "Source error" : ((bool.booleanValue()) ? ChatColor.RED + "VPN/Proxy detected" : ChatColor.GREEN + "No VPN/Proxy detected")));
+                if (Config.consensus >= 0.0d) {
+                    // Consensus algorithm
+                    sender.sendMessage((api.consensus(args[0]) >= Config.consensus) ? ChatColor.RED + "VPN/Proxy detected" : ChatColor.GREEN + "No VPN/Proxy detected");
+                } else {
+                    // Cascade algorithm
+                    sender.sendMessage(api.isVPN(args[0]) ? ChatColor.RED + "VPN/Proxy detected" : ChatColor.GREEN + "No VPN/Proxy detected");
                 }
-                sender.sendMessage(ChatColor.GREEN + "Test complete!");
             }
         });
     }

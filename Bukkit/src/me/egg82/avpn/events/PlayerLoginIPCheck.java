@@ -17,79 +17,105 @@ import ninja.egg82.plugin.handlers.events.LowEventHandler;
 import ninja.egg82.utils.ThreadUtil;
 
 public class PlayerLoginIPCheck extends LowEventHandler<PlayerLoginEvent> {
-	//vars
-	private VPNAPI api = VPNAPI.getInstance();
-	
-	private IRegistry<UUID, String> uuidIpRegistry = ServiceLocator.getService(UUIDIPRegistry.class);
-	
-	//constructor
-	public PlayerLoginIPCheck() {
-		super();
-	}
-	
-	//public
-	
-	//private
-	protected void onExecute(long elapsedMilliseconds) {
-		String ip = uuidIpRegistry.removeRegister(event.getPlayer().getUniqueId());
-		
-		if (!Config.kick) {
-			if (Config.debug) {
-				ServiceLocator.getService(IDebugPrinter.class).printInfo("Plugin set to API-only. Ignoring " + event.getPlayer().getName());
-			}
-			return;
-		}
-		
-		if (event.getPlayer().hasPermission(PermissionsType.BYPASS)) {
-			if (Config.debug) {
-				ServiceLocator.getService(IDebugPrinter.class).printInfo(event.getPlayer().getName() + " bypasses check. Ignoring.");
-			}
-			return;
-		}
-		
-		if (ip == null || ip.isEmpty()) {
-			return;
-		}
-		
-		if (Config.ignore.contains(ip)) {
-			if (Config.debug) {
-				ServiceLocator.getService(IDebugPrinter.class).printInfo(event.getPlayer().getName() + " is using an ignored ip \"" + ip + "\". Ignoring.");
-			}
-			return;
-		}
-		
-		if (Config.async) {
-			ThreadUtil.submit(new Runnable() {
-				public void run() {
-					// We're passing the player object directly because it's unlikely this operation will take long, even in worst-cases
-					// Potential memory leaks from keeping the object referenced shouldn't apply here
-					checkVPN(event.getPlayer(), ip, true);
-				}
-			});
-		} else {
-			checkVPN(event.getPlayer(), ip, false);
-		}
-	}
-	
-	private void checkVPN(Player player, String ip, boolean isAsync) {
-		if (api.isVPN(ip, true)) {
-			if (Config.debug) {
-				ServiceLocator.getService(IDebugPrinter.class).printInfo(player.getName() + " found using a VPN. Kicking with defined message.");
-			}
-			if (isAsync) {
-				// We're not allowed to kick players off the main thread
-				TaskUtil.runSync(new Runnable() {
-					public void run() {
-						player.kickPlayer(Config.kickMessage);
-					}
-				});
-			} else {
-				player.kickPlayer(Config.kickMessage);
-			}
-		} else {
-			if (Config.debug) {
-				ServiceLocator.getService(IDebugPrinter.class).printInfo(player.getName() + " passed VPN check.");
-			}
-		}
-	}
+    // vars
+    private VPNAPI api = VPNAPI.getInstance();
+
+    private IRegistry<UUID, String> uuidIpRegistry = ServiceLocator.getService(UUIDIPRegistry.class);
+
+    // constructor
+    public PlayerLoginIPCheck() {
+        super();
+    }
+
+    // public
+
+    // private
+    protected void onExecute(long elapsedMilliseconds) {
+        String ip = uuidIpRegistry.removeRegister(event.getPlayer().getUniqueId());
+
+        if (!Config.kick) {
+            if (Config.debug) {
+                ServiceLocator.getService(IDebugPrinter.class).printInfo("Plugin set to API-only. Ignoring " + event.getPlayer().getName());
+            }
+            return;
+        }
+
+        if (event.getPlayer().hasPermission(PermissionsType.BYPASS)) {
+            if (Config.debug) {
+                ServiceLocator.getService(IDebugPrinter.class).printInfo(event.getPlayer().getName() + " bypasses check. Ignoring.");
+            }
+            return;
+        }
+
+        if (ip == null || ip.isEmpty()) {
+            return;
+        }
+
+        if (Config.ignore.contains(ip)) {
+            if (Config.debug) {
+                ServiceLocator.getService(IDebugPrinter.class).printInfo(event.getPlayer().getName() + " is using an ignored ip \"" + ip + "\". Ignoring.");
+            }
+            return;
+        }
+
+        if (Config.async) {
+            ThreadUtil.submit(new Runnable() {
+                public void run() {
+                    // We're passing the player object directly because it's unlikely this operation
+                    // will take long, even in worst-cases
+                    // Potential memory leaks from keeping the object referenced shouldn't apply
+                    // here
+                    checkVPN(event.getPlayer(), ip, true);
+                }
+            });
+        } else {
+            checkVPN(event.getPlayer(), ip, false);
+        }
+    }
+
+    private void checkVPN(Player player, String ip, boolean isAsync) {
+        if (Config.consensus >= 0.0d) {
+            // Consensus algorithm
+            if (api.consensus(ip, true) >= Config.consensus) {
+                if (Config.debug) {
+                    ServiceLocator.getService(IDebugPrinter.class).printInfo(player.getName() + " found using a VPN. Kicking with defined message.");
+                }
+                if (isAsync) {
+                    // We're not allowed to kick players off the main thread
+                    TaskUtil.runSync(new Runnable() {
+                        public void run() {
+                            player.kickPlayer(Config.kickMessage);
+                        }
+                    });
+                } else {
+                    player.kickPlayer(Config.kickMessage);
+                }
+            } else {
+                if (Config.debug) {
+                    ServiceLocator.getService(IDebugPrinter.class).printInfo(player.getName() + " passed VPN check.");
+                }
+            }
+        } else {
+            // Cascade algorithm
+            if (api.isVPN(ip, true)) {
+                if (Config.debug) {
+                    ServiceLocator.getService(IDebugPrinter.class).printInfo(player.getName() + " found using a VPN. Kicking with defined message.");
+                }
+                if (isAsync) {
+                    // We're not allowed to kick players off the main thread
+                    TaskUtil.runSync(new Runnable() {
+                        public void run() {
+                            player.kickPlayer(Config.kickMessage);
+                        }
+                    });
+                } else {
+                    player.kickPlayer(Config.kickMessage);
+                }
+            } else {
+                if (Config.debug) {
+                    ServiceLocator.getService(IDebugPrinter.class).printInfo(player.getName() + " passed VPN check.");
+                }
+            }
+        }
+    }
 }
