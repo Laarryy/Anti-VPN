@@ -2,18 +2,24 @@ package me.egg82.avpn;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ScheduledFuture;
 import java.util.function.BiConsumer;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.reflect.TypeToken;
@@ -26,6 +32,7 @@ import me.egg82.avpn.sql.sqlite.ClearDataSQLiteCommand;
 import me.egg82.avpn.utils.RedisUtil;
 import ninja.egg82.analytics.exceptions.GameAnalyticsExceptionHandler;
 import ninja.egg82.analytics.exceptions.IExceptionHandler;
+import ninja.egg82.analytics.exceptions.NullExceptionHandler;
 import ninja.egg82.analytics.exceptions.RollbarExceptionHandler;
 import ninja.egg82.bukkit.BasePlugin;
 import ninja.egg82.bukkit.processors.CommandProcessor;
@@ -35,6 +42,7 @@ import ninja.egg82.events.CompleteEventArgs;
 import ninja.egg82.patterns.ServiceLocator;
 import ninja.egg82.plugin.enums.SenderType;
 import ninja.egg82.plugin.messaging.IMessageHandler;
+import ninja.egg82.plugin.messaging.RabbitMessageHandler;
 import ninja.egg82.plugin.utils.PluginReflectUtil;
 import ninja.egg82.sql.ISQL;
 import ninja.egg82.utils.ThreadUtil;
@@ -44,11 +52,14 @@ import redis.clients.jedis.JedisPool;
 
 public class AntiVPN extends BasePlugin {
     // vars
+    private Metrics metrics = null;
+
     private int numMessages = 0;
     private int numCommands = 0;
     private int numEvents = 0;
     private int numTicks = 0;
 
+    private ScheduledFuture<?> exceptionHandlerFuture = null;
     private IExceptionHandler exceptionHandler = null;
     private String version = getDescription().getVersion();
 
@@ -56,7 +67,7 @@ public class AntiVPN extends BasePlugin {
 
     // constructor
     public AntiVPN() {
-        super();
+        super(58291);
 
         exceptionHandler = ServiceLocator.getService(IExceptionHandler.class);
         getLogger().setLevel(Level.WARNING);
@@ -123,12 +134,30 @@ public class AntiVPN extends BasePlugin {
             ServiceLocator.getService(IDebugPrinter.class)
                 .printInfo((Config.consensus < 0.0d) ? "Using cascade algorithm" : "Using consensus algorithm, set to " + format.format(Config.consensus * 100.0d) + "%");
         }
+        Config.sendUsage = config.getNode("stats", "usage").getBoolean();
+        if (Config.debug) {
+            ServiceLocator.getService(IDebugPrinter.class).printInfo((Config.sendUsage) ? "Sending usage stats" : "Not sending usage stats");
+        }
+        Config.sendErrors = config.getNode("stats", "errors").getBoolean();
+        if (Config.debug) {
+            ServiceLocator.getService(IDebugPrinter.class).printInfo((Config.sendErrors) ? "Sending error stats" : "Not sending error stats");
+        }
+        Config.checkUpdates = config.getNode("update", "check").getBoolean();
+        if (Config.debug) {
+            ServiceLocator.getService(IDebugPrinter.class).printInfo((Config.checkUpdates) ? "Update check enabled" : "Update check disabled");
+        }
+        Config.notifyUpdates = config.getNode("update", "notify").getBoolean();
+        if (Config.debug) {
+            ServiceLocator.getService(IDebugPrinter.class).printInfo((Config.notifyUpdates) ? "Update notifications enabled" : "Update notifications disabled");
+        }
     }
 
     public void onEnable() {
         super.onEnable();
 
-        swapExceptionHandlers(new RollbarExceptionHandler("dccf7919d6204dfea740702ad41ee08c", "production", version, getServerId(), getName()));
+        if (Config.sendErrors) {
+            swapExceptionHandlers(new RollbarExceptionHandler(Config.ROLLBAR_KEY, "production", version, getServerId(), getName()));
+        }
 
         List<IMessageHandler> services = ServiceLocator.removeServices(IMessageHandler.class);
         for (IMessageHandler handler : services) {
@@ -165,8 +194,66 @@ public class AntiVPN extends BasePlugin {
 
         enableMessage();
 
+        ThreadUtil.submit(new Runnable() {
+            public void run() {
+                try {
+                    metrics = new Metrics(ServiceLocator.getService(JavaPlugin.class));
+                } catch (Exception ex) {
+                    printWarning("Could not connect to bStats.");
+                    return;
+                }
+
+                metrics.addCustomChart(new Metrics.AdvancedPie("sources", () -> {
+                    if (!Config.sendUsage) {
+                        return null;
+                    }
+
+                    Map<String, Integer> values = new HashMap<String, Integer>();
+                    for (String key : Config.sources) {
+                        values.put(key, Integer.valueOf(1));
+                    }
+                    return values;
+                }));
+                metrics.addCustomChart(new Metrics.SimplePie("kick", () -> {
+                    if (!Config.sendUsage) {
+                        return null;
+                    }
+
+                    return String.valueOf(Config.kick);
+                }));
+                metrics.addCustomChart(new Metrics.SimplePie("algorithm", () -> {
+                    if (!Config.sendUsage) {
+                        return null;
+                    }
+
+                    return (Config.consensus >= 0.0d) ? "consensus" : "cascade";
+                }));
+                metrics.addCustomChart(new Metrics.SimplePie("messaging", () -> {
+                    if (!Config.sendUsage) {
+                        return null;
+                    }
+
+                    return (ServiceLocator.getService(IMessageHandler.class) instanceof RabbitMessageHandler) ? "RabbitMQ" : "BungeeCord";
+                }));
+                metrics.addCustomChart(new Metrics.SimplePie("redis", () -> {
+                    if (!Config.sendUsage) {
+                        return null;
+                    }
+
+                    return (ServiceLocator.getService(JedisPool.class) == null) ? "no" : "yes";
+                }));
+                metrics.addCustomChart(new Metrics.SimplePie("sql", () -> {
+                    if (!Config.sendUsage) {
+                        return null;
+                    }
+
+                    return (ServiceLocator.getService(ISQL.class).getType() == BaseSQLType.SQLite) ? "SQLite" : "MySQL";
+                }));
+            }
+        });
+        ThreadUtil.submit(checkUpdate);
         if (exceptionHandler.hasLimit()) {
-            ThreadUtil.schedule(checkExceptionLimitReached, 2L * 60L * 1000L);
+            exceptionHandlerFuture = ThreadUtil.schedule(checkExceptionLimitReached, 2L * 60L * 1000L);
         }
         ThreadUtil.schedule(onFetchQueueThread, 10L * 1000L);
     }
@@ -244,19 +331,85 @@ public class AntiVPN extends BasePlugin {
             ThreadUtil.schedule(onFetchQueueThread, 10L * 1000L);
         }
     };
+    private Runnable checkUpdate = new Runnable() {
+        public void run() {
+            if (isUpdateAvailable()) {
+                return;
+            }
+            if (!Config.checkUpdates) {
+                ThreadUtil.schedule(checkUpdate, 60L * 60L * 1000L);
+                return;
+            }
+            
+            boolean update = false;
+            
+            try {
+                update = checkUpdate();
+            } catch (Exception ex) {
+                printWarning("Could not check for update.");
+                ex.printStackTrace();
+                ThreadUtil.schedule(checkUpdate, 60L * 60L * 1000L);
+                return;
+            }
+            
+            if (!update) {
+                ThreadUtil.schedule(checkUpdate, 60L * 60L * 1000L);
+                return;
+            }
+
+            String latestVersion = null;
+            try {
+                latestVersion = getLatestVersion();
+            } catch (Exception ex) {
+                ThreadUtil.schedule(checkUpdate, 60L * 60L * 1000L);
+                return;
+            }
+
+            printInfo(ChatColor.AQUA + "Update available! New version: " + ChatColor.YELLOW + latestVersion);
+            if (Config.notifyUpdates) {
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    if (player.hasPermission("avpn.admin")) {
+                        player.sendMessage(ChatColor.AQUA + "Anti-VPN (Bukkit) has an " + ChatColor.GREEN + "update" + ChatColor.AQUA + " available! New version: " + ChatColor.YELLOW + latestVersion);
+                    }
+                }
+            }
+
+            ThreadUtil.schedule(checkUpdate, 60L * 60L * 1000L);
+        }
+    };
     private Runnable checkExceptionLimitReached = new Runnable() {
         public void run() {
-            if (exceptionHandler.isLimitReached()) {
-                swapExceptionHandlers(new GameAnalyticsExceptionHandler("10b55aa4f41d64ff258f9c66a5fbf9ec", "3794acfebab1122e852d73bbf505c37f42bf3f41", version, getServerId(), getName()));
+            if (!Config.sendErrors) {
+                return;
+            }
+
+            if (exceptionHandler instanceof NullExceptionHandler) {
+                swapExceptionHandlers(new RollbarExceptionHandler(Config.ROLLBAR_KEY, "production", version, getServerId(), getName()));
+            } else {
+                if (exceptionHandler.isLimitReached()) {
+                    swapExceptionHandlers(new GameAnalyticsExceptionHandler(Config.GAMEANALYTICS_KEY, Config.GAMEANALYTICS_SECRET, version, getServerId(), getName()));
+                }
             }
 
             if (exceptionHandler.hasLimit()) {
-                ThreadUtil.schedule(checkExceptionLimitReached, 10L * 60L * 1000L);
+                exceptionHandlerFuture = ThreadUtil.schedule(checkExceptionLimitReached, 10L * 60L * 1000L);
             }
         }
     };
 
-    private void swapExceptionHandlers(IExceptionHandler newHandler) {
+    public void swapExceptionHandlers(IExceptionHandler newHandler) {
+        if (exceptionHandlerFuture != null) {
+            exceptionHandlerFuture.cancel(false);
+            if (!exceptionHandlerFuture.isDone() && !exceptionHandlerFuture.isCancelled()) {
+                // Running
+                try {
+                    exceptionHandlerFuture.get();
+                } catch (Exception ex) {
+
+                }
+            }
+        }
+
         List<IExceptionHandler> oldHandlers = ServiceLocator.removeServices(IExceptionHandler.class);
 
         exceptionHandler = newHandler;
@@ -274,6 +427,10 @@ public class AntiVPN extends BasePlugin {
 
             handler.close();
             exceptionHandler.addLogs(handler.getUnsentLogs());
+        }
+
+        if (exceptionHandler.hasLimit()) {
+            exceptionHandlerFuture = ThreadUtil.schedule(checkExceptionLimitReached, 2L * 60L * 1000L);
         }
     }
 

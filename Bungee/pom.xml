@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <artifactId>AntiVPN-Bungee</artifactId>
-  <version>2.2.11</version>
+  <version>2.3.11</version>
   <name>AntiVPN</name>
   <build>
     <sourceDirectory>src</sourceDirectory>
@@ -12,6 +12,11 @@
         <configuration>
           <source>1.8</source>
           <target>1.8</target>
+          <artifactSet>
+            <includes>
+              <include>org.bstats:*</include>
+            </includes>
+          </artifactSet>
         </configuration>
       </plugin>
       <plugin>
@@ -119,6 +124,10 @@
                   </excludes>
                 </relocation>
                 <relocation>
+                  <pattern>org.bstats</pattern>
+                  <shadedPattern>me.egg82.avpn.extern.org.bstats</shadedPattern>
+                </relocation>
+                <relocation>
                   <pattern>org.json</pattern>
                   <shadedPattern>me.egg82.avpn.extern.org.json</shadedPattern>
                 </relocation>
@@ -150,6 +159,10 @@
       <id>sponge</id>
       <url>https://repo.spongepowered.org/maven/</url>
     </repository>
+    <repository>
+      <id>bstats-repo</id>
+      <url>http://repo.bstats.org/content/repositories/releases/</url>
+    </repository>
   </repositories>
   <dependencies>
     <dependency>
@@ -159,19 +172,24 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
+      <groupId>org.bstats</groupId>
+      <artifactId>bstats-bungeecord</artifactId>
+      <version>1.2</version>
+    </dependency>
+    <dependency>
       <groupId>ninja.egg82.plugins</groupId>
       <artifactId>AntiVPN</artifactId>
-      <version>2.2.11</version>
+      <version>2.3.12</version>
     </dependency>
     <dependency>
       <groupId>ninja.egg82.lib</groupId>
       <artifactId>bungee</artifactId>
-      <version>1.0.11</version>
+      <version>1.0.12</version>
     </dependency>
     <dependency>
       <groupId>ninja.egg82.lib</groupId>
       <artifactId>plugin-common</artifactId>
-      <version>1.1.11</version>
+      <version>1.2.12</version>
       <scope>provided</scope>
     </dependency>
     <dependency>

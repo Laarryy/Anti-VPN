@@ -7,8 +7,8 @@ import java.util.Optional;
 import org.json.simple.JSONObject;
 
 import me.egg82.avpn.Configuration;
-import me.egg82.avpn.utils.WebUtil;
 import ninja.egg82.patterns.ServiceLocator;
+import ninja.egg82.plugin.utils.WebUtil;
 
 public class IPDetectorAPI implements IFetchAPI {
     // vars
@@ -32,7 +32,13 @@ public class IPDetectorAPI implements IFetchAPI {
         Map<String, String> headers = new HashMap<String, String>();
         headers.put("API-Key", key);
 
-        JSONObject json = WebUtil.getJson("https://api.ipdetector.info/" + ip, headers);
+        JSONObject json = null;
+        try {
+            json = WebUtil.getJsonObject("https://api.ipdetector.info/" + ip, "egg82/AntiVPN", headers);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return Optional.empty();
+        }
         if (json == null) {
             return Optional.empty();
         }

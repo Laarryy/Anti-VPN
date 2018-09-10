@@ -20,6 +20,7 @@ import org.bukkit.plugin.Plugin;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.reflect.TypeToken;
 
+import me.egg82.avpn.AntiVPN;
 import me.egg82.avpn.Config;
 import me.egg82.avpn.Configuration;
 import me.egg82.avpn.Loaders;
@@ -28,6 +29,8 @@ import me.egg82.avpn.core.RedisSubscriber;
 import me.egg82.avpn.debug.IDebugPrinter;
 import me.egg82.avpn.registries.IPRegistry;
 import me.egg82.avpn.utils.RedisUtil;
+import ninja.egg82.analytics.exceptions.NullExceptionHandler;
+import ninja.egg82.analytics.exceptions.RollbarExceptionHandler;
 import ninja.egg82.bukkit.BasePlugin;
 import ninja.egg82.patterns.ServiceLocator;
 import ninja.egg82.plugin.enums.SenderType;
@@ -139,6 +142,40 @@ public class AVPNReloadCommand extends CommandHandler {
         if (Config.debug) {
             ServiceLocator.getService(IDebugPrinter.class)
                 .printInfo((Config.consensus < 0.0d) ? "Using cascade algorithm" : "Using consensus algorithm, set to " + format.format(Config.consensus * 100.0d) + "%");
+        }
+        Config.sendUsage = config.getNode("stats", "usage").getBoolean();
+        if (Config.debug) {
+            ServiceLocator.getService(IDebugPrinter.class).printInfo((Config.sendUsage) ? "Sending usage stats" : "Not sending usage stats");
+        }
+        boolean oldSendErrors = Config.sendErrors;
+        Config.sendErrors = config.getNode("stats", "errors").getBoolean();
+        if (Config.debug) {
+            ServiceLocator.getService(IDebugPrinter.class).printInfo((Config.sendErrors) ? "Sending error stats" : "Not sending error stats");
+        }
+        Config.checkUpdates = config.getNode("update", "check").getBoolean();
+        if (Config.debug) {
+            ServiceLocator.getService(IDebugPrinter.class).printInfo((Config.checkUpdates) ? "Update check enabled" : "Update check disabled");
+        }
+        Config.notifyUpdates = config.getNode("update", "notify").getBoolean();
+        if (Config.debug) {
+            ServiceLocator.getService(IDebugPrinter.class).printInfo((Config.notifyUpdates) ? "Update notifications enabled" : "Update notifications disabled");
+        }
+
+        if (oldSendErrors != Config.sendErrors) {
+            if (Config.sendErrors) {
+                ThreadUtil.submit(new Runnable() {
+                    public void run() {
+                        AntiVPN plugin = ServiceLocator.getService(AntiVPN.class);
+                        plugin.swapExceptionHandlers(new RollbarExceptionHandler(Config.ROLLBAR_KEY, "production", plugin.getDescription().getVersion(), plugin.getServerId(), plugin.getName()));
+                    }
+                });
+            } else {
+                ThreadUtil.submit(new Runnable() {
+                    public void run() {
+                        ServiceLocator.getService(AntiVPN.class).swapExceptionHandlers(new NullExceptionHandler());
+                    }
+                });
+            }
         }
 
         // Memory caches

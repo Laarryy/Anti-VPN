@@ -7,8 +7,8 @@ import java.util.Optional;
 import org.json.simple.JSONObject;
 
 import me.egg82.avpn.Configuration;
-import me.egg82.avpn.utils.WebUtil;
 import ninja.egg82.patterns.ServiceLocator;
+import ninja.egg82.plugin.utils.WebUtil;
 
 public class IPHubAPI implements IFetchAPI {
     // vars
@@ -34,7 +34,13 @@ public class IPHubAPI implements IFetchAPI {
         Map<String, String> headers = new HashMap<String, String>();
         headers.put("X-Key", key);
 
-        JSONObject json = WebUtil.getJson("https://v2.api.iphub.info/ip/" + ip, headers);
+        JSONObject json = null;
+        try {
+            json = WebUtil.getJsonObject("https://v2.api.iphub.info/ip/" + ip, "egg82/AntiVPN", headers);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return Optional.empty();
+        }
         if (json == null) {
             return Optional.empty();
         }

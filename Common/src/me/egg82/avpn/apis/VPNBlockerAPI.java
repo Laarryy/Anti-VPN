@@ -5,8 +5,8 @@ import java.util.Optional;
 import org.json.simple.JSONObject;
 
 import me.egg82.avpn.Configuration;
-import me.egg82.avpn.utils.WebUtil;
 import ninja.egg82.patterns.ServiceLocator;
+import ninja.egg82.plugin.utils.WebUtil;
 
 public class VPNBlockerAPI implements IFetchAPI {
     // vars
@@ -24,7 +24,14 @@ public class VPNBlockerAPI implements IFetchAPI {
     public Optional<Boolean> getResult(String ip) {
         String key = ServiceLocator.getService(Configuration.class).getNode("sources", "vpnblocker", "key").getString();
 
-        JSONObject json = WebUtil.getJson("http" + ((key != null && !key.isEmpty()) ? "s" : "") + "://api.vpnblocker.net/v2/json/" + ip + ((key != null && !key.isEmpty()) ? "/" + key : ""));
+        JSONObject json = null;
+        try {
+            json = WebUtil.getJsonObject("http" + ((key != null && !key.isEmpty()) ? "s" : "") + "://api.vpnblocker.net/v2/json/" + ip + ((key != null && !key.isEmpty()) ? "/" + key : ""),
+                "egg82/AntiVPN");
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return Optional.empty();
+        }
         if (json == null) {
             return Optional.empty();
         }

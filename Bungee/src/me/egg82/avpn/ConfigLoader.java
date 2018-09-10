@@ -81,6 +81,9 @@ public class ConfigLoader {
         if (config.getNode("version").getDouble() == 2.0d) {
             to21(config);
         }
+        if (config.getNode("version").getDouble() == 2.1d) {
+            to22(config);
+        }
 
         if (config.getNode("version").getDouble() != oldVersion) {
             File backupFile = new File(ServiceLocator.getService(Plugin.class).getDataFolder(), configFileName + ".bak");
@@ -132,5 +135,20 @@ public class ConfigLoader {
     private static void to21(ConfigurationNode config) {
         // Add consensus
         config.getNode("consensus").setValue(Double.valueOf(-1.0d));
+
+        // Version
+        config.getNode("version").setValue(Double.valueOf(2.1d));
+    }
+    private static void to22(ConfigurationNode config) {
+        // Add stats
+        config.getNode("stats", "usage").setValue(Boolean.TRUE);
+        config.getNode("stats", "errors").setValue(Boolean.TRUE);
+
+        // Add update
+        config.getNode("update", "check").setValue(Boolean.TRUE);
+        config.getNode("update", "notify").setValue(Boolean.TRUE);
+
+        // Version
+        config.getNode("version").setValue(Double.valueOf(2.2d));
     }
 }

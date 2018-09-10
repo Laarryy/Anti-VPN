@@ -6,8 +6,8 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import me.egg82.avpn.Configuration;
-import me.egg82.avpn.utils.WebUtil;
 import ninja.egg82.patterns.ServiceLocator;
+import ninja.egg82.plugin.utils.WebUtil;
 
 public class ShodanAPI implements IFetchAPI {
     // vars
@@ -28,7 +28,13 @@ public class ShodanAPI implements IFetchAPI {
             return Optional.empty();
         }
 
-        JSONObject json = WebUtil.getJson("https://api.shodan.io/shodan/host/" + ip + "?key=" + key);
+        JSONObject json = null;
+        try {
+            json = WebUtil.getJsonObject("https://api.shodan.io/shodan/host/" + ip + "?key=" + key, "egg82/AntiVPN");
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return Optional.empty();
+        }
         if (json == null) {
             return Optional.empty();
         }

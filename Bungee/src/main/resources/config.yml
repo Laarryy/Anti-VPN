@@ -162,5 +162,23 @@ kick: true
 # This value can range between 0 and 1 (or less than zero to use cascade)
 consensus: -1.0
 
+stats:
+  # Whether or not to send anonymous usage statistics to bStats
+  # True: Send anonymous stats, let the author know how well the plugin is doing and how it's used!
+  # False: Do not send stats and make the author sad :(
+  usage: true
+  # Whether or not to send anonymous errors to the author
+  # True: Send errors anonymously to Rollbar and/or GameAnalytics so the author can fix them!
+  # False: Do not send errors and wonder why any bugs you encounter haven't beeen fixed
+  errors: true
+  # Whether or not to notify players with the avpn.admin permission node
+  notify: true
+
+update:
+  # Whether or not to automatically check for updates and notify the console if found
+  check: true
+  # Whether or not to notify players with the avpn.admin permission node
+  notify: true
+
 # Config version, no touchy plz
-version: 2.1
+version: 2.2

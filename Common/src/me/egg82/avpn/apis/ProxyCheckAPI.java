@@ -5,8 +5,8 @@ import java.util.Optional;
 import org.json.simple.JSONObject;
 
 import me.egg82.avpn.Configuration;
-import me.egg82.avpn.utils.WebUtil;
 import ninja.egg82.patterns.ServiceLocator;
+import ninja.egg82.plugin.utils.WebUtil;
 
 public class ProxyCheckAPI implements IFetchAPI {
     // vars
@@ -24,7 +24,13 @@ public class ProxyCheckAPI implements IFetchAPI {
     public Optional<Boolean> getResult(String ip) {
         String key = ServiceLocator.getService(Configuration.class).getNode("sources", "proxycheck", "key").getString();
 
-        JSONObject json = WebUtil.getJson("https://proxycheck.io/v2/" + ip + "?vpn=1" + ((key != null && !key.isEmpty()) ? "&key=" + key : ""));
+        JSONObject json = null;
+        try {
+            json = WebUtil.getJsonObject("https://proxycheck.io/v2/" + ip + "?vpn=1" + ((key != null && !key.isEmpty()) ? "&key=" + key : ""), "egg82/AntiVPN");
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return Optional.empty();
+        }
         if (json == null) {
             return Optional.empty();
         }

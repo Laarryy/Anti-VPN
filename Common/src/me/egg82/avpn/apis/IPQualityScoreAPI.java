@@ -5,8 +5,8 @@ import java.util.Optional;
 import org.json.simple.JSONObject;
 
 import me.egg82.avpn.Configuration;
-import me.egg82.avpn.utils.WebUtil;
 import ninja.egg82.patterns.ServiceLocator;
+import ninja.egg82.plugin.utils.WebUtil;
 
 public class IPQualityScoreAPI implements IFetchAPI {
     // vars
@@ -27,7 +27,13 @@ public class IPQualityScoreAPI implements IFetchAPI {
             return Optional.empty();
         }
 
-        JSONObject json = WebUtil.getJson("http://www.ipqualityscore.com/api/json/ip/" + key + "/" + ip);
+        JSONObject json = null;
+        try {
+            json = WebUtil.getJsonObject("http://www.ipqualityscore.com/api/json/ip/" + key + "/" + ip, "egg82/AntiVPN");
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return Optional.empty();
+        }
         if (json == null) {
             return Optional.empty();
         }
