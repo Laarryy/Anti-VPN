@@ -19,6 +19,7 @@ import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.google.common.collect.ImmutableSet;
@@ -27,6 +28,7 @@ import com.google.common.reflect.TypeToken;
 import me.egg82.avpn.core.RedisSubscriber;
 import me.egg82.avpn.debug.BukkitDebugPrinter;
 import me.egg82.avpn.debug.IDebugPrinter;
+import me.egg82.avpn.reflection.analytics.PlanAnalyticsHelper;
 import me.egg82.avpn.sql.mysql.FetchQueueMySQLCommand;
 import me.egg82.avpn.sql.sqlite.ClearDataSQLiteCommand;
 import me.egg82.avpn.utils.RedisUtil;
@@ -81,10 +83,26 @@ public class AntiVPN extends BasePlugin {
     public void onLoad() {
         super.onLoad();
 
+        if (!Bukkit.getName().equals("Paper") && !Bukkit.getName().equals("PaperSpigot")) {
+            printWarning(ChatColor.AQUA + "============================================");
+            printWarning("Please note that Anti-VPN works better with Paper!");
+            printWarning("https://whypaper.emc.gs/");
+            printWarning(ChatColor.AQUA + "============================================");
+        }
+
         ServiceLocator.provideService(BukkitDebugPrinter.class);
 
         PluginReflectUtil.addServicesFromPackage("me.egg82.avpn.registries", true);
         PluginReflectUtil.addServicesFromPackage("me.egg82.avpn.lists", true);
+
+        PluginManager manager = getServer().getPluginManager();
+
+        if (manager.getPlugin("Plan") != null) {
+            printInfo(ChatColor.GREEN + "Enabling support for Plan.");
+            ServiceLocator.provideService(PlanAnalyticsHelper.class, false);
+        } else {
+            printInfo(ChatColor.YELLOW + "Plan was not found. Personal analytics support has been disabled.");
+        }
 
         Configuration config = ConfigLoader.getConfig("config.yml", "config.yml");
 

@@ -58,6 +58,7 @@ sources:
     - 'ipqualityscore'
     - 'ipdetector'
     - 'vpnblocker'
+    - 'voxprox'
     - 'shodan'
   # https://iphub.info/
   # Results updated Sep 6, 2018
@@ -123,6 +124,15 @@ sources:
     enabled: true
     # Optional API key to use
     key: ''
+  # https://www.voxprox.com
+  # Error rate: 0%
+  # NordVPN detection rate: 66.67%
+  # Cryptostorm detection rate: 70%
+  # False-flagged homes: 40%
+  voxprox:
+    enabled: false
+    # API key to use (Required for this service)
+    key: ''
   # https://www.shodan.io/
   # Error rate: 94.52%
   # NordVPN detection rate: 89.47%
@@ -181,4 +191,4 @@ update:
   notify: true
 
 # Config version, no touchy plz
-version: 2.2
+version: 2.3

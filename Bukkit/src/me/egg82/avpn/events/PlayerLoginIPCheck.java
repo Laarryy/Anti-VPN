@@ -5,6 +5,7 @@ import java.util.UUID;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerLoginEvent;
 
+import me.egg82.avpn.AnalyticsData;
 import me.egg82.avpn.Config;
 import me.egg82.avpn.VPNAPI;
 import me.egg82.avpn.debug.IDebugPrinter;
@@ -77,6 +78,7 @@ public class PlayerLoginIPCheck extends LowEventHandler<PlayerLoginEvent> {
         if (Config.consensus >= 0.0d) {
             // Consensus algorithm
             if (api.consensus(ip, true) >= Config.consensus) {
+                AnalyticsData.playersBlocked++;
                 if (Config.debug) {
                     ServiceLocator.getService(IDebugPrinter.class).printInfo(player.getName() + " found using a VPN. Kicking with defined message.");
                 }
@@ -98,6 +100,7 @@ public class PlayerLoginIPCheck extends LowEventHandler<PlayerLoginEvent> {
         } else {
             // Cascade algorithm
             if (api.isVPN(ip, true)) {
+                AnalyticsData.playersBlocked++;
                 if (Config.debug) {
                     ServiceLocator.getService(IDebugPrinter.class).printInfo(player.getName() + " found using a VPN. Kicking with defined message.");
                 }

@@ -5,12 +5,15 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.bukkit.plugin.Plugin;
 import org.yaml.snakeyaml.DumperOptions.FlowStyle;
 
 import com.google.common.io.Files;
+import com.google.common.reflect.TypeToken;
 
 import ninja.egg82.patterns.ServiceLocator;
 import ninja.egg82.plugin.utils.DirectoryUtil;
@@ -84,6 +87,9 @@ public class ConfigLoader {
         if (config.getNode("version").getDouble() == 2.1d) {
             to22(config);
         }
+        if (config.getNode("version").getDouble() == 2.2d) {
+            to23(config);
+        }
 
         if (config.getNode("version").getDouble() != oldVersion) {
             File backupFile = new File(ServiceLocator.getService(Plugin.class).getDataFolder(), configFileName + ".bak");
@@ -153,5 +159,24 @@ public class ConfigLoader {
 
         // Version
         config.getNode("version").setValue(Double.valueOf(2.2d));
+    }
+    private static void to23(ConfigurationNode config) {
+        // Add voxprox
+        config.getNode("sources", "voxprox", "enabled").setValue(Boolean.FALSE);
+        config.getNode("sources", "voxprox", "key").setValue("");
+
+        List<String> sources = null;
+        try {
+            sources = config.getNode("sources", "order").getList(TypeToken.of(String.class));
+        } catch (Exception ex) {
+            sources = new ArrayList<String>();
+        }
+        if (!sources.contains("voxprox")) {
+            sources.add("voxprox");
+        }
+        config.getNode("sources", "order").setValue(Arrays.asList(sources));
+
+        // Version
+        config.getNode("version").setValue(Double.valueOf(2.3d));
     }
 }

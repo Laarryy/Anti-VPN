@@ -3,6 +3,7 @@ package me.egg82.avpn.events;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 
+import me.egg82.avpn.AnalyticsData;
 import me.egg82.avpn.Config;
 import me.egg82.avpn.VPNAPI;
 import me.egg82.avpn.debug.IDebugPrinter;
@@ -92,6 +93,7 @@ public class PostLoginIPCheck extends LowAsyncEventHandler<PostLoginEvent> {
         if (Config.consensus >= 0.0d) {
             // Consensus algorithm
             if (api.consensus(ip, true) >= Config.consensus) {
+                AnalyticsData.playersBlocked++;
                 if (Config.debug) {
                     ServiceLocator.getService(IDebugPrinter.class).printInfo(player.getName() + " found using a VPN. Kicking with defined message.");
                 }
@@ -104,6 +106,7 @@ public class PostLoginIPCheck extends LowAsyncEventHandler<PostLoginEvent> {
         } else {
             // Cascade algorithm
             if (api.isVPN(ip, true)) {
+                AnalyticsData.playersBlocked++;
                 if (Config.debug) {
                     ServiceLocator.getService(IDebugPrinter.class).printInfo(player.getName() + " found using a VPN. Kicking with defined message.");
                 }

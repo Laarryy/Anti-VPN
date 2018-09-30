@@ -23,6 +23,7 @@ import com.google.common.reflect.TypeToken;
 import me.egg82.avpn.core.RedisSubscriber;
 import me.egg82.avpn.debug.BungeeDebugPrinter;
 import me.egg82.avpn.debug.IDebugPrinter;
+import me.egg82.avpn.reflection.analytics.PlanAnalyticsHelper;
 import me.egg82.avpn.sql.mysql.FetchQueueMySQLCommand;
 import me.egg82.avpn.sql.sqlite.ClearDataSQLiteCommand;
 import me.egg82.avpn.utils.RedisUtil;
@@ -30,6 +31,7 @@ import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
+import net.md_5.bungee.api.plugin.PluginManager;
 import ninja.egg82.analytics.exceptions.GameAnalyticsExceptionHandler;
 import ninja.egg82.analytics.exceptions.IExceptionHandler;
 import ninja.egg82.analytics.exceptions.NullExceptionHandler;
@@ -86,6 +88,15 @@ public class AntiVPN extends BasePlugin {
 
         PluginReflectUtil.addServicesFromPackage("me.egg82.avpn.registries", true);
         PluginReflectUtil.addServicesFromPackage("me.egg82.avpn.lists", true);
+
+        PluginManager manager = getProxy().getPluginManager();
+
+        if (manager.getPlugin("Plan") != null) {
+            printInfo(ChatColor.GREEN + "Enabling support for Plan.");
+            ServiceLocator.provideService(PlanAnalyticsHelper.class, false);
+        } else {
+            printInfo(ChatColor.YELLOW + "Plan was not found. Personal analytics support has been disabled.");
+        }
 
         Configuration config = ConfigLoader.getConfig("config.yml", "config.yml");
 
