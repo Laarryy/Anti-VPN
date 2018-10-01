@@ -1,9 +1,10 @@
 name: AntiVPN
 main: me.egg82.avpn.AntiVPN
-version: 2.4.13
+version: 2.4.14
 author: egg82
 api-version: 1.13
 description: Get the best; save money on overpriced plugins and block VPN users!
+softdepends: [Plan]
 commands:
   avpnreload:
     description: Reloads the plugin

@@ -89,15 +89,6 @@ public class AntiVPN extends BasePlugin {
         PluginReflectUtil.addServicesFromPackage("me.egg82.avpn.registries", true);
         PluginReflectUtil.addServicesFromPackage("me.egg82.avpn.lists", true);
 
-        PluginManager manager = getProxy().getPluginManager();
-
-        if (manager.getPlugin("Plan") != null) {
-            printInfo(ChatColor.GREEN + "Enabling support for Plan.");
-            ServiceLocator.provideService(PlanAnalyticsHelper.class, false);
-        } else {
-            printInfo(ChatColor.YELLOW + "Plan was not found. Personal analytics support has been disabled.");
-        }
-
         Configuration config = ConfigLoader.getConfig("config.yml", "config.yml");
 
         Config.debug = config.getNode("debug").getBoolean();
@@ -170,6 +161,15 @@ public class AntiVPN extends BasePlugin {
 
     public void onEnable() {
         super.onEnable();
+
+        PluginManager manager = getProxy().getPluginManager();
+
+        if (manager.getPlugin("Plan") != null) {
+            printInfo(ChatColor.GREEN + "Enabling support for Plan.");
+            ServiceLocator.provideService(PlanAnalyticsHelper.class, false);
+        } else {
+            printInfo(ChatColor.YELLOW + "Plan was not found. Personal analytics support has been disabled.");
+        }
 
         if (Config.sendErrors) {
             swapExceptionHandlers(new RollbarExceptionHandler(Config.ROLLBAR_KEY, "production", version, getServerId(), getDescription().getName()));
