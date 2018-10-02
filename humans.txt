@@ -1,0 +1,15 @@
+# humanstxt.org/
+# The humans responsible & technology colophon
+
+# TEAM
+
+    egg82 -- Dev -- https://www.youtube.com/user/eggy82
+
+# THANKS
+
+    Anti-VPN contributors ;)
+
+# TECHNOLOGY COLOPHON
+
+    CSS3, HTML5
+    Apache Server Configs, jQuery, Modernizr, Normalize.css, Materialize.css, FontAwesome
