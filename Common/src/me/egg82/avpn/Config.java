@@ -17,7 +17,7 @@ public class Config {
 
     public static volatile boolean sendUsage = true;
     public static volatile boolean sendErrors = true;
-    
+
     public static volatile boolean checkUpdates = true;
     public static volatile boolean notifyUpdates = true;
 

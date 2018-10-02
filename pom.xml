@@ -11,7 +11,9 @@
   <modules>
     <module>Common</module>
     <module>Bungee</module>
+	<module>Velocity</module>
 	<module>Bukkit</module>
+	<module>Sponge</module>
   </modules>
   <description>AntiVPN parent project</description>
   <url>https://www.egg82.ninja</url>
