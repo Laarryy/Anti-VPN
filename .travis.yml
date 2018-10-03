@@ -7,3 +7,10 @@ deploy:
   file: '*/target/AntiVPN-*.jar'
   on:
     repo: egg82/AntiVPN
+addons:
+  sonarcloud:
+    organization: 'egg82-github'
+    token:
+      secure: "dmtW3lpIJfJGL8RcYZPY6pIWAY2a84uTCxKsbDTCcRZNGXCThek9yIO+SCLUpU6zhQWNUr3shz6Vm2isV+E4vct7+mDpIORLl9kZLnXSS5Pxb682eCmFcQNWlZfFEXrdhEHjeyF9XvfUTSf/WI1mvdw1ZFMrlvio5p5A/4rDO++nEhDhGO6rAHUHWWx67WqQlkRovZ1tZk1BtZ4WuRRL5R2woIED5QXBbgw6BIzo84K6fztqxoLIj9aBli3rwz6L4YR3uHu8wuoCJgEt0mka9AtHvkD4C9azHI3Mrmerlr9yoAvCgy7WzpIE1kS6NkRFnlzvob5C1ICb/uUL27fVl0BNC3CJgK8SSzPNyGNId6X4uMuC2F3dHxNwW9HE7kPStdhW0+DeQJOfpcORcF4wXvBLI86qo2dZDll/VJ8KIH1vpU1XG1gxP/VR1SWKv7tuNgbXf/7klSpYhmg9R8XYKQoKdQonKVh2NhNsUa5TfI+tvRHT1DzgVpGNA14nyEoczQIu9OFRldX8FSKgrWiCsRsClZHMBH5J3To+HV9b07TfsWRR1ZqlnmGrdiabdLpEP5JFdWYthdHihC5X27qKuJyFk1SWq6yjC4OrYocYQvMjLxv7mm8E7rNDqTWc4mSaNRSOwUfQENYzbb0L5XJkLLHpeJW9VckKKP+eaKgGNCo="
+script:
+  - mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar

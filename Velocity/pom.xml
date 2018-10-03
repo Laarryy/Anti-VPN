@@ -47,8 +47,8 @@
                     <exclude>**/*.txt</exclude>
                     <exclude>junit/**</exclude>
                     <exclude>org/junit/**</exclude>
-					<exclude>org/hamcrest/**</exclude>
-					<exclude>edu/umd/cs/findbugs/**</exclude>
+                    <exclude>org/hamcrest/**</exclude>
+                    <exclude>edu/umd/cs/findbugs/**</exclude>
                     <exclude>org/checkerframework/**</exclude>
                     <exclude>afu/**</exclude>
                     <exclude>org/codehaus/mojo/animal_sniffer/**</exclude>
