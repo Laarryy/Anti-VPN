@@ -1,0 +1,24 @@
+package me.egg82.antivpn.commands.internal;
+
+import me.egg82.antivpn.utils.ConfigurationFileUtil;
+import me.egg82.antivpn.utils.LogUtil;
+import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.CommandSender;
+import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.api.plugin.Plugin;
+
+public class ReloadCommand implements Runnable {
+    private final Plugin plugin;
+    private final CommandSender sender;
+
+    public ReloadCommand(Plugin plugin, CommandSender sender) {
+        this.plugin = plugin;
+        this.sender = sender;
+    }
+
+    public void run() {
+        sender.sendMessage(new TextComponent(LogUtil.getHeading() + ChatColor.YELLOW + "Reloading, please wait.."));
+        ConfigurationFileUtil.reloadConfig(plugin);
+        sender.sendMessage(new TextComponent(LogUtil.getHeading() + ChatColor.GREEN + "Configuration reloaded!"));
+    }
+}
