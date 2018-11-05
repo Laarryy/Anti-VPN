@@ -5,6 +5,9 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URLClassLoader;
 import java.nio.file.Files;
+import java.sql.Driver;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.Collections;
 import java.util.logging.Level;
 import me.egg82.antivpn.utils.JarUtil;
@@ -124,6 +127,12 @@ public class BungeeBootstrap extends Plugin {
             JarUtil.loadJar("http://central.maven.org/maven2/org/xerial/sqlite-jdbc/3.25.2/sqlite-jdbc-3.25.2.jar",
                     new File(jarsFolder, "sqlite-jdbc-3.25.2.jar"),
                     classLoader);
+
+            try {
+                DriverManager.registerDriver((Driver) Class.forName("org.sqlite.JDBC", true, classLoader).newInstance());
+            } catch (ClassNotFoundException | InstantiationException | SQLException ex) {
+                logger.error(ex.getMessage(), ex);
+            }
         }
 
         try {
@@ -133,6 +142,12 @@ public class BungeeBootstrap extends Plugin {
             JarUtil.loadJar("http://central.maven.org/maven2/mysql/mysql-connector-java/8.0.13/mysql-connector-java-8.0.13.jar",
                     new File(jarsFolder, "mysql-connector-java-8.0.13.jar"),
                     classLoader);
+
+            try {
+                DriverManager.registerDriver((Driver) Class.forName("com.mysql.jdbc.Driver", true, classLoader).newInstance());
+            } catch (ClassNotFoundException | InstantiationException | SQLException ex) {
+                logger.error(ex.getMessage(), ex);
+            }
         }
     }
 

@@ -9,6 +9,7 @@
         <module name="antivpn-bukkit" />
         <module name="antivpn-common" />
         <module name="Bungee" />
+        <module name="Velocity" />
       </profile>
     </annotationProcessing>
   </component>

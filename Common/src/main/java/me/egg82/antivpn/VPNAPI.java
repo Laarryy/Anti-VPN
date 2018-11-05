@@ -25,7 +25,7 @@ public class VPNAPI {
 
     public static VPNAPI getInstance() { return api; }
 
-    public ImmutableMap<String, Optional<Boolean>> test(String ip) {
+    public ImmutableMap<String, Optional<Boolean>> testAllSources(String ip) {
         if (ip == null) {
             throw new IllegalArgumentException("ip cannot be null.");
         }
@@ -44,10 +44,10 @@ public class VPNAPI {
             return ImmutableMap.of();
         }
 
-        return ImmutableMap.copyOf(internalApi.test(ip, cachedConfig.getSources(), config.getNode("sources"), cachedConfig.getDebug()));
+        return ImmutableMap.copyOf(internalApi.testAllSources(ip, cachedConfig.getSources(), config.getNode("sources"), cachedConfig.getDebug()));
     }
 
-    public Optional<Boolean> getResult(String ip, String sourceName) {
+    public Optional<Boolean> getSourceResult(String ip, String sourceName) {
         if (ip == null) {
             throw new IllegalArgumentException("ip cannot be null.");
         }
@@ -67,7 +67,7 @@ public class VPNAPI {
             return Optional.empty();
         }
 
-        return internalApi.getResult(ip, sourceName, config.getNode("sources", sourceName));
+        return internalApi.getSourceResult(ip, sourceName, config.getNode("sources", sourceName));
     }
 
     public double consensus(String ip) { return consensus(ip, true); }
@@ -100,9 +100,9 @@ public class VPNAPI {
         return internalApi.consensus(ip, expensive, cachedConfig.getSourceCacheTime(), cachedConfig.getRedisPool(), config.getNode("redis"), null, cachedConfig.getSQL(), config.getNode("storage"), cachedConfig.getSQLType(), cachedConfig.getSources(), config.getNode("sources"), cachedConfig.getDebug());
     }
 
-    public boolean isVPN(String ip) { return isVPN(ip, true); }
+    public boolean cascade(String ip) { return cascade(ip, true); }
 
-    public boolean isVPN(String ip, boolean expensive) {
+    public boolean cascade(String ip, boolean expensive) {
         if (ip == null) {
             throw new IllegalArgumentException("ip cannot be null.");
         }
@@ -122,11 +122,11 @@ public class VPNAPI {
         }
 
         try (Connection rabbitConnection = RabbitMQUtil.getConnection(cachedConfig.getRabbitConnectionFactory())) {
-            return internalApi.isVPN(ip, expensive, cachedConfig.getSourceCacheTime(), cachedConfig.getRedisPool(), config.getNode("redis"), rabbitConnection, cachedConfig.getSQL(), config.getNode("storage"), cachedConfig.getSQLType(), cachedConfig.getSources(), config.getNode("sources"), cachedConfig.getDebug());
+            return internalApi.cascade(ip, expensive, cachedConfig.getSourceCacheTime(), cachedConfig.getRedisPool(), config.getNode("redis"), rabbitConnection, cachedConfig.getSQL(), config.getNode("storage"), cachedConfig.getSQLType(), cachedConfig.getSources(), config.getNode("sources"), cachedConfig.getDebug());
         } catch (IOException | TimeoutException ex) {
             logger.error(ex.getMessage(), ex);
         }
 
-        return internalApi.isVPN(ip, expensive, cachedConfig.getSourceCacheTime(), cachedConfig.getRedisPool(), config.getNode("redis"), null, cachedConfig.getSQL(), config.getNode("storage"), cachedConfig.getSQLType(), cachedConfig.getSources(), config.getNode("sources"), cachedConfig.getDebug());
+        return internalApi.cascade(ip, expensive, cachedConfig.getSourceCacheTime(), cachedConfig.getRedisPool(), config.getNode("redis"), null, cachedConfig.getSQL(), config.getNode("storage"), cachedConfig.getSQLType(), cachedConfig.getSources(), config.getNode("sources"), cachedConfig.getDebug());
     }
 }

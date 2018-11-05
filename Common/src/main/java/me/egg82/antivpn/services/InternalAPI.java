@@ -53,7 +53,7 @@ public class InternalAPI {
         apis = apiBuilder.build();
     }
 
-    public Map<String, Optional<Boolean>> test(String ip, Set<String> sources, ConfigurationNode sourcesConfigNode, boolean debug) {
+    public Map<String, Optional<Boolean>> testAllSources(String ip, Set<String> sources, ConfigurationNode sourcesConfigNode, boolean debug) {
         CountDownLatch latch = new CountDownLatch(sources.size());
 
         ConcurrentMap<String, Optional<Boolean>> retVal = new ConcurrentLinkedHashMap.Builder<String, Optional<Boolean>>().maximumWeightedCapacity(Long.MAX_VALUE).build();
@@ -84,7 +84,7 @@ public class InternalAPI {
         return retVal;
     }
 
-    public Optional<Boolean> getResult(String ip, String source, ConfigurationNode sourceConfigNode) {
+    public Optional<Boolean> getSourceResult(String ip, String source, ConfigurationNode sourceConfigNode) {
         API api = apis.get(source);
         if (api == null) {
             return Optional.empty();
@@ -92,7 +92,7 @@ public class InternalAPI {
         return api.getResult(ip, sourceConfigNode);
     }
 
-    public boolean isVPN(String ip, boolean expensive, long sourceCacheTime, JedisPool redisPool, ConfigurationNode redisConfigNode, Connection rabbitConnection, SQL sql, ConfigurationNode storageConfigNode, SQLType sqlType, Set<String> sources, ConfigurationNode sourcesConfigNode, boolean debug) {
+    public boolean cascade(String ip, boolean expensive, long sourceCacheTime, JedisPool redisPool, ConfigurationNode redisConfigNode, Connection rabbitConnection, SQL sql, ConfigurationNode storageConfigNode, SQLType sqlType, Set<String> sources, ConfigurationNode sourcesConfigNode, boolean debug) {
         boolean retVal = ipCache.get(ip, f -> resultExpensive(ip, expensive, sourceCacheTime, redisPool, redisConfigNode, rabbitConnection, sql, storageConfigNode, sqlType, sources, sourcesConfigNode, debug));
         if (debug) {
             logger.info(ip + " cascade value cached. Value: " + retVal);

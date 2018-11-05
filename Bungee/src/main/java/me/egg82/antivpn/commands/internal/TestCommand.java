@@ -22,7 +22,7 @@ public class TestCommand implements Runnable {
     public void run() {
         sender.sendMessage(new TextComponent(LogUtil.getHeading() + ChatColor.YELLOW + "Testing with " + ChatColor.WHITE + ip + ChatColor.YELLOW + ", please wait.."));
 
-        Map<String, Optional<Boolean>> results = api.test(ip);
+        Map<String, Optional<Boolean>> results = api.testAllSources(ip);
         for (Map.Entry<String, Optional<Boolean>> kvp : results.entrySet()) {
             if (!kvp.getValue().isPresent()) {
                 sender.sendMessage(new TextComponent(LogUtil.getHeading() + LogUtil.getSourceHeading(kvp.getKey()) + ChatColor.YELLOW + "Source error"));

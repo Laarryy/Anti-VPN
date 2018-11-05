@@ -44,7 +44,7 @@ public class CheckCommand implements Runnable {
                         double consensus = clamp(0.0d, 1.0d, config.getNode("kick", "algorithm", "min-consensus").getDouble(0.6d));
                         f.accept(api.consensus(ip) >= consensus ? ChatColor.DARK_RED + "VPN/PRoxy detected" : ChatColor.GREEN + "No VPN/Proxy detected");
                     } else {
-                        f.accept(api.isVPN(ip) ? ChatColor.DARK_RED + "VPN/PRoxy detected" : ChatColor.GREEN + "No VPN/Proxy detected");
+                        f.accept(api.cascade(ip) ? ChatColor.DARK_RED + "VPN/PRoxy detected" : ChatColor.GREEN + "No VPN/Proxy detected");
                     }
                 })
                 .syncLast(v -> sender.sendMessage(LogUtil.getHeading() + v))

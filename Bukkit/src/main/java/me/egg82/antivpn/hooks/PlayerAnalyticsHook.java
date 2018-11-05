@@ -65,7 +65,7 @@ public class PlayerAnalyticsHook implements PluginHook {
                 double consensus = clamp(0.0d, 1.0d, config.getNode("kick", "algorithm", "min-consensus").getDouble(0.6d));
                 isVPN = api.consensus(ip) >= consensus;
             } else {
-                isVPN = api.isVPN(ip);
+                isVPN = api.cascade(ip);
             }
 
             container.addValue("Using VPN/Proxy", (isVPN) ? "Yes" : "No");
@@ -105,7 +105,7 @@ public class PlayerAnalyticsHook implements PluginHook {
                     double consensus = clamp(0.0d, 1.0d, config.getNode("kick", "algorithm", "min-consensus").getDouble(0.6d));
                     isVPN = api.consensus(ip) >= consensus;
                 } else {
-                    isVPN = api.isVPN(ip);
+                    isVPN = api.cascade(ip);
                 }
 
                 if (isVPN) {

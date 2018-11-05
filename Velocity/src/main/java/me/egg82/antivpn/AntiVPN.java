@@ -1,68 +1,60 @@
 package me.egg82.antivpn;
 
-import co.aikar.commands.BungeeCommandManager;
 import co.aikar.commands.ConditionFailedException;
+import co.aikar.commands.VelocityCommandManager;
+import com.velocitypowered.api.event.PostOrder;
+import com.velocitypowered.api.event.connection.PostLoginEvent;
+import com.velocitypowered.api.plugin.PluginDescription;
+import com.velocitypowered.api.proxy.ProxyServer;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.logging.Level;
 import me.egg82.antivpn.commands.AntiVPNCommand;
 import me.egg82.antivpn.enums.SQLType;
 import me.egg82.antivpn.events.PostLoginCheckHandler;
-import me.egg82.antivpn.events.PostLoginUpdateNotifyHandler;
 import me.egg82.antivpn.extended.CachedConfigValues;
 import me.egg82.antivpn.extended.Configuration;
 import me.egg82.antivpn.extended.RabbitMQReceiver;
 import me.egg82.antivpn.extended.RedisSubscriber;
-import me.egg82.antivpn.hooks.PlayerAnalyticsHook;
-import me.egg82.antivpn.hooks.PluginHook;
 import me.egg82.antivpn.services.Redis;
 import me.egg82.antivpn.sql.MySQL;
 import me.egg82.antivpn.sql.SQLite;
 import me.egg82.antivpn.utils.ConfigurationFileUtil;
 import me.egg82.antivpn.utils.LogUtil;
 import me.egg82.antivpn.utils.ValidationUtil;
-import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.api.event.PostLoginEvent;
-import net.md_5.bungee.api.plugin.Plugin;
-import net.md_5.bungee.api.plugin.PluginManager;
-import net.md_5.bungee.event.EventPriority;
-import ninja.egg82.events.BungeeEventSubscriber;
-import ninja.egg82.events.BungeeEvents;
+import net.kyori.text.TextComponent;
+import net.kyori.text.format.TextColor;
+import ninja.egg82.events.VelocityEventSubscriber;
+import ninja.egg82.events.VelocityEvents;
 import ninja.egg82.service.ServiceLocator;
 import ninja.egg82.service.ServiceNotFoundException;
-import ninja.egg82.updater.BungeeUpdater;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class AntiVPN {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private BungeeCommandManager commandManager;
+    private VelocityCommandManager commandManager;
 
-    private List<BungeeEventSubscriber<?>> events = new ArrayList<>();
+    private List<VelocityEventSubscriber<?>> events = new ArrayList<>();
 
-    private final Plugin plugin;
+    private VelocityBootstrap bootstrap;
+    private ProxyServer proxy;
+    private java.util.logging.Logger pluginLogger;
+    private PluginDescription description;
 
-    public AntiVPN(Plugin plugin) {
-        this.plugin = plugin;
+    public AntiVPN(VelocityBootstrap bootstrap, ProxyServer proxy, java.util.logging.Logger pluginLogger, PluginDescription description) {
+        this.bootstrap = bootstrap;
+        this.proxy = proxy;
+        this.pluginLogger = pluginLogger;
+        this.description = description;
     }
 
-    public void onLoad() {
-        if (!plugin.getProxy().getName().equalsIgnoreCase("waterfall")) {
-            plugin.getProxy().getLogger().log(Level.INFO, ChatColor.AQUA + "====================================");
-            plugin.getProxy().getLogger().log(Level.INFO, ChatColor.YELLOW + "Anti-VPN runs better on Waterfall!");
-            plugin.getProxy().getLogger().log(Level.INFO, ChatColor.YELLOW + "https://whypaper.emc.gs/");
-            plugin.getProxy().getLogger().log(Level.INFO, ChatColor.AQUA + "====================================");
-        }
-    }
+    public void onLoad() {}
 
     public void onEnable() {
-        commandManager = new BungeeCommandManager(plugin);
+        commandManager = new VelocityCommandManager(bootstrap, description, proxy, pluginLogger);
         commandManager.enableUnstableAPI("help");
 
         loadServices();
@@ -71,19 +63,20 @@ public class AntiVPN {
         loadEvents();
         loadHooks();
 
-        plugin.getProxy().getConsole().sendMessage(new TextComponent(LogUtil.getHeading() + ChatColor.GREEN + "Enabled"));
+        proxy.getConsoleCommandSource().sendMessage(LogUtil.getHeading().append(TextComponent.of("Enabled").color(TextColor.GREEN)).build());
 
-        plugin.getProxy().getConsole().sendMessage(new TextComponent(LogUtil.getHeading()
-                + ChatColor.YELLOW + "[" + ChatColor.AQUA + "Version " + ChatColor.WHITE + plugin.getDescription().getVersion() + ChatColor.YELLOW +  "] "
-                + ChatColor.YELLOW + "[" + ChatColor.WHITE + commandManager.getRegisteredRootCommands().size() + ChatColor.GOLD + " Commands" + ChatColor.YELLOW +  "] "
-                + ChatColor.YELLOW + "[" + ChatColor.WHITE + events.size() + ChatColor.BLUE + " Events" + ChatColor.YELLOW +  "]"
-        ));
+        proxy.getConsoleCommandSource().sendMessage(LogUtil.getHeading()
+                .append(TextComponent.of("[").color(TextColor.YELLOW)).append(TextComponent.of("Version ").color(TextColor.AQUA)).append(TextComponent.of(description.getVersion().get()).color(TextColor.WHITE)).append(TextComponent.of("] ").color(TextColor.YELLOW))
+                .append(TextComponent.of("[").color(TextColor.YELLOW)).append(TextComponent.of(String.valueOf(commandManager.getRegisteredRootCommands().size())).color(TextColor.WHITE)).append(TextComponent.of(" Commands").color(TextColor.GOLD)).append(TextComponent.of("] ").color(TextColor.YELLOW))
+                .append(TextComponent.of("[").color(TextColor.YELLOW)).append(TextComponent.of(String.valueOf(events.size())).color(TextColor.WHITE)).append(TextComponent.of(" Events").color(TextColor.BLUE)).append(TextComponent.of("] ").color(TextColor.YELLOW))
+                .build()
+        );
     }
 
     public void onDisable() {
         commandManager.unregisterCommands();
 
-        for (BungeeEventSubscriber<?> event : events) {
+        for (VelocityEventSubscriber<?> event : events) {
             event.cancel();
         }
         events.clear();
@@ -91,11 +84,11 @@ public class AntiVPN {
         unloadHooks();
         unloadServices();
 
-        plugin.getProxy().getConsole().sendMessage(new TextComponent(LogUtil.getHeading() + ChatColor.DARK_RED + "Disabled"));
+        proxy.getConsoleCommandSource().sendMessage(LogUtil.getHeading().append(TextComponent.of("Disabled").color(TextColor.DARK_RED)).build());
     }
 
     private void loadServices() {
-        ConfigurationFileUtil.reloadConfig(plugin);
+        ConfigurationFileUtil.reloadConfig(bootstrap, proxy, description);
 
         Configuration config;
         CachedConfigValues cachedConfig;
@@ -110,7 +103,6 @@ public class AntiVPN {
 
         new RedisSubscriber(cachedConfig.getRedisPool(), config.getNode("redis"));
         ServiceLocator.register(new RabbitMQReceiver(cachedConfig.getRabbitConnectionFactory()));
-        ServiceLocator.register(new BungeeUpdater(plugin, 58716));
     }
 
     private void loadSQL() {
@@ -161,36 +153,16 @@ public class AntiVPN {
             }
         });
 
-        commandManager.registerCommand(new AntiVPNCommand(plugin));
+        commandManager.registerCommand(new AntiVPNCommand(bootstrap, proxy, description));
     }
 
     private void loadEvents() {
-
-        events.add(BungeeEvents.subscribe(plugin, PostLoginEvent.class, EventPriority.LOW).handler(e -> new PostLoginCheckHandler().accept(e)));
-        events.add(BungeeEvents.subscribe(plugin, PostLoginEvent.class, EventPriority.LOW).handler(e -> new PostLoginUpdateNotifyHandler().accept(e)));
+        events.add(VelocityEvents.subscribe(bootstrap, proxy, PostLoginEvent.class, PostOrder.EARLY).handler(e -> new PostLoginCheckHandler(proxy).accept(e)));
     }
 
-    private void loadHooks() {
-        PluginManager manager = plugin.getProxy().getPluginManager();
+    private void loadHooks() {}
 
-        if (manager.getPlugin("Plan") != null) {
-            plugin.getProxy().getConsole().sendMessage(new TextComponent(LogUtil.getHeading() + ChatColor.GREEN + "Enabling support for Plan."));
-            ServiceLocator.register(new PlayerAnalyticsHook(plugin));
-        } else {
-            plugin.getProxy().getConsole().sendMessage(new TextComponent(LogUtil.getHeading() + ChatColor.YELLOW + "Plan was not found. Personal analytics support has been disabled."));
-        }
-    }
-
-    private void unloadHooks() {
-        Optional<? extends PluginHook> plan;
-        try {
-            plan = ServiceLocator.getOptional(PlayerAnalyticsHook.class);
-        } catch (InstantiationException | IllegalAccessException ex) {
-            logger.error(ex.getMessage(), ex);
-            plan = Optional.empty();
-        }
-        plan.ifPresent(v -> v.cancel());
-    }
+    private void unloadHooks() {}
 
     private void unloadServices() {
         CachedConfigValues cachedConfig;

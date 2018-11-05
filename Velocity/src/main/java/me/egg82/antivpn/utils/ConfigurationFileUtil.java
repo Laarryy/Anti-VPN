@@ -2,19 +2,21 @@ package me.egg82.antivpn.utils;
 
 import com.google.common.reflect.TypeToken;
 import com.rabbitmq.client.ConnectionFactory;
+import com.velocitypowered.api.plugin.PluginDescription;
+import com.velocitypowered.api.proxy.ProxyServer;
 import com.zaxxer.hikari.HikariConfig;
 import java.io.*;
 import java.nio.file.Files;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import me.egg82.antivpn.VelocityBootstrap;
 import me.egg82.antivpn.enums.SQLType;
 import me.egg82.antivpn.extended.CachedConfigValues;
 import me.egg82.antivpn.extended.Configuration;
 import me.egg82.antivpn.extended.RabbitMQReceiver;
-import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.api.plugin.Plugin;
+import net.kyori.text.TextComponent;
+import net.kyori.text.format.TextColor;
 import ninja.egg82.service.ServiceLocator;
 import ninja.egg82.sql.SQL;
 import ninja.leaping.configurate.ConfigurationNode;
@@ -32,10 +34,10 @@ public class ConfigurationFileUtil {
 
     private ConfigurationFileUtil() {}
 
-    public static void reloadConfig(Plugin plugin) {
+    public static void reloadConfig(VelocityBootstrap bootstrap, ProxyServer proxy, PluginDescription description) {
         Configuration config;
         try {
-            config = getConfig(plugin, "config.yml", new File(plugin.getDataFolder(), "config.yml"));
+            config = getConfig(bootstrap, "config.yml", new File(new File(description.getSource().get().getParent().toFile(), description.getName().get()), "config.yml"));
         } catch (IOException ex) {
             logger.error(ex.getMessage(), ex);
             return;
@@ -44,43 +46,43 @@ public class ConfigurationFileUtil {
         boolean debug = config.getNode("debug").getBoolean(false);
 
         if (debug) {
-            plugin.getProxy().getConsole().sendMessage(new TextComponent(LogUtil.getHeading() + ChatColor.YELLOW + "Debug " + ChatColor.WHITE + "enabled"));
+            proxy.getConsoleCommandSource().sendMessage(LogUtil.getHeading().append(TextComponent.of("Debug ").color(TextColor.YELLOW)).append(TextComponent.of("enabled").color(TextColor.WHITE)).build());
         }
 
         String sourceCacheTime = config.getNode("sources", "cacheTime").getString("6hours");
         Optional<Long> sourceCacheTimeLong = TimeUtil.getTime(sourceCacheTime);
         Optional<TimeUnit> sourceCacheTimeUnit = TimeUtil.getUnit(sourceCacheTime);
         if (!sourceCacheTimeLong.isPresent()) {
-            plugin.getProxy().getConsole().sendMessage(new TextComponent(ChatColor.YELLOW + "sources.cacheTime is not a valid time pattern. Using default value."));
+            proxy.getConsoleCommandSource().sendMessage(TextComponent.of(TextColor.YELLOW + "sources.cacheTime is not a valid time pattern. Using default value."));
             sourceCacheTimeLong = Optional.of(6L);
             sourceCacheTimeUnit = Optional.of(TimeUnit.HOURS);
         }
         if (!sourceCacheTimeUnit.isPresent()) {
-            plugin.getProxy().getConsole().sendMessage(new TextComponent(ChatColor.YELLOW + "sources.cacheTime is not a valid time pattern. Using default value."));
+            proxy.getConsoleCommandSource().sendMessage(TextComponent.of(TextColor.YELLOW + "sources.cacheTime is not a valid time pattern. Using default value."));
             sourceCacheTimeLong = Optional.of(6L);
             sourceCacheTimeUnit = Optional.of(TimeUnit.HOURS);
         }
 
         if (debug) {
-            plugin.getProxy().getConsole().sendMessage(new TextComponent(LogUtil.getHeading() + ChatColor.YELLOW + "Source cache time: " + ChatColor.WHITE + sourceCacheTimeUnit.get().toMillis(sourceCacheTimeLong.get()) + " millis"));
+            proxy.getConsoleCommandSource().sendMessage(LogUtil.getHeading().append(TextComponent.of("Source cache time: ").color(TextColor.YELLOW)).append(TextComponent.of(sourceCacheTimeUnit.get().toMillis(sourceCacheTimeLong.get()) + " millis").color(TextColor.WHITE)).build());
         }
 
         String cacheTime = config.getNode("cacheTime").getString("1minute");
         Optional<Long> cacheTimeLong = TimeUtil.getTime(cacheTime);
         Optional<TimeUnit> cacheTimeUnit = TimeUtil.getUnit(cacheTime);
         if (!cacheTimeLong.isPresent()) {
-            plugin.getProxy().getConsole().sendMessage(new TextComponent(ChatColor.YELLOW + "cacheTime is not a valid time pattern. Using default value."));
+            proxy.getConsoleCommandSource().sendMessage(TextComponent.of(TextColor.YELLOW + "cacheTime is not a valid time pattern. Using default value."));
             cacheTimeLong = Optional.of(1L);
             cacheTimeUnit = Optional.of(TimeUnit.MINUTES);
         }
         if (!cacheTimeUnit.isPresent()) {
-            plugin.getProxy().getConsole().sendMessage(new TextComponent(ChatColor.YELLOW + "cacheTime is not a valid time pattern. Using default value."));
+            proxy.getConsoleCommandSource().sendMessage(TextComponent.of(TextColor.YELLOW + "cacheTime is not a valid time pattern. Using default value."));
             cacheTimeLong = Optional.of(1L);
             cacheTimeUnit = Optional.of(TimeUnit.MINUTES);
         }
 
         if (debug) {
-            plugin.getProxy().getConsole().sendMessage(new TextComponent(LogUtil.getHeading() + ChatColor.YELLOW + "Memory cache time: " + ChatColor.WHITE + cacheTimeUnit.get().toMillis(cacheTimeLong.get()) + " millis"));
+            proxy.getConsoleCommandSource().sendMessage(LogUtil.getHeading().append(TextComponent.of("Memory cache time: ").color(TextColor.YELLOW)).append(TextComponent.of(cacheTimeUnit.get().toMillis(cacheTimeLong.get()) + " millis").color(TextColor.WHITE)).build());
         }
 
         Set<String> sources;
@@ -95,7 +97,7 @@ public class ConfigurationFileUtil {
             String source = i.next();
             if (!config.getNode("sources", source, "enabled").getBoolean()) {
                 if (debug) {
-                    plugin.getProxy().getConsole().sendMessage(new TextComponent(LogUtil.getHeading() + ChatColor.DARK_RED + source + " is disabled. Removing."));
+                    proxy.getConsoleCommandSource().sendMessage(LogUtil.getHeading().append(TextComponent.of(source + " is disabled. Removing.").color(TextColor.DARK_RED)).build());
                 }
                 i.remove();
                 continue;
@@ -108,7 +110,7 @@ public class ConfigurationFileUtil {
                     && config.getNode("sources", source, "key").getString("").isEmpty()
             ) {
                 if (debug) {
-                    plugin.getProxy().getConsole().sendMessage(new TextComponent(LogUtil.getHeading() + ChatColor.DARK_RED + source + " requires a key which was not provided. Removing."));
+                    proxy.getConsoleCommandSource().sendMessage(LogUtil.getHeading().append(TextComponent.of(source + " requires a key which was not provided. Removing.").color(TextColor.DARK_RED)).build());
                 }
                 i.remove();
             }
@@ -116,7 +118,7 @@ public class ConfigurationFileUtil {
 
         if (debug) {
             for (String source : sources) {
-                plugin.getProxy().getConsole().sendMessage(new TextComponent(LogUtil.getHeading() + ChatColor.YELLOW + "Added source: " + ChatColor.WHITE + source));
+                proxy.getConsoleCommandSource().sendMessage(LogUtil.getHeading().append(TextComponent.of("Added source: ").color(TextColor.YELLOW)).append(TextComponent.of(source).color(TextColor.WHITE)).build());
             }
         }
 
@@ -130,7 +132,7 @@ public class ConfigurationFileUtil {
 
         if (debug) {
             for (String ip : ignoredIps) {
-                plugin.getProxy().getConsole().sendMessage(new TextComponent(LogUtil.getHeading() + ChatColor.YELLOW + "Ignoring IP: " + ChatColor.WHITE + ip));
+                proxy.getConsoleCommandSource().sendMessage(LogUtil.getHeading().append(TextComponent.of("Ignoring IP: ").color(TextColor.YELLOW)).append(TextComponent.of(ip).color(TextColor.WHITE)).build());
             }
         }
 
@@ -147,9 +149,9 @@ public class ConfigurationFileUtil {
                 .cacheTime(cacheTimeLong.get(), cacheTimeUnit.get())
                 .debug(debug)
                 .threads(config.getNode("threads").getInt(4))
-                .redisPool(getRedisPool(plugin, config.getNode("redis")))
-                .rabbitConnectionFactory(getRabbitConnectionFactory(plugin, config.getNode("rabbitmq")))
-                .sql(getSQL(plugin, config.getNode("storage")))
+                .redisPool(getRedisPool(proxy, config.getNode("redis")))
+                .rabbitConnectionFactory(getRabbitConnectionFactory(proxy, config.getNode("rabbitmq")))
+                .sql(getSQL(proxy, description, config.getNode("storage")))
                 .sqlType(config.getNode("storage", "method").getString("sqlite"))
                 .build();
 
@@ -157,14 +159,14 @@ public class ConfigurationFileUtil {
         ServiceLocator.register(cachedValues);
 
         if (debug) {
-            plugin.getProxy().getConsole().sendMessage(new TextComponent(LogUtil.getHeading() + ChatColor.YELLOW + "API threads: " + ChatColor.WHITE + cachedValues.getThreads()));
-            plugin.getProxy().getConsole().sendMessage(new TextComponent(LogUtil.getHeading() + ChatColor.YELLOW + "Using Redis: " + ChatColor.WHITE + (cachedValues.getRedisPool() != null)));
-            plugin.getProxy().getConsole().sendMessage(new TextComponent(LogUtil.getHeading() + ChatColor.YELLOW + "Using RabbitMQ: " + ChatColor.WHITE + (cachedValues.getRabbitConnectionFactory() != null)));
-            plugin.getProxy().getConsole().sendMessage(new TextComponent(LogUtil.getHeading() + ChatColor.YELLOW + "SQL type: " + ChatColor.WHITE + cachedValues.getSQLType().name()));
+            proxy.getConsoleCommandSource().sendMessage(LogUtil.getHeading().append(TextComponent.of("API threads: ").color(TextColor.YELLOW)).append(TextComponent.of(String.valueOf(cachedValues.getThreads())).color(TextColor.WHITE)).build());
+            proxy.getConsoleCommandSource().sendMessage(LogUtil.getHeading().append(TextComponent.of("Using Redis: ").color(TextColor.YELLOW)).append(TextComponent.of(String.valueOf(cachedValues.getRedisPool() != null)).color(TextColor.WHITE)).build());
+            proxy.getConsoleCommandSource().sendMessage(LogUtil.getHeading().append(TextComponent.of("Using RabbitMQ: ").color(TextColor.YELLOW)).append(TextComponent.of(String.valueOf(cachedValues.getRabbitConnectionFactory() != null)).color(TextColor.WHITE)).build());
+            proxy.getConsoleCommandSource().sendMessage(LogUtil.getHeading().append(TextComponent.of("SQL type: ").color(TextColor.YELLOW)).append(TextComponent.of(cachedValues.getSQLType().name()).color(TextColor.WHITE)).build());
         }
     }
 
-    public static Configuration getConfig(Plugin plugin, String resourcePath, File fileOnDisk) throws IOException {
+    public static Configuration getConfig(VelocityBootstrap bootstrap, String resourcePath, File fileOnDisk) throws IOException {
         File parentDir = fileOnDisk.getParentFile();
         if (parentDir.exists() && !parentDir.isDirectory()) {
             Files.delete(parentDir.toPath());
@@ -179,7 +181,7 @@ public class ConfigurationFileUtil {
         }
 
         if (!fileOnDisk.exists()) {
-            try (InputStreamReader reader = new InputStreamReader(plugin.getResourceAsStream(resourcePath));
+            try (InputStreamReader reader = new InputStreamReader(bootstrap.getResourceAsStream(resourcePath));
                  BufferedReader in = new BufferedReader(reader);
                  FileWriter writer = new FileWriter(fileOnDisk);
                  BufferedWriter out = new BufferedWriter(writer)) {
@@ -214,10 +216,10 @@ public class ConfigurationFileUtil {
         }
     }
 
-    private static SQL getSQL(Plugin plugin, ConfigurationNode storageConfigNode) {
+    private static SQL getSQL(ProxyServer proxy, PluginDescription description, ConfigurationNode storageConfigNode) {
         SQLType type = SQLType.getByName(storageConfigNode.getNode("method").getString("sqlite"));
         if (type == SQLType.UNKNOWN) {
-            plugin.getProxy().getConsole().sendMessage(new TextComponent(ChatColor.YELLOW + "storage.method is an unknown value. Using default value."));
+            proxy.getConsoleCommandSource().sendMessage(TextComponent.of(TextColor.YELLOW + "storage.method is an unknown value. Using default value."));
             type = SQLType.SQLite;
         }
 
@@ -226,7 +228,7 @@ public class ConfigurationFileUtil {
             hikariConfig.setJdbcUrl("jdbc:mysql://" + storageConfigNode.getNode("data", "address").getString("127.0.0.1:3306") + "/" + storageConfigNode.getNode("data", "database").getString("avpn"));
             hikariConfig.setConnectionTestQuery("SELECT 1;");
         } else if (type == SQLType.SQLite) {
-            hikariConfig.setJdbcUrl("jdbc:sqlite:" + new File(plugin.getDataFolder(), storageConfigNode.getNode("data", "database").getString("avpn") + ".db").getAbsolutePath());
+            hikariConfig.setJdbcUrl("jdbc:sqlite:" + new File(new File(description.getSource().get().getParent().toFile(), description.getName().get()), storageConfigNode.getNode("data", "database").getString("avpn") + ".db").getAbsolutePath());
             hikariConfig.setConnectionTestQuery("SELECT 1;");
         }
         hikariConfig.setUsername(storageConfigNode.getNode("data", "username").getString(""));
@@ -242,7 +244,7 @@ public class ConfigurationFileUtil {
         return new SQL(hikariConfig);
     }
 
-    private static JedisPool getRedisPool(Plugin plugin, ConfigurationNode redisConfigNode) {
+    private static JedisPool getRedisPool(ProxyServer proxy, ConfigurationNode redisConfigNode) {
         if (!redisConfigNode.getNode("enabled").getBoolean(false)) {
             return null;
         }
@@ -254,14 +256,14 @@ public class ConfigurationFileUtil {
             port = Integer.parseInt(address.substring(portIndex + 1));
             address = address.substring(0, portIndex);
         } else {
-            plugin.getProxy().getConsole().sendMessage(new TextComponent(ChatColor.YELLOW + "redis.address port is an unknown value. Using default value."));
+            proxy.getConsoleCommandSource().sendMessage(TextComponent.of(TextColor.YELLOW + "redis.address port is an unknown value. Using default value."));
             port = 6379;
         }
 
         return new JedisPool(address, port);
     }
 
-    private static ConnectionFactory getRabbitConnectionFactory(Plugin plugin, ConfigurationNode rabbitConfigNode) {
+    private static ConnectionFactory getRabbitConnectionFactory(ProxyServer proxy, ConfigurationNode rabbitConfigNode) {
         if (!rabbitConfigNode.getNode("enabled").getBoolean(false)) {
             return null;
         }
@@ -273,7 +275,7 @@ public class ConfigurationFileUtil {
             port = Integer.parseInt(address.substring(portIndex + 1));
             address = address.substring(0, portIndex);
         } else {
-            plugin.getProxy().getConsole().sendMessage(new TextComponent(ChatColor.YELLOW + "rabbitmq.address port is an unknown value. Using default value."));
+            proxy.getConsoleCommandSource().sendMessage(TextComponent.of(TextColor.YELLOW + "rabbitmq.address port is an unknown value. Using default value."));
             port = 5672;
         }
 

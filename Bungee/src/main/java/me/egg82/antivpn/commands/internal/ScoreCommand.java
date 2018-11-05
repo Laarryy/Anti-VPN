@@ -76,7 +76,7 @@ public class ScoreCommand implements Runnable {
                 Thread.currentThread().interrupt();
             }
 
-            Optional<Boolean> result = api.getResult(ip, source);
+            Optional<Boolean> result = api.getSourceResult(ip, source);
             Boolean bool = result.orElse(null);
             if (bool == null) {
                 error++;

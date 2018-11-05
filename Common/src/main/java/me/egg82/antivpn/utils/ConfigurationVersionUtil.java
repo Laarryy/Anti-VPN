@@ -34,7 +34,9 @@ public class ConfigurationVersionUtil {
 
         if (config.getNode("version").getDouble() != oldVersion) {
             File backupFile = new File(fileOnDisk.getParent(), fileOnDisk.getName() + ".bak");
-            java.nio.file.Files.delete(backupFile.toPath());
+            if (backupFile.exists()) {
+                java.nio.file.Files.delete(backupFile.toPath());
+            }
 
             Files.copy(fileOnDisk, backupFile);
             loader.save(config);

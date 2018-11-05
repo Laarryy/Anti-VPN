@@ -47,16 +47,16 @@ https://www.myget.org/feed/egg82-java/package/maven/ninja.egg82.plugins/AntiVPN
 ```Java
 VPNAPI.getInstance();
 ...
-boolean isVPN(String ip, [boolean expensive]);
-ImmutableMap<String, Optional<Boolean>> test(String ip); // WARNING: Does not cache results
+boolean cascade(String ip, [boolean expensive]);
+ImmutableMap<String, Optional<Boolean>> testAllSources(String ip); // WARNING: Does not cache results
 double consensus(String ip, [boolean expensive]);
-Optional<Boolean> getResult(String ip, String sourceName); // WARNING: Does not cache results
+Optional<Boolean> getSourceResult(String ip, String sourceName); // WARNING: Does not cache results
 ```
 
 ### Example - Detect if a player is using a VPN (cascade)
 ```Java
 VPNAPI api = VPNAPI.getInstance();
-if (api.isVPN(playerIp)) {
+if (api.cascade(playerIp)) {
     // Do something
 }
 ```
@@ -72,7 +72,7 @@ if (api.consensus(playerIp) >= threshold) { // Anywhere from 0.0 to 1.0
 ### Example - See which services detect a given IP as a VPN
 ```Java
 VPNAPI api = VPNAPI.getInstance();
-ImmutableMap<String, Optional<Boolean>> response = api.test(ip);
+ImmutableMap<String, Optional<Boolean>> response = api.testAllSources(ip);
 for (Entry<String, Optional<Boolean>> kvp : response) {
     // Do something
 }
@@ -81,12 +81,12 @@ for (Entry<String, Optional<Boolean>> kvp : response) {
 ### Example - Get the most updated result from a specified provider
 ```Java
 VPNAPI api = VPNAPI.getInstance();
-Optional<Boolean> result = api.getResult(playerIp);
+Optional<Boolean> result = api.getSourceResult(playerIp);
 if (!result.isPresent()) {
     // Error- ran out of credits, too many attempts, etc etc
     return;
 }
-if (result.get().booleanValue()) {
+if (result.get()) {
     // Do something
 } else {
     // Do something else

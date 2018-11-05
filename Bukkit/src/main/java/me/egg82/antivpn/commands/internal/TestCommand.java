@@ -27,7 +27,7 @@ public class TestCommand implements Runnable {
 
         chain
                 .<ImmutableMap<String, Optional<Boolean>>>asyncFirstCallback(f -> {
-                    f.accept(api.test(ip));
+                    f.accept(api.testAllSources(ip));
                 })
                 .syncLast(v -> {
                     for (Map.Entry<String, Optional<Boolean>> kvp : v.entrySet()) {

@@ -1,61 +1,68 @@
 package me.egg82.antivpn.commands.internal;
 
-import co.aikar.taskchain.TaskChain;
+import com.velocitypowered.api.command.CommandSource;
 import java.net.InetAddress;
 import java.text.DecimalFormat;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 import me.egg82.antivpn.VPNAPI;
 import me.egg82.antivpn.utils.LogUtil;
 import me.egg82.antivpn.utils.ValidationUtil;
+import net.kyori.text.TextComponent;
+import net.kyori.text.format.TextColor;
 import org.apache.commons.net.util.SubnetUtils;
-import org.bukkit.ChatColor;
-import org.bukkit.command.CommandSender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ScoreCommand implements Runnable {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private final TaskChain<?> chain;
-    private final CommandSender sender;
-    private final String source;
+    private final CommandSource source;
+    private final String sourceName;
 
     private final VPNAPI api = VPNAPI.getInstance();
 
     private static final DecimalFormat format = new DecimalFormat(".##");
 
-    public ScoreCommand(TaskChain<?> chain, CommandSender sender, String source) {
-        this.chain = chain;
-        this.sender = sender;
+    public ScoreCommand(CommandSource source, String sourceName) {
         this.source = source;
+        this.sourceName = sourceName;
     }
 
     public void run() {
-        sender.sendMessage(LogUtil.getHeading() + ChatColor.YELLOW + "Scoring " + ChatColor.WHITE + source + ChatColor.YELLOW + ", please wait..");
+        source.sendMessage(LogUtil.getHeading().append(TextComponent.of("Scoring ").color(TextColor.YELLOW)).append(TextComponent.of(sourceName).color(TextColor.WHITE)).append(TextComponent.of(", please wait..").color(TextColor.YELLOW)).build());
 
-        chain
-                .sync(() -> sender.sendMessage(LogUtil.getHeading() + ChatColor.YELLOW + "Scoring against " + ChatColor.WHITE + "NordVPN" + ChatColor.YELLOW + ".."))
-                .async(() -> test(sender, source, "NordVPN", getNordVPNIPs()))
-                .sync(() -> sender.sendMessage(LogUtil.getHeading() + ChatColor.YELLOW + "Sleeping for one minute.."))
-                .delay(60, TimeUnit.SECONDS)
-                .sync(() -> sender.sendMessage(LogUtil.getHeading() + ChatColor.YELLOW + "Scoring against " + ChatColor.WHITE + "Cryptostorm" + ChatColor.YELLOW + ".."))
-                .async(() -> test(sender, source, "Cryptostorm", getCryptostormIPs()))
-                .sync(() -> sender.sendMessage(LogUtil.getHeading() + ChatColor.YELLOW + "Sleeping for one minute.."))
-                .delay(60, TimeUnit.SECONDS)
-                .sync(() -> sender.sendMessage(LogUtil.getHeading() + ChatColor.YELLOW + "Scoring against " + ChatColor.WHITE + "random home IPs" + ChatColor.YELLOW + ".."))
-                .async(() -> test(sender, source, "Random home IP", getHomeIPs(), true))
-                .sync(() -> sender.sendMessage(LogUtil.getHeading() + ChatColor.GREEN + "Score for " + ChatColor.YELLOW + source + ChatColor.GREEN + " complete!"))
-                .execute();
+        source.sendMessage(LogUtil.getHeading().append(TextComponent.of("Scoring against ").color(TextColor.YELLOW)).append(TextComponent.of("NordVPN").color(TextColor.WHITE)).append(TextComponent.of("..").color(TextColor.YELLOW)).build());
+        test(source, sourceName, "NordVPN", getNordVPNIPs());
+        source.sendMessage(LogUtil.getHeading().append(TextComponent.of("Sleeping for one minute..").color(TextColor.YELLOW)).build());
+
+        try {
+            Thread.sleep(60000L);
+        } catch (InterruptedException ex) {
+            logger.error(ex.getMessage(), ex);
+        }
+
+        source.sendMessage(LogUtil.getHeading().append(TextComponent.of("Scoring against ").color(TextColor.YELLOW)).append(TextComponent.of("Cryptostorm").color(TextColor.WHITE)).append(TextComponent.of("..").color(TextColor.YELLOW)).build());
+        test(source, sourceName, "Cryptostorm", getCryptostormIPs());
+        source.sendMessage(LogUtil.getHeading().append(TextComponent.of("Sleeping for one minute..").color(TextColor.YELLOW)).build());
+
+        try {
+            Thread.sleep(60000L);
+        } catch (InterruptedException ex) {
+            logger.error(ex.getMessage(), ex);
+        }
+
+        source.sendMessage(LogUtil.getHeading().append(TextComponent.of("Scoring against ").color(TextColor.YELLOW)).append(TextComponent.of("random home IPs").color(TextColor.WHITE)).append(TextComponent.of("..").color(TextColor.YELLOW)).build());
+        test(source, sourceName, "Random home IP", getHomeIPs(), true);
+        source.sendMessage(LogUtil.getHeading().append(TextComponent.of("Score for ").color(TextColor.GREEN)).append(TextComponent.of(sourceName).color(TextColor.YELLOW)).append(TextComponent.of(" complete!").color(TextColor.GREEN)).build());
     }
 
-    private void test(CommandSender sender, String source, String vpnName, Set<String> ips) {
-        test(sender, source, vpnName, ips, false);
+    private void test(CommandSource source, String sourceName, String vpnName, Set<String> ips) {
+        test(source, sourceName, vpnName, ips, false);
     }
 
-    private void test(CommandSender sender, String source, String vpnName, Set<String> ips, boolean flipResult) {
+    private void test(CommandSource source, String sourceName, String vpnName, Set<String> ips, boolean flipResult) {
         double error = 0.0d;
         double good = 0.0d;
 
@@ -69,7 +76,7 @@ public class ScoreCommand implements Runnable {
                 Thread.currentThread().interrupt();
             }
 
-            Optional<Boolean> result = api.getSourceResult(ip, source);
+            Optional<Boolean> result = api.getSourceResult(ip, sourceName);
             Boolean bool = result.orElse(null);
             if (bool == null) {
                 error++;
@@ -82,9 +89,9 @@ public class ScoreCommand implements Runnable {
         }
 
         if (error > 0) {
-            sender.sendMessage(LogUtil.getHeading() + LogUtil.getSourceHeading(source) + ChatColor.DARK_RED + "Error " + ChatColor.WHITE + format.format((error / ips.size()) * 100.0d) + "%");
+            source.sendMessage(LogUtil.getHeading().append(LogUtil.getSourceHeading(sourceName)).append(TextComponent.of("Error ").color(TextColor.DARK_RED)).append(TextComponent.of(format.format((error / ips.size()) * 100.0d) + "%").color(TextColor.WHITE)).build());
         }
-        sender.sendMessage(LogUtil.getHeading() + LogUtil.getSourceHeading(source) + ChatColor.YELLOW + vpnName + " score: " + ChatColor.WHITE + format.format((good / (ips.size() - error)) * 100.0d) + "%");
+        source.sendMessage(LogUtil.getHeading().append(LogUtil.getSourceHeading(sourceName)).append(TextComponent.of(vpnName + " score: ").color(TextColor.YELLOW)).append(TextComponent.of(format.format((good / (ips.size() - error)) * 100.0d) + "%").color(TextColor.WHITE)).build());
     }
 
     private Set<String> getNordVPNIPs() {

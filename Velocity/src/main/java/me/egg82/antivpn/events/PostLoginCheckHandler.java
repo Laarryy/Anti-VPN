@@ -1,16 +1,16 @@
 package me.egg82.antivpn.events;
 
+import com.velocitypowered.api.event.connection.PostLoginEvent;
+import com.velocitypowered.api.proxy.ProxyServer;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.function.Consumer;
 import me.egg82.antivpn.VPNAPI;
 import me.egg82.antivpn.extended.CachedConfigValues;
 import me.egg82.antivpn.extended.Configuration;
-import me.egg82.antivpn.hooks.PlayerAnalyticsHook;
 import me.egg82.antivpn.utils.LogUtil;
-import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.api.event.PostLoginEvent;
+import net.kyori.text.TextComponent;
+import net.kyori.text.format.TextColor;
 import ninja.egg82.service.ServiceLocator;
 import ninja.egg82.service.ServiceNotFoundException;
 import org.slf4j.Logger;
@@ -19,10 +19,16 @@ import org.slf4j.LoggerFactory;
 public class PostLoginCheckHandler implements Consumer<PostLoginEvent> {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
+    private final ProxyServer proxy;
+
     private final VPNAPI api = VPNAPI.getInstance();
 
+    public PostLoginCheckHandler(ProxyServer proxy) {
+        this.proxy = proxy;
+    }
+
     public void accept(PostLoginEvent event) {
-        String ip = getIp(event.getPlayer().getAddress());
+        String ip = getIp(event.getPlayer().getRemoteAddress());
         if (ip == null || ip.isEmpty()) {
             return;
         }
@@ -40,14 +46,14 @@ public class PostLoginCheckHandler implements Consumer<PostLoginEvent> {
 
         if (event.getPlayer().hasPermission("avpn.bypass")) {
             if (cachedConfig.getDebug()) {
-                logger.info(LogUtil.getHeading() + ChatColor.WHITE + event.getPlayer().getName() + ChatColor.YELLOW + " bypasses check. Ignoring.");
+                proxy.getConsoleCommandSource().sendMessage(LogUtil.getHeading().append(TextComponent.of(event.getPlayer().getUsername()).color(TextColor.WHITE)).append(TextComponent.of(" bypasses check. Ignoring.").color(TextColor.YELLOW)).build());
             }
             return;
         }
 
         if (!config.getNode("kick", "enabled").getBoolean(true)) {
             if (cachedConfig.getDebug()) {
-                logger.info(LogUtil.getHeading() + ChatColor.YELLOW + "Plugin set to API-only. Ignoring " + ChatColor.WHITE + event.getPlayer().getName());
+                proxy.getConsoleCommandSource().sendMessage(LogUtil.getHeading().append(TextComponent.of("Plugin set to API-only. Ignoring ").color(TextColor.YELLOW)).append(TextComponent.of(event.getPlayer().getUsername()).color(TextColor.WHITE)).build());
             }
             return;
         }
@@ -66,14 +72,13 @@ public class PostLoginCheckHandler implements Consumer<PostLoginEvent> {
         }
 
         if (isVPN) {
-            PlayerAnalyticsHook.incrementBlocked();
             if (cachedConfig.getDebug()) {
-                logger.info(LogUtil.getHeading() + ChatColor.WHITE + event.getPlayer().getName() + ChatColor.DARK_RED + " found using a VPN. Kicking with defined message.");
+                proxy.getConsoleCommandSource().sendMessage(LogUtil.getHeading().append(TextComponent.of(event.getPlayer().getUsername()).color(TextColor.WHITE)).append(TextComponent.of(" found using a VPN. Kicking with defined message.").color(TextColor.DARK_RED)).build());
             }
 
-            event.getPlayer().disconnect(new TextComponent(config.getNode("kick", "message").getString("")));
+            event.getPlayer().disconnect(TextComponent.of(config.getNode("kick", "message").getString("")));
         } else {
-            logger.info(LogUtil.getHeading() + ChatColor.WHITE + event.getPlayer().getName() + ChatColor.GREEN + " passed VPN check.");
+            proxy.getConsoleCommandSource().sendMessage(LogUtil.getHeading().append(TextComponent.of(event.getPlayer().getUsername()).color(TextColor.WHITE)).append(TextComponent.of(" passed VPN check.").color(TextColor.GREEN)).build());
         }
     }
 

@@ -34,7 +34,7 @@ public class ConfigurationFileUtil {
     public static void reloadConfig(Plugin plugin) {
         Configuration config;
         try {
-            config = ConfigurationFileUtil.getConfig(plugin, "config.yml", new File(plugin.getDataFolder(), "config.yml"));
+            config = getConfig(plugin, "config.yml", new File(plugin.getDataFolder(), "config.yml"));
         } catch (IOException ex) {
             logger.error(ex.getMessage(), ex);
             return;
@@ -43,7 +43,7 @@ public class ConfigurationFileUtil {
         boolean debug = config.getNode("debug").getBoolean(false);
 
         if (debug) {
-            logger.info(getHeading() + ChatColor.YELLOW + "Debug " + ChatColor.WHITE + "enabled");
+            logger.info(LogUtil.getHeading() + ChatColor.YELLOW + "Debug " + ChatColor.WHITE + "enabled");
         }
 
         String sourceCacheTime = config.getNode("sources", "cacheTime").getString("6hours");
@@ -61,7 +61,7 @@ public class ConfigurationFileUtil {
         }
 
         if (debug) {
-            logger.info(getHeading() + ChatColor.YELLOW + "Source cache time: " + ChatColor.WHITE + sourceCacheTimeUnit.get().toMillis(sourceCacheTimeLong.get()) + " millis");
+            logger.info(LogUtil.getHeading() + ChatColor.YELLOW + "Source cache time: " + ChatColor.WHITE + sourceCacheTimeUnit.get().toMillis(sourceCacheTimeLong.get()) + " millis");
         }
 
         String cacheTime = config.getNode("cacheTime").getString("1minute");
@@ -79,7 +79,7 @@ public class ConfigurationFileUtil {
         }
 
         if (debug) {
-            logger.info(getHeading() + ChatColor.YELLOW + "Memory cache time: " + ChatColor.WHITE + cacheTimeUnit.get().toMillis(cacheTimeLong.get()) + " millis");
+            logger.info(LogUtil.getHeading() + ChatColor.YELLOW + "Memory cache time: " + ChatColor.WHITE + cacheTimeUnit.get().toMillis(cacheTimeLong.get()) + " millis");
         }
 
         Set<String> sources;
@@ -94,7 +94,7 @@ public class ConfigurationFileUtil {
             String source = i.next();
             if (!config.getNode("sources", source, "enabled").getBoolean()) {
                 if (debug) {
-                    logger.info(getHeading() + ChatColor.DARK_RED + source + " is disabled. Removing.");
+                    logger.info(LogUtil.getHeading() + ChatColor.DARK_RED + source + " is disabled. Removing.");
                 }
                 i.remove();
                 continue;
@@ -107,7 +107,7 @@ public class ConfigurationFileUtil {
                     && config.getNode("sources", source, "key").getString("").isEmpty()
             ) {
                 if (debug) {
-                    logger.info(getHeading() + ChatColor.DARK_RED + source + " requires a key which was not provided. Removing.");
+                    logger.info(LogUtil.getHeading() + ChatColor.DARK_RED + source + " requires a key which was not provided. Removing.");
                 }
                 i.remove();
             }
@@ -115,7 +115,7 @@ public class ConfigurationFileUtil {
 
         if (debug) {
             for (String source : sources) {
-                logger.info(getHeading() + ChatColor.YELLOW + "Added source: " + ChatColor.WHITE + source);
+                logger.info(LogUtil.getHeading() + ChatColor.YELLOW + "Added source: " + ChatColor.WHITE + source);
             }
         }
 
@@ -129,7 +129,7 @@ public class ConfigurationFileUtil {
 
         if (debug) {
             for (String ip : ignoredIps) {
-                logger.info(getHeading() + ChatColor.YELLOW + "Ignoring IP: " + ChatColor.WHITE + ip);
+                logger.info(LogUtil.getHeading() + ChatColor.YELLOW + "Ignoring IP: " + ChatColor.WHITE + ip);
             }
         }
 
@@ -156,10 +156,10 @@ public class ConfigurationFileUtil {
         ServiceLocator.register(cachedValues);
 
         if (debug) {
-            logger.info(getHeading() + ChatColor.YELLOW + "API threads: " + ChatColor.WHITE + cachedValues.getThreads());
-            logger.info(getHeading() + ChatColor.YELLOW + "Using Redis: " + ChatColor.WHITE + (cachedValues.getRedisPool() != null));
-            logger.info(getHeading() + ChatColor.YELLOW + "Using RabbitMQ: " + ChatColor.WHITE + (cachedValues.getRabbitConnectionFactory() != null));
-            logger.info(getHeading() + ChatColor.YELLOW + "SQL type: " + ChatColor.WHITE + cachedValues.getSQLType().name());
+            logger.info(LogUtil.getHeading() + ChatColor.YELLOW + "API threads: " + ChatColor.WHITE + cachedValues.getThreads());
+            logger.info(LogUtil.getHeading() + ChatColor.YELLOW + "Using Redis: " + ChatColor.WHITE + (cachedValues.getRedisPool() != null));
+            logger.info(LogUtil.getHeading() + ChatColor.YELLOW + "Using RabbitMQ: " + ChatColor.WHITE + (cachedValues.getRabbitConnectionFactory() != null));
+            logger.info(LogUtil.getHeading() + ChatColor.YELLOW + "SQL type: " + ChatColor.WHITE + cachedValues.getSQLType().name());
         }
     }
 
@@ -285,6 +285,4 @@ public class ConfigurationFileUtil {
 
         return factory;
     }
-
-    private static String getHeading() { return ChatColor.YELLOW + "[" + ChatColor.AQUA + "Anti-VPN" + ChatColor.YELLOW + "] " + ChatColor.RESET; }
 }

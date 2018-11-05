@@ -47,7 +47,7 @@ public class AsyncPlayerPreLoginCacheHandler implements Consumer<AsyncPlayerPreL
         if (config.getNode("kick", "algorithm", "method").getString("cascade").equalsIgnoreCase("consensus")) {
             api.consensus(ip); // Calling this will cache the result internally, even if the value is unused
         } else {
-            api.isVPN(ip); // Calling this will cache the result internally, even if the value is unused
+            api.cascade(ip); // Calling this will cache the result internally, even if the value is unused
         }
     }
 
