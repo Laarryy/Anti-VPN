@@ -52,8 +52,8 @@ public class RabbitMQReceiver {
                         boolean value = (Boolean) obj.get("value");
                         long created = ((Number) obj.get("created")).longValue();
 
-                        if (!ValidationUtil.isValidIp(message)) {
-                            logger.warn("non-valid IP sent through Redis pub/sub cascade");
+                        if (!ValidationUtil.isValidIp(ip)) {
+                            logger.warn("non-valid IP sent through RabbitMQ cascade");
                             return;
                         }
 
@@ -78,8 +78,8 @@ public class RabbitMQReceiver {
                         double value = ((Number) obj.get("value")).doubleValue();
                         long created = ((Number) obj.get("created")).longValue();
 
-                        if (!ValidationUtil.isValidIp(message)) {
-                            logger.warn("non-valid IP sent through Redis pub/sub consensus");
+                        if (!ValidationUtil.isValidIp(ip)) {
+                            logger.warn("non-valid IP sent through RabbitMQ consensus");
                             return;
                         }
 
