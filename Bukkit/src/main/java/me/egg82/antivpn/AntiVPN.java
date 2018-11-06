@@ -3,15 +3,18 @@ package me.egg82.antivpn;
 import co.aikar.commands.ConditionFailedException;
 import co.aikar.commands.PaperCommandManager;
 import co.aikar.taskchain.BukkitTaskChainFactory;
+import co.aikar.taskchain.TaskChain;
 import co.aikar.taskchain.TaskChainFactory;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import me.egg82.antivpn.commands.AntiVPNCommand;
+import me.egg82.antivpn.core.SQLFetchResult;
 import me.egg82.antivpn.enums.SQLType;
 import me.egg82.antivpn.events.AsyncPlayerPreLoginCacheHandler;
 import me.egg82.antivpn.events.PlayerLoginCheckHandler;
@@ -146,15 +149,54 @@ public class AntiVPN {
             MySQL.createTables(cachedConfig.getSQL(), config.getNode("storage")).thenRun(() ->
                     MySQL.loadInfo(cachedConfig.getSQL(), config.getNode("storage")).thenAccept(v -> {
                         Redis.updateFromQueue(v, cachedConfig.getSourceCacheTime(), cachedConfig.getRedisPool(), config.getNode("redis"));
+                        updateSQL();
                     })
             );
         } else if (cachedConfig.getSQLType() == SQLType.SQLite) {
             SQLite.createTables(cachedConfig.getSQL(), config.getNode("storage")).thenRun(() ->
                     SQLite.loadInfo(cachedConfig.getSQL(), config.getNode("storage")).thenAccept(v -> {
                         Redis.updateFromQueue(v, cachedConfig.getSourceCacheTime(), cachedConfig.getRedisPool(), config.getNode("redis"));
+                        updateSQL();
                     })
             );
         }
+    }
+
+    private void updateSQL() {
+        TaskChain<?> chain = taskFactory.newChain();
+
+        chain
+                .delay(10, TimeUnit.SECONDS)
+                .async(() -> {
+                    Configuration config;
+                    CachedConfigValues cachedConfig;
+
+                    try {
+                        config = ServiceLocator.get(Configuration.class);
+                        cachedConfig = ServiceLocator.get(CachedConfigValues.class);
+                    } catch (InstantiationException | IllegalAccessException | ServiceNotFoundException ex) {
+                        logger.error(ex.getMessage(), ex);
+                        return;
+                    }
+
+                    SQLFetchResult result = null;
+
+                    try {
+                        if (cachedConfig.getSQLType() == SQLType.MySQL) {
+                            result = MySQL.fetchQueue(cachedConfig.getSQL(), config.getNode("storage"), cachedConfig.getSourceCacheTime()).get();
+                        }
+
+                        if (result != null) {
+                            Redis.updateFromQueue(result, cachedConfig.getSourceCacheTime(), cachedConfig.getRedisPool(), config.getNode("redis")).get();
+                        }
+                    } catch (ExecutionException ex) {
+                        logger.error(ex.getMessage(), ex);
+                    } catch (InterruptedException ex) {
+                        logger.error(ex.getMessage(), ex);
+                        Thread.currentThread().interrupt();
+                    }
+                })
+                .execute(this::updateSQL);
     }
 
     private void loadCommands() {

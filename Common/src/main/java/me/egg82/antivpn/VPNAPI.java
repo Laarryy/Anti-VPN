@@ -18,8 +18,8 @@ import org.slf4j.LoggerFactory;
 public class VPNAPI {
     private static final Logger logger = LoggerFactory.getLogger(VPNAPI.class);
 
-    private static VPNAPI api = new VPNAPI();
-    private InternalAPI internalApi = new InternalAPI();
+    private static final VPNAPI api = new VPNAPI();
+    private final InternalAPI internalApi = new InternalAPI();
 
     private VPNAPI() {}
 

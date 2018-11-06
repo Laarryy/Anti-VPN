@@ -17,9 +17,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class MySQL {
-    private MySQL() {}
-
     private static final Logger logger = LoggerFactory.getLogger(MySQL.class);
+
+    private MySQL() {}
 
     public static CompletableFuture<Void> createTables(SQL sql, ConfigurationNode storageConfigNode) {
         String databaseName = storageConfigNode.getNode("data", "database").getString();

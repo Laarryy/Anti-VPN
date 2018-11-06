@@ -17,9 +17,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class SQLite {
-    private SQLite() {}
-
     private static final Logger logger = LoggerFactory.getLogger(SQLite.class);
+
+    private SQLite() {}
 
     public static CompletableFuture<Void> createTables(SQL sql, ConfigurationNode storageConfigNode) {
         String tablePrefix = !storageConfigNode.getNode("data", "prefix").getString("").isEmpty() ? storageConfigNode.getNode("data", "prefix").getString() : "antivpn_";

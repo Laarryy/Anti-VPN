@@ -59,6 +59,10 @@ public class CachedConfigValues {
         }
 
         public CachedConfigValues.Builder sourceCacheTime(long value, TimeUnit unit) {
+            if (value <= 0L) {
+                throw new IllegalArgumentException("value cannot be <= 0.");
+            }
+
             values.sourceCacheTime = new LongObjectPair<>(value, unit);
             return this;
         }
@@ -72,6 +76,10 @@ public class CachedConfigValues {
         }
 
         public CachedConfigValues.Builder cacheTime(long value, TimeUnit unit) {
+            if (value <= 0L) {
+                throw new IllegalArgumentException("value cannot be <= 0.");
+            }
+
             values.cacheTime = new LongObjectPair<>(value, unit);
             return this;
         }
@@ -82,6 +90,10 @@ public class CachedConfigValues {
         }
 
         public CachedConfigValues.Builder threads(int value) {
+            if (value <= 1) {
+                throw new IllegalArgumentException("value cannot be <= 1.");
+            }
+
             values.threads = value;
             return this;
         }
