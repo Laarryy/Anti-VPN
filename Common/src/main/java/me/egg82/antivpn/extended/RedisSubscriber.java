@@ -74,11 +74,6 @@ public class RedisSubscriber {
                     logger.error(ex.getMessage(), ex);
                 }
             } else if (channel.equals("antivpn-delete")) {
-                if (!ValidationUtil.isValidIp(message)) {
-                    logger.warn("non-valid IP sent through Redis pub/sub delete");
-                    return;
-                }
-
                 CachedConfigValues cachedConfig;
                 Configuration config;
 
@@ -90,7 +85,7 @@ public class RedisSubscriber {
                     return;
                 }
 
-                // In this case, the message is the IP
+                // In this case, the message is the "IP"
                 InternalAPI.delete(message, cachedConfig.getSQL(), config.getNode("storage"), cachedConfig.getSQLType());
             }
         }

@@ -98,11 +98,6 @@ public class RabbitMQReceiver {
                 public void handleDelivery(String tag, Envelope envelope, AMQP.BasicProperties properies, byte[] body) throws IOException {
                     String message = new String(body, "UTF-8");
 
-                    if (!ValidationUtil.isValidIp(message)) {
-                        logger.warn("non-valid IP sent through Redis pub/sub delete");
-                        return;
-                    }
-
                     CachedConfigValues cachedConfig;
                     Configuration config;
 
@@ -114,7 +109,7 @@ public class RabbitMQReceiver {
                         return;
                     }
 
-                    // In this case, the message is the IP
+                    // In this case, the message is the "IP"
                     InternalAPI.delete(message, cachedConfig.getSQL(), config.getNode("storage"), cachedConfig.getSQLType());
                 }
             };
