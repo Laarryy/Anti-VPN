@@ -148,6 +148,7 @@
                                         <exclude>com/google/common/**</exclude>
                                         <exclude>junit/**</exclude>
                                         <exclude>org/yaml/snakeyaml/**</exclude>
+                                        <exclude>org/intellij/**</exclude>
                                         <exclude>org/junit/**</exclude>
 
                                         <!-- dep-injected -->

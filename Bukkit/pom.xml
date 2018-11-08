@@ -156,6 +156,7 @@
                                         <exclude>javax/annotation/**</exclude>
                                         <exclude>junit/**</exclude>
                                         <exclude>org/apache/commons/lang3/**</exclude>
+                                        <exclude>org/intellij/**</exclude>
                                         <exclude>org/junit/**</exclude>
                                         <exclude>org/json/simple/**</exclude>
                                         <exclude>org/yaml/snakeyaml/**</exclude>

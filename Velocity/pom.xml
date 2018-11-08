@@ -137,6 +137,7 @@
                                         <exclude>javax/annotation/**</exclude>
                                         <exclude>org/checkerframework/**</exclude>
                                         <exclude>org/codehaus/**</exclude>
+                                        <exclude>org/intellij/**</exclude>
                                         <exclude>junit/**</exclude>
                                         <exclude>org/junit/**</exclude>
 

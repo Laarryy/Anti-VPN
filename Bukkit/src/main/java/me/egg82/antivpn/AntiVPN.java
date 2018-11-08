@@ -100,7 +100,7 @@ public class AntiVPN {
     }
 
     public void onDisable() {
-        taskFactory.shutdown(20, TimeUnit.SECONDS);
+        taskFactory.shutdown(8, TimeUnit.SECONDS);
         commandManager.unregisterCommands();
 
         for (BukkitEventSubscriber<?> event : events) {
