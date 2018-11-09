@@ -47,6 +47,7 @@ https://www.myget.org/feed/egg82-java/package/maven/ninja.egg82.plugins/AntiVPN
 ```Java
 VPNAPI.getInstance();
 ...
+long getCurrentSQLTime();
 boolean cascade(String ip, [boolean expensive]);
 ImmutableMap<String, Optional<Boolean>> testAllSources(String ip); // WARNING: Does not cache results
 double consensus(String ip, [boolean expensive]);

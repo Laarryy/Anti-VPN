@@ -1,5 +1,6 @@
 package me.egg82.antivpn.services;
 
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import me.egg82.antivpn.core.ConsensusResult;
 import me.egg82.antivpn.core.DataResult;
@@ -14,9 +15,12 @@ import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.exceptions.JedisException;
 
 public class Redis {
-    private Redis() {}
-
     private static final Logger logger = LoggerFactory.getLogger(Redis.class);
+
+    private static final UUID serverId = UUID.randomUUID();
+    public static UUID getServerID() { return serverId; }
+
+    private Redis() {}
 
     public static CompletableFuture<Boolean> updateFromQueue(SQLFetchResult sqlResult, long sourceCacheTime, JedisPool pool, ConfigurationNode redisConfigNode) {
         return CompletableFuture.supplyAsync(() -> {
@@ -39,6 +43,7 @@ public class Redis {
                         obj.put("ip", result.getIp());
                         obj.put("value", result.getValue());
                         obj.put("created", result.getCreated());
+                        obj.put("id", serverId.toString());
                         redis.publish("antivpn-result", obj.toJSONString());
                     } else {
                         redis.publish("antivpn-delete", result.getIp());
@@ -59,6 +64,7 @@ public class Redis {
                         obj.put("ip", result.getIp());
                         obj.put("value", result.getValue());
                         obj.put("created", result.getCreated());
+                        obj.put("id", serverId.toString());
                         redis.publish("antivpn-consensus", obj.toJSONString());
                     } else {
                         redis.publish("antivpn-delete", result.getIp());
@@ -99,6 +105,7 @@ public class Redis {
                     obj.put("ip", sqlResult.getIp());
                     obj.put("value", sqlResult.getValue());
                     obj.put("created", sqlResult.getCreated());
+                    obj.put("id", serverId.toString());
                     redis.publish("antivpn-result", obj.toJSONString());
                 } else {
                     redis.publish("antivpn-delete", sqlResult.getIp());
@@ -133,6 +140,7 @@ public class Redis {
                     obj.put("ip", sqlResult.getIp());
                     obj.put("value", sqlResult.getValue());
                     obj.put("created", sqlResult.getCreated());
+                    obj.put("id", serverId.toString());
                     redis.publish("antivpn-consensus", obj.toJSONString());
                 } else {
                     redis.publish("antivpn-delete", sqlResult.getIp());

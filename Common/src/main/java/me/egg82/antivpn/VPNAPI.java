@@ -4,10 +4,14 @@ import com.google.common.collect.ImmutableMap;
 import com.rabbitmq.client.Connection;
 import java.io.IOException;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
+import me.egg82.antivpn.enums.SQLType;
 import me.egg82.antivpn.extended.CachedConfigValues;
 import me.egg82.antivpn.extended.Configuration;
 import me.egg82.antivpn.services.InternalAPI;
+import me.egg82.antivpn.sql.MySQL;
+import me.egg82.antivpn.sql.SQLite;
 import me.egg82.antivpn.utils.RabbitMQUtil;
 import me.egg82.antivpn.utils.ValidationUtil;
 import ninja.egg82.service.ServiceLocator;
@@ -24,6 +28,32 @@ public class VPNAPI {
     private VPNAPI() {}
 
     public static VPNAPI getInstance() { return api; }
+
+    public long getCurrentSQLTime() {
+        CachedConfigValues cachedConfig;
+
+        try {
+            cachedConfig = ServiceLocator.get(CachedConfigValues.class);
+        } catch (IllegalAccessException | InstantiationException | ServiceNotFoundException ex) {
+            logger.error(ex.getMessage(), ex);
+            return -1L;
+        }
+
+        try {
+            if (cachedConfig.getSQLType() == SQLType.MySQL) {
+                return MySQL.getCurrentTime(cachedConfig.getSQL()).get();
+            } else if (cachedConfig.getSQLType() == SQLType.SQLite) {
+                return SQLite.getCurrentTime(cachedConfig.getSQL()).get();
+            }
+        } catch (ExecutionException ex) {
+            logger.error(ex.getMessage(), ex);
+        } catch (InterruptedException ex) {
+            logger.error(ex.getMessage(), ex);
+            Thread.currentThread().interrupt();
+        }
+
+        return -1L;
+    }
 
     public ImmutableMap<String, Optional<Boolean>> testAllSources(String ip) {
         if (ip == null) {

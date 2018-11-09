@@ -5,7 +5,6 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import me.egg82.antivpn.core.ConsensusResult;
 import me.egg82.antivpn.core.DataResult;
 import me.egg82.antivpn.core.SQLFetchResult;
@@ -82,7 +81,7 @@ public class SQLite {
                     // Grab all data and convert to more useful object types
                     String ip = (String) o[0];
                     boolean value = (((Number) o[1]).intValue() == 0) ? false : true;
-                    long created = Timestamp.valueOf((String) o[2]).getTime();
+                    long created = getTime(o[2]).getTime();
 
                     data.add(new DataResult(ip, value, created));
                 }
@@ -105,7 +104,7 @@ public class SQLite {
                     // Grab all data and convert to more useful object types
                     String ip = (String) o[0];
                     double value = ((Number) o[1]).doubleValue();
-                    long created = Timestamp.valueOf((String) o[2]).getTime();
+                    long created = getTime(o[2]).getTime();
 
                     consensus.add(new ConsensusResult(ip, value, created));
                 }
@@ -143,7 +142,7 @@ public class SQLite {
                 for (Object[] o : query.getData()) {
                     // Grab all data and convert to more useful object types
                     boolean value = ((Number) o[0]).intValue() != 0;
-                    long created = Timestamp.valueOf((String) o[1]).getTime();
+                    long created = getTime(o[1]).getTime();
 
                     result = new DataResult(ip, value, created);
                 }
@@ -168,7 +167,7 @@ public class SQLite {
                 for (Object[] o : query.getData()) {
                     // Grab all data and convert to more useful object types
                     double value = ((Number) o[0]).doubleValue();
-                    long created = Timestamp.valueOf((String) o[1]).getTime();
+                    long created = getTime(o[1]).getTime();
 
                     result = new ConsensusResult(ip, value, created);
                 }
@@ -190,11 +189,10 @@ public class SQLite {
                 sql.execute("INSERT OR REPLACE INTO `" + tablePrefix.substring(0, tablePrefix.length() - 1) + "` (`ip`, `value`) VALUES (?, ?);", ip, (value) ? 1 : 0);
                 SQLQueryResult query = sql.query("SELECT `created` FROM `" + tablePrefix.substring(0, tablePrefix.length() - 1) + "` WHERE `ip`=?;", ip);
 
-                Timestamp sqlCreated = null;
-                Timestamp updated = new Timestamp(System.currentTimeMillis());
+                Timestamp sqlCreated;
 
                 for (Object[] o : query.getData()) {
-                    sqlCreated = Timestamp.valueOf((String) o[0]);
+                    sqlCreated = getTime(o[0]);
                     result = new DataResult(ip, value, sqlCreated.getTime());
                 }
             } catch (SQLException | ClassCastException ex) {
@@ -215,11 +213,10 @@ public class SQLite {
                 sql.execute("INSERT OR REPLACE INTO `" + tablePrefix + "consensus` (`ip`, `value`) VALUES (?, ?);", ip, value);
                 SQLQueryResult query = sql.query("SELECT `created` FROM `" + tablePrefix + "consensus` WHERE `ip`=?;", ip);
 
-                Timestamp sqlCreated = null;
-                Timestamp updated = new Timestamp(System.currentTimeMillis());
+                Timestamp sqlCreated;
 
                 for (Object[] o : query.getData()) {
-                    sqlCreated = Timestamp.valueOf((String) o[0]);
+                    sqlCreated = getTime(o[0]);
                     result = new ConsensusResult(ip, value, sqlCreated.getTime());
                 }
             } catch (SQLException | ClassCastException ex) {
@@ -265,5 +262,30 @@ public class SQLite {
                 logger.error(ex.getMessage(), ex);
             }
         });
+    }
+
+    public static CompletableFuture<Long> getCurrentTime(SQL sql) {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                SQLQueryResult query = sql.query("SELECT CURRENT_TIMESTAMP;");
+
+                for (Object[] o : query.getData()) {
+                    return getTime(o[0]).getTime();
+                }
+            } catch (SQLException | ClassCastException ex) {
+                logger.error(ex.getMessage(), ex);
+            }
+
+            return -1L;
+        });
+    }
+
+    private static Timestamp getTime(Object o) {
+        if (o instanceof String) {
+            return Timestamp.valueOf((String) o);
+        } else if (o instanceof Number) {
+            return new Timestamp(((Number) o).longValue());
+        }
+        return null;
     }
 }

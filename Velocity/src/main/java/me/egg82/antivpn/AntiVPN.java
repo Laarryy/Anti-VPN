@@ -2,6 +2,7 @@ package me.egg82.antivpn;
 
 import co.aikar.commands.ConditionFailedException;
 import co.aikar.commands.VelocityCommandManager;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.velocitypowered.api.event.PostOrder;
 import com.velocitypowered.api.event.connection.PostLoginEvent;
 import com.velocitypowered.api.plugin.PluginDescription;
@@ -9,9 +10,7 @@ import com.velocitypowered.api.proxy.ProxyServer;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.TimeoutException;
+import java.util.concurrent.*;
 import me.egg82.antivpn.commands.AntiVPNCommand;
 import me.egg82.antivpn.core.SQLFetchResult;
 import me.egg82.antivpn.enums.SQLType;
@@ -37,6 +36,8 @@ import org.slf4j.LoggerFactory;
 
 public class AntiVPN {
     private final Logger logger = LoggerFactory.getLogger(getClass());
+
+    private final ExecutorService singlePool = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder().setNameFormat("AntiVPN-%d").build());
 
     private VelocityCommandManager commandManager;
 
@@ -104,7 +105,7 @@ public class AntiVPN {
             return;
         }
 
-        new RedisSubscriber(cachedConfig.getRedisPool(), config.getNode("redis"));
+        singlePool.submit(() -> new RedisSubscriber(cachedConfig.getRedisPool(), config.getNode("redis")));
         ServiceLocator.register(new RabbitMQReceiver(cachedConfig.getRabbitConnectionFactory()));
     }
 
@@ -231,5 +232,9 @@ public class AntiVPN {
         try {
             rabbitReceiver.close();
         } catch (IOException | TimeoutException ignored) {}
+
+        if (!singlePool.isShutdown()) {
+            singlePool.shutdownNow();
+        }
     }
 }

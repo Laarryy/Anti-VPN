@@ -1,6 +1,8 @@
 package me.egg82.antivpn.extended;
 
+import java.util.UUID;
 import me.egg82.antivpn.services.InternalAPI;
+import me.egg82.antivpn.services.Redis;
 import me.egg82.antivpn.utils.RedisUtil;
 import me.egg82.antivpn.utils.ValidationUtil;
 import ninja.egg82.json.JSONUtil;
@@ -41,9 +43,15 @@ public class RedisSubscriber {
                     String ip = (String) obj.get("ip");
                     boolean value = (Boolean) obj.get("value");
                     long created = ((Number) obj.get("created")).longValue();
+                    UUID id = UUID.fromString((String) obj.get("id"));
 
                     if (!ValidationUtil.isValidIp(message)) {
                         logger.warn("non-valid IP sent through Redis pub/sub cascade");
+                        return;
+                    }
+
+                    if (id.equals(Redis.getServerID())) {
+                        logger.info("ignoring message sent from this server");
                         return;
                     }
 
@@ -60,9 +68,15 @@ public class RedisSubscriber {
                     String ip = (String) obj.get("ip");
                     double value = ((Number) obj.get("value")).doubleValue();
                     long created = ((Number) obj.get("created")).longValue();
+                    UUID id = UUID.fromString((String) obj.get("id"));
 
                     if (!ValidationUtil.isValidIp(message)) {
                         logger.warn("non-valid IP sent through Redis pub/sub consensus");
+                        return;
+                    }
+
+                    if (id.equals(Redis.getServerID())) {
+                        logger.info("ignoring message sent from this server");
                         return;
                     }
 

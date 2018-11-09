@@ -2,8 +2,10 @@ package me.egg82.antivpn.extended;
 
 import com.rabbitmq.client.*;
 import java.io.IOException;
+import java.util.UUID;
 import java.util.concurrent.TimeoutException;
 import me.egg82.antivpn.services.InternalAPI;
+import me.egg82.antivpn.services.RabbitMQ;
 import me.egg82.antivpn.utils.RabbitMQUtil;
 import me.egg82.antivpn.utils.ValidationUtil;
 import ninja.egg82.json.JSONUtil;
@@ -51,9 +53,15 @@ public class RabbitMQReceiver {
                         String ip = (String) obj.get("ip");
                         boolean value = (Boolean) obj.get("value");
                         long created = ((Number) obj.get("created")).longValue();
+                        UUID id = UUID.fromString((String) obj.get("id"));
 
                         if (!ValidationUtil.isValidIp(ip)) {
                             logger.warn("non-valid IP sent through RabbitMQ cascade");
+                            return;
+                        }
+
+                        if (id.equals(RabbitMQ.getServerID())) {
+                            logger.info("ignoring message sent from this server");
                             return;
                         }
 
@@ -77,9 +85,15 @@ public class RabbitMQReceiver {
                         String ip = (String) obj.get("ip");
                         double value = ((Number) obj.get("value")).doubleValue();
                         long created = ((Number) obj.get("created")).longValue();
+                        UUID id = UUID.fromString((String) obj.get("id"));
 
                         if (!ValidationUtil.isValidIp(ip)) {
                             logger.warn("non-valid IP sent through RabbitMQ consensus");
+                            return;
+                        }
+
+                        if (id.equals(RabbitMQ.getServerID())) {
+                            logger.info("ignoring message sent from this server");
                             return;
                         }
 

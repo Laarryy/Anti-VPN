@@ -2,14 +2,12 @@ package me.egg82.antivpn;
 
 import co.aikar.commands.BungeeCommandManager;
 import co.aikar.commands.ConditionFailedException;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+import java.util.concurrent.*;
 import java.util.logging.Level;
 import me.egg82.antivpn.commands.AntiVPNCommand;
 import me.egg82.antivpn.core.SQLFetchResult;
@@ -44,6 +42,8 @@ import org.slf4j.LoggerFactory;
 
 public class AntiVPN {
     private final Logger logger = LoggerFactory.getLogger(getClass());
+
+    private final ExecutorService singlePool = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder().setNameFormat("AntiVPN-%d").build());
 
     private BungeeCommandManager commandManager;
 
@@ -111,7 +111,7 @@ public class AntiVPN {
             return;
         }
 
-        new RedisSubscriber(cachedConfig.getRedisPool(), config.getNode("redis"));
+        singlePool.submit(() -> new RedisSubscriber(cachedConfig.getRedisPool(), config.getNode("redis")));
         ServiceLocator.register(new RabbitMQReceiver(cachedConfig.getRabbitConnectionFactory()));
         ServiceLocator.register(new BungeeUpdater(plugin, 58716));
     }
@@ -258,5 +258,9 @@ public class AntiVPN {
         try {
             rabbitReceiver.close();
         } catch (IOException | TimeoutException ignored) {}
+
+        if (!singlePool.isShutdown()) {
+            singlePool.shutdownNow();
+        }
     }
 }

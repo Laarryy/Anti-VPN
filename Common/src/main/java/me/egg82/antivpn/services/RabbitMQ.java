@@ -3,6 +3,7 @@ package me.egg82.antivpn.services;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import java.io.IOException;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeoutException;
 import me.egg82.antivpn.core.ConsensusResult;
@@ -13,9 +14,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class RabbitMQ {
-    private RabbitMQ() {}
-
     private static final Logger logger = LoggerFactory.getLogger(RabbitMQ.class);
+
+    private static final UUID serverId = UUID.randomUUID();
+    public static UUID getServerID() { return serverId; }
+
+    private RabbitMQ() {}
 
     public static CompletableFuture<Boolean> broadcast(DataResult sqlResult, long sourceCacheTime, Connection connection) {
         return CompletableFuture.supplyAsync(() -> {
@@ -31,6 +35,7 @@ public class RabbitMQ {
                     obj.put("ip", sqlResult.getIp());
                     obj.put("value", sqlResult.getValue());
                     obj.put("created", sqlResult.getCreated());
+                    obj.put("id", serverId.toString());
 
                     channel.exchangeDeclare("antivpn-result", "fanout");
                     channel.basicPublish("antivpn-result", "", null, obj.toJSONString().getBytes());
@@ -62,6 +67,7 @@ public class RabbitMQ {
                     obj.put("ip", sqlResult.getIp());
                     obj.put("value", sqlResult.getValue());
                     obj.put("created", sqlResult.getCreated());
+                    obj.put("id", serverId.toString());
 
                     channel.exchangeDeclare("antivpn-consensus", "fanout");
                     channel.basicPublish("antivpn-result", "", null, obj.toJSONString().getBytes());
