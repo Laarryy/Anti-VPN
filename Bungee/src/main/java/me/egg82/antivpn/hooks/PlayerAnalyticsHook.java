@@ -30,6 +30,8 @@ public class PlayerAnalyticsHook implements PluginHook {
 
     public static void incrementBlocked() { blocked.getAndIncrement(); }
 
+    public static long getBlocked() { return blocked.get(); }
+
     class Data extends PluginData {
         private final VPNAPI api = VPNAPI.getInstance();
 
@@ -95,12 +97,12 @@ public class PlayerAnalyticsHook implements PluginHook {
             for (UUID uuid : uuids) {
                 ProxiedPlayer player = plugin.getProxy().getPlayer(uuid);
                 if (player == null) {
-                    return container;
+                    continue;
                 }
 
                 String ip = getIp(player);
                 if (ip == null || ip.isEmpty()) {
-                    return container;
+                    continue;
                 }
 
                 boolean isVPN;

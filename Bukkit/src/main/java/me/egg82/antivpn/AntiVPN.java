@@ -7,9 +7,7 @@ import co.aikar.taskchain.TaskChain;
 import co.aikar.taskchain.TaskChainFactory;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.*;
 import java.util.logging.Level;
 import me.egg82.antivpn.commands.AntiVPNCommand;
@@ -36,6 +34,7 @@ import ninja.egg82.events.BukkitEvents;
 import ninja.egg82.service.ServiceLocator;
 import ninja.egg82.service.ServiceNotFoundException;
 import ninja.egg82.updater.SpigotUpdater;
+import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.event.EventPriority;
@@ -55,6 +54,8 @@ public class AntiVPN {
     private PaperCommandManager commandManager;
 
     private List<BukkitEventSubscriber<?>> events = new ArrayList<>();
+
+    private Metrics metrics = null;
 
     private final Plugin plugin;
     private final boolean isBukkit;
@@ -90,6 +91,7 @@ public class AntiVPN {
         loadCommands();
         loadEvents();
         loadHooks();
+        loadMetrics();
 
         plugin.getServer().getConsoleSender().sendMessage(LogUtil.getHeading() + ChatColor.GREEN + "Enabled");
 
@@ -98,6 +100,8 @@ public class AntiVPN {
                 + ChatColor.YELLOW + "[" + ChatColor.WHITE + commandManager.getRegisteredRootCommands().size() + ChatColor.GOLD + " Commands" + ChatColor.YELLOW +  "] "
                 + ChatColor.YELLOW + "[" + ChatColor.WHITE + events.size() + ChatColor.BLUE + " Events" + ChatColor.YELLOW +  "]"
         );
+
+        checkUpdate();
     }
 
     public void onDisable() {
@@ -246,6 +250,154 @@ public class AntiVPN {
         } else {
             plugin.getServer().getConsoleSender().sendMessage(LogUtil.getHeading() + ChatColor.YELLOW + "PlaceholderAPI was not found. Skipping support for placeholders.");
         }
+    }
+
+    private void loadMetrics() {
+        metrics = new Metrics(plugin);
+        metrics.addCustomChart(new Metrics.SimplePie("sql", () -> {
+            Configuration config;
+            try {
+                config = ServiceLocator.get(Configuration.class);
+            } catch (InstantiationException | IllegalAccessException | ServiceNotFoundException ex) {
+                logger.error(ex.getMessage(), ex);
+                return null;
+            }
+
+            if (!config.getNode("stats", "usage").getBoolean(true)) {
+                return null;
+            }
+
+            return config.getNode("storage", "method").getString("sqlite");
+        }));
+        metrics.addCustomChart(new Metrics.SimplePie("redis", () -> {
+            Configuration config;
+            try {
+                config = ServiceLocator.get(Configuration.class);
+            } catch (InstantiationException | IllegalAccessException | ServiceNotFoundException ex) {
+                logger.error(ex.getMessage(), ex);
+                return null;
+            }
+
+            if (!config.getNode("stats", "usage").getBoolean(true)) {
+                return null;
+            }
+
+            return config.getNode("redis", "enabled").getBoolean(false) ? "yes" : "no";
+        }));
+        metrics.addCustomChart(new Metrics.SimplePie("rabbitmq", () -> {
+            Configuration config;
+            try {
+                config = ServiceLocator.get(Configuration.class);
+            } catch (InstantiationException | IllegalAccessException | ServiceNotFoundException ex) {
+                logger.error(ex.getMessage(), ex);
+                return null;
+            }
+
+            if (!config.getNode("stats", "usage").getBoolean(true)) {
+                return null;
+            }
+
+            return config.getNode("rabbitmq", "enabled").getBoolean(false) ? "yes" : "no";
+        }));
+        metrics.addCustomChart(new Metrics.AdvancedPie("sources", () -> {
+            Configuration config;
+            CachedConfigValues cachedConfig;
+            try {
+                config = ServiceLocator.get(Configuration.class);
+                cachedConfig = ServiceLocator.get(CachedConfigValues.class);
+            } catch (InstantiationException | IllegalAccessException | ServiceNotFoundException ex) {
+                logger.error(ex.getMessage(), ex);
+                return null;
+            }
+
+            if (!config.getNode("stats", "usage").getBoolean(true)) {
+                return null;
+            }
+
+            Map<String, Integer> values = new HashMap<>();
+            for (String key : cachedConfig.getSources()) {
+                values.put(key, 1);
+            }
+            return values;
+        }));
+        metrics.addCustomChart(new Metrics.SimplePie("kick", () -> {
+            Configuration config;
+            try {
+                config = ServiceLocator.get(Configuration.class);
+            } catch (InstantiationException | IllegalAccessException | ServiceNotFoundException ex) {
+                logger.error(ex.getMessage(), ex);
+                return null;
+            }
+
+            if (!config.getNode("stats", "usage").getBoolean(true)) {
+                return null;
+            }
+
+            return config.getNode("kick", "enabled").getBoolean(true) ? "yes" : "no";
+        }));
+        metrics.addCustomChart(new Metrics.SimplePie("algorithm", () -> {
+            Configuration config;
+            try {
+                config = ServiceLocator.get(Configuration.class);
+            } catch (InstantiationException | IllegalAccessException | ServiceNotFoundException ex) {
+                logger.error(ex.getMessage(), ex);
+                return null;
+            }
+
+            if (!config.getNode("stats", "usage").getBoolean(true)) {
+                return null;
+            }
+
+            return config.getNode("kick", "method").getString("cascade");
+        }));
+        metrics.addCustomChart(new Metrics.SingleLineChart("blocked", () -> {
+            Configuration config;
+            try {
+                config = ServiceLocator.get(Configuration.class);
+            } catch (InstantiationException | IllegalAccessException | ServiceNotFoundException ex) {
+                logger.error(ex.getMessage(), ex);
+                return null;
+            }
+
+            if (!config.getNode("stats", "usage").getBoolean(true)) {
+                return null;
+            }
+
+            return (int) PlayerAnalyticsHook.getBlocked();
+        }));
+    }
+
+    private void checkUpdate() {
+        Configuration config;
+        SpigotUpdater updater;
+        try {
+            config = ServiceLocator.get(Configuration.class);
+            updater = ServiceLocator.get(SpigotUpdater.class);
+        } catch (InstantiationException | IllegalAccessException | ServiceNotFoundException ex) {
+            logger.error(ex.getMessage(), ex);
+            return;
+        }
+
+        if (!config.getNode("update", "check").getBoolean(true)) {
+            return;
+        }
+
+        updater.isUpdateAvailable().thenAccept(v -> {
+            if (!v) {
+                return;
+            }
+
+            if (config.getNode("update", "notify").getBoolean(true)) {
+                try {
+                    plugin.getServer().getConsoleSender().sendMessage(LogUtil.getHeading() + ChatColor.AQUA + " has an " + ChatColor.GREEN + "update" + ChatColor.AQUA + " available! New version: " + ChatColor.YELLOW + updater.getLatestVersion().get());
+                } catch (ExecutionException ex) {
+                    logger.error(ex.getMessage(), ex);
+                } catch (InterruptedException ex) {
+                    logger.error(ex.getMessage(), ex);
+                    Thread.currentThread().interrupt();
+                }
+            }
+        });
     }
 
     private void unloadHooks() {

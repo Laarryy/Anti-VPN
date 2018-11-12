@@ -148,6 +148,11 @@
             <artifactId>logback-core</artifactId>
             <version>1.2.3</version>
         </dependency>
+        <dependency>
+            <groupId>ninja.egg82</groupId>
+            <artifactId>gameanalytics-api</artifactId>
+            <version>1.0.0</version>
+        </dependency>
 
         <dependency>
             <groupId>org.junit.jupiter</groupId>

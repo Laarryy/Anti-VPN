@@ -32,6 +32,10 @@ public class PostLoginUpdateNotifyHandler implements Consumer<PostLoginEvent> {
             return;
         }
 
+        if (!config.getNode("update", "check").getBoolean(true)) {
+            return;
+        }
+
         updater.isUpdateAvailable().thenAccept(v -> {
             if (!v) {
                 return;

@@ -31,6 +31,10 @@ public class PlayerLoginUpdateNotifyHandler implements Consumer<PlayerLoginEvent
             return;
         }
 
+        if (!config.getNode("update", "check").getBoolean(true)) {
+            return;
+        }
+
         updater.isUpdateAvailable().thenAccept(v -> {
             if (!v) {
                 return;
