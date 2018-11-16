@@ -2,6 +2,9 @@ package me.egg82.antivpn;
 
 import co.aikar.commands.BungeeCommandManager;
 import co.aikar.commands.ConditionFailedException;
+import co.aikar.commands.RegisteredCommand;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.SetMultimap;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import java.io.IOException;
 import java.util.*;
@@ -210,6 +213,18 @@ public class AntiVPN {
             if (!cachedConfig.getSources().contains(value)) {
                 throw new ConditionFailedException("Value must be a valid source name.");
             }
+        });
+
+        commandManager.getCommandCompletions().registerCompletion("subcommand", c -> {
+            String lower = c.getInput().toLowerCase();
+            Set<String> commands = new LinkedHashSet<>();
+            SetMultimap<String, RegisteredCommand> subcommands = commandManager.getRootCommand("antivpn").getSubCommands();
+            for (Map.Entry<String, RegisteredCommand> kvp : subcommands.entries()) {
+                if (!kvp.getValue().isPrivate() && (lower.isEmpty() || kvp.getKey().toLowerCase().startsWith(lower)) && kvp.getValue().getCommand().indexOf(' ') == -1) {
+                    commands.add(kvp.getValue().getCommand());
+                }
+            }
+            return ImmutableList.copyOf(commands);
         });
 
         commandManager.registerCommand(new AntiVPNCommand(plugin));

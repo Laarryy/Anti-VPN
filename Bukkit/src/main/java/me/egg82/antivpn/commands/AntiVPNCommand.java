@@ -8,6 +8,7 @@ import me.egg82.antivpn.commands.internal.CheckCommand;
 import me.egg82.antivpn.commands.internal.ReloadCommand;
 import me.egg82.antivpn.commands.internal.ScoreCommand;
 import me.egg82.antivpn.commands.internal.TestCommand;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.Plugin;
 
@@ -50,6 +51,12 @@ public class AntiVPNCommand extends BaseCommand {
     @Syntax("<ip>")
     public void onCheck(CommandSender sender, @Conditions("ip") String ip) {
         new CheckCommand(taskFactory.newChain(), sender, ip).run();
+    }
+
+    @CatchUnknown @Default
+    @CommandCompletion("@subcommand")
+    public void onDefault(CommandSender sender, String[] args) {
+        Bukkit.getServer().dispatchCommand(sender, "antivpn help");
     }
 
     @HelpCommand

@@ -47,6 +47,12 @@ public class AntiVPNCommand extends BaseCommand {
         new CheckCommand(sender, ip).run();
     }
 
+    @CatchUnknown @Default
+    @CommandCompletion("@subcommand")
+    public void onDefault(CommandSender sender, String[] args) {
+        plugin.getProxy().getPluginManager().dispatchCommand(sender, "antivpn help");
+    }
+
     @HelpCommand
     @Syntax("[command]")
     public void onHelp(CommandSender sender, CommandHelp help) { help.showHelp(); }
