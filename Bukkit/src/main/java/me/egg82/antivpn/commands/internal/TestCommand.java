@@ -26,9 +26,7 @@ public class TestCommand implements Runnable {
         sender.sendMessage(LogUtil.getHeading() + ChatColor.YELLOW + "Testing with " + ChatColor.WHITE + ip + ChatColor.YELLOW + ", please wait..");
 
         chain
-                .<ImmutableMap<String, Optional<Boolean>>>asyncFirstCallback(f -> {
-                    f.accept(api.testAllSources(ip));
-                })
+                .<ImmutableMap<String, Optional<Boolean>>>asyncCallback((v, f) -> f.accept(api.testAllSources(ip)))
                 .syncLast(v -> {
                     for (Map.Entry<String, Optional<Boolean>> kvp : v.entrySet()) {
                         if (!kvp.getValue().isPresent()) {

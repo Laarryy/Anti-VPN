@@ -30,7 +30,7 @@ public class CheckCommand implements Runnable {
         sender.sendMessage(LogUtil.getHeading() + ChatColor.YELLOW + "Checking " + ChatColor.WHITE + ip + ChatColor.YELLOW + "..");
 
         chain
-                .<String>asyncFirstCallback(f -> {
+                .<String>asyncCallback((v, f) -> {
                     Configuration config;
                     try {
                         config = ServiceLocator.get(Configuration.class);
