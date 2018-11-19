@@ -178,15 +178,9 @@ public class MySQL {
                     long created = ((Timestamp) o[2]).getTime();
 
                     data.add(new DataResult(ip, value, created));
-
-                    // Update SQL data, force this thread
-                    update(sql, storageConfigNode, ip, value).get();
                 }
-            } catch (SQLException | ClassCastException | ExecutionException ex) {
+            } catch (SQLException | ClassCastException ex) {
                 logger.error(ex.getMessage(), ex);
-            } catch (InterruptedException ex) {
-                logger.error(ex.getMessage(), ex);
-                Thread.currentThread().interrupt();
             }
 
             try {
@@ -207,15 +201,9 @@ public class MySQL {
                     long created = ((Timestamp) o[2]).getTime();
 
                     consensus.add(new ConsensusResult(ip, value, created));
-
-                    // Update SQL data, force this thread
-                    update(sql, storageConfigNode, ip, value).get();
                 }
-            } catch (SQLException | ClassCastException | ExecutionException ex) {
+            } catch (SQLException | ClassCastException ex) {
                 logger.error(ex.getMessage(), ex);
-            } catch (InterruptedException ex) {
-                logger.error(ex.getMessage(), ex);
-                Thread.currentThread().interrupt();
             }
 
             try {
