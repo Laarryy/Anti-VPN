@@ -29,6 +29,11 @@ public class Redis {
                     return Boolean.FALSE;
                 }
 
+                for (String key : sqlResult.getRemovedKeys()) {
+                    redis.del(key);
+                    redis.publish("antivpn-delete", key);
+                }
+
                 for (DataResult result : sqlResult.getData()) {
                     String key = "avpn:" + result.getIp();
                     int offset = (int) Math.floorDiv((sourceCacheTime + result.getCreated()) - System.currentTimeMillis(), 1000L);
@@ -69,11 +74,6 @@ public class Redis {
                     } else {
                         redis.publish("antivpn-delete", result.getIp());
                     }
-                }
-
-                for (String key : sqlResult.getRemovedKeys()) {
-                    redis.del(key);
-                    redis.publish("antivpn-delete", key);
                 }
 
                 return Boolean.TRUE;

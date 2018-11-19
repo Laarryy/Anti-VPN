@@ -28,9 +28,9 @@ import redis.clients.jedis.JedisPool;
 public class InternalAPI {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private static Cache<String, Boolean> ipCache = Caffeine.newBuilder().expireAfterAccess(1L, TimeUnit.MINUTES).expireAfterWrite(6L, TimeUnit.HOURS).build();
-    private static Cache<String, Double> ipConsensusCache = Caffeine.newBuilder().expireAfterAccess(1L, TimeUnit.MINUTES).expireAfterWrite(6L, TimeUnit.HOURS).build();
-    private static LoadingCache<String, Boolean> sourceValidationCache = Caffeine.newBuilder().expireAfterWrite(1L,TimeUnit.MINUTES).build(k -> Boolean.TRUE);
+    private static Cache<String, Boolean> ipCache = Caffeine.newBuilder().expireAfterAccess(1L, TimeUnit.MINUTES).expireAfterWrite(1L, TimeUnit.HOURS).build();
+    private static Cache<String, Double> ipConsensusCache = Caffeine.newBuilder().expireAfterAccess(1L, TimeUnit.MINUTES).expireAfterWrite(1L, TimeUnit.HOURS).build();
+    private static LoadingCache<String, Boolean> sourceValidationCache = Caffeine.newBuilder().expireAfterWrite(1L, TimeUnit.MINUTES).build(k -> Boolean.TRUE);
 
     private ImmutableMap<String, API> apis;
 
@@ -112,9 +112,9 @@ public class InternalAPI {
         threadPool = Executors.newWorkStealingPool(newThreadCount);
     }
 
-    public static void changeCacheTime(long cacheDuration, TimeUnit cacheUnit, long sourceDuration, TimeUnit sourceUnit) {
-        ipCache = Caffeine.newBuilder().expireAfterAccess(cacheDuration, cacheUnit).expireAfterWrite(sourceDuration, sourceUnit).build();
-        ipConsensusCache = Caffeine.newBuilder().expireAfterAccess(cacheDuration, cacheUnit).expireAfterWrite(sourceDuration, sourceUnit).build();
+    public static void changeCacheTime(long duration, TimeUnit unit) {
+        ipCache = Caffeine.newBuilder().expireAfterAccess(duration, unit).expireAfterWrite(1L, TimeUnit.HOURS).build();
+        ipConsensusCache = Caffeine.newBuilder().expireAfterAccess(duration, unit).expireAfterWrite(1L, TimeUnit.HOURS).build();
     }
 
     public static void set(String ip, boolean value, long created, SQL sql, ConfigurationNode storageConfigNode, SQLType sqlType) {
