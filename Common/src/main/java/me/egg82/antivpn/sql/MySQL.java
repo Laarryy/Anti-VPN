@@ -342,10 +342,11 @@ public class MySQL {
     public static CompletableFuture<Long> getCurrentTime(SQL sql) {
         return CompletableFuture.supplyAsync(() -> {
             try {
+                long start = System.currentTimeMillis();
                 SQLQueryResult query = sql.query("SELECT CURRENT_TIMESTAMP();");
 
                 for (Object[] o : query.getData()) {
-                    return ((Timestamp) o[0]).getTime();
+                    return ((Timestamp) o[0]).getTime() + (System.currentTimeMillis() - start);
                 }
             } catch (SQLException | ClassCastException ex) {
                 logger.error(ex.getMessage(), ex);
