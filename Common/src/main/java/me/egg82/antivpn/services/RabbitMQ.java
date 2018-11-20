@@ -73,7 +73,7 @@ public class RabbitMQ {
                     obj.put("id", serverId.toString());
 
                     channel.exchangeDeclare("antivpn-consensus", "fanout");
-                    channel.basicPublish("antivpn-result", "", null, obj.toJSONString().getBytes(utf8));
+                    channel.basicPublish("antivpn-consensus", "", null, obj.toJSONString().getBytes(utf8));
                 } else {
                     channel.exchangeDeclare("antivpn-delete", "fanout");
                     channel.basicPublish("antivpn-delete", "", null, sqlResult.getIp().getBytes(utf8));
