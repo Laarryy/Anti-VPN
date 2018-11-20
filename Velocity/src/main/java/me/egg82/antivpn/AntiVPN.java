@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
 public class AntiVPN {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private final ExecutorService singlePool = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder().setNameFormat("AntiVPN-%d").build());
+    private final ExecutorService workPool = Executors.newFixedThreadPool(2, new ThreadFactoryBuilder().setNameFormat("AntiVPN-%d").build());
 
     private VelocityCommandManager commandManager;
 
@@ -105,7 +105,7 @@ public class AntiVPN {
             return;
         }
 
-        singlePool.submit(() -> new RedisSubscriber(cachedConfig.getRedisPool(), config.getNode("redis")));
+        workPool.submit(() -> new RedisSubscriber(cachedConfig.getRedisPool(), config.getNode("redis")));
         ServiceLocator.register(new RabbitMQReceiver(cachedConfig.getRabbitConnectionFactory()));
     }
 
@@ -139,7 +139,7 @@ public class AntiVPN {
     }
 
     private void updateSQL() {
-        ForkJoinPool.commonPool().execute(() -> {
+        workPool.submit(() -> {
             try {
                 Thread.sleep(10000L);
             } catch (InterruptedException ex) {
@@ -233,8 +233,16 @@ public class AntiVPN {
             rabbitReceiver.close();
         } catch (IOException | TimeoutException ignored) {}
 
-        if (!singlePool.isShutdown()) {
-            singlePool.shutdownNow();
+        if (!workPool.isShutdown()) {
+            workPool.shutdown();
+            try {
+                if (!workPool.awaitTermination(8L, TimeUnit.SECONDS)) {
+                    workPool.shutdownNow();
+                }
+            } catch (InterruptedException ignored) {
+                workPool.shutdownNow();
+                Thread.currentThread().interrupt();
+            }
         }
     }
 }
