@@ -43,7 +43,7 @@ public class PostLoginUpdateNotifyHandler implements Consumer<PostLoginEvent> {
 
             if (config.getNode("update", "notify").getBoolean(true)) {
                 try {
-                    event.getPlayer().sendMessage(new TextComponent(LogUtil.getHeading() + ChatColor.AQUA + " (Bukkit) has an " + ChatColor.GREEN + "update" + ChatColor.AQUA + " available! New version: " + ChatColor.YELLOW + updater.getLatestVersion().get()));
+                    event.getPlayer().sendMessage(new TextComponent(LogUtil.getHeading() + ChatColor.AQUA + " (Bungee) has an " + ChatColor.GREEN + "update" + ChatColor.AQUA + " available! New version: " + ChatColor.YELLOW + updater.getLatestVersion().get()));
                 } catch (ExecutionException ex) {
                     logger.error(ex.getMessage(), ex);
                 } catch (InterruptedException ex) {

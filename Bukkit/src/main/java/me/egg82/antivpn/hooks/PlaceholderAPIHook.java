@@ -9,7 +9,7 @@ public class PlaceholderAPIHook implements PluginHook {
 
     public void cancel() {}
 
-    public static String withPlaceholders(Player player, String input) { return PlaceholderAPI.setPlaceholders(player, input); }
+    public String withPlaceholders(Player player, String input) { return PlaceholderAPI.setPlaceholders(player, input); }
 
-    public static String withPlaceholders(OfflinePlayer player, String input) { return PlaceholderAPI.setPlaceholders(player, input); }
+    public String withPlaceholders(OfflinePlayer player, String input) { return PlaceholderAPI.setPlaceholders(player, input); }
 }

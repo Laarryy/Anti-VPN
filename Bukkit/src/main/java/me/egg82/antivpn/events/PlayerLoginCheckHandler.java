@@ -80,7 +80,7 @@ public class PlayerLoginCheckHandler implements Consumer<PlayerLoginEvent> {
             }
 
             if (placeholderapi.isPresent()) {
-                event.getPlayer().kickPlayer(PlaceholderAPIHook.withPlaceholders(event.getPlayer(), config.getNode("kick", "message").getString("")));
+                event.getPlayer().kickPlayer(placeholderapi.get().withPlaceholders(event.getPlayer(), config.getNode("kick", "message").getString("")));
             } else {
                 event.getPlayer().kickPlayer(config.getNode("kick", "message").getString(""));
             }
