@@ -4,7 +4,6 @@ import co.aikar.commands.ConditionFailedException;
 import co.aikar.commands.PaperCommandManager;
 import co.aikar.commands.RegisteredCommand;
 import co.aikar.taskchain.BukkitTaskChainFactory;
-import co.aikar.taskchain.TaskChain;
 import co.aikar.taskchain.TaskChainFactory;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.SetMultimap;
