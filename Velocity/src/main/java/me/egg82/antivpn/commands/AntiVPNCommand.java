@@ -6,6 +6,7 @@ import co.aikar.commands.annotation.*;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.plugin.PluginDescription;
 import com.velocitypowered.api.proxy.ProxyServer;
+import me.egg82.antivpn.AntiVPN;
 import me.egg82.antivpn.VelocityBootstrap;
 import me.egg82.antivpn.commands.internal.CheckCommand;
 import me.egg82.antivpn.commands.internal.ReloadCommand;
@@ -14,11 +15,13 @@ import me.egg82.antivpn.commands.internal.TestCommand;
 
 @CommandAlias("antivpn|avpn")
 public class AntiVPNCommand extends BaseCommand {
+    private final AntiVPN concrete;
     private final VelocityBootstrap bootstrap;
     private final ProxyServer proxy;
     private final PluginDescription pluginDescription;
 
-    public AntiVPNCommand(VelocityBootstrap bootstrap, ProxyServer proxy, PluginDescription description) {
+    public AntiVPNCommand(AntiVPN concrete, VelocityBootstrap bootstrap, ProxyServer proxy, PluginDescription description) {
+        this.concrete = concrete;
         this.bootstrap = bootstrap;
         this.proxy = proxy;
         this.pluginDescription = description;
@@ -28,7 +31,7 @@ public class AntiVPNCommand extends BaseCommand {
     @CommandPermission("avpn.admin")
     @Description("Reloads the plugin.")
     public void onReload(CommandSource source) {
-        new ReloadCommand(bootstrap, proxy, pluginDescription, source).run();
+        new ReloadCommand(concrete, bootstrap, proxy, pluginDescription, source).run();
     }
 
     @Subcommand("test")

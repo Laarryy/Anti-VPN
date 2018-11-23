@@ -7,7 +7,9 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="antivpn-bukkit" />
+        <module name="antivpn-bungee" />
         <module name="antivpn-common" />
+        <module name="antivpn-velocity" />
         <module name="Bungee" />
         <module name="Velocity" />
       </profile>

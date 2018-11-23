@@ -124,6 +124,11 @@ public class AntiVPN {
     private void loadServices() {
         ConfigurationFileUtil.reloadConfig(plugin);
 
+        loadServicesExternal();
+        ServiceLocator.register(new SpigotUpdater(plugin, 58291));
+    }
+
+    public void loadServicesExternal() {
         Configuration config;
         CachedConfigValues cachedConfig;
 
@@ -137,7 +142,6 @@ public class AntiVPN {
 
         workPool.submit(() -> new RedisSubscriber(cachedConfig.getRedisPool(), config.getNode("redis")));
         ServiceLocator.register(new RabbitMQReceiver(cachedConfig.getRabbitConnectionFactory()));
-        ServiceLocator.register(new SpigotUpdater(plugin, 58291));
     }
 
     private void loadSQL() {
@@ -164,6 +168,33 @@ public class AntiVPN {
                     SQLite.loadInfo(cachedConfig.getSQL(), config.getNode("storage")).thenAccept(v -> {
                         Redis.updateFromQueue(v, cachedConfig.getSourceCacheTime(), cachedConfig.getRedisPool(), config.getNode("redis"));
                         updateSQL();
+                    })
+            );
+        }
+    }
+
+    public void loadSQLExternal() {
+        Configuration config;
+        CachedConfigValues cachedConfig;
+
+        try {
+            config = ServiceLocator.get(Configuration.class);
+            cachedConfig = ServiceLocator.get(CachedConfigValues.class);
+        } catch (InstantiationException | IllegalAccessException | ServiceNotFoundException ex) {
+            logger.error(ex.getMessage(), ex);
+            return;
+        }
+
+        if (cachedConfig.getSQLType() == SQLType.MySQL) {
+            MySQL.createTables(cachedConfig.getSQL(), config.getNode("storage")).thenRun(() ->
+                    MySQL.loadInfo(cachedConfig.getSQL(), config.getNode("storage")).thenAccept(v -> {
+                        Redis.updateFromQueue(v, cachedConfig.getSourceCacheTime(), cachedConfig.getRedisPool(), config.getNode("redis"));
+                    })
+            );
+        } else if (cachedConfig.getSQLType() == SQLType.SQLite) {
+            SQLite.createTables(cachedConfig.getSQL(), config.getNode("storage")).thenRun(() ->
+                    SQLite.loadInfo(cachedConfig.getSQL(), config.getNode("storage")).thenAccept(v -> {
+                        Redis.updateFromQueue(v, cachedConfig.getSourceCacheTime(), cachedConfig.getRedisPool(), config.getNode("redis"));
                     })
             );
         }
@@ -242,7 +273,7 @@ public class AntiVPN {
             return ImmutableList.copyOf(commands);
         });
 
-        commandManager.registerCommand(new AntiVPNCommand(plugin, taskFactory));
+        commandManager.registerCommand(new AntiVPNCommand(this, plugin, taskFactory));
     }
 
     private void loadEvents() {
@@ -437,7 +468,7 @@ public class AntiVPN {
         placeholderapi.ifPresent(v -> v.cancel());
     }
 
-    private void unloadServices() {
+    public void unloadServices() {
         CachedConfigValues cachedConfig;
         RabbitMQReceiver rabbitReceiver;
 

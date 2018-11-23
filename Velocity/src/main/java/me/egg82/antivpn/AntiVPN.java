@@ -94,6 +94,10 @@ public class AntiVPN {
     private void loadServices() {
         ConfigurationFileUtil.reloadConfig(bootstrap, proxy, description);
 
+        loadServicesExternal();
+    }
+
+    public void loadServicesExternal() {
         Configuration config;
         CachedConfigValues cachedConfig;
 
@@ -133,6 +137,33 @@ public class AntiVPN {
                     SQLite.loadInfo(cachedConfig.getSQL(), config.getNode("storage")).thenAccept(v -> {
                         Redis.updateFromQueue(v, cachedConfig.getSourceCacheTime(), cachedConfig.getRedisPool(), config.getNode("redis"));
                         updateSQL();
+                    })
+            );
+        }
+    }
+
+    public void loadSQLExternal() {
+        Configuration config;
+        CachedConfigValues cachedConfig;
+
+        try {
+            config = ServiceLocator.get(Configuration.class);
+            cachedConfig = ServiceLocator.get(CachedConfigValues.class);
+        } catch (InstantiationException | IllegalAccessException | ServiceNotFoundException ex) {
+            logger.error(ex.getMessage(), ex);
+            return;
+        }
+
+        if (cachedConfig.getSQLType() == SQLType.MySQL) {
+            MySQL.createTables(cachedConfig.getSQL(), config.getNode("storage")).thenRun(() ->
+                    MySQL.loadInfo(cachedConfig.getSQL(), config.getNode("storage")).thenAccept(v -> {
+                        Redis.updateFromQueue(v, cachedConfig.getSourceCacheTime(), cachedConfig.getRedisPool(), config.getNode("redis"));
+                    })
+            );
+        } else if (cachedConfig.getSQLType() == SQLType.SQLite) {
+            SQLite.createTables(cachedConfig.getSQL(), config.getNode("storage")).thenRun(() ->
+                    SQLite.loadInfo(cachedConfig.getSQL(), config.getNode("storage")).thenAccept(v -> {
+                        Redis.updateFromQueue(v, cachedConfig.getSourceCacheTime(), cachedConfig.getRedisPool(), config.getNode("redis"));
                     })
             );
         }
@@ -200,7 +231,7 @@ public class AntiVPN {
             }
         });
 
-        commandManager.registerCommand(new AntiVPNCommand(bootstrap, proxy, description));
+        commandManager.registerCommand(new AntiVPNCommand(this, bootstrap, proxy, description));
     }
 
     private void loadEvents() {
@@ -211,7 +242,7 @@ public class AntiVPN {
 
     private void unloadHooks() {}
 
-    private void unloadServices() {
+    public void unloadServices() {
         CachedConfigValues cachedConfig;
         RabbitMQReceiver rabbitReceiver;
 

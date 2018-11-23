@@ -4,6 +4,7 @@ import co.aikar.commands.BaseCommand;
 import co.aikar.commands.CommandHelp;
 import co.aikar.commands.annotation.*;
 import co.aikar.taskchain.TaskChainFactory;
+import me.egg82.antivpn.AntiVPN;
 import me.egg82.antivpn.commands.internal.CheckCommand;
 import me.egg82.antivpn.commands.internal.ReloadCommand;
 import me.egg82.antivpn.commands.internal.ScoreCommand;
@@ -14,10 +15,12 @@ import org.bukkit.plugin.Plugin;
 
 @CommandAlias("antivpn|avpn")
 public class AntiVPNCommand extends BaseCommand {
+    private final AntiVPN concrete;
     private final Plugin plugin;
     private final TaskChainFactory taskFactory;
 
-    public AntiVPNCommand(Plugin plugin, TaskChainFactory taskFactory) {
+    public AntiVPNCommand(AntiVPN concrete, Plugin plugin, TaskChainFactory taskFactory) {
+        this.concrete = concrete;
         this.plugin = plugin;
         this.taskFactory = taskFactory;
     }
@@ -26,7 +29,7 @@ public class AntiVPNCommand extends BaseCommand {
     @CommandPermission("avpn.admin")
     @Description("Reloads the plugin.")
     public void onReload(CommandSender sender) {
-        new ReloadCommand(plugin, taskFactory.newChain(), sender).run();
+        new ReloadCommand(concrete, plugin, taskFactory.newChain(), sender).run();
     }
 
     @Subcommand("test")
