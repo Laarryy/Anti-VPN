@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
 public class AntiVPN {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private final ExecutorService workPool = Executors.newFixedThreadPool(2, new ThreadFactoryBuilder().setNameFormat("AntiVPN-%d").build());
+    private ExecutorService workPool = null;
 
     private VelocityCommandManager commandManager;
 
@@ -98,6 +98,8 @@ public class AntiVPN {
     }
 
     public void loadServicesExternal() {
+        workPool = Executors.newFixedThreadPool(2, new ThreadFactoryBuilder().setNameFormat("AntiVPN-%d").build());
+
         Configuration config;
         CachedConfigValues cachedConfig;
 
