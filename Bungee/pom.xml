@@ -5,7 +5,7 @@
     <parent>
         <artifactId>antivpn-parent</artifactId>
         <groupId>me.egg82</groupId>
-        <version>3.5.16</version>
+        <version>3.5.17</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -71,6 +71,7 @@
                             <shadedPattern>me.egg82.antivpn.external.com.google</shadedPattern>
                             <excludes>
                                 <exclude>com.google.common.*</exclude>
+                                <exclude>com.google.gson.*</exclude>
                             </excludes>
                         </relocation>
                         <relocation>

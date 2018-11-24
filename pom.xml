@@ -7,7 +7,7 @@
     <groupId>me.egg82</groupId>
     <artifactId>antivpn-parent</artifactId>
     <packaging>pom</packaging>
-    <version>3.5.16</version>
+    <version>3.5.17</version>
 
     <modules>
         <module>Common</module>
