@@ -263,7 +263,7 @@ public class AntiVPN {
     }
 
     private void loadEvents() {
-        events.add(BungeeEvents.subscribe(plugin, PostLoginEvent.class, EventPriority.LOW).handler(e -> new PostLoginCheckHandler().accept(e)));
+        events.add(BungeeEvents.subscribe(plugin, PostLoginEvent.class, EventPriority.LOWEST).handler(e -> new PostLoginCheckHandler().accept(e)));
         events.add(BungeeEvents.subscribe(plugin, PostLoginEvent.class, EventPriority.LOW).handler(e -> new PostLoginUpdateNotifyHandler().accept(e)));
     }
 

@@ -237,7 +237,7 @@ public class AntiVPN {
     }
 
     private void loadEvents() {
-        events.add(VelocityEvents.subscribe(bootstrap, proxy, PostLoginEvent.class, PostOrder.EARLY).handler(e -> new PostLoginCheckHandler(proxy).accept(e)));
+        events.add(VelocityEvents.subscribe(bootstrap, proxy, PostLoginEvent.class, PostOrder.FIRST).handler(e -> new PostLoginCheckHandler(proxy).accept(e)));
     }
 
     private void loadHooks() {}
