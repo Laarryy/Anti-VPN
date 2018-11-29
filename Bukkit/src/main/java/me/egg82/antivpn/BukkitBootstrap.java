@@ -131,7 +131,11 @@ public class BukkitBootstrap extends JavaPlugin {
             JarUtil.loadJar("http://central.maven.org/maven2/org/xerial/sqlite-jdbc/3.25.2/sqlite-jdbc-3.25.2.jar",
                     new File(jarsFolder, "sqlite-jdbc-3.25.2.jar"),
                     classLoader);
+        }
 
+        try {
+            DriverManager.getDriver("org.sqlite.JDBC");
+        } catch (SQLException ignored) {
             try {
                 DriverManager.registerDriver((Driver) Class.forName("org.sqlite.JDBC", true, classLoader).newInstance());
             } catch (ClassNotFoundException | InstantiationException | SQLException ex) {
@@ -146,7 +150,11 @@ public class BukkitBootstrap extends JavaPlugin {
             JarUtil.loadJar("http://central.maven.org/maven2/mysql/mysql-connector-java/8.0.13/mysql-connector-java-8.0.13.jar",
                     new File(jarsFolder, "mysql-connector-java-8.0.13.jar"),
                     classLoader);
+        }
 
+        try {
+            DriverManager.getDriver("com.mysql.jdbc.Driver");
+        } catch (SQLException ignored) {
             try {
                 DriverManager.registerDriver((Driver) Class.forName("com.mysql.jdbc.Driver", true, classLoader).newInstance());
             } catch (ClassNotFoundException | InstantiationException | SQLException ex) {

@@ -134,11 +134,15 @@ public class RabbitMQReceiver {
     }
 
     public void close() throws IOException, TimeoutException {
-        if (channel != null) {
-            channel.close();
-        }
-        if (connection != null) {
-            connection.close();
-        }
+        try {
+            if (channel != null) {
+                channel.close();
+            }
+        } catch (AlreadyClosedException ignored) {}
+        try {
+            if (connection != null) {
+                connection.close();
+            }
+        } catch (AlreadyClosedException ignored) {}
     }
 }
