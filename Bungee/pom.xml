@@ -70,8 +70,8 @@
                             <pattern>com.google</pattern>
                             <shadedPattern>me.egg82.antivpn.external.com.google</shadedPattern>
                             <excludes>
-                                <exclude>com.google.common.*</exclude>
-                                <exclude>com.google.gson.*</exclude>
+                                <exclude>com.google.common.**</exclude>
+                                <exclude>com.google.gson.**</exclude>
                             </excludes>
                         </relocation>
                         <relocation>
@@ -107,7 +107,7 @@
                             <pattern>org.apache.commons</pattern>
                             <shadedPattern>me.egg82.antivpn.external.org.apache.commons</shadedPattern>
                             <excludes>
-                                <exclude>org.apache.commons.pool2.*</exclude>
+                                <exclude>org.apache.commons.pool2.**</exclude>
                             </excludes>
                         </relocation>
                         <relocation>
