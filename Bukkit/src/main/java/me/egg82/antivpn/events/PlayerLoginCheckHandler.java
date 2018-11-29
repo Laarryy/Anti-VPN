@@ -71,6 +71,8 @@ public class PlayerLoginCheckHandler implements Consumer<PlayerLoginEvent> {
                 logger.info(LogUtil.getHeading() + ChatColor.WHITE + event.getPlayer().getName() + ChatColor.DARK_RED + " found using a VPN. Kicking with defined message.");
             }
 
+            event.setResult(PlayerLoginEvent.Result.KICK_OTHER);
+
             Optional<PlaceholderAPIHook> placeholderapi;
             try {
                 placeholderapi = ServiceLocator.getOptional(PlaceholderAPIHook.class);
@@ -80,9 +82,9 @@ public class PlayerLoginCheckHandler implements Consumer<PlayerLoginEvent> {
             }
 
             if (placeholderapi.isPresent()) {
-                event.getPlayer().kickPlayer(placeholderapi.get().withPlaceholders(event.getPlayer(), config.getNode("kick", "message").getString("")));
+                event.setKickMessage(placeholderapi.get().withPlaceholders(event.getPlayer(), config.getNode("kick", "message").getString("")));
             } else {
-                event.getPlayer().kickPlayer(config.getNode("kick", "message").getString(""));
+                event.setKickMessage(config.getNode("kick", "message").getString(""));
             }
         } else {
             logger.info(LogUtil.getHeading() + ChatColor.WHITE + event.getPlayer().getName() + ChatColor.GREEN + " passed VPN check.");
