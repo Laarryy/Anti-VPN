@@ -1,6 +1,6 @@
 name: AntiVPN
 main: me.egg82.antivpn.BukkitBootstrap
-version: 3.5.17
+version: 3.5.18
 author: egg82
 api-version: 1.13
 description: Get the best; save money on overpriced plugins and block VPN users!
