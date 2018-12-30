@@ -241,6 +241,26 @@ public class ConfigurationFileUtil {
         hikariConfig.addDataSourceProperty("characterEncoding", storageConfigNode.getNode("settings", "properties", "encoding").getString("utf8"));
         hikariConfig.setAutoCommit(true);
 
+        // Optimizations
+        if (type == SQLType.MySQL) {
+            hikariConfig.addDataSourceProperty("useSSL", String.valueOf(storageConfigNode.getNode("data", "ssl").getBoolean(false)));
+            // http://assets.en.oreilly.com/1/event/21/Connector_J%20Performance%20Gems%20Presentation.pdf
+            hikariConfig.addDataSourceProperty("cacheServerConfiguration", "true");
+            hikariConfig.addDataSourceProperty("useLocalSessionState", "true");
+            hikariConfig.addDataSourceProperty("useLocalTransactionState", "true");
+            hikariConfig.addDataSourceProperty("rewriteBatchedStatements", "true");
+            hikariConfig.addDataSourceProperty("useServerPrepStmts", "true");
+            hikariConfig.addDataSourceProperty("cachePrepStmts", "true");
+            hikariConfig.addDataSourceProperty("maintainTimeStats", "false");
+            hikariConfig.addDataSourceProperty("useUnbufferedIO", "false");
+            hikariConfig.addDataSourceProperty("useReadAheadInput", "false");
+            // https://github.com/brettwooldridge/HikariCP/wiki/MySQL-Configuration
+            hikariConfig.addDataSourceProperty("prepStmtCacheSize", "250");
+            hikariConfig.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
+            hikariConfig.addDataSourceProperty("cacheResultSetMetadata", "true");
+            hikariConfig.addDataSourceProperty("elideSetAutoCommits", "true");
+        }
+
         return new SQL(hikariConfig);
     }
 

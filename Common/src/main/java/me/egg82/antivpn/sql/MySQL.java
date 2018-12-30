@@ -5,7 +5,6 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import me.egg82.antivpn.core.ConsensusResult;
 import me.egg82.antivpn.core.DataResult;
 import me.egg82.antivpn.core.SQLFetchResult;

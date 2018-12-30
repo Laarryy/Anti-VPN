@@ -41,7 +41,7 @@ public class IPHubAPI implements API {
             logger.error(ex.getMessage(), ex);
             return Optional.empty();
         }
-        if (json == null) {
+        if (json == null || json.get("block") == null) {
             return Optional.empty();
         }
 

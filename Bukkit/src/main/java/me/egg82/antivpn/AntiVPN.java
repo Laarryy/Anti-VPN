@@ -482,8 +482,6 @@ public class AntiVPN {
             return;
         }
 
-        cachedConfig.getSQL().close();
-
         if (cachedConfig.getRedisPool() != null) {
             cachedConfig.getRedisPool().close();
         }
@@ -503,6 +501,8 @@ public class AntiVPN {
                 Thread.currentThread().interrupt();
             }
         }
+
+        cachedConfig.getSQL().close();
     }
 
     private void log(Level level, String message) {

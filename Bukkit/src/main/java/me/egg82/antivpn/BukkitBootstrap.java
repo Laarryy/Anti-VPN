@@ -43,7 +43,6 @@ public class BukkitBootstrap extends JavaPlugin {
         }
 
         concrete = new AntiVPN(this);
-
         concrete.onLoad();
     }
 

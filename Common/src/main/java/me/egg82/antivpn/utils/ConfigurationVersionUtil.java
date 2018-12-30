@@ -31,6 +31,9 @@ public class ConfigurationVersionUtil {
         if (config.getNode("version").getDouble() == 2.3d) {
             to33(config);
         }
+        if (config.getNode("version").getDouble() == 3.3d) {
+            to34(config);
+        }
 
         if (config.getNode("version").getDouble() != oldVersion) {
             File backupFile = new File(fileOnDisk.getParent(), fileOnDisk.getName() + ".bak");
@@ -204,5 +207,13 @@ public class ConfigurationVersionUtil {
 
         // Version
         config.getNode("version").setValue(3.3d);
+    }
+
+    private static void to34(ConfigurationNode config) {
+        // Add storage->data->SSL
+        config.getNode("storage", "data", "ssl").setValue(Boolean.FALSE);
+
+        // Version
+        config.getNode("version").setValue(3.4d);
     }
 }

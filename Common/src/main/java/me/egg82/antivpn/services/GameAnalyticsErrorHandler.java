@@ -24,7 +24,9 @@ public class GameAnalyticsErrorHandler {
         try {
             gameAnalytics.queueEvent(GAError.builder(eventBase, exception).build());
         } catch (IOException ex) {
-            ex.printStackTrace();
+            if (!ex.getMessage().equals("Connection has been closed.")) {
+                ex.printStackTrace();
+            }
         }
     }
 
@@ -36,7 +38,9 @@ public class GameAnalyticsErrorHandler {
         try {
             gameAnalytics.queueEvent(GAError.builder(eventBase, severity, message).build());
         } catch (IOException ex) {
-            ex.printStackTrace();
+            if (!ex.getMessage().equals("Connection has been closed.")) {
+                ex.printStackTrace();
+            }
         }
     }
 

@@ -31,7 +31,7 @@ public class ProxyCheckAPI implements API {
             logger.error(ex.getMessage(), ex);
             return Optional.empty();
         }
-        if (json == null) {
+        if (json == null || json.get("status") == null) {
             return Optional.empty();
         }
 
@@ -41,6 +41,9 @@ public class ProxyCheckAPI implements API {
         }
 
         JSONObject result = (JSONObject) json.get(ip);
+        if (result == null || result.get("proxy") == null) {
+            return Optional.empty();
+        }
         String proxy = (String) result.get("proxy");
 
         return Optional.of(proxy.equalsIgnoreCase("yes") ? Boolean.TRUE : Boolean.FALSE);

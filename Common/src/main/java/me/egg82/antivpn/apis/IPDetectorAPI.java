@@ -39,7 +39,7 @@ public class IPDetectorAPI implements API {
             logger.error(ex.getMessage(), ex);
             return Optional.empty();
         }
-        if (json == null) {
+        if (json == null || json.get("goodIp") == null) {
             return Optional.empty();
         }
 

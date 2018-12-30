@@ -29,7 +29,7 @@ public class GetIPIntelAPI implements API {
             logger.error(ex.getMessage(), ex);
             return Optional.empty();
         }
-        if (json == null) {
+        if (json == null || json.get("result") == null) {
             return Optional.empty();
         }
 

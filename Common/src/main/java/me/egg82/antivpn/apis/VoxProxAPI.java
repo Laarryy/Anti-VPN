@@ -34,7 +34,7 @@ public class VoxProxAPI implements API {
             logger.error(ex.getMessage(), ex);
             return Optional.empty();
         }
-        if (json == null) {
+        if (json == null || json.get("Result") == null) {
             return Optional.empty();
         }
 

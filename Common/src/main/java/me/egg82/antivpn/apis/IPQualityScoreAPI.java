@@ -34,7 +34,7 @@ public class IPQualityScoreAPI implements API {
             logger.error(ex.getMessage(), ex);
             return Optional.empty();
         }
-        if (json == null) {
+        if (json == null || json.get("success") == null) {
             return Optional.empty();
         }
 
@@ -42,17 +42,21 @@ public class IPQualityScoreAPI implements API {
             return Optional.empty();
         }
 
-        if (((Boolean) json.get("proxy"))) {
+        if (json.get("proxy") != null && ((Boolean) json.get("proxy"))) {
             return Optional.of(Boolean.TRUE);
         }
-        if (((Boolean) json.get("vpn"))) {
+        if (json.get("vpn") != null && ((Boolean) json.get("vpn"))) {
             return Optional.of(Boolean.TRUE);
         }
-        if (((Boolean) json.get("tor"))) {
+        if (json.get("tor") != null && ((Boolean) json.get("tor"))) {
             return Optional.of(Boolean.TRUE);
         }
-        if (((Boolean) json.get("is_crawler"))) {
+        if (json.get("is_crawler") != null && ((Boolean) json.get("is_crawler"))) {
             return Optional.of(Boolean.TRUE);
+        }
+
+        if (json.get("fraud_score") == null) {
+            return Optional.empty();
         }
 
         double retVal = ((Number) json.get("fraud_score")).doubleValue();

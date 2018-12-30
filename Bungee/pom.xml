@@ -230,7 +230,7 @@
         <dependency>
             <groupId>ninja.egg82</groupId>
             <artifactId>event-chain-bungee</artifactId>
-            <version>1.0.1</version>
+            <version>1.0.5</version>
         </dependency>
         <dependency>
             <groupId>org.spongepowered</groupId>

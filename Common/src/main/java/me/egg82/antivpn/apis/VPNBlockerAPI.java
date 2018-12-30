@@ -31,7 +31,7 @@ public class VPNBlockerAPI implements API {
             logger.error(ex.getMessage(), ex);
             return Optional.empty();
         }
-        if (json == null) {
+        if (json == null || json.get("status") == null) {
             return Optional.empty();
         }
 
@@ -40,6 +40,10 @@ public class VPNBlockerAPI implements API {
             return Optional.empty();
         }
 
-        return Optional.of((((Boolean) json.get("host-ip"))) ? Boolean.TRUE : Boolean.FALSE);
+        if (json.get("host-ip") == null) {
+            return Optional.empty();
+        }
+
+        return Optional.of((Boolean) json.get("host-ip") ? Boolean.TRUE : Boolean.FALSE);
     }
 }
