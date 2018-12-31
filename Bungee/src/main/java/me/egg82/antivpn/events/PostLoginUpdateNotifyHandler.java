@@ -9,7 +9,7 @@ import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.event.PostLoginEvent;
 import ninja.egg82.service.ServiceLocator;
 import ninja.egg82.service.ServiceNotFoundException;
-import ninja.egg82.updater.SpigotUpdater;
+import ninja.egg82.updater.BungeeUpdater;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,11 +22,11 @@ public class PostLoginUpdateNotifyHandler implements Consumer<PostLoginEvent> {
         }
 
         Configuration config;
-        SpigotUpdater updater;
+        BungeeUpdater updater;
 
         try {
             config = ServiceLocator.get(Configuration.class);
-            updater = ServiceLocator.get(SpigotUpdater.class);
+            updater = ServiceLocator.get(BungeeUpdater.class);
         } catch (InstantiationException | IllegalAccessException | ServiceNotFoundException ex) {
             logger.error(ex.getMessage(), ex);
             return;

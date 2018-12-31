@@ -26,7 +26,7 @@ import net.kyori.text.TextComponent;
 import net.kyori.text.format.TextColor;
 import org.slf4j.LoggerFactory;
 
-@Plugin(id="antivpn", name="AntiVPN", version="3.5.18", description="Get the best; save money on overpriced plugins and block VPN users!", authors="egg82")
+@Plugin(id="antivpn", name="AntiVPN", version="3.5.19", description="Get the best; save money on overpriced plugins and block VPN users!", authors="egg82")
 public class VelocityBootstrap {
     private final org.slf4j.Logger logger = LoggerFactory.getLogger(getClass());
 

@@ -9,6 +9,8 @@ import me.egg82.antivpn.extended.Configuration;
 import me.egg82.antivpn.hooks.PlayerAnalyticsHook;
 import me.egg82.antivpn.utils.LogUtil;
 import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.CommandSender;
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.event.PostLoginEvent;
 import ninja.egg82.service.ServiceLocator;
@@ -22,10 +24,15 @@ public class PostLoginCheckHandler implements Consumer<PostLoginEvent> {
     private final VPNAPI api = VPNAPI.getInstance();
 
     public void accept(PostLoginEvent event) {
+        CommandSender console = ProxyServer.getInstance().getConsole();
+        console.sendMessage(new TextComponent("PostLoginEvent"));
+
         String ip = getIp(event.getPlayer().getAddress());
         if (ip == null || ip.isEmpty()) {
             return;
         }
+
+        console.sendMessage(new TextComponent("IP: " + ip));
 
         Configuration config;
         CachedConfigValues cachedConfig;
@@ -37,6 +44,11 @@ public class PostLoginCheckHandler implements Consumer<PostLoginEvent> {
             logger.error(ex.getMessage(), ex);
             return;
         }
+
+        console.sendMessage(new TextComponent("Debug: " +  cachedConfig.getDebug()));
+
+        // Kick immediately for testing ONLY
+        event.getPlayer().disconnect(new TextComponent(config.getNode("kick", "message").getString("")));
 
         if (event.getPlayer().hasPermission("avpn.bypass")) {
             if (cachedConfig.getDebug()) {
