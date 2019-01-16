@@ -7,7 +7,7 @@ import me.egg82.antivpn.VPNAPI;
 import me.egg82.antivpn.extended.CachedConfigValues;
 import me.egg82.antivpn.extended.Configuration;
 import me.egg82.antivpn.hooks.PlaceholderAPIHook;
-import me.egg82.antivpn.hooks.PlayerAnalyticsHook;
+import me.egg82.antivpn.services.AnalyticsHelper;
 import me.egg82.antivpn.utils.LogUtil;
 import ninja.egg82.service.ServiceLocator;
 import ninja.egg82.service.ServiceNotFoundException;
@@ -66,7 +66,7 @@ public class PlayerLoginCheckHandler implements Consumer<PlayerLoginEvent> {
         }
 
         if (isVPN) {
-            PlayerAnalyticsHook.incrementBlocked();
+            AnalyticsHelper.incrementBlocked();
             if (cachedConfig.getDebug()) {
                 logger.info(LogUtil.getHeading() + ChatColor.WHITE + event.getPlayer().getName() + ChatColor.DARK_RED + " found using a VPN. Kicking with defined message.");
             }

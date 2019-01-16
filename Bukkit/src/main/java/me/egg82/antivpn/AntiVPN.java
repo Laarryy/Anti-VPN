@@ -25,6 +25,7 @@ import me.egg82.antivpn.extended.RedisSubscriber;
 import me.egg82.antivpn.hooks.PlaceholderAPIHook;
 import me.egg82.antivpn.hooks.PlayerAnalyticsHook;
 import me.egg82.antivpn.hooks.PluginHook;
+import me.egg82.antivpn.services.AnalyticsHelper;
 import me.egg82.antivpn.services.Redis;
 import me.egg82.antivpn.sql.MySQL;
 import me.egg82.antivpn.sql.SQLite;
@@ -413,7 +414,7 @@ public class AntiVPN {
                 return null;
             }
 
-            return (int) PlayerAnalyticsHook.getBlocked();
+            return (int) AnalyticsHelper.getBlocked();
         }));
     }
 

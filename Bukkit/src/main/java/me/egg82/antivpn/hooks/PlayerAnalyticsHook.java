@@ -9,9 +9,9 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.Collection;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicLong;
 import me.egg82.antivpn.VPNAPI;
 import me.egg82.antivpn.extended.Configuration;
+import me.egg82.antivpn.services.AnalyticsHelper;
 import ninja.egg82.service.ServiceLocator;
 import ninja.egg82.service.ServiceNotFoundException;
 import org.bukkit.Bukkit;
@@ -22,15 +22,9 @@ import org.slf4j.LoggerFactory;
 public class PlayerAnalyticsHook implements PluginHook {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private static final AtomicLong blocked = new AtomicLong(0L);
-
     public PlayerAnalyticsHook() { PlanAPI.getInstance().addPluginDataSource(new Data()); }
 
     public void cancel() {}
-
-    public static void incrementBlocked() { blocked.getAndIncrement(); }
-
-    public static long getBlocked() { return blocked.get(); }
 
     class Data extends PluginData {
         private final VPNAPI api = VPNAPI.getInstance();
@@ -86,7 +80,7 @@ public class PlayerAnalyticsHook implements PluginHook {
             }
 
             if (config.getNode("kick", "enabled").getBoolean(true)) {
-                container.addValue("Proxies/VPNs blocked", blocked.get() + " since startup.");
+                container.addValue("Proxies/VPNs blocked", AnalyticsHelper.getBlocked() + " since startup.");
             }
 
             int vpns = 0;

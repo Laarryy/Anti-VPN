@@ -6,10 +6,12 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.velocitypowered.api.event.PostOrder;
 import com.velocitypowered.api.event.connection.PostLoginEvent;
 import com.velocitypowered.api.plugin.PluginDescription;
+import com.velocitypowered.api.plugin.PluginManager;
 import com.velocitypowered.api.proxy.ProxyServer;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.*;
 import me.egg82.antivpn.commands.AntiVPNCommand;
 import me.egg82.antivpn.core.SQLFetchResult;
@@ -19,6 +21,8 @@ import me.egg82.antivpn.extended.CachedConfigValues;
 import me.egg82.antivpn.extended.Configuration;
 import me.egg82.antivpn.extended.RabbitMQReceiver;
 import me.egg82.antivpn.extended.RedisSubscriber;
+import me.egg82.antivpn.hooks.PlayerAnalyticsHook;
+import me.egg82.antivpn.hooks.PluginHook;
 import me.egg82.antivpn.services.Redis;
 import me.egg82.antivpn.sql.MySQL;
 import me.egg82.antivpn.sql.SQLite;
@@ -240,9 +244,27 @@ public class AntiVPN {
         events.add(VelocityEvents.subscribe(bootstrap, proxy, PostLoginEvent.class, PostOrder.FIRST).handler(e -> new PostLoginCheckHandler(proxy).accept(e)));
     }
 
-    private void loadHooks() {}
+    private void loadHooks() {
+        PluginManager manager = proxy.getPluginManager();
 
-    private void unloadHooks() {}
+        if (manager.getPlugin("Plan").isPresent()) {
+            proxy.getConsoleCommandSource().sendMessage(LogUtil.getHeading().append(TextComponent.of("Enabling support for Plan.").color(TextColor.GREEN)).build());
+            ServiceLocator.register(new PlayerAnalyticsHook(proxy));
+        } else {
+            proxy.getConsoleCommandSource().sendMessage(LogUtil.getHeading().append(TextComponent.of("Plan was not found. Personal analytics support has been disabled.").color(TextColor.YELLOW)).build());
+        }
+    }
+
+    private void unloadHooks() {
+        Optional<? extends PluginHook> plan;
+        try {
+            plan = ServiceLocator.getOptional(PlayerAnalyticsHook.class);
+        } catch (InstantiationException | IllegalAccessException ex) {
+            logger.error(ex.getMessage(), ex);
+            plan = Optional.empty();
+        }
+        plan.ifPresent(v -> v.cancel());
+    }
 
     public void unloadServices() {
         CachedConfigValues cachedConfig;

@@ -5,15 +5,16 @@ import com.djrapitops.plan.data.element.AnalysisContainer;
 import com.djrapitops.plan.data.element.InspectContainer;
 import com.djrapitops.plan.data.plugin.ContainerSize;
 import com.djrapitops.plan.data.plugin.PluginData;
+import com.velocitypowered.api.proxy.Player;
+import com.velocitypowered.api.proxy.ProxyServer;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.Collection;
+import java.util.Optional;
 import java.util.UUID;
 import me.egg82.antivpn.VPNAPI;
 import me.egg82.antivpn.extended.Configuration;
 import me.egg82.antivpn.services.AnalyticsHelper;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
-import net.md_5.bungee.api.plugin.Plugin;
 import ninja.egg82.service.ServiceLocator;
 import ninja.egg82.service.ServiceNotFoundException;
 import org.slf4j.Logger;
@@ -22,30 +23,30 @@ import org.slf4j.LoggerFactory;
 public class PlayerAnalyticsHook implements PluginHook {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    public PlayerAnalyticsHook(Plugin plugin) { PlanAPI.getInstance().addPluginDataSource(new Data(plugin)); }
+    public PlayerAnalyticsHook(ProxyServer proxy) { PlanAPI.getInstance().addPluginDataSource(new Data(proxy)); }
 
     public void cancel() {}
 
     class Data extends PluginData {
         private final VPNAPI api = VPNAPI.getInstance();
 
-        private final Plugin plugin;
+        private final ProxyServer proxy;
 
-        private Data(Plugin plugin) {
+        private Data(ProxyServer proxy) {
             super(ContainerSize.THIRD, "Anti-VPN");
             setPluginIcon("ban");
             setIconColor("red");
 
-            this.plugin = plugin;
+            this.proxy = proxy;
         }
 
         public InspectContainer getPlayerData(UUID uuid, InspectContainer container) {
-            ProxiedPlayer player = plugin.getProxy().getPlayer(uuid);
-            if (player == null) {
+            Optional<Player> player = proxy.getPlayer(uuid);
+            if (!player.isPresent()) {
                 return container;
             }
 
-            String ip = getIp(player);
+            String ip = getIp(player.get());
             if (ip == null || ip.isEmpty()) {
                 return container;
             }
@@ -89,12 +90,12 @@ public class PlayerAnalyticsHook implements PluginHook {
 
             int vpns = 0;
             for (UUID uuid : uuids) {
-                ProxiedPlayer player = plugin.getProxy().getPlayer(uuid);
-                if (player == null) {
+                Optional<Player> player = proxy.getPlayer(uuid);
+                if (!player.isPresent()) {
                     continue;
                 }
 
-                String ip = getIp(player);
+                String ip = getIp(player.get());
                 if (ip == null || ip.isEmpty()) {
                     continue;
                 }
@@ -118,8 +119,8 @@ public class PlayerAnalyticsHook implements PluginHook {
             return container;
         }
 
-        private String getIp(ProxiedPlayer player) {
-            InetSocketAddress address = player.getAddress();
+        private String getIp(Player player) {
+            InetSocketAddress address = player.getRemoteAddress();
             if (address == null) {
                 return null;
             }

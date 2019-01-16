@@ -4,7 +4,6 @@ import com.velocitypowered.api.event.PostOrder;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
-import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.PluginDescription;
 import com.velocitypowered.api.proxy.ProxyServer;
 import java.io.*;
@@ -26,7 +25,6 @@ import net.kyori.text.TextComponent;
 import net.kyori.text.format.TextColor;
 import org.slf4j.LoggerFactory;
 
-@Plugin(id="antivpn", name="AntiVPN", version="3.5.19", description="Get the best; save money on overpriced plugins and block VPN users!", authors="egg82")
 public class VelocityBootstrap {
     private final org.slf4j.Logger logger = LoggerFactory.getLogger(getClass());
 

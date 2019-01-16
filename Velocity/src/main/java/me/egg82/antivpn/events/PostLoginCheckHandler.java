@@ -8,6 +8,7 @@ import java.util.function.Consumer;
 import me.egg82.antivpn.VPNAPI;
 import me.egg82.antivpn.extended.CachedConfigValues;
 import me.egg82.antivpn.extended.Configuration;
+import me.egg82.antivpn.services.AnalyticsHelper;
 import me.egg82.antivpn.utils.LogUtil;
 import net.kyori.text.TextComponent;
 import net.kyori.text.format.TextColor;
@@ -72,6 +73,7 @@ public class PostLoginCheckHandler implements Consumer<PostLoginEvent> {
         }
 
         if (isVPN) {
+            AnalyticsHelper.incrementBlocked();
             if (cachedConfig.getDebug()) {
                 proxy.getConsoleCommandSource().sendMessage(LogUtil.getHeading().append(TextComponent.of(event.getPlayer().getUsername()).color(TextColor.WHITE)).append(TextComponent.of(" found using a VPN. Kicking with defined message.").color(TextColor.DARK_RED)).build());
             }

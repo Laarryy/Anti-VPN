@@ -6,7 +6,7 @@ import java.util.function.Consumer;
 import me.egg82.antivpn.VPNAPI;
 import me.egg82.antivpn.extended.CachedConfigValues;
 import me.egg82.antivpn.extended.Configuration;
-import me.egg82.antivpn.hooks.PlayerAnalyticsHook;
+import me.egg82.antivpn.services.AnalyticsHelper;
 import me.egg82.antivpn.utils.LogUtil;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -66,7 +66,7 @@ public class PostLoginCheckHandler implements Consumer<PostLoginEvent> {
         }
 
         if (isVPN) {
-            PlayerAnalyticsHook.incrementBlocked();
+            AnalyticsHelper.incrementBlocked();
             if (cachedConfig.getDebug()) {
                 logger.info(LogUtil.getHeading() + ChatColor.WHITE + event.getPlayer().getName() + ChatColor.DARK_RED + " found using a VPN. Kicking with defined message.");
             }

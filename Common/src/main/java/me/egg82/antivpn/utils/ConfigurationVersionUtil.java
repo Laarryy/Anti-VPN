@@ -9,8 +9,13 @@ import java.util.Arrays;
 import java.util.List;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
+import ninja.leaping.configurate.objectmapping.ObjectMappingException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ConfigurationVersionUtil {
+    private static final Logger logger = LoggerFactory.getLogger(ConfigurationVersionUtil.class);
+
     private ConfigurationVersionUtil() {}
 
     public static void conformVersion(ConfigurationLoader<ConfigurationNode> loader, ConfigurationNode config, File fileOnDisk) throws IOException {
@@ -33,6 +38,9 @@ public class ConfigurationVersionUtil {
         }
         if (config.getNode("version").getDouble() == 3.3d) {
             to34(config);
+        }
+        if (config.getNode("version").getDouble() == 3.4d) {
+            to35(config);
         }
 
         if (config.getNode("version").getDouble() != oldVersion) {
@@ -102,7 +110,7 @@ public class ConfigurationVersionUtil {
 
         List<String> sources;
         try {
-            sources = config.getNode("sources", "order").getList(TypeToken.of(String.class));
+            sources = new ArrayList<>(config.getNode("sources", "order").getList(TypeToken.of(String.class)));
         } catch (Exception ex) {
             sources = new ArrayList<>();
         }
@@ -215,5 +223,31 @@ public class ConfigurationVersionUtil {
 
         // Version
         config.getNode("version").setValue(3.4d);
+    }
+
+    private static void to35(ConfigurationNode config) {
+        // Remove IPDetector
+        List<String> order;
+        try {
+            order = new ArrayList<>(config.getNode("sources", "order").getList(TypeToken.of(String.class)));
+        } catch (ObjectMappingException ex) {
+            logger.error(ex.getMessage(), ex);
+            return;
+        }
+
+        List<String> removed = new ArrayList<>();
+        for (String source : order) {
+            if (source.equalsIgnoreCase("ipdetector")) { // sources are case-insensitive when loaded
+                removed.add(source);
+            }
+        }
+
+        order.removeAll(removed);
+        config.getNode("sources", "order").setValue(order);
+
+        config.getNode("sources").removeChild("ipdetector");
+
+        // Version
+        config.getNode("version").setValue(3.5d);
     }
 }
