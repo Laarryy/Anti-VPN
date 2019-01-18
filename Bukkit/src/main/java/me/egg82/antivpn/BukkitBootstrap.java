@@ -76,27 +76,27 @@ public class BukkitBootstrap extends JavaPlugin {
                 Collections.singletonList(new Relocation(parse("com{}github{}benmanes{}caffeine"), parse(externalPath + "{}com{}github{}benmanes{}caffeine"))));
 
         log(Level.INFO, LogUtil.getHeading() + ChatColor.YELLOW + "Loading dep " + ChatColor.WHITE + "RabbitMQ");
-        JarUtil.loadJar("http://central.maven.org/maven2/com/rabbitmq/amqp-client/5.5.0/amqp-client-5.5.0.jar",
-                new File(jarsFolder, "amqp-client-5.5.0.jar"),
+        JarUtil.loadJar("http://central.maven.org/maven2/com/rabbitmq/amqp-client/5.5.2/amqp-client-5.5.2.jar",
+                new File(jarsFolder, "amqp-client-5.5.2.jar"),
                 classLoader);
 
         log(Level.INFO, LogUtil.getHeading() + ChatColor.YELLOW + "Loading dep " + ChatColor.WHITE + "HikariCP");
-        JarUtil.loadJar("http://central.maven.org/maven2/com/zaxxer/HikariCP/3.2.0/HikariCP-3.2.0.jar",
-                new File(jarsFolder, "HikariCP-3.2.0.jar"),
-                new File(jarsFolder, "HikariCP-3.2.0-relocated.jar"),
+        JarUtil.loadJar("http://central.maven.org/maven2/com/zaxxer/HikariCP/3.3.0/HikariCP-3.3.0.jar",
+                new File(jarsFolder, "HikariCP-3.3.0.jar"),
+                new File(jarsFolder, "HikariCP-3.3.0-relocated.jar"),
                 classLoader,
                 Collections.singletonList(new Relocation(parse("com{}zaxxer{}hikari"), parse(externalPath + "{}com{}zaxxer{}hikari"))));
 
         log(Level.INFO, LogUtil.getHeading() + ChatColor.YELLOW + "Loading dep " + ChatColor.WHITE + "Redis");
-        JarUtil.loadJar("http://central.maven.org/maven2/redis/clients/jedis/2.9.0/jedis-2.9.0.jar",
-                new File(jarsFolder, "jedis-2.9.0.jar"),
-                new File(jarsFolder, "jedis-2.9.0-relocated.jar"),
+        JarUtil.loadJar("http://central.maven.org/maven2/redis/clients/jedis/3.0.1/jedis-3.0.1.jar",
+                new File(jarsFolder, "jedis-3.0.1.jar"),
+                new File(jarsFolder, "jedis-3.0.1-relocated.jar"),
                 classLoader,
                 Collections.singletonList(new Relocation(parse("redis{}clients"), parse(externalPath + "{}redis{}clients"))));
 
         log(Level.INFO, LogUtil.getHeading() + ChatColor.YELLOW + "Loading dep " + ChatColor.WHITE + "Javassist");
-        JarUtil.loadJar("http://central.maven.org/maven2/org/javassist/javassist/3.23.1-GA/javassist-3.23.1-GA.jar",
-                new File(jarsFolder, getJavassistString() + "-3.23.1-GA.jar"),
+        JarUtil.loadJar("http://central.maven.org/maven2/org/javassist/javassist/3.24.1-GA/javassist-3.24.1-GA.jar",
+                new File(jarsFolder, getJavassistString() + "-3.24.1-GA.jar"),
                 classLoader);
 
         log(Level.INFO, LogUtil.getHeading() + ChatColor.YELLOW + "Loading dep " + ChatColor.WHITE + "Apache Collections");

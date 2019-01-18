@@ -9,5 +9,5 @@ public class AnalyticsHelper {
 
     public static void incrementBlocked() { blocked.getAndIncrement(); }
 
-    public static long getBlocked() { return blocked.get(); }
+    public static long getBlocked() { return blocked.getAndSet(0L); }
 }
