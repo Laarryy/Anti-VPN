@@ -180,7 +180,6 @@ public class AntiVPN {
             try {
                 Thread.sleep(10000L);
             } catch (InterruptedException ex) {
-                logger.error(ex.getMessage(), ex);
                 Thread.currentThread().interrupt();
             }
 
@@ -208,7 +207,6 @@ public class AntiVPN {
             } catch (ExecutionException ex) {
                 logger.error(ex.getMessage(), ex);
             } catch (InterruptedException ex) {
-                logger.error(ex.getMessage(), ex);
                 Thread.currentThread().interrupt();
             }
 
