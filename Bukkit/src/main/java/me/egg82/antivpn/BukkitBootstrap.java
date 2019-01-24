@@ -97,7 +97,9 @@ public class BukkitBootstrap extends JavaPlugin {
         log(Level.INFO, LogUtil.getHeading() + ChatColor.YELLOW + "Loading dep " + ChatColor.WHITE + "Javassist");
         JarUtil.loadJar("http://central.maven.org/maven2/org/javassist/javassist/3.24.1-GA/javassist-3.24.1-GA.jar",
                 new File(jarsFolder, getJavassistString() + "-3.24.1-GA.jar"),
-                classLoader);
+                new File(jarsFolder, getJavassistString() + "-3.24.1-GA-relocated.jar"),
+                classLoader,
+                Collections.singletonList(new Relocation(parse(getJavassistString()), parse(externalPath + "{}" + getJavassistString()))));
 
         log(Level.INFO, LogUtil.getHeading() + ChatColor.YELLOW + "Loading dep " + ChatColor.WHITE + "Apache Collections");
         JarUtil.loadJar("http://central.maven.org/maven2/commons-collections/commons-collections/3.2.2/commons-collections-3.2.2.jar",
@@ -120,7 +122,9 @@ public class BukkitBootstrap extends JavaPlugin {
             log(Level.INFO, LogUtil.getHeading() + ChatColor.YELLOW + "Loading dep " + ChatColor.WHITE + "Reflections");
             JarUtil.loadJar("http://central.maven.org/maven2/org/reflections/reflections/0.9.10/reflections-0.9.10.jar",
                     new File(jarsFolder, "reflections-0.9.10.jar"),
-                    classLoader);
+                    new File(jarsFolder, "reflections-0.9.10-relocated.jar"),
+                    classLoader,
+                    Collections.singletonList(new Relocation(parse(getJavassistString()), parse(externalPath + "{}" + getJavassistString()))));
         }
 
         try {

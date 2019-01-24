@@ -10,7 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>antivpn-velocity</artifactId>
-    <version>3.5.21</version>
+    <version>3.5.22</version>
 
     <build>
         <sourceDirectory>src/main/java</sourceDirectory>
@@ -219,7 +219,7 @@
         <dependency>
             <groupId>ninja.egg82</groupId>
             <artifactId>event-chain-velocity</artifactId>
-            <version>1.0.6</version>
+            <version>1.0.7</version>
         </dependency>
         <dependency>
             <groupId>org.spongepowered</groupId>
@@ -249,7 +249,7 @@
         <dependency>
             <groupId>me.egg82</groupId>
             <artifactId>antivpn-common</artifactId>
-            <version>3.5.21</version>
+            <version>3.5.22</version>
         </dependency>
 
         <dependency>
