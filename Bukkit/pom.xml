@@ -132,6 +132,10 @@
                             <pattern>org.jetbrains</pattern>
                             <shadedPattern>me.egg82.antivpn.external.org.jetbrains</shadedPattern>
                         </relocation>
+                        <relocation>
+                            <pattern>org.reflections</pattern>
+                            <shadedPattern>me.egg82.antivpn.external.org.reflections</shadedPattern>
+                        </relocation>
                     </relocations>
                 </configuration>
                 <executions>

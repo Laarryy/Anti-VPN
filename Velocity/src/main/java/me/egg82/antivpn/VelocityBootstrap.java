@@ -13,6 +13,7 @@ import java.nio.file.Files;
 import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.UUID;
 import java.util.logging.Logger;
@@ -122,17 +123,17 @@ public class VelocityBootstrap {
                 classLoader,
                 Collections.singletonList(new Relocation(parse("org{}apache{}commons{}lang3"), parse(externalPath + "{}org{}apache{}commons{}lang3"))));
 
-        try {
-            Class.forName("org.reflections.Reflections", false, classLoader);
-        } catch (ClassNotFoundException ignored) {
-            // 0.9.10 for 1.11 compatibility
-            proxy.getConsoleCommandSource().sendMessage(LogUtil.getHeading().append(TextComponent.of("Loading dep ").color(TextColor.YELLOW)).append(TextComponent.of("Reflections").color(TextColor.WHITE)).build());
-            JarUtil.loadJar("http://central.maven.org/maven2/org/reflections/reflections/0.9.10/reflections-0.9.10.jar",
-                    new File(jarsFolder, "reflections-0.9.10.jar"),
-                    new File(jarsFolder, "reflections-0.9.10-relocated.jar"),
-                    classLoader,
-                    Collections.singletonList(new Relocation(parse(getJavassistString()), parse(externalPath + "{}" + getJavassistString()))));
-        }
+
+        // 0.9.10 for 1.11 compatibility
+        proxy.getConsoleCommandSource().sendMessage(LogUtil.getHeading().append(TextComponent.of("Loading dep ").color(TextColor.YELLOW)).append(TextComponent.of("Reflections").color(TextColor.WHITE)).build());
+        JarUtil.loadJar("http://central.maven.org/maven2/org/reflections/reflections/0.9.10/reflections-0.9.10.jar",
+                new File(jarsFolder, "reflections-0.9.10.jar"),
+                new File(jarsFolder, "reflections-0.9.10-relocated.jar"),
+                classLoader,
+                Arrays.asList(
+                        new Relocation(parse("org{}reflections"), parse(externalPath + "{}org{}reflections")),
+                        new Relocation(parse(getJavassistString()), parse(externalPath + "{}" + getJavassistString()))
+                ));
 
         try {
             Class.forName("org.sqlite.JDBC", false, classLoader);

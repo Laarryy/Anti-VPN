@@ -107,6 +107,10 @@
                             <shadedPattern>me.egg82.antivpn.external.org.json</shadedPattern>
                         </relocation>
                         <relocation>
+                            <pattern>org.reflections</pattern>
+                            <shadedPattern>me.egg82.antivpn.external.org.reflections</shadedPattern>
+                        </relocation>
+                        <relocation>
                             <pattern>org.yaml</pattern>
                             <shadedPattern>me.egg82.antivpn.external.org.yaml</shadedPattern>
                         </relocation>
