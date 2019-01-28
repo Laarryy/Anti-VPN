@@ -133,11 +133,9 @@ public class BungeeBootstrap extends Plugin {
             Class.forName("org.sqlite.JDBC", false, classLoader);
         } catch (ClassNotFoundException ignored) {
             getProxy().getLogger().log(Level.INFO, LogUtil.getHeading() + ChatColor.YELLOW + "Loading dep " + ChatColor.WHITE + "SQLite");
-            JarUtil.loadJar("http://central.maven.org/maven2/org/reflections/reflections/0.9.10/reflections-0.9.10.jar",
-                    new File(jarsFolder, "reflections-0.9.10.jar"),
-                    new File(jarsFolder, "reflections-0.9.10-relocated.jar"),
-                    classLoader,
-                    Collections.singletonList(new Relocation(parse(getJavassistString()), parse(externalPath + "{}" + getJavassistString()))));
+            JarUtil.loadJar("http://central.maven.org/maven2/org/xerial/sqlite-jdbc/3.25.2/sqlite-jdbc-3.25.2.jar",
+                    new File(jarsFolder, "sqlite-jdbc-3.25.2.jar"),
+                    classLoader);
         }
 
         try {
