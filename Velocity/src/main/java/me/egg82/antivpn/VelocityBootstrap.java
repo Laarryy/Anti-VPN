@@ -18,6 +18,7 @@ import java.util.Collections;
 import java.util.UUID;
 import java.util.logging.Logger;
 import javax.inject.Inject;
+import me.egg82.antivpn.services.GameAnalyticsErrorHandler;
 import me.egg82.antivpn.utils.JarUtil;
 import me.egg82.antivpn.utils.LogUtil;
 import me.egg82.antivpn.utils.ValidationUtil;
@@ -184,79 +185,55 @@ public class VelocityBootstrap {
         return input.replace("{}", ".");
     }
 
-    private UUID getID() {
+    private UUID getID(File idFile) {
         String id;
+
         try {
-            id = readID();
+            id = readID(idFile);
         } catch (IOException ex) {
             logger.error(ex.getMessage(), ex);
-            return null;
+            id = null;
         }
 
-        if (id == null || id.isEmpty() || id.equalsIgnoreCase("unnamed") || id.equalsIgnoreCase("unknown") || id.equalsIgnoreCase("default") || !ValidationUtil.isValidUuid(id)) {
+        if (id == null || id.isEmpty() || !ValidationUtil.isValidUuid(id)) {
             id = UUID.randomUUID().toString();
             try {
-                writeID(id);
+                writeID(idFile, id);
             } catch (IOException ex) {
                 logger.error(ex.getMessage(), ex);
             }
         }
+
         return UUID.fromString(id);
     }
 
-    private String readID() throws IOException {
-        File config = new File(description.getSource().get().toAbsolutePath().getParent().getParent().toFile(), "velocity-extra.toml");
-        if (config.exists() && config.isDirectory()) {
-            Files.delete(config.toPath());
-        }
-        if (!config.exists()) {
-            if (!config.createNewFile()) {
-                throw new IOException("Stats file could not be created.");
-            }
+    private String readID(File idFile) throws IOException {
+        if (!idFile.exists() || (idFile.exists() && idFile.isDirectory())) {
+            return null;
         }
 
-        try (FileReader reader = new FileReader(config); BufferedReader in = new BufferedReader(reader)) {
+        StringBuilder builder = new StringBuilder();
+        try (FileReader reader = new FileReader(idFile); BufferedReader in = new BufferedReader(reader)) {
             String line;
             while ((line = in.readLine()) != null) {
-                if (line.trim().startsWith("stats =")) {
-                    return line.trim().substring(7).trim();
-                }
+                builder.append(line).append(System.lineSeparator());
             }
         }
-
-        return null;
+        return builder.toString().trim();
     }
 
-    private void writeID(String id) throws IOException {
-        File config = new File(description.getSource().get().toAbsolutePath().getParent().getParent().toFile(), "velocity-extra.toml");
-        if (config.exists() && config.isDirectory()) {
-            Files.delete(config.toPath());
+    private void writeID(File idFile, String id) throws IOException {
+        if (idFile.exists() && idFile.isDirectory()) {
+            Files.delete(idFile.toPath());
         }
-        if (!config.exists()) {
-            if (!config.createNewFile()) {
+        if (!idFile.exists()) {
+            if (!idFile.createNewFile()) {
                 throw new IOException("Stats file could not be created.");
             }
         }
 
-        boolean written = false;
-        StringBuilder builder = new StringBuilder();
-        try (FileReader reader = new FileReader(config); BufferedReader in = new BufferedReader(reader)) {
-            String line;
-            while ((line = in.readLine()) != null) {
-                if (line.trim().startsWith("stats =")) {
-                    written = true;
-                    builder.append("stats = " + id).append(System.lineSeparator());
-                } else {
-                    builder.append(line).append(System.lineSeparator());
-                }
-            }
-        }
-        if (!written) {
-            builder.append("stats = " + id).append(System.lineSeparator());
-        }
-
-        try (FileWriter out = new FileWriter(config)) {
-            out.write(builder.toString());
+        try (FileWriter out = new FileWriter(idFile)) {
+            out.write(id + System.lineSeparator());
         }
     }
 
@@ -264,6 +241,7 @@ public class VelocityBootstrap {
 
     @Subscribe(order = PostOrder.EARLY)
     public void onEnable(ProxyInitializeEvent event) {
+        GameAnalyticsErrorHandler.open(getID(new File(new File(description.getSource().get().getParent().toFile(), description.getName().get()), "stats-id.txt")), description.getVersion().get(), proxy.getVersion().getVersion());
         concrete.onLoad();
         concrete.onEnable();
     }
@@ -271,5 +249,6 @@ public class VelocityBootstrap {
     @Subscribe(order = PostOrder.LATE)
     public void onDisable(ProxyShutdownEvent event) {
         concrete.onDisable();
+        GameAnalyticsErrorHandler.close();
     }
 }

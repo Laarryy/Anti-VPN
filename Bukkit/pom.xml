@@ -10,7 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>antivpn-bukkit</artifactId>
-    <version>3.5.22</version>
+    <version>3.5.23</version>
 
     <build>
         <sourceDirectory>src/main/java</sourceDirectory>
@@ -226,7 +226,7 @@
         <dependency>
             <groupId>org.bukkit</groupId>
             <artifactId>bukkit</artifactId>
-            <version>1.13-R0.1-SNAPSHOT</version>
+            <version>1.14.1-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
 
@@ -304,7 +304,7 @@
         <dependency>
             <groupId>me.egg82</groupId>
             <artifactId>antivpn-common</artifactId>
-            <version>3.5.22</version>
+            <version>3.5.23</version>
         </dependency>
 
         <dependency>

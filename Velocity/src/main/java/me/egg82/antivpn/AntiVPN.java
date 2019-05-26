@@ -62,7 +62,7 @@ public class AntiVPN {
     public void onLoad() {}
 
     public void onEnable() {
-        commandManager = new VelocityCommandManager(bootstrap, description, proxy, pluginLogger);
+        commandManager = new VelocityCommandManager(proxy, bootstrap);
         commandManager.enableUnstableAPI("help");
 
         loadServices();

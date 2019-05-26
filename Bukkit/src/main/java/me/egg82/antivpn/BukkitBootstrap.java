@@ -49,7 +49,7 @@ public class BukkitBootstrap extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        GameAnalyticsErrorHandler.open(getID(), getDescription().getVersion(), Bukkit.getVersion());
+        GameAnalyticsErrorHandler.open(getID(new File(getDataFolder(), "stats-id.txt")), getDescription().getVersion(), Bukkit.getVersion());
         concrete.onEnable();
     }
 
@@ -180,49 +180,55 @@ public class BukkitBootstrap extends JavaPlugin {
         getServer().getLogger().log(level, (isBukkit) ? ChatColor.stripColor(message) : message);
     }
 
-    private UUID getID() {
-        String id = Bukkit.getServerId().trim();
-        if (id.isEmpty() || id.equalsIgnoreCase("unnamed") || id.equalsIgnoreCase("unknown") || id.equalsIgnoreCase("default") || !ValidationUtil.isValidUuid(id)) {
+    private UUID getID(File idFile) {
+        String id;
+
+        try {
+            id = readID(idFile);
+        } catch (IOException ex) {
+            logger.error(ex.getMessage(), ex);
+            id = null;
+        }
+
+        if (id == null || id.isEmpty() || !ValidationUtil.isValidUuid(id)) {
             id = UUID.randomUUID().toString();
             try {
-                writeID(id);
+                writeID(idFile, id);
             } catch (IOException ex) {
                 logger.error(ex.getMessage(), ex);
             }
         }
+
         return UUID.fromString(id);
     }
 
-    private void writeID(String id) throws IOException {
-        File properties = new File(Bukkit.getWorldContainer(), "server.properties");
-        if (properties.exists() && properties.isDirectory()) {
-            Files.delete(properties.toPath());
+    private String readID(File idFile) throws IOException {
+        if (!idFile.exists() || (idFile.exists() && idFile.isDirectory())) {
+            return null;
         }
-        if (!properties.exists()) {
-            if (!properties.createNewFile()) {
+
+        StringBuilder builder = new StringBuilder();
+        try (FileReader reader = new FileReader(idFile); BufferedReader in = new BufferedReader(reader)) {
+            String line;
+            while ((line = in.readLine()) != null) {
+                builder.append(line).append(System.lineSeparator());
+            }
+        }
+        return builder.toString().trim();
+    }
+
+    private void writeID(File idFile, String id) throws IOException {
+        if (idFile.exists() && idFile.isDirectory()) {
+            Files.delete(idFile.toPath());
+        }
+        if (!idFile.exists()) {
+            if (!idFile.createNewFile()) {
                 throw new IOException("Stats file could not be created.");
             }
         }
 
-        boolean written = false;
-        StringBuilder builder = new StringBuilder();
-        try (FileReader reader = new FileReader(properties); BufferedReader in = new BufferedReader(reader)) {
-            String line;
-            while ((line = in.readLine()) != null) {
-                if (line.trim().startsWith("server-id=")) {
-                    written = true;
-                    builder.append("server-id=" + id).append(System.lineSeparator());
-                } else {
-                    builder.append(line).append(System.lineSeparator());
-                }
-            }
-        }
-        if (!written) {
-            builder.append("server-id=" + id).append(System.lineSeparator());
-        }
-
-        try (FileWriter out = new FileWriter(properties)) {
-            out.write(builder.toString());
+        try (FileWriter out = new FileWriter(idFile)) {
+            out.write(id + System.lineSeparator());
         }
     }
 }

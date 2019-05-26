@@ -43,7 +43,7 @@ public class BungeeBootstrap extends Plugin {
 
     @Override
     public void onEnable() {
-        GameAnalyticsErrorHandler.open(getID(), getDescription().getVersion(), getProxy().getVersion());
+        GameAnalyticsErrorHandler.open(getID(new File(getDataFolder(), "stats-id.txt")), getDescription().getVersion(), getProxy().getVersion());
         concrete.onEnable();
     }
 
@@ -178,79 +178,55 @@ public class BungeeBootstrap extends Plugin {
         return input.replace("{}", ".");
     }
 
-    private UUID getID() {
+    private UUID getID(File idFile) {
         String id;
+
         try {
-            id = readID();
+            id = readID(idFile);
         } catch (IOException ex) {
             logger.error(ex.getMessage(), ex);
-            return null;
+            id = null;
         }
 
-        if (id == null || id.isEmpty() || id.equalsIgnoreCase("unnamed") || id.equalsIgnoreCase("unknown") || id.equalsIgnoreCase("default") || !ValidationUtil.isValidUuid(id)) {
+        if (id == null || id.isEmpty() || !ValidationUtil.isValidUuid(id)) {
             id = UUID.randomUUID().toString();
             try {
-                writeID(id);
+                writeID(idFile, id);
             } catch (IOException ex) {
                 logger.error(ex.getMessage(), ex);
             }
         }
+
         return UUID.fromString(id);
     }
 
-    private String readID() throws IOException {
-        File config = new File(getProxy().getPluginsFolder().getParent(), "config.yml");
-        if (config.exists() && config.isDirectory()) {
-            Files.delete(config.toPath());
-        }
-        if (!config.exists()) {
-            if (!config.createNewFile()) {
-                throw new IOException("Stats file could not be created.");
-            }
+    private String readID(File idFile) throws IOException {
+        if (!idFile.exists() || (idFile.exists() && idFile.isDirectory())) {
+            return null;
         }
 
-        try (FileReader reader = new FileReader(config); BufferedReader in = new BufferedReader(reader)) {
+        StringBuilder builder = new StringBuilder();
+        try (FileReader reader = new FileReader(idFile); BufferedReader in = new BufferedReader(reader)) {
             String line;
             while ((line = in.readLine()) != null) {
-                if (line.trim().startsWith("stats:")) {
-                    return line.trim().substring(6).trim();
-                }
+                builder.append(line).append(System.lineSeparator());
             }
         }
-
-        return null;
+        return builder.toString().trim();
     }
 
-    private void writeID(String id) throws IOException {
-        File config = new File(getProxy().getPluginsFolder().getParent(), "config.yml");
-        if (config.exists() && config.isDirectory()) {
-            Files.delete(config.toPath());
+    private void writeID(File idFile, String id) throws IOException {
+        if (idFile.exists() && idFile.isDirectory()) {
+            Files.delete(idFile.toPath());
         }
-        if (!config.exists()) {
-            if (!config.createNewFile()) {
+        if (!idFile.exists()) {
+            if (!idFile.createNewFile()) {
                 throw new IOException("Stats file could not be created.");
             }
         }
 
-        boolean written = false;
-        StringBuilder builder = new StringBuilder();
-        try (FileReader reader = new FileReader(config); BufferedReader in = new BufferedReader(reader)) {
-            String line;
-            while ((line = in.readLine()) != null) {
-                if (line.trim().startsWith("stats:")) {
-                    written = true;
-                    builder.append("stats:" + id).append(System.lineSeparator());
-                } else {
-                    builder.append(line).append(System.lineSeparator());
-                }
-            }
-        }
-        if (!written) {
-            builder.append("stats:" + id).append(System.lineSeparator());
-        }
-
-        try (FileWriter out = new FileWriter(config)) {
-            out.write(builder.toString());
+        try (FileWriter out = new FileWriter(idFile)) {
+            out.write(id + System.lineSeparator());
         }
     }
 }
