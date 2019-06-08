@@ -1,13 +1,13 @@
 package me.egg82.antivpn.commands.internal;
 
 import com.velocitypowered.api.command.CommandSource;
+import java.util.Optional;
 import me.egg82.antivpn.VPNAPI;
 import me.egg82.antivpn.extended.Configuration;
+import me.egg82.antivpn.utils.ConfigUtil;
 import me.egg82.antivpn.utils.LogUtil;
 import net.kyori.text.TextComponent;
 import net.kyori.text.format.TextColor;
-import ninja.egg82.service.ServiceLocator;
-import ninja.egg82.service.ServiceNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,18 +27,15 @@ public class CheckCommand implements Runnable {
     public void run() {
         source.sendMessage(LogUtil.getHeading().append(TextComponent.of("Checking ").color(TextColor.YELLOW)).append(TextComponent.of(ip).color(TextColor.WHITE)).append(TextComponent.of("..").color(TextColor.YELLOW)).build());
 
-        Configuration config;
-        try {
-            config = ServiceLocator.get(Configuration.class);
-        } catch (InstantiationException | IllegalAccessException | ServiceNotFoundException ex) {
-            logger.error(ex.getMessage(), ex);
+        Optional<Configuration> config = ConfigUtil.getConfig();
+        if (!config.isPresent()) {
             source.sendMessage(LogUtil.getHeading().append(TextComponent.of("Internal error").color(TextColor.DARK_RED)).build());
             return;
         }
 
         boolean isVPN;
-        if (config.getNode("kick", "algorithm", "method").getString("cascade").equalsIgnoreCase("consensus")) {
-            double consensus = clamp(0.0d, 1.0d, config.getNode("kick", "algorithm", "min-consensus").getDouble(0.6d));
+        if (config.get().getNode("kick", "algorithm", "method").getString("cascade").equalsIgnoreCase("consensus")) {
+            double consensus = clamp(0.0d, 1.0d, config.get().getNode("kick", "algorithm", "min-consensus").getDouble(0.6d));
             isVPN = api.consensus(ip) >= consensus;
         } else {
             isVPN = api.cascade(ip);

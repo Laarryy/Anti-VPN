@@ -25,6 +25,7 @@ import me.egg82.antivpn.services.AnalyticsHelper;
 import me.egg82.antivpn.services.Redis;
 import me.egg82.antivpn.sql.MySQL;
 import me.egg82.antivpn.sql.SQLite;
+import me.egg82.antivpn.utils.ConfigUtil;
 import me.egg82.antivpn.utils.ConfigurationFileUtil;
 import me.egg82.antivpn.utils.LogUtil;
 import me.egg82.antivpn.utils.ValidationUtil;
@@ -115,44 +116,34 @@ public class AntiVPN {
     public void loadServicesExternal() {
         workPool = Executors.newFixedThreadPool(2, new ThreadFactoryBuilder().setNameFormat("AntiVPN-%d").build());
 
-        Configuration config;
-        CachedConfigValues cachedConfig;
-
-        try {
-            config = ServiceLocator.get(Configuration.class);
-            cachedConfig = ServiceLocator.get(CachedConfigValues.class);
-        } catch (InstantiationException | IllegalAccessException | ServiceNotFoundException ex) {
-            logger.error(ex.getMessage(), ex);
+        Optional<Configuration> config = ConfigUtil.getConfig();
+        Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+        if (!config.isPresent() || !cachedConfig.isPresent()) {
             return;
         }
 
-        workPool.submit(() -> new RedisSubscriber(cachedConfig.getRedisPool(), config.getNode("redis")));
-        ServiceLocator.register(new RabbitMQReceiver(cachedConfig.getRabbitConnectionFactory()));
+        workPool.submit(() -> new RedisSubscriber(cachedConfig.get().getRedisPool(), config.get().getNode("redis")));
+        ServiceLocator.register(new RabbitMQReceiver(cachedConfig.get().getRabbitConnectionFactory()));
     }
 
     private void loadSQL() {
-        Configuration config;
-        CachedConfigValues cachedConfig;
-
-        try {
-            config = ServiceLocator.get(Configuration.class);
-            cachedConfig = ServiceLocator.get(CachedConfigValues.class);
-        } catch (InstantiationException | IllegalAccessException | ServiceNotFoundException ex) {
-            logger.error(ex.getMessage(), ex);
+        Optional<Configuration> config = ConfigUtil.getConfig();
+        Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+        if (!config.isPresent() || !cachedConfig.isPresent()) {
             return;
         }
 
-        if (cachedConfig.getSQLType() == SQLType.MySQL) {
-            MySQL.createTables(cachedConfig.getSQL(), config.getNode("storage")).thenRun(() ->
-                    MySQL.loadInfo(cachedConfig.getSQL(), config.getNode("storage")).thenAccept(v -> {
-                        Redis.updateFromQueue(v, cachedConfig.getSourceCacheTime(), cachedConfig.getRedisPool(), config.getNode("redis"));
+        if (cachedConfig.get().getSQLType() == SQLType.MySQL) {
+            MySQL.createTables(cachedConfig.get().getSQL(), config.get().getNode("storage")).thenRun(() ->
+                    MySQL.loadInfo(cachedConfig.get().getSQL(), config.get().getNode("storage")).thenAccept(v -> {
+                        Redis.updateFromQueue(v, cachedConfig.get().getSourceCacheTime(), cachedConfig.get().getRedisPool(), config.get().getNode("redis"));
                         updateSQL();
                     })
             );
-        } else if (cachedConfig.getSQLType() == SQLType.SQLite) {
-            SQLite.createTables(cachedConfig.getSQL(), config.getNode("storage")).thenRun(() ->
-                    SQLite.loadInfo(cachedConfig.getSQL(), config.getNode("storage")).thenAccept(v -> {
-                        Redis.updateFromQueue(v, cachedConfig.getSourceCacheTime(), cachedConfig.getRedisPool(), config.getNode("redis"));
+        } else if (cachedConfig.get().getSQLType() == SQLType.SQLite) {
+            SQLite.createTables(cachedConfig.get().getSQL(), config.get().getNode("storage")).thenRun(() ->
+                    SQLite.loadInfo(cachedConfig.get().getSQL(), config.get().getNode("storage")).thenAccept(v -> {
+                        Redis.updateFromQueue(v, cachedConfig.get().getSourceCacheTime(), cachedConfig.get().getRedisPool(), config.get().getNode("redis"));
                         updateSQL();
                     })
             );
@@ -160,27 +151,22 @@ public class AntiVPN {
     }
 
     public void loadSQLExternal() {
-        Configuration config;
-        CachedConfigValues cachedConfig;
-
-        try {
-            config = ServiceLocator.get(Configuration.class);
-            cachedConfig = ServiceLocator.get(CachedConfigValues.class);
-        } catch (InstantiationException | IllegalAccessException | ServiceNotFoundException ex) {
-            logger.error(ex.getMessage(), ex);
+        Optional<Configuration> config = ConfigUtil.getConfig();
+        Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+        if (!config.isPresent() || !cachedConfig.isPresent()) {
             return;
         }
 
-        if (cachedConfig.getSQLType() == SQLType.MySQL) {
-            MySQL.createTables(cachedConfig.getSQL(), config.getNode("storage")).thenRun(() ->
-                    MySQL.loadInfo(cachedConfig.getSQL(), config.getNode("storage")).thenAccept(v -> {
-                        Redis.updateFromQueue(v, cachedConfig.getSourceCacheTime(), cachedConfig.getRedisPool(), config.getNode("redis"));
+        if (cachedConfig.get().getSQLType() == SQLType.MySQL) {
+            MySQL.createTables(cachedConfig.get().getSQL(), config.get().getNode("storage")).thenRun(() ->
+                    MySQL.loadInfo(cachedConfig.get().getSQL(), config.get().getNode("storage")).thenAccept(v -> {
+                        Redis.updateFromQueue(v, cachedConfig.get().getSourceCacheTime(), cachedConfig.get().getRedisPool(), config.get().getNode("redis"));
                     })
             );
-        } else if (cachedConfig.getSQLType() == SQLType.SQLite) {
-            SQLite.createTables(cachedConfig.getSQL(), config.getNode("storage")).thenRun(() ->
-                    SQLite.loadInfo(cachedConfig.getSQL(), config.getNode("storage")).thenAccept(v -> {
-                        Redis.updateFromQueue(v, cachedConfig.getSourceCacheTime(), cachedConfig.getRedisPool(), config.getNode("redis"));
+        } else if (cachedConfig.get().getSQLType() == SQLType.SQLite) {
+            SQLite.createTables(cachedConfig.get().getSQL(), config.get().getNode("storage")).thenRun(() ->
+                    SQLite.loadInfo(cachedConfig.get().getSQL(), config.get().getNode("storage")).thenAccept(v -> {
+                        Redis.updateFromQueue(v, cachedConfig.get().getSourceCacheTime(), cachedConfig.get().getRedisPool(), config.get().getNode("redis"));
                     })
             );
         }
@@ -194,26 +180,21 @@ public class AntiVPN {
                 Thread.currentThread().interrupt();
             }
 
-            Configuration config;
-            CachedConfigValues cachedConfig;
-
-            try {
-                config = ServiceLocator.get(Configuration.class);
-                cachedConfig = ServiceLocator.get(CachedConfigValues.class);
-            } catch (InstantiationException | IllegalAccessException | ServiceNotFoundException ex) {
-                logger.error(ex.getMessage(), ex);
+            Optional<Configuration> config = ConfigUtil.getConfig();
+            Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+            if (!config.isPresent() || !cachedConfig.isPresent()) {
                 return;
             }
 
             SQLFetchResult result = null;
 
             try {
-                if (cachedConfig.getSQLType() == SQLType.MySQL) {
-                    result = MySQL.fetchQueue(cachedConfig.getSQL(), config.getNode("storage"), cachedConfig.getSourceCacheTime()).get();
+                if (cachedConfig.get().getSQLType() == SQLType.MySQL) {
+                    result = MySQL.fetchQueue(cachedConfig.get().getSQL(), config.get().getNode("storage"), cachedConfig.get().getSourceCacheTime()).get();
                 }
 
                 if (result != null) {
-                    Redis.updateFromQueue(result, cachedConfig.getSourceCacheTime(), cachedConfig.getRedisPool(), config.getNode("redis")).get();
+                    Redis.updateFromQueue(result, cachedConfig.get().getSourceCacheTime(), cachedConfig.get().getRedisPool(), config.get().getNode("redis")).get();
                 }
             } catch (ExecutionException ex) {
                 logger.error(ex.getMessage(), ex);
@@ -232,16 +213,12 @@ public class AntiVPN {
             }
         });
         commandManager.getCommandConditions().addCondition(String.class, "source", (c, exec, value) -> {
-            CachedConfigValues cachedConfig;
-
-            try {
-                cachedConfig = ServiceLocator.get(CachedConfigValues.class);
-            } catch (InstantiationException | IllegalAccessException | ServiceNotFoundException ex) {
-                logger.error(ex.getMessage(), ex);
+            Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+            if (!cachedConfig.isPresent()) {
                 return;
             }
 
-            if (!cachedConfig.getSources().contains(value)) {
+            if (!cachedConfig.get().getSources().contains(value)) {
                 throw new ConditionFailedException("Value must be a valid source name.");
             }
         });
@@ -280,111 +257,89 @@ public class AntiVPN {
     private void loadMetrics() {
         metrics = new Metrics(plugin);
         metrics.addCustomChart(new Metrics.SimplePie("sql", () -> {
-            Configuration config;
-            try {
-                config = ServiceLocator.get(Configuration.class);
-            } catch (InstantiationException | IllegalAccessException | ServiceNotFoundException ex) {
-                logger.error(ex.getMessage(), ex);
+            Optional<Configuration> config = ConfigUtil.getConfig();
+            if (!config.isPresent()) {
                 return null;
             }
 
-            if (!config.getNode("stats", "usage").getBoolean(true)) {
+            if (!config.get().getNode("stats", "usage").getBoolean(true)) {
                 return null;
             }
 
-            return config.getNode("storage", "method").getString("sqlite");
+            return config.get().getNode("storage", "method").getString("sqlite");
         }));
         metrics.addCustomChart(new Metrics.SimplePie("redis", () -> {
-            Configuration config;
-            try {
-                config = ServiceLocator.get(Configuration.class);
-            } catch (InstantiationException | IllegalAccessException | ServiceNotFoundException ex) {
-                logger.error(ex.getMessage(), ex);
+            Optional<Configuration> config = ConfigUtil.getConfig();
+            if (!config.isPresent()) {
                 return null;
             }
 
-            if (!config.getNode("stats", "usage").getBoolean(true)) {
+            if (!config.get().getNode("stats", "usage").getBoolean(true)) {
                 return null;
             }
 
-            return config.getNode("redis", "enabled").getBoolean(false) ? "yes" : "no";
+            return config.get().getNode("redis", "enabled").getBoolean(false) ? "yes" : "no";
         }));
         metrics.addCustomChart(new Metrics.SimplePie("rabbitmq", () -> {
-            Configuration config;
-            try {
-                config = ServiceLocator.get(Configuration.class);
-            } catch (InstantiationException | IllegalAccessException | ServiceNotFoundException ex) {
-                logger.error(ex.getMessage(), ex);
+            Optional<Configuration> config = ConfigUtil.getConfig();
+            if (!config.isPresent()) {
                 return null;
             }
 
-            if (!config.getNode("stats", "usage").getBoolean(true)) {
+            if (!config.get().getNode("stats", "usage").getBoolean(true)) {
                 return null;
             }
 
-            return config.getNode("rabbitmq", "enabled").getBoolean(false) ? "yes" : "no";
+            return config.get().getNode("rabbitmq", "enabled").getBoolean(false) ? "yes" : "no";
         }));
         metrics.addCustomChart(new Metrics.AdvancedPie("sources", () -> {
-            Configuration config;
-            CachedConfigValues cachedConfig;
-            try {
-                config = ServiceLocator.get(Configuration.class);
-                cachedConfig = ServiceLocator.get(CachedConfigValues.class);
-            } catch (InstantiationException | IllegalAccessException | ServiceNotFoundException ex) {
-                logger.error(ex.getMessage(), ex);
+            Optional<Configuration> config = ConfigUtil.getConfig();
+            Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+            if (!config.isPresent() || !cachedConfig.isPresent()) {
                 return null;
             }
 
-            if (!config.getNode("stats", "usage").getBoolean(true)) {
+            if (!config.get().getNode("stats", "usage").getBoolean(true)) {
                 return null;
             }
 
             Map<String, Integer> values = new HashMap<>();
-            for (String key : cachedConfig.getSources()) {
+            for (String key : cachedConfig.get().getSources()) {
                 values.put(key, 1);
             }
             return values;
         }));
         metrics.addCustomChart(new Metrics.SimplePie("kick", () -> {
-            Configuration config;
-            try {
-                config = ServiceLocator.get(Configuration.class);
-            } catch (InstantiationException | IllegalAccessException | ServiceNotFoundException ex) {
-                logger.error(ex.getMessage(), ex);
+            Optional<Configuration> config = ConfigUtil.getConfig();
+            if (!config.isPresent()) {
                 return null;
             }
 
-            if (!config.getNode("stats", "usage").getBoolean(true)) {
+            if (!config.get().getNode("stats", "usage").getBoolean(true)) {
                 return null;
             }
 
-            return config.getNode("kick", "enabled").getBoolean(true) ? "yes" : "no";
+            return config.get().getNode("kick", "enabled").getBoolean(true) ? "yes" : "no";
         }));
         metrics.addCustomChart(new Metrics.SimplePie("algorithm", () -> {
-            Configuration config;
-            try {
-                config = ServiceLocator.get(Configuration.class);
-            } catch (InstantiationException | IllegalAccessException | ServiceNotFoundException ex) {
-                logger.error(ex.getMessage(), ex);
+            Optional<Configuration> config = ConfigUtil.getConfig();
+            if (!config.isPresent()) {
                 return null;
             }
 
-            if (!config.getNode("stats", "usage").getBoolean(true)) {
+            if (!config.get().getNode("stats", "usage").getBoolean(true)) {
                 return null;
             }
 
-            return config.getNode("kick", "method").getString("cascade");
+            return config.get().getNode("kick", "method").getString("cascade");
         }));
         metrics.addCustomChart(new Metrics.SingleLineChart("blocked", () -> {
-            Configuration config;
-            try {
-                config = ServiceLocator.get(Configuration.class);
-            } catch (InstantiationException | IllegalAccessException | ServiceNotFoundException ex) {
-                logger.error(ex.getMessage(), ex);
+            Optional<Configuration> config = ConfigUtil.getConfig();
+            if (!config.isPresent()) {
                 return null;
             }
 
-            if (!config.getNode("stats", "usage").getBoolean(true)) {
+            if (!config.get().getNode("stats", "usage").getBoolean(true)) {
                 return null;
             }
 
@@ -393,17 +348,20 @@ public class AntiVPN {
     }
 
     private void checkUpdate() {
-        Configuration config;
+        Optional<Configuration> config = ConfigUtil.getConfig();
+        if (!config.isPresent()) {
+            return;
+        }
+
         BungeeUpdater updater;
         try {
-            config = ServiceLocator.get(Configuration.class);
             updater = ServiceLocator.get(BungeeUpdater.class);
         } catch (InstantiationException | IllegalAccessException | ServiceNotFoundException ex) {
             logger.error(ex.getMessage(), ex);
             return;
         }
 
-        if (!config.getNode("update", "check").getBoolean(true)) {
+        if (!config.get().getNode("update", "check").getBoolean(true)) {
             return;
         }
 
@@ -412,7 +370,7 @@ public class AntiVPN {
                 return;
             }
 
-            if (config.getNode("update", "notify").getBoolean(true)) {
+            if (config.get().getNode("update", "notify").getBoolean(true)) {
                 try {
                     plugin.getProxy().getConsole().sendMessage(new TextComponent(LogUtil.getHeading() + ChatColor.AQUA + " has an " + ChatColor.GREEN + "update" + ChatColor.AQUA + " available! New version: " + ChatColor.YELLOW + updater.getLatestVersion().get()));
                 } catch (ExecutionException ex) {
@@ -437,19 +395,22 @@ public class AntiVPN {
     }
 
     public void unloadServices() {
-        CachedConfigValues cachedConfig;
+        Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+        if (!cachedConfig.isPresent()) {
+            return;
+        }
+
         RabbitMQReceiver rabbitReceiver;
 
         try {
-            cachedConfig = ServiceLocator.get(CachedConfigValues.class);
             rabbitReceiver = ServiceLocator.get(RabbitMQReceiver.class);
         } catch (InstantiationException | IllegalAccessException | ServiceNotFoundException ex) {
             logger.error(ex.getMessage(), ex);
             return;
         }
 
-        if (cachedConfig.getRedisPool() != null) {
-            cachedConfig.getRedisPool().close();
+        if (cachedConfig.get().getRedisPool() != null) {
+            cachedConfig.get().getRedisPool().close();
         }
 
         try {
@@ -468,6 +429,6 @@ public class AntiVPN {
             }
         }
 
-        cachedConfig.getSQL().close();
+        cachedConfig.get().getSQL().close();
     }
 }

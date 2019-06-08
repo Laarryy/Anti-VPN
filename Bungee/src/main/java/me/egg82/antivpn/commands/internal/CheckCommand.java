@@ -1,13 +1,13 @@
 package me.egg82.antivpn.commands.internal;
 
+import java.util.Optional;
 import me.egg82.antivpn.VPNAPI;
 import me.egg82.antivpn.extended.Configuration;
+import me.egg82.antivpn.utils.ConfigUtil;
 import me.egg82.antivpn.utils.LogUtil;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.TextComponent;
-import ninja.egg82.service.ServiceLocator;
-import ninja.egg82.service.ServiceNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,17 +27,14 @@ public class CheckCommand implements Runnable {
     public void run() {
         sender.sendMessage(new TextComponent(LogUtil.getHeading() + ChatColor.YELLOW + "Checking " + ChatColor.WHITE + ip + ChatColor.YELLOW + ".."));
 
-        Configuration config;
-        try {
-            config = ServiceLocator.get(Configuration.class);
-        } catch (InstantiationException | IllegalAccessException | ServiceNotFoundException ex) {
-            logger.error(ex.getMessage(), ex);
+        Optional<Configuration> config = ConfigUtil.getConfig();
+        if (!config.isPresent()) {
             sender.sendMessage(new TextComponent(LogUtil.getHeading() + ChatColor.DARK_RED + "Internal error"));
             return;
         }
 
-        if (config.getNode("kick", "algorithm", "method").getString("cascade").equalsIgnoreCase("consensus")) {
-            double consensus = clamp(0.0d, 1.0d, config.getNode("kick", "algorithm", "min-consensus").getDouble(0.6d));
+        if (config.get().getNode("kick", "algorithm", "method").getString("cascade").equalsIgnoreCase("consensus")) {
+            double consensus = clamp(0.0d, 1.0d, config.get().getNode("kick", "algorithm", "min-consensus").getDouble(0.6d));
             sender.sendMessage(new TextComponent(LogUtil.getHeading() + (api.consensus(ip) >= consensus ? ChatColor.DARK_RED + "VPN/PRoxy detected" : ChatColor.GREEN + "No VPN/Proxy detected")));
         } else {
             sender.sendMessage(new TextComponent(LogUtil.getHeading() + (api.cascade(ip) ? ChatColor.DARK_RED + "VPN/PRoxy detected" : ChatColor.GREEN + "No VPN/Proxy detected")));

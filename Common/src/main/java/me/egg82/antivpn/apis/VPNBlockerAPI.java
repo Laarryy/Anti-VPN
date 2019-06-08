@@ -2,6 +2,9 @@ package me.egg82.antivpn.apis;
 
 import java.io.IOException;
 import java.util.Optional;
+import me.egg82.antivpn.APIException;
+import me.egg82.antivpn.extended.Configuration;
+import me.egg82.antivpn.utils.ConfigUtil;
 import ninja.egg82.json.JSONWebUtil;
 import ninja.leaping.configurate.ConfigurationNode;
 import org.json.simple.JSONObject;
@@ -14,13 +17,12 @@ public class VPNBlockerAPI implements API {
 
     public String getName() { return "vpnblocker"; }
 
-    public Optional<Boolean> getResult(String ip, ConfigurationNode sourceConfigNode) {
+    public boolean getResult(String ip) throws APIException {
         if (ip == null) {
             throw new IllegalArgumentException("ip cannot be null.");
         }
-        if (sourceConfigNode == null) {
-            throw new IllegalArgumentException("sourceConfigNode cannot be null.");
-        }
+
+        ConfigurationNode sourceConfigNode = getSourceConfigNode();
 
         String key = sourceConfigNode.getNode("key").getString();
 
@@ -29,21 +31,30 @@ public class VPNBlockerAPI implements API {
             json = JSONWebUtil.getJsonObject("http" + ((key != null && !key.isEmpty()) ? "s" : "") + "://api.vpnblocker.net/v2/json/" + ip + ((key != null && !key.isEmpty()) ? "/" + key : ""), "egg82/AntiVPN");
         } catch (IOException | ParseException ex) {
             logger.error(ex.getMessage(), ex);
-            return Optional.empty();
+            throw new APIException(false, "Could not get result from " + getName());
         }
         if (json == null || json.get("status") == null) {
-            return Optional.empty();
+            throw new APIException(false, "Could not get result from " + getName());
         }
 
         String status = (String) json.get("status");
         if (!status.equalsIgnoreCase("success")) {
-            return Optional.empty();
+            throw new APIException(false, "Could not get result from " + getName());
         }
 
         if (json.get("host-ip") == null) {
-            return Optional.empty();
+            throw new APIException(false, "Could not get result from " + getName());
         }
 
-        return Optional.of((Boolean) json.get("host-ip") ? Boolean.TRUE : Boolean.FALSE);
+        return (Boolean) json.get("host-ip");
+    }
+
+    private ConfigurationNode getSourceConfigNode() throws APIException {
+        Optional<Configuration> config = ConfigUtil.getConfig();
+        if (!config.isPresent()) {
+            throw new APIException(true, "Could not get configuration.");
+        }
+
+        return config.get().getNode("sources", getName());
     }
 }

@@ -1,27 +1,17 @@
 package me.egg82.antivpn;
 
 import com.google.common.collect.ImmutableMap;
-import com.rabbitmq.client.Connection;
-import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Optional;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeoutException;
 import me.egg82.antivpn.enums.SQLType;
 import me.egg82.antivpn.extended.CachedConfigValues;
-import me.egg82.antivpn.extended.Configuration;
 import me.egg82.antivpn.services.InternalAPI;
 import me.egg82.antivpn.sql.MySQL;
 import me.egg82.antivpn.sql.SQLite;
-import me.egg82.antivpn.utils.RabbitMQUtil;
+import me.egg82.antivpn.utils.ConfigUtil;
 import me.egg82.antivpn.utils.ValidationUtil;
-import ninja.egg82.service.ServiceLocator;
-import ninja.egg82.service.ServiceNotFoundException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class VPNAPI {
-    private static final Logger logger = LoggerFactory.getLogger(VPNAPI.class);
-
     private static final VPNAPI api = new VPNAPI();
     private final InternalAPI internalApi = new InternalAPI();
 
@@ -29,33 +19,26 @@ public class VPNAPI {
 
     public static VPNAPI getInstance() { return api; }
 
-    public long getCurrentSQLTime() {
-        CachedConfigValues cachedConfig;
-
-        try {
-            cachedConfig = ServiceLocator.get(CachedConfigValues.class);
-        } catch (IllegalAccessException | InstantiationException | ServiceNotFoundException ex) {
-            logger.error(ex.getMessage(), ex);
-            return -1L;
+    public long getCurrentSQLTime() throws APIException {
+        Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+        if (!cachedConfig.isPresent()) {
+            throw new APIException(true, "Could not get cached config.");
         }
 
         try {
-            if (cachedConfig.getSQLType() == SQLType.MySQL) {
-                return MySQL.getCurrentTime(cachedConfig.getSQL()).get();
-            } else if (cachedConfig.getSQLType() == SQLType.SQLite) {
-                return SQLite.getCurrentTime(cachedConfig.getSQL()).get();
+            if (cachedConfig.get().getSQLType() == SQLType.MySQL) {
+                return MySQL.getCurrentTime();
+            } else if (cachedConfig.get().getSQLType() == SQLType.SQLite) {
+                return SQLite.getCurrentTime();
             }
-        } catch (ExecutionException ex) {
-            logger.error(ex.getMessage(), ex);
-        } catch (InterruptedException ex) {
-            logger.error(ex.getMessage(), ex);
-            Thread.currentThread().interrupt();
+        } catch (SQLException ex) {
+            throw new APIException(true, ex);
         }
 
-        return -1L;
+        throw new APIException(true, "Could not get time from database.");
     }
 
-    public ImmutableMap<String, Optional<Boolean>> testAllSources(String ip) {
+    public ImmutableMap<String, Optional<Boolean>> testAllSources(String ip) throws APIException {
         if (ip == null) {
             throw new IllegalArgumentException("ip cannot be null.");
         }
@@ -63,21 +46,10 @@ public class VPNAPI {
             throw new IllegalArgumentException("ip is invalid.");
         }
 
-        CachedConfigValues cachedConfig;
-        Configuration config;
-
-        try {
-            cachedConfig = ServiceLocator.get(CachedConfigValues.class);
-            config = ServiceLocator.get(Configuration.class);
-        } catch (IllegalAccessException | InstantiationException | ServiceNotFoundException ex) {
-            logger.error(ex.getMessage(), ex);
-            return ImmutableMap.of();
-        }
-
-        return ImmutableMap.copyOf(internalApi.testAllSources(ip, cachedConfig.getSources(), config.getNode("sources"), cachedConfig.getDebug()));
+        return ImmutableMap.copyOf(internalApi.testAllSources(ip));
     }
 
-    public Optional<Boolean> getSourceResult(String ip, String sourceName) {
+    public boolean getSourceResult(String ip, String sourceName) throws APIException {
         if (ip == null) {
             throw new IllegalArgumentException("ip cannot be null.");
         }
@@ -88,21 +60,12 @@ public class VPNAPI {
             throw new IllegalArgumentException("ip is invalid.");
         }
 
-        Configuration config;
-
-        try {
-            config = ServiceLocator.get(Configuration.class);
-        } catch (IllegalAccessException | InstantiationException | ServiceNotFoundException ex) {
-            logger.error(ex.getMessage(), ex);
-            return Optional.empty();
-        }
-
-        return internalApi.getSourceResult(ip, sourceName, config.getNode("sources", sourceName));
+        return internalApi.getSourceResult(ip, sourceName);
     }
 
-    public double consensus(String ip) { return consensus(ip, true); }
+    public double consensus(String ip) throws APIException { return consensus(ip, true); }
 
-    public double consensus(String ip, boolean expensive) {
+    public double consensus(String ip, boolean expensive) throws APIException {
         if (ip == null) {
             throw new IllegalArgumentException("ip cannot be null.");
         }
@@ -110,29 +73,12 @@ public class VPNAPI {
             throw new IllegalArgumentException("ip is invalid.");
         }
 
-        CachedConfigValues cachedConfig;
-        Configuration config;
-
-        try {
-            cachedConfig = ServiceLocator.get(CachedConfigValues.class);
-            config = ServiceLocator.get(Configuration.class);
-        } catch (IllegalAccessException | InstantiationException | ServiceNotFoundException ex) {
-            logger.error(ex.getMessage(), ex);
-            return 0.0d;
-        }
-
-        try (Connection rabbitConnection = RabbitMQUtil.getConnection(cachedConfig.getRabbitConnectionFactory())) {
-            return internalApi.consensus(ip, expensive, cachedConfig.getSourceCacheTime(), cachedConfig.getRedisPool(), config.getNode("redis"), rabbitConnection, cachedConfig.getSQL(), config.getNode("storage"), cachedConfig.getSQLType(), cachedConfig.getSources(), config.getNode("sources"), cachedConfig.getDebug());
-        } catch (IOException | TimeoutException ex) {
-            logger.error(ex.getMessage(), ex);
-        }
-
-        return internalApi.consensus(ip, expensive, cachedConfig.getSourceCacheTime(), cachedConfig.getRedisPool(), config.getNode("redis"), null, cachedConfig.getSQL(), config.getNode("storage"), cachedConfig.getSQLType(), cachedConfig.getSources(), config.getNode("sources"), cachedConfig.getDebug());
+        return internalApi.consensus(ip, expensive);
     }
 
-    public boolean cascade(String ip) { return cascade(ip, true); }
+    public boolean cascade(String ip) throws APIException { return cascade(ip, true); }
 
-    public boolean cascade(String ip, boolean expensive) {
+    public boolean cascade(String ip, boolean expensive) throws APIException {
         if (ip == null) {
             throw new IllegalArgumentException("ip cannot be null.");
         }
@@ -140,23 +86,6 @@ public class VPNAPI {
             throw new IllegalArgumentException("ip is invalid.");
         }
 
-        CachedConfigValues cachedConfig;
-        Configuration config;
-
-        try {
-            cachedConfig = ServiceLocator.get(CachedConfigValues.class);
-            config = ServiceLocator.get(Configuration.class);
-        } catch (IllegalAccessException | InstantiationException | ServiceNotFoundException ex) {
-            logger.error(ex.getMessage(), ex);
-            return false;
-        }
-
-        try (Connection rabbitConnection = RabbitMQUtil.getConnection(cachedConfig.getRabbitConnectionFactory())) {
-            return internalApi.cascade(ip, expensive, cachedConfig.getSourceCacheTime(), cachedConfig.getRedisPool(), config.getNode("redis"), rabbitConnection, cachedConfig.getSQL(), config.getNode("storage"), cachedConfig.getSQLType(), cachedConfig.getSources(), config.getNode("sources"), cachedConfig.getDebug());
-        } catch (IOException | TimeoutException ex) {
-            logger.error(ex.getMessage(), ex);
-        }
-
-        return internalApi.cascade(ip, expensive, cachedConfig.getSourceCacheTime(), cachedConfig.getRedisPool(), config.getNode("redis"), null, cachedConfig.getSQL(), config.getNode("storage"), cachedConfig.getSQLType(), cachedConfig.getSources(), config.getNode("sources"), cachedConfig.getDebug());
+        return internalApi.cascade(ip, expensive);
     }
 }

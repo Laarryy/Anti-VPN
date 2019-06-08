@@ -1,10 +1,9 @@
 package me.egg82.antivpn.apis;
 
-import java.util.Optional;
-import ninja.leaping.configurate.ConfigurationNode;
+import me.egg82.antivpn.APIException;
 
 public interface API {
     String getName();
 
-    Optional<Boolean> getResult(String ip, ConfigurationNode sourceConfigNode);
+    boolean getResult(String ip) throws APIException;
 }

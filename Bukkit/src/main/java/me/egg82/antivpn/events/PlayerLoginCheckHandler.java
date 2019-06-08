@@ -8,6 +8,7 @@ import me.egg82.antivpn.extended.CachedConfigValues;
 import me.egg82.antivpn.extended.Configuration;
 import me.egg82.antivpn.hooks.PlaceholderAPIHook;
 import me.egg82.antivpn.services.AnalyticsHelper;
+import me.egg82.antivpn.utils.ConfigUtil;
 import me.egg82.antivpn.utils.LogUtil;
 import ninja.egg82.service.ServiceLocator;
 import ninja.egg82.service.ServiceNotFoundException;
@@ -27,39 +28,34 @@ public class PlayerLoginCheckHandler implements Consumer<PlayerLoginEvent> {
             return;
         }
 
-        Configuration config;
-        CachedConfigValues cachedConfig;
-
-        try {
-            config = ServiceLocator.get(Configuration.class);
-            cachedConfig = ServiceLocator.get(CachedConfigValues.class);
-        } catch (InstantiationException | IllegalAccessException | ServiceNotFoundException ex) {
-            logger.error(ex.getMessage(), ex);
+        Optional<Configuration> config = ConfigUtil.getConfig();
+        Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+        if (!config.isPresent() || !cachedConfig.isPresent()) {
             return;
         }
 
         if (event.getPlayer().hasPermission("avpn.bypass")) {
-            if (cachedConfig.getDebug()) {
+            if (ConfigUtil.getDebugOrFalse()) {
                 logger.info(LogUtil.getHeading() + ChatColor.WHITE + event.getPlayer().getName() + ChatColor.YELLOW + " bypasses check. Ignoring.");
             }
             return;
         }
 
-        if (!config.getNode("kick", "enabled").getBoolean(true)) {
-            if (cachedConfig.getDebug()) {
+        if (!config.get().getNode("kick", "enabled").getBoolean(true)) {
+            if (ConfigUtil.getDebugOrFalse()) {
                 logger.info(LogUtil.getHeading() + ChatColor.YELLOW + "Plugin set to API-only. Ignoring " + ChatColor.WHITE + event.getPlayer().getName());
             }
             return;
         }
 
-        if (cachedConfig.getIgnoredIps().contains(ip)) {
+        if (cachedConfig.get().getIgnoredIps().contains(ip)) {
             return;
         }
 
         boolean isVPN;
 
-        if (config.getNode("kick", "algorithm", "method").getString("cascade").equalsIgnoreCase("consensus")) {
-            double consensus = clamp(0.0d, 1.0d, config.getNode("kick", "algorithm", "min-consensus").getDouble(0.6d));
+        if (config.get().getNode("kick", "algorithm", "method").getString("cascade").equalsIgnoreCase("consensus")) {
+            double consensus = clamp(0.0d, 1.0d, config.get().getNode("kick", "algorithm", "min-consensus").getDouble(0.6d));
             isVPN = api.consensus(ip) >= consensus;
         } else {
             isVPN = api.cascade(ip);
@@ -67,7 +63,7 @@ public class PlayerLoginCheckHandler implements Consumer<PlayerLoginEvent> {
 
         if (isVPN) {
             AnalyticsHelper.incrementBlocked();
-            if (cachedConfig.getDebug()) {
+            if (ConfigUtil.getDebugOrFalse()) {
                 logger.info(LogUtil.getHeading() + ChatColor.WHITE + event.getPlayer().getName() + ChatColor.DARK_RED + " found using a VPN. Kicking with defined message.");
             }
 
@@ -82,9 +78,9 @@ public class PlayerLoginCheckHandler implements Consumer<PlayerLoginEvent> {
             }
 
             if (placeholderapi.isPresent()) {
-                event.setKickMessage(placeholderapi.get().withPlaceholders(event.getPlayer(), config.getNode("kick", "message").getString("")));
+                event.setKickMessage(placeholderapi.get().withPlaceholders(event.getPlayer(), config.get().getNode("kick", "message").getString("")));
             } else {
-                event.setKickMessage(config.getNode("kick", "message").getString(""));
+                event.setKickMessage(config.get().getNode("kick", "message").getString(""));
             }
         } else {
             logger.info(LogUtil.getHeading() + ChatColor.WHITE + event.getPlayer().getName() + ChatColor.GREEN + " passed VPN check.");

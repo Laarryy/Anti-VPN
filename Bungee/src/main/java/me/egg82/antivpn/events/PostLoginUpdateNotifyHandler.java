@@ -1,8 +1,10 @@
 package me.egg82.antivpn.events;
 
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 import me.egg82.antivpn.extended.Configuration;
+import me.egg82.antivpn.utils.ConfigUtil;
 import me.egg82.antivpn.utils.LogUtil;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -21,18 +23,21 @@ public class PostLoginUpdateNotifyHandler implements Consumer<PostLoginEvent> {
             return;
         }
 
-        Configuration config;
+        Optional<Configuration> config = ConfigUtil.getConfig();
+        if (!config.isPresent()) {
+            return;
+        }
+
         BungeeUpdater updater;
 
         try {
-            config = ServiceLocator.get(Configuration.class);
             updater = ServiceLocator.get(BungeeUpdater.class);
         } catch (InstantiationException | IllegalAccessException | ServiceNotFoundException ex) {
             logger.error(ex.getMessage(), ex);
             return;
         }
 
-        if (!config.getNode("update", "check").getBoolean(true)) {
+        if (!config.get().getNode("update", "check").getBoolean(true)) {
             return;
         }
 
@@ -41,7 +46,7 @@ public class PostLoginUpdateNotifyHandler implements Consumer<PostLoginEvent> {
                 return;
             }
 
-            if (config.getNode("update", "notify").getBoolean(true)) {
+            if (config.get().getNode("update", "notify").getBoolean(true)) {
                 try {
                     event.getPlayer().sendMessage(new TextComponent(LogUtil.getHeading() + ChatColor.AQUA + " (Bungee) has an " + ChatColor.GREEN + "update" + ChatColor.AQUA + " available! New version: " + ChatColor.YELLOW + updater.getLatestVersion().get()));
                 } catch (ExecutionException ex) {

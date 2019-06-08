@@ -8,10 +8,12 @@ import com.djrapitops.plan.data.plugin.PluginData;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.Collection;
+import java.util.Optional;
 import java.util.UUID;
 import me.egg82.antivpn.VPNAPI;
 import me.egg82.antivpn.extended.Configuration;
 import me.egg82.antivpn.services.AnalyticsHelper;
+import me.egg82.antivpn.utils.ConfigUtil;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
 import ninja.egg82.service.ServiceLocator;
@@ -50,19 +52,15 @@ public class PlayerAnalyticsHook implements PluginHook {
                 return container;
             }
 
-            Configuration config;
-
-            try {
-                config = ServiceLocator.get(Configuration.class);
-            } catch (InstantiationException | IllegalAccessException | ServiceNotFoundException ex) {
-                logger.error(ex.getMessage(), ex);
+            Optional<Configuration> config = ConfigUtil.getConfig();
+            if (!config.isPresent()) {
                 return container;
             }
 
             boolean isVPN;
 
-            if (config.getNode("kick", "algorithm", "method").getString("cascade").equalsIgnoreCase("consensus")) {
-                double consensus = clamp(0.0d, 1.0d, config.getNode("kick", "algorithm", "min-consensus").getDouble(0.6d));
+            if (config.get().getNode("kick", "algorithm", "method").getString("cascade").equalsIgnoreCase("consensus")) {
+                double consensus = clamp(0.0d, 1.0d, config.get().getNode("kick", "algorithm", "min-consensus").getDouble(0.6d));
                 isVPN = api.consensus(ip) >= consensus;
             } else {
                 isVPN = api.cascade(ip);
@@ -74,16 +72,12 @@ public class PlayerAnalyticsHook implements PluginHook {
         }
 
         public AnalysisContainer getServerData(Collection<UUID> uuids, AnalysisContainer container) {
-            Configuration config;
-
-            try {
-                config = ServiceLocator.get(Configuration.class);
-            } catch (InstantiationException | IllegalAccessException | ServiceNotFoundException ex) {
-                logger.error(ex.getMessage(), ex);
+            Optional<Configuration> config = ConfigUtil.getConfig();
+            if (!config.isPresent()) {
                 return container;
             }
 
-            if (config.getNode("kick", "enabled").getBoolean(true)) {
+            if (config.get().getNode("kick", "enabled").getBoolean(true)) {
                 container.addValue("Proxies/VPNs blocked", AnalyticsHelper.getBlocked() + " since startup.");
             }
 
@@ -101,8 +95,8 @@ public class PlayerAnalyticsHook implements PluginHook {
 
                 boolean isVPN;
 
-                if (config.getNode("kick", "algorithm", "method").getString("cascade").equalsIgnoreCase("consensus")) {
-                    double consensus = clamp(0.0d, 1.0d, config.getNode("kick", "algorithm", "min-consensus").getDouble(0.6d));
+                if (config.get().getNode("kick", "algorithm", "method").getString("cascade").equalsIgnoreCase("consensus")) {
+                    double consensus = clamp(0.0d, 1.0d, config.get().getNode("kick", "algorithm", "min-consensus").getDouble(0.6d));
                     isVPN = api.consensus(ip) >= consensus;
                 } else {
                     isVPN = api.cascade(ip);

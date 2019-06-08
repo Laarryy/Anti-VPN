@@ -100,12 +100,8 @@ public class ConfigurationFileUtil {
                 continue;
             }
 
-            if ((source.equalsIgnoreCase("iphub")
-                    || source.equalsIgnoreCase("ipqualityscore")
-                    || source.equalsIgnoreCase("voxprox")
-                    || source.equalsIgnoreCase("shodan"))
-                    && config.getNode("sources", source, "key").getString("").isEmpty()
-            ) {
+            String key = config.getNode("sources", source, "key").getString();
+            if (key != null && key.isEmpty()) {
                 if (debug) {
                     logger.info(LogUtil.getHeading() + ChatColor.DARK_RED + source + " requires a key which was not provided. Removing.");
                 }

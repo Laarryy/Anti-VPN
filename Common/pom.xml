@@ -10,7 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>antivpn-common</artifactId>
-    <version>3.5.24</version>
+    <version>4.6.24</version>
 
     <build>
         <sourceDirectory>src/main/java</sourceDirectory>
@@ -154,6 +154,12 @@
             <version>1.0.1</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.spongepowered</groupId>
+            <artifactId>configurate-yaml</artifactId>
+            <version>3.6.1</version>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
