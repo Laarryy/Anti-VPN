@@ -35,6 +35,29 @@
                             <pattern>org.bstats</pattern>
                             <shadedPattern>me.egg82.antivpn.external.org.bstats</shadedPattern>
                         </relocation>
+                        <relocation>
+                            <pattern>ninja.egg82.maven</pattern>
+                            <shadedPattern>me.egg82.antivpn.external.ninja.egg82.maven</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>ninja.egg82.services</pattern>
+                            <shadedPattern>me.egg82.antivpn.external.ninja.egg82.services</shadedPattern>
+                            <includes>
+                                <include>ninja.egg82.services.ProxiedURLClassLoader*</include>
+                            </includes>
+                        </relocation>
+                        <relocation>
+                            <pattern>ninja.egg82.utils</pattern>
+                            <shadedPattern>me.egg82.antivpn.external.ninja.egg82.utils</shadedPattern>
+                            <includes>
+                                <include>ninja.egg82.utils.DocumentUtil</include>
+                                <include>ninja.egg82.utils.InjectUtil</include>
+                                <include>ninja.egg82.utils.HTTPUtil</include>
+                                <include>ninja.egg82.utils.DownloadUtil</include>
+                                <include>ninja.egg82.utils.MavenUtil</include>
+                                <include>ninja.egg82.utils.XMLUtil</include>
+                            </includes>
+                        </relocation>
                     </relocations>
                 </configuration>
                 <executions>
@@ -55,6 +78,10 @@
                                     <excludes>
                                         <!-- included or useless -->
                                         <exclude>LICENSE*</exclude>
+                                        <exclude>junit/**</exclude>
+                                        <exclude>org/intellij/**</exclude>
+                                        <exclude>org/junit/**</exclude>
+                                        <exclude>org/hamcrest/**</exclude>
                                         <!-- <exclude>com/google/common/**</exclude>
                                         <exclude>javax/annotation/**</exclude>
                                         <exclude>junit/**</exclude>
@@ -65,14 +92,38 @@
                                         <exclude>org/yaml/snakeyaml/**</exclude> -->
 
                                         <!-- dep-injected -->
+                                        <!-- mvn dependency:tree -->
                                         <exclude>com/github/benmanes/caffeine/**</exclude>
-                                        <exclude>com/google/common/**</exclude>
-                                        <exclude>com/google/errorprone/annotations/**</exclude>
-                                        <exclude>com/google/j2objc/annotations/**</exclude>
+                                        <exclude>com/google/common/**</exclude> <!-- included with many things -->
+                                        <exclude>com/google/errorprone/annotations/**</exclude> <!-- included with guava -->
+                                        <exclude>com/google/j2objc/annotations/**</exclude> <!-- included with guava -->
                                         <exclude>com/google/thirdparty/publicsuffix/**</exclude> <!-- included with guava -->
                                         <exclude>com/googlecode/concurrentlinkedhashmap/**</exclude>
                                         <exclude>com/rabbitmq/**</exclude>
-                                        <exclude>com/zaxxer/hikari/**</exclude>
+                                        <exclude>com/zaxxer/hikari/**</exclude> <!-- included with easy-sql -->
+                                        <exclude>javassist/**</exclude>
+                                        <exclude>javax/annotation/**</exclude>
+                                        <exclude>ninja/egg82/analytics/**</exclude>
+                                        <exclude>ninja/egg82/configuration/**</exclude>
+                                        <exclude>ninja/egg82/core/**</exclude> <!-- included with easy-sql -->
+                                        <exclude>ninja/egg82/json/**</exclude>
+                                        <exclude>ninja/egg82/reflect/**</exclude>
+                                        <exclude>ninja/egg82/service/**</exclude>
+                                        <exclude>ninja/egg82/sql/**</exclude>
+                                        <exclude>ninja/egg82/tuples/**</exclude>
+                                        <exclude>ninja/leaping/configurate/**</exclude>
+                                        <exclude>org/apache/commons/beanutils/**</exclude> <!-- included with validator -->
+                                        <exclude>org/apache/commons/collections/**</exclude> <!-- included with validator -->
+                                        <exclude>org/apache/commons/digester/**</exclude> <!-- included with validator -->
+                                        <exclude>org/apache/commons/lang3/**</exclude> <!-- included with collections -->
+                                        <exclude>org/apache/commons/logging/**</exclude> <!-- included with validator -->
+                                        <exclude>org/apache/commons/pool2/**</exclude> <!-- included with jedis -->
+                                        <exclude>org/apache/commons/validator/**</exclude>
+                                        <exclude>org/checkerframework/**</exclude> <!-- included with configurate-core -->
+                                        <exclude>org/codehaus/mojo/animal_sniffer/**</exclude> <!-- included with guava -->
+                                        <exclude>org/json/simple/**</exclude> <!-- included with gameanalytics-api -->
+                                        <exclude>org/reflections/**</exclude> <!-- included with reflection-utils -->
+                                        <exclude>redis/clients/jedis/**</exclude>
                                         <exclude>rabbitmq-amqp-client.properties</exclude> <!-- included with rabbitmq -->
                                         <exclude>version.properties</exclude> <!-- included with rabbitmq -->
                                         <!-- <exclude>com/rabbitmq/**</exclude>
