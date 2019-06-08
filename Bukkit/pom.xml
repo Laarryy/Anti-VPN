@@ -72,9 +72,9 @@
                                         <exclude>com/google/thirdparty/publicsuffix/**</exclude> <!-- included with guava -->
                                         <exclude>com/googlecode/concurrentlinkedhashmap/**</exclude>
                                         <exclude>com/rabbitmq/**</exclude>
+                                        <exclude>com/zaxxer/hikari/**</exclude>
                                         <exclude>rabbitmq-amqp-client.properties</exclude> <!-- included with rabbitmq -->
                                         <exclude>version.properties</exclude> <!-- included with rabbitmq -->
-                                        <exclude>com/zaxxer/hikari/**</exclude>
                                         <!-- <exclude>com/rabbitmq/**</exclude>
                                         <exclude>com/zaxxer/hikari/**</exclude>
                                         <exclude>javassist/**</exclude>

@@ -314,7 +314,6 @@ public class BukkitBootstrap extends JavaPlugin {
         if (depth > 0) {
             for (Artifact dependency : artifact.getDependencies()) {
                 if (dependency.getScope() == Scope.COMPILE || dependency.getScope() == Scope.RUNTIME) {
-                    log(Level.INFO, "Downloading dependency " + dependency);
                     injectArtifact(dependency, jarsDir, classLoader, null, depth - 1);
                 }
             }
