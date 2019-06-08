@@ -3,6 +3,7 @@ package me.egg82.antivpn.events;
 import java.net.InetAddress;
 import java.util.Optional;
 import java.util.function.Consumer;
+import me.egg82.antivpn.APIException;
 import me.egg82.antivpn.VPNAPI;
 import me.egg82.antivpn.extended.CachedConfigValues;
 import me.egg82.antivpn.extended.Configuration;
@@ -40,9 +41,17 @@ public class AsyncPlayerPreLoginCacheHandler implements Consumer<AsyncPlayerPreL
         }
 
         if (config.get().getNode("kick", "algorithm", "method").getString("cascade").equalsIgnoreCase("consensus")) {
-            api.consensus(ip); // Calling this will cache the result internally, even if the value is unused
+            try {
+                api.consensus(ip); // Calling this will cache the result internally, even if the value is unused
+            } catch (APIException ex) {
+                logger.error(ex.getMessage(), ex);
+            }
         } else {
-            api.cascade(ip); // Calling this will cache the result internally, even if the value is unused
+            try {
+                api.cascade(ip); // Calling this will cache the result internally, even if the value is unused
+            } catch (APIException ex) {
+                logger.error(ex.getMessage(), ex);
+            }
         }
     }
 

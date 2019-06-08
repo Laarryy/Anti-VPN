@@ -4,9 +4,9 @@ import co.aikar.taskchain.TaskChain;
 import java.net.InetAddress;
 import java.text.DecimalFormat;
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import me.egg82.antivpn.APIException;
 import me.egg82.antivpn.VPNAPI;
 import me.egg82.antivpn.utils.LogUtil;
 import me.egg82.antivpn.utils.ValidationUtil;
@@ -69,14 +69,19 @@ public class ScoreCommand implements Runnable {
                 Thread.currentThread().interrupt();
             }
 
-            Optional<Boolean> result = api.getSourceResult(ip, source);
-            Boolean bool = result.orElse(null);
-            if (bool == null) {
+            boolean result;
+            try {
+                result = api.getSourceResult(ip, source);
+            } catch (APIException ex) {
+                if (ex.isHard()) {
+                    logger.error(ex.getMessage(), ex);
+                    continue;
+                }
                 error++;
                 continue;
             }
 
-            if ((!flipResult && bool) || (flipResult && !bool)) {
+            if ((!flipResult && result) || (flipResult && !result)) {
                 good++;
             }
         }

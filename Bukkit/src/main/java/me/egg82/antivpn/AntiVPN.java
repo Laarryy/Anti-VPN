@@ -157,7 +157,7 @@ public class AntiVPN {
             return ImmutableList.copyOf(commands);
         });
 
-        commandManager.registerCommand(new AntiVPNCommand(this, plugin, taskFactory));
+        commandManager.registerCommand(new AntiVPNCommand(plugin, taskFactory));
     }
 
     private void loadEvents() {
