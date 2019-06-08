@@ -19,7 +19,6 @@ import java.util.UUID;
 import java.util.logging.Logger;
 import javax.inject.Inject;
 import me.egg82.antivpn.services.GameAnalyticsErrorHandler;
-import me.egg82.antivpn.utils.JarUtil;
 import me.egg82.antivpn.utils.LogUtil;
 import me.egg82.antivpn.utils.ValidationUtil;
 import me.lucko.jarrelocator.Relocation;
@@ -70,7 +69,7 @@ public class VelocityBootstrap {
             }
         }
 
-        proxy.getConsoleCommandSource().sendMessage(LogUtil.getHeading().append(TextComponent.of("Loading dep ").color(TextColor.YELLOW)).append(TextComponent.of("Caffeine").color(TextColor.WHITE)).build());
+        /*proxy.getConsoleCommandSource().sendMessage(LogUtil.getHeading().append(TextComponent.of("Loading dep ").color(TextColor.YELLOW)).append(TextComponent.of("Caffeine").color(TextColor.WHITE)).build());
         JarUtil.loadJar("http://central.maven.org/maven2/com/github/ben-manes/caffeine/caffeine/2.6.2/caffeine-2.6.2.jar",
                 new File(jarsFolder, "caffeine-2.6.2.jar"),
                 new File(jarsFolder, "caffeine-2.6.2-relocated.jar"),
@@ -172,7 +171,7 @@ public class VelocityBootstrap {
             } catch (ClassNotFoundException | InstantiationException | SQLException ex) {
                 logger.error(ex.getMessage(), ex);
             }
-        }
+        }*/
     }
 
     // Because Maven's relocate is maybe sometimes a bit too powerful ;)

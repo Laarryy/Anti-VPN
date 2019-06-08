@@ -279,9 +279,9 @@ public class AntiVPN {
     }
 
     private void loadEvents() {
-        events.add(BukkitEvents.subscribe(AsyncPlayerPreLoginEvent.class, EventPriority.HIGH).handler(e -> new AsyncPlayerPreLoginCacheHandler().accept(e)));
-        events.add(BukkitEvents.subscribe(PlayerLoginEvent.class, EventPriority.LOWEST).handler(e -> new PlayerLoginCheckHandler().accept(e)));
-        events.add(BukkitEvents.subscribe(PlayerLoginEvent.class, EventPriority.LOW).handler(e -> new PlayerLoginUpdateNotifyHandler(plugin).accept(e)));
+        events.add(BukkitEvents.subscribe(plugin, AsyncPlayerPreLoginEvent.class, EventPriority.HIGH).handler(e -> new AsyncPlayerPreLoginCacheHandler().accept(e)));
+        events.add(BukkitEvents.subscribe(plugin, PlayerLoginEvent.class, EventPriority.LOWEST).handler(e -> new PlayerLoginCheckHandler().accept(e)));
+        events.add(BukkitEvents.subscribe(plugin, PlayerLoginEvent.class, EventPriority.LOW).handler(e -> new PlayerLoginUpdateNotifyHandler(plugin).accept(e)));
     }
 
     private void loadHooks() {

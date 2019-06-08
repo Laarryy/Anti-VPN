@@ -2,32 +2,36 @@ package me.egg82.antivpn;
 
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URISyntaxException;
 import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.UUID;
 import java.util.logging.Level;
-import me.egg82.antivpn.services.GameAnalyticsErrorHandler;
-import me.egg82.antivpn.utils.JarUtil;
+import javax.xml.xpath.XPathExpressionException;
 import me.egg82.antivpn.utils.LogUtil;
-import me.egg82.antivpn.utils.ValidationUtil;
-import me.lucko.jarrelocator.Relocation;
+import ninja.egg82.maven.Artifact;
+import ninja.egg82.maven.Scope;
+import ninja.egg82.services.ProxiedURLClassLoader;
+import ninja.egg82.utils.InjectUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
 
 public class BukkitBootstrap extends JavaPlugin {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private AntiVPN concrete;
-    private final String externalPath = "me{}egg82{}antivpn{}external";
+    private Object concrete;
+    private Class<?> concreteClass;
+
     private final boolean isBukkit;
+
+    private URLClassLoader proxiedClassLoader;
 
     public BukkitBootstrap() {
         super();
@@ -36,40 +40,166 @@ public class BukkitBootstrap extends JavaPlugin {
 
     @Override
     public void onLoad() {
+        proxiedClassLoader = new ProxiedURLClassLoader(getClass().getClassLoader());
+
         try {
-            loadJars(new File(getDataFolder(), "external"), (URLClassLoader) getClass().getClassLoader());
-        } catch (ClassCastException | IOException | IllegalAccessException | InvocationTargetException ex) {
+            loadJars(new File(getDataFolder(), "external"), proxiedClassLoader);
+        } catch (ClassCastException | IOException | IllegalAccessException | InvocationTargetException | URISyntaxException | XPathExpressionException | SAXException ex) {
             logger.error(ex.getMessage(), ex);
             throw new RuntimeException("Could not load required deps.");
         }
 
-        concrete = new AntiVPN(this);
-        concrete.onLoad();
+        try {
+            concreteClass = proxiedClassLoader.loadClass("me.egg82.antivpn.AntiVPN");
+            concrete = concreteClass.getDeclaredConstructor(Plugin.class).newInstance(this);
+            concreteClass.getMethod("onLoad").invoke(concrete);
+        } catch (ClassNotFoundException | NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException ex) {
+            logger.error(ex.getMessage(), ex);
+            throw new RuntimeException("Could not create main class.");
+        }
     }
 
     @Override
     public void onEnable() {
-        GameAnalyticsErrorHandler.open(getID(new File(getDataFolder(), "stats-id.txt")), getDescription().getVersion(), Bukkit.getVersion());
-        concrete.onEnable();
+        try {
+            concreteClass.getMethod("onEnable").invoke(concrete);
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ex) {
+            logger.error(ex.getMessage(), ex);
+            throw new RuntimeException("Could not invoke onEnable.");
+        }
     }
 
     @Override
     public void onDisable() {
-        concrete.onDisable();
-        GameAnalyticsErrorHandler.close();
+        try {
+            concreteClass.getMethod("onDisable").invoke(concrete);
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ex) {
+            logger.error(ex.getMessage(), ex);
+            throw new RuntimeException("Could not invoke onDisable.");
+        }
     }
 
-    private void loadJars(File jarsFolder, URLClassLoader classLoader) throws IOException, IllegalAccessException, InvocationTargetException {
-        if (jarsFolder.exists() && !jarsFolder.isDirectory()) {
-            Files.delete(jarsFolder.toPath());
+    private void loadJars(File jarsDir, URLClassLoader classLoader) throws IOException, IllegalAccessException, InvocationTargetException, URISyntaxException, XPathExpressionException, SAXException {
+        if (jarsDir.exists() && !jarsDir.isDirectory()) {
+            Files.delete(jarsDir.toPath());
         }
-        if (!jarsFolder.exists()) {
-            if (!jarsFolder.mkdirs()) {
+        if (!jarsDir.exists()) {
+            if (!jarsDir.mkdirs()) {
                 throw new IOException("Could not create parent directory structure.");
             }
         }
 
-        log(Level.INFO, LogUtil.getHeading() + ChatColor.YELLOW + "Loading dep " + ChatColor.WHITE + "Caffeine");
+        InjectUtil.injectFile(getFile(), classLoader);
+
+        File cacheDir = new File(jarsDir, "cache");
+
+        Artifact taskchainBukkit = Artifact.builder("co.aikar", "taskchain-bukkit", "3.7.2", cacheDir)
+                .addRepository("https://nexus.egg82.me/repository/aikar/")
+                .addRepository("https://repo.aikar.co/nexus/content/groups/aikar/")
+                .addRepository("https://nexus.egg82.me/repository/maven-central/")
+                .build();
+        injectArtifact(taskchainBukkit, jarsDir, classLoader, "Taskchain", 1);
+
+        Artifact acfPaper = Artifact.builder("co.aikar", "acf-paper", "0.5.0-SNAPSHOT", cacheDir)
+                .addDirectJarURL("https://nexus.egg82.me/repository/aikar/{GROUP}/{ARTIFACT}/{VERSION}/{ARTIFACT}-{SNAPSHOT}-shaded.jar")
+                .addDirectJarURL("https://repo.aikar.co/nexus/content/groups/aikar/{GROUP}/{ARTIFACT}/{VERSION}/{ARTIFACT}-{SNAPSHOT}-shaded.jar")
+                .addRepository("https://nexus.egg82.me/repository/aikar/")
+                .addRepository("https://repo.aikar.co/nexus/content/groups/aikar/")
+                .addRepository("https://nexus.egg82.me/repository/maven-central/")
+                .build();
+        injectArtifact(acfPaper, jarsDir, classLoader, "ACF", 0);
+
+        Artifact eventChainBukkit = Artifact.builder("ninja.egg82", "event-chain-bukkit", "1.0.9", cacheDir)
+                .addRepository("https://nexus.egg82.me/repository/egg82/")
+                .addRepository("https://www.myget.org/F/egg82-java/maven/")
+                .addRepository("https://nexus.egg82.me/repository/maven-central/")
+                .build();
+        injectArtifact(eventChainBukkit, jarsDir, classLoader, "Event Chain");
+
+        Artifact configurateYaml = Artifact.builder("org.spongepowered", "configurate-yaml", "3.6.1", cacheDir)
+                .addRepository("https://nexus.egg82.me/repository/sponge/")
+                .addRepository("https://repo.spongepowered.org/maven/")
+                .addRepository("https://nexus.egg82.me/repository/maven-central/")
+                .build();
+        injectArtifact(configurateYaml, jarsDir, classLoader, "Configurate", 1);
+
+        Artifact spigotUpdater = Artifact.builder("ninja.egg82", "spigot-updater", "1.0.1", cacheDir)
+                .addRepository("https://nexus.egg82.me/repository/egg82/")
+                .addRepository("https://www.myget.org/F/egg82-java/maven/")
+                .addRepository("https://nexus.egg82.me/repository/maven-central/")
+                .build();
+        injectArtifact(spigotUpdater, jarsDir, classLoader, "Spigot Updater");
+
+        Artifact serviceLocator = Artifact.builder("ninja.egg82", "service-locator", "1.0.1", cacheDir)
+                .addRepository("https://nexus.egg82.me/repository/egg82/")
+                .addRepository("https://www.myget.org/F/egg82-java/maven/")
+                .addRepository("https://nexus.egg82.me/repository/maven-central/")
+                .build();
+        injectArtifact(serviceLocator, jarsDir, classLoader, "Service Locator");
+
+        Artifact commonsNet = Artifact.builder("commons-net", "commons-net", "3.6", cacheDir)
+                .addRepository("https://nexus.egg82.me/repository/maven-central/")
+                .build();
+        injectArtifact(commonsNet, jarsDir, classLoader, "Apache Commons (Net)");
+
+        Artifact sqlite = Artifact.builder("org.xerial", "sqlite-jdbc", "latest", cacheDir)
+                .addRepository("https://nexus.egg82.me/repository/maven-central/")
+                .build();
+        injectArtifact(sqlite, jarsDir, classLoader, "SQLite");
+
+        try {
+            DriverManager.registerDriver((Driver) Class.forName("org.sqlite.JDBC", true, classLoader).newInstance());
+        } catch (ClassNotFoundException | InstantiationException | SQLException ex) {
+            logger.error(ex.getMessage(), ex);
+        }
+
+        Artifact mysql = Artifact.builder("mysql", "mysql-connector-java", "latest", cacheDir)
+                .addRepository("https://nexus.egg82.me/repository/maven-central/")
+                .build();
+        injectArtifact(mysql, jarsDir, classLoader, "MySQL", 1);
+
+        try {
+            DriverManager.registerDriver((Driver) Class.forName("com.mysql.jdbc.Driver", true, classLoader).newInstance());
+        } catch (ClassNotFoundException | InstantiationException | SQLException ex) {
+            logger.error(ex.getMessage(), ex);
+        }
+
+        Artifact caffeine = Artifact.builder("com.github.ben-manes.caffeine", "caffeine", "2.7.0", cacheDir)
+                .addRepository("https://nexus.egg82.me/repository/maven-central/")
+                .build();
+        injectArtifact(caffeine, jarsDir, classLoader, "Caffeine");
+
+        Artifact guava = Artifact.builder("com.google.guava", "guava", "27.1-jre", cacheDir)
+                .addRepository("https://nexus.egg82.me/repository/maven-central/")
+                .build();
+        injectArtifact(guava, jarsDir, classLoader, "Google Guava");
+
+        Artifact errorProneAnnotations = Artifact.builder("com.google.errorprone", "error_prone_annotations", "latest", cacheDir)
+                .addRepository("https://nexus.egg82.me/repository/maven-central/")
+                .build();
+        injectArtifact(errorProneAnnotations, jarsDir, classLoader, "Error Prone Annotations");
+
+        Artifact j2objcAnnotations = Artifact.builder("com.google.j2objc", "j2objc-annotations", "latest", cacheDir)
+                .addRepository("https://nexus.egg82.me/repository/maven-central/")
+                .build();
+        injectArtifact(j2objcAnnotations, jarsDir, classLoader, "J2objc Annotations");
+
+        Artifact concurrentlinkedhashmap = Artifact.builder("com.googlecode.concurrentlinkedhashmap", "concurrentlinkedhashmap-lru", "latest", cacheDir)
+                .addRepository("https://nexus.egg82.me/repository/maven-central/")
+                .build();
+        injectArtifact(concurrentlinkedhashmap, jarsDir, classLoader, "ConcurrentLinkedHashMap");
+
+        Artifact amqpClient = Artifact.builder("com.rabbitmq", "amqp-client", "5.7.1", cacheDir)
+                .addRepository("https://nexus.egg82.me/repository/maven-central/")
+                .build();
+        injectArtifact(amqpClient, jarsDir, classLoader, "RabbitMQ");
+
+        Artifact hikariCP = Artifact.builder("com.zaxxer", "HikariCP", "latest", cacheDir)
+                .addRepository("https://nexus.egg82.me/repository/maven-central/")
+                .build();
+        injectArtifact(hikariCP, jarsDir, classLoader, "HikariCP");
+
+        /*log(Level.INFO, LogUtil.getHeading() + ChatColor.YELLOW + "Loading dep " + ChatColor.WHITE + "Caffeine");
         JarUtil.loadJar("http://central.maven.org/maven2/com/github/ben-manes/caffeine/caffeine/2.6.2/caffeine-2.6.2.jar",
                 new File(jarsFolder, "caffeine-2.6.2.jar"),
                 new File(jarsFolder, "caffeine-2.6.2-relocated.jar"),
@@ -163,72 +293,35 @@ public class BukkitBootstrap extends JavaPlugin {
             } catch (ClassNotFoundException | InstantiationException | SQLException ex) {
                 logger.error(ex.getMessage(), ex);
             }
+        }*/
+    }
+
+    private void injectArtifact(Artifact artifact, File jarsDir, URLClassLoader classLoader, String friendlyName) throws IOException, IllegalAccessException, InvocationTargetException, URISyntaxException, XPathExpressionException, SAXException {
+        injectArtifact(artifact, jarsDir, classLoader, friendlyName, 0);
+    }
+
+    private void injectArtifact(Artifact artifact, File jarsDir, URLClassLoader classLoader, String friendlyName, int depth) throws IOException, IllegalAccessException, InvocationTargetException, URISyntaxException, XPathExpressionException, SAXException {
+        File output = new File(jarsDir, artifact.getGroupId()
+                + "-" + artifact.getArtifactId()
+                + "-" + artifact.getRealVersion() + ".jar"
+        );
+
+        if (friendlyName != null && !artifact.fileExists(output)) {
+            log(Level.INFO, LogUtil.getHeading() + ChatColor.YELLOW + "Downloading " + ChatColor.WHITE + friendlyName);
         }
-    }
+        artifact.injectJar(output, classLoader);
 
-    // Because Maven's relocate is maybe sometimes a bit too powerful ;)
-    private String getJavassistString() {
-        return new String(new byte[] {'j', 'a', 'v', 'a', 's', 's', 'i', 's', 't'});
-    }
-
-    // Because Maven's relocate is maybe sometimes a bit too powerful ;)
-    private String parse(String input) {
-        return input.replace("{}", ".");
+        if (depth > 0) {
+            for (Artifact dependency : artifact.getDependencies()) {
+                if (dependency.getScope() == Scope.COMPILE || dependency.getScope() == Scope.RUNTIME) {
+                    log(Level.INFO, "Downloading dependency " + dependency);
+                    injectArtifact(dependency, jarsDir, classLoader, null, depth - 1);
+                }
+            }
+        }
     }
 
     private void log(Level level, String message) {
         getServer().getLogger().log(level, (isBukkit) ? ChatColor.stripColor(message) : message);
-    }
-
-    private UUID getID(File idFile) {
-        String id;
-
-        try {
-            id = readID(idFile);
-        } catch (IOException ex) {
-            logger.error(ex.getMessage(), ex);
-            id = null;
-        }
-
-        if (id == null || id.isEmpty() || !ValidationUtil.isValidUuid(id)) {
-            id = UUID.randomUUID().toString();
-            try {
-                writeID(idFile, id);
-            } catch (IOException ex) {
-                logger.error(ex.getMessage(), ex);
-            }
-        }
-
-        return UUID.fromString(id);
-    }
-
-    private String readID(File idFile) throws IOException {
-        if (!idFile.exists() || (idFile.exists() && idFile.isDirectory())) {
-            return null;
-        }
-
-        StringBuilder builder = new StringBuilder();
-        try (FileReader reader = new FileReader(idFile); BufferedReader in = new BufferedReader(reader)) {
-            String line;
-            while ((line = in.readLine()) != null) {
-                builder.append(line).append(System.lineSeparator());
-            }
-        }
-        return builder.toString().trim();
-    }
-
-    private void writeID(File idFile, String id) throws IOException {
-        if (idFile.exists() && idFile.isDirectory()) {
-            Files.delete(idFile.toPath());
-        }
-        if (!idFile.exists()) {
-            if (!idFile.createNewFile()) {
-                throw new IOException("Stats file could not be created.");
-            }
-        }
-
-        try (FileWriter out = new FileWriter(idFile)) {
-            out.write(id + System.lineSeparator());
-        }
     }
 }

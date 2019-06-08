@@ -10,7 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>antivpn-bungee</artifactId>
-    <version>3.5.23</version>
+    <version>3.5.24</version>
 
     <build>
         <sourceDirectory>src/main/java</sourceDirectory>
@@ -274,7 +274,7 @@
         <dependency>
             <groupId>me.egg82</groupId>
             <artifactId>antivpn-common</artifactId>
-            <version>3.5.23</version>
+            <version>3.5.24</version>
         </dependency>
 
         <dependency>
