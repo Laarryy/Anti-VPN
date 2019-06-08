@@ -17,6 +17,8 @@ public class ProxyCheckAPI implements API {
 
     public String getName() { return "proxycheck"; }
 
+    public boolean isKeyRequired() { return false; }
+
     public boolean getResult(String ip) throws APIException {
         if (ip == null) {
             throw new IllegalArgumentException("ip cannot be null.");

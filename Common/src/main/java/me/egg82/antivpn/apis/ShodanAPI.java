@@ -18,6 +18,8 @@ public class ShodanAPI implements API {
 
     public String getName() { return "shodan"; }
 
+    public boolean isKeyRequired() { return true; }
+
     public boolean getResult(String ip) throws APIException {
         if (ip == null) {
             throw new IllegalArgumentException("ip cannot be null.");

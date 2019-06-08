@@ -8,10 +8,12 @@ import java.nio.file.Files;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import me.egg82.antivpn.apis.API;
 import me.egg82.antivpn.enums.SQLType;
 import me.egg82.antivpn.extended.CachedConfigValues;
 import me.egg82.antivpn.extended.Configuration;
 import me.egg82.antivpn.extended.RabbitMQReceiver;
+import me.egg82.antivpn.services.InternalAPI;
 import ninja.egg82.service.ServiceLocator;
 import ninja.egg82.sql.SQL;
 import ninja.leaping.configurate.ConfigurationNode;
@@ -100,8 +102,8 @@ public class ConfigurationFileUtil {
                 continue;
             }
 
-            String key = config.getNode("sources", source, "key").getString();
-            if (key != null && key.isEmpty()) {
+            Optional<API> api = InternalAPI.getAPI(source);
+            if (api.isPresent() && api.get().isKeyRequired() && config.getNode("sources", source, "key").getString("").isEmpty()) {
                 if (debug) {
                     logger.info(LogUtil.getHeading() + ChatColor.DARK_RED + source + " requires a key which was not provided. Removing.");
                 }

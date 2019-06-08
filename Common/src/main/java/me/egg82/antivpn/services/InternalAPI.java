@@ -25,7 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class InternalAPI {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(InternalAPI.class);
 
     private static Cache<String, Boolean> ipCache = Caffeine.newBuilder().expireAfterAccess(1L, TimeUnit.MINUTES).expireAfterWrite(1L, TimeUnit.HOURS).build();
     private static Cache<String, Double> ipConsensusCache = Caffeine.newBuilder().expireAfterAccess(1L, TimeUnit.MINUTES).expireAfterWrite(1L, TimeUnit.HOURS).build();
@@ -34,11 +34,9 @@ public class InternalAPI {
     private final Object ipCacheLock = new Object();
     private final Object ipConsensusCacheLock = new Object();
 
-    private ImmutableMap<String, API> apis;
+    private static final ImmutableMap<String, API> apis;
 
-    private static ExecutorService threadPool = Executors.newWorkStealingPool(4);
-
-    public InternalAPI() {
+    static {
         ImmutableMap.Builder<String, API> apiBuilder = ImmutableMap.builder();
 
         List<Class<API>> list = PackageFilter.getClasses(API.class, "me.egg82.antivpn.apis", false, false, false);
@@ -54,6 +52,12 @@ public class InternalAPI {
 
         apis = apiBuilder.build();
     }
+
+    private static ExecutorService threadPool = Executors.newWorkStealingPool(4);
+
+    public InternalAPI() { }
+
+    public static Optional<API> getAPI(String name) { return Optional.ofNullable(apis.getOrDefault(name, null)); }
 
     public Map<String, Optional<Boolean>> testAllSources(String ip) throws APIException {
         Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
@@ -228,7 +232,7 @@ public class InternalAPI {
 
             if (result.isPresent()) {
                 if (ConfigUtil.getDebugOrFalse()) {
-                    logger.info(ip + " cascade found in storage. Value: " + result);
+                    logger.info(ip + " cascade found in storage. Value: " + result.get());
                 }
                 // Update messaging/Redis
                 Redis.update(result.get());
@@ -348,7 +352,7 @@ public class InternalAPI {
 
             if (result.isPresent()) {
                 if (ConfigUtil.getDebugOrFalse()) {
-                    logger.info(ip + " consensus found in storage. Value: " + result);
+                    logger.info(ip + " consensus found in storage. Value: " + result.get());
                 }
                 // Update messaging/Redis
                 Redis.update(result.get());

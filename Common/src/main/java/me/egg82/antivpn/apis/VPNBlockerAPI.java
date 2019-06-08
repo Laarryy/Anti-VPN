@@ -17,6 +17,8 @@ public class VPNBlockerAPI implements API {
 
     public String getName() { return "vpnblocker"; }
 
+    public boolean isKeyRequired() { return false; }
+
     public boolean getResult(String ip) throws APIException {
         if (ip == null) {
             throw new IllegalArgumentException("ip cannot be null.");

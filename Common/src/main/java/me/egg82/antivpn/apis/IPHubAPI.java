@@ -19,6 +19,8 @@ public class IPHubAPI implements API {
 
     public String getName() { return "iphub"; }
 
+    public boolean isKeyRequired() { return true; }
+
     public boolean getResult(String ip) throws APIException {
         if (ip == null) {
             throw new IllegalArgumentException("ip cannot be null.");

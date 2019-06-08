@@ -35,6 +35,7 @@ public class TestCommand implements Runnable {
                 .<ImmutableMap<String, Optional<Boolean>>>asyncCallback((v, f) -> {
                     try {
                         f.accept(api.testAllSources(ip));
+                        return;
                     } catch (APIException ex) {
                         logger.error(ex.getMessage(), ex);
                     }
