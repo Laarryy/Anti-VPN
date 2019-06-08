@@ -84,6 +84,7 @@ sources:
   - 'vpnblocker'
   - 'voxprox'
   - 'shodan'
+  - 'ipwarner'
 
   # https://iphub.info/
   # Results updated Sep 6, 2018
@@ -165,6 +166,12 @@ sources:
     # API key to use (Required for this service)
     key: ''
 
+  # https://ipwarner.com/
+  ipwarner:
+    enabled: false
+    # API key to use (Required for this service, free one available at https://ipwarner.com/register )
+    key: ''
+
 kick:
   # When true, will kick players found to be using VPNs
   # Disable this is you intend to use your own kicking/tagging systems using the API
@@ -225,4 +232,4 @@ update:
   notify: true
 
 # Config version, no touchy plz
-version: 3.5
+version: 3.6

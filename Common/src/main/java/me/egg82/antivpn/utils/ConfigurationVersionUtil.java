@@ -42,6 +42,9 @@ public class ConfigurationVersionUtil {
         if (config.getNode("version").getDouble() == 3.4d) {
             to35(config);
         }
+        if (config.getNode("version").getDouble() == 3.5d) {
+            to36(config);
+        }
 
         if (config.getNode("version").getDouble() != oldVersion) {
             File backupFile = new File(fileOnDisk.getParent(), fileOnDisk.getName() + ".bak");
@@ -249,5 +252,25 @@ public class ConfigurationVersionUtil {
 
         // Version
         config.getNode("version").setValue(3.5d);
+    }
+
+    private static void to36(ConfigurationNode config) {
+        // Add ipwarner
+        config.getNode("sources", "ipwarner", "enabled").setValue(Boolean.FALSE);
+        config.getNode("sources", "ipwarner", "key").setValue("");
+
+        List<String> sources;
+        try {
+            sources = new ArrayList<>(config.getNode("sources", "order").getList(TypeToken.of(String.class)));
+        } catch (Exception ex) {
+            sources = new ArrayList<>();
+        }
+        if (!sources.contains("ipwarner")) {
+            sources.add("ipwarner");
+        }
+        config.getNode("sources", "order").setValue(sources);
+
+        // Version
+        config.getNode("version").setValue(3.6d);
     }
 }
