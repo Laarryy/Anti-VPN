@@ -49,8 +49,6 @@ public class BukkitBootstrap extends JavaPlugin {
             throw new RuntimeException("Could not load required deps.");
         }
 
-        ExternalAPI.setInstance(proxiedClassLoader);
-
         try {
             concreteClass = proxiedClassLoader.loadClass("me.egg82.antivpn.AntiVPN");
             concrete = concreteClass.getDeclaredConstructor(Plugin.class).newInstance(this);
@@ -68,6 +66,10 @@ public class BukkitBootstrap extends JavaPlugin {
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ex) {
             logger.error(ex.getMessage(), ex);
             throw new RuntimeException("Could not invoke onEnable.");
+        }
+
+        if (ExternalAPI.getInstance() == null) {
+            ExternalAPI.setInstance(proxiedClassLoader);
         }
     }
 
@@ -91,9 +93,18 @@ public class BukkitBootstrap extends JavaPlugin {
             }
         }
 
-        InjectUtil.injectFile(getFile(), classLoader);
-
         File cacheDir = new File(jarsDir, "cache");
+
+        // First
+
+        Artifact guava = Artifact.builder("com.google.guava", "guava", "27.1-jre", cacheDir)
+                .addRepository("https://nexus.egg82.me/repository/maven-central/")
+                .build();
+        injectArtifact(guava, jarsDir, classLoader, "Google Guava", 1);
+
+        // Same file
+
+        InjectUtil.injectFile(getFile(), classLoader);
 
         // Local
 
@@ -247,9 +258,8 @@ public class BukkitBootstrap extends JavaPlugin {
                 .build();
         injectArtifact(jedis, jarsDir, classLoader, "Jedis", 1);
 
-        Artifact guava = Artifact.builder("com.google.guava", "guava", "27.1-jre", cacheDir)
-                .addRepository("https://nexus.egg82.me/repository/maven-central/")
-                .build();
+        // Last
+
         injectArtifact(guava, jarsDir, classLoader, "Google Guava", 1);
     }
 

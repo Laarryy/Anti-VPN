@@ -10,7 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 public class ExternalAPI {
-    private static ExternalAPI api;
+    private static ExternalAPI api = null;
 
     private final Object concrete;
     private final Class<?> concreteClass;
