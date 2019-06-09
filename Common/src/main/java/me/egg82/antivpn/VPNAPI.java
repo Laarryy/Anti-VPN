@@ -15,7 +15,7 @@ public class VPNAPI {
     private static final VPNAPI api = new VPNAPI();
     private final InternalAPI internalApi = new InternalAPI();
 
-    private VPNAPI() {}
+    private VPNAPI() { }
 
     public static VPNAPI getInstance() { return api; }
 

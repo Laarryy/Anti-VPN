@@ -49,6 +49,8 @@ public class BukkitBootstrap extends JavaPlugin {
             throw new RuntimeException("Could not load required deps.");
         }
 
+        ExternalAPI.setInstance(proxiedClassLoader);
+
         try {
             concreteClass = proxiedClassLoader.loadClass("me.egg82.antivpn.AntiVPN");
             concrete = concreteClass.getDeclaredConstructor(Plugin.class).newInstance(this);

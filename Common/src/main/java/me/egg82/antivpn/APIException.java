@@ -8,13 +8,13 @@ public class APIException extends Exception {
         this.hard = hard;
     }
 
-    public APIException(boolean hard, Exception inner) {
-        super(inner);
+    public APIException(boolean hard, Throwable cause) {
+        super(cause);
         this.hard = hard;
     }
 
-    public APIException(boolean hard, String message, Exception inner) {
-        super(message, inner);
+    public APIException(boolean hard, String message, Throwable cause) {
+        super(message, cause);
         this.hard = hard;
     }
 
