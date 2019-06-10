@@ -8,10 +8,13 @@ import java.nio.file.Files;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+
+import me.egg82.antivpn.apis.API;
 import me.egg82.antivpn.enums.SQLType;
 import me.egg82.antivpn.extended.CachedConfigValues;
 import me.egg82.antivpn.extended.Configuration;
 import me.egg82.antivpn.extended.RabbitMQReceiver;
+import me.egg82.antivpn.services.InternalAPI;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.plugin.Plugin;
@@ -101,12 +104,8 @@ public class ConfigurationFileUtil {
                 continue;
             }
 
-            if ((source.equalsIgnoreCase("iphub")
-                    || source.equalsIgnoreCase("ipqualityscore")
-                    || source.equalsIgnoreCase("voxprox")
-                    || source.equalsIgnoreCase("shodan"))
-                    && config.getNode("sources", source, "key").getString("").isEmpty()
-            ) {
+            Optional<API> api = InternalAPI.getAPI(source);
+            if (api.isPresent() && api.get().isKeyRequired() && config.getNode("sources", source, "key").getString("").isEmpty()) {
                 if (debug) {
                     plugin.getProxy().getConsole().sendMessage(new TextComponent(LogUtil.getHeading() + ChatColor.DARK_RED + source + " requires a key which was not provided. Removing."));
                 }
@@ -147,8 +146,8 @@ public class ConfigurationFileUtil {
                 .cacheTime(cacheTimeLong.get(), cacheTimeUnit.get())
                 .debug(debug)
                 .threads(config.getNode("threads").getInt(4))
-                .redisPool(getRedisPool(plugin, config.getNode("redis")))
-                .rabbitConnectionFactory(getRabbitConnectionFactory(plugin, config.getNode("rabbitmq")))
+                .redisPool(getRedisPool(config.getNode("redis")))
+                .rabbitConnectionFactory(getRabbitConnectionFactory(config.getNode("rabbitmq")))
                 .sql(getSQL(plugin, config.getNode("storage")))
                 .sqlType(config.getNode("storage", "method").getString("sqlite"))
                 .build();
@@ -217,7 +216,7 @@ public class ConfigurationFileUtil {
     private static SQL getSQL(Plugin plugin, ConfigurationNode storageConfigNode) {
         SQLType type = SQLType.getByName(storageConfigNode.getNode("method").getString("sqlite"));
         if (type == SQLType.UNKNOWN) {
-            plugin.getProxy().getConsole().sendMessage(new TextComponent(ChatColor.YELLOW + "storage.method is an unknown value. Using default value."));
+            logger.warn(ChatColor.YELLOW + "storage.method is an unknown value. Using default value.");
             type = SQLType.SQLite;
         }
 
@@ -262,7 +261,7 @@ public class ConfigurationFileUtil {
         return new SQL(hikariConfig);
     }
 
-    private static JedisPool getRedisPool(Plugin plugin, ConfigurationNode redisConfigNode) {
+    private static JedisPool getRedisPool(ConfigurationNode redisConfigNode) {
         if (!redisConfigNode.getNode("enabled").getBoolean(false)) {
             return null;
         }
@@ -274,14 +273,14 @@ public class ConfigurationFileUtil {
             port = Integer.parseInt(address.substring(portIndex + 1));
             address = address.substring(0, portIndex);
         } else {
-            plugin.getProxy().getConsole().sendMessage(new TextComponent(ChatColor.YELLOW + "redis.address port is an unknown value. Using default value."));
+            logger.warn("redis.address port is an unknown value. Using default value.");
             port = 6379;
         }
 
         return new JedisPool(address, port);
     }
 
-    private static ConnectionFactory getRabbitConnectionFactory(Plugin plugin, ConfigurationNode rabbitConfigNode) {
+    private static ConnectionFactory getRabbitConnectionFactory(ConfigurationNode rabbitConfigNode) {
         if (!rabbitConfigNode.getNode("enabled").getBoolean(false)) {
             return null;
         }
@@ -293,7 +292,7 @@ public class ConfigurationFileUtil {
             port = Integer.parseInt(address.substring(portIndex + 1));
             address = address.substring(0, portIndex);
         } else {
-            plugin.getProxy().getConsole().sendMessage(new TextComponent(ChatColor.YELLOW + "rabbitmq.address port is an unknown value. Using default value."));
+            logger.warn("rabbitmq.address port is an unknown value. Using default value.");
             port = 5672;
         }
 

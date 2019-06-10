@@ -1,6 +1,8 @@
 package me.egg82.antivpn.commands.internal;
 
 import java.util.Optional;
+
+import me.egg82.antivpn.APIException;
 import me.egg82.antivpn.VPNAPI;
 import me.egg82.antivpn.extended.Configuration;
 import me.egg82.antivpn.utils.ConfigUtil;
@@ -35,9 +37,19 @@ public class CheckCommand implements Runnable {
 
         if (config.get().getNode("kick", "algorithm", "method").getString("cascade").equalsIgnoreCase("consensus")) {
             double consensus = clamp(0.0d, 1.0d, config.get().getNode("kick", "algorithm", "min-consensus").getDouble(0.6d));
-            sender.sendMessage(new TextComponent(LogUtil.getHeading() + (api.consensus(ip) >= consensus ? ChatColor.DARK_RED + "VPN/PRoxy detected" : ChatColor.GREEN + "No VPN/Proxy detected")));
+            try {
+                sender.sendMessage(new TextComponent(LogUtil.getHeading() + (api.consensus(ip) >= consensus ? ChatColor.DARK_RED + "VPN/PRoxy detected" : ChatColor.GREEN + "No VPN/Proxy detected")));
+            } catch (APIException ex) {
+                logger.error(ex.getMessage(), ex);
+                sender.sendMessage(new TextComponent(LogUtil.getHeading() + ChatColor.DARK_RED + "Internal error"));
+            }
         } else {
-            sender.sendMessage(new TextComponent(LogUtil.getHeading() + (api.cascade(ip) ? ChatColor.DARK_RED + "VPN/PRoxy detected" : ChatColor.GREEN + "No VPN/Proxy detected")));
+            try {
+                sender.sendMessage(new TextComponent(LogUtil.getHeading() + (api.cascade(ip) ? ChatColor.DARK_RED + "VPN/PRoxy detected" : ChatColor.GREEN + "No VPN/Proxy detected")));
+            } catch (APIException ex) {
+                logger.error(ex.getMessage(), ex);
+                sender.sendMessage(new TextComponent(LogUtil.getHeading() + ChatColor.DARK_RED + "Internal error"));
+            }
         }
     }
 

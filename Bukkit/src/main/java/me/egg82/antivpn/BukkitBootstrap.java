@@ -263,7 +263,7 @@ public class BukkitBootstrap extends JavaPlugin {
     }
 
     private void printLatest(String friendlyName) {
-        log(Level.INFO, LogUtil.getHeading() + ChatColor.YELLOW + "Checking version for " + ChatColor.WHITE + friendlyName);
+        log(Level.INFO, LogUtil.getHeading() + ChatColor.YELLOW + "Checking version of " + ChatColor.WHITE + friendlyName);
     }
 
     private void injectArtifact(Artifact artifact, File jarsDir, URLClassLoader classLoader, String friendlyName) throws IOException, IllegalAccessException, InvocationTargetException, URISyntaxException, XPathExpressionException, SAXException {

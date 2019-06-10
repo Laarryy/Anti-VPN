@@ -6,29 +6,21 @@ import co.aikar.commands.RegisteredCommand;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.SetMultimap;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import java.io.IOException;
+
+import java.io.File;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.logging.Level;
 import me.egg82.antivpn.commands.AntiVPNCommand;
-import me.egg82.antivpn.core.SQLFetchResult;
-import me.egg82.antivpn.enums.SQLType;
 import me.egg82.antivpn.events.PostLoginCheckHandler;
 import me.egg82.antivpn.events.PostLoginUpdateNotifyHandler;
 import me.egg82.antivpn.extended.CachedConfigValues;
 import me.egg82.antivpn.extended.Configuration;
-import me.egg82.antivpn.extended.RabbitMQReceiver;
-import me.egg82.antivpn.extended.RedisSubscriber;
 import me.egg82.antivpn.hooks.PlayerAnalyticsHook;
 import me.egg82.antivpn.hooks.PluginHook;
 import me.egg82.antivpn.services.AnalyticsHelper;
-import me.egg82.antivpn.services.Redis;
-import me.egg82.antivpn.sql.MySQL;
-import me.egg82.antivpn.sql.SQLite;
-import me.egg82.antivpn.utils.ConfigUtil;
-import me.egg82.antivpn.utils.ConfigurationFileUtil;
-import me.egg82.antivpn.utils.LogUtil;
-import me.egg82.antivpn.utils.ValidationUtil;
+import me.egg82.antivpn.services.GameAnalyticsErrorHandler;
+import me.egg82.antivpn.utils.*;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.event.PostLoginEvent;
@@ -47,7 +39,7 @@ import org.slf4j.LoggerFactory;
 public class AntiVPN {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private ExecutorService workPool = null;
+    private ExecutorService workPool = Executors.newFixedThreadPool(1, new ThreadFactoryBuilder().setNameFormat("AntiVPN-%d").build());
 
     private BungeeCommandManager commandManager;
 
@@ -71,11 +63,12 @@ public class AntiVPN {
     }
 
     public void onEnable() {
+        GameAnalyticsErrorHandler.open(ServerIDUtil.getID(new File(plugin.getDataFolder(), "stats-id.txt")), plugin.getDescription().getVersion(), plugin.getProxy().getVersion());
+
         commandManager = new BungeeCommandManager(plugin);
         commandManager.enableUnstableAPI("help");
 
         loadServices();
-        loadSQL();
         loadCommands();
         loadEvents();
         loadHooks();
@@ -89,7 +82,7 @@ public class AntiVPN {
                 + ChatColor.YELLOW + "[" + ChatColor.WHITE + events.size() + ChatColor.BLUE + " Events" + ChatColor.YELLOW +  "]"
         ));
 
-        checkUpdate();
+        workPool.submit(this::checkUpdate);
     }
 
     public void onDisable() {
@@ -104,106 +97,19 @@ public class AntiVPN {
         unloadServices();
 
         plugin.getProxy().getConsole().sendMessage(new TextComponent(LogUtil.getHeading() + ChatColor.DARK_RED + "Disabled"));
+
+        GameAnalyticsErrorHandler.close();
     }
 
     private void loadServices() {
         ConfigurationFileUtil.reloadConfig(plugin);
 
-        loadServicesExternal();
+        ServiceUtil.registerWorkPool();
+        ServiceUtil.registerRedis();
+        ServiceUtil.registerRabbit();
+        ServiceUtil.registerSQL();
+
         ServiceLocator.register(new BungeeUpdater(plugin, 58716));
-    }
-
-    public void loadServicesExternal() {
-        workPool = Executors.newFixedThreadPool(2, new ThreadFactoryBuilder().setNameFormat("AntiVPN-%d").build());
-
-        Optional<Configuration> config = ConfigUtil.getConfig();
-        Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
-        if (!config.isPresent() || !cachedConfig.isPresent()) {
-            return;
-        }
-
-        workPool.submit(() -> new RedisSubscriber(cachedConfig.get().getRedisPool(), config.get().getNode("redis")));
-        ServiceLocator.register(new RabbitMQReceiver(cachedConfig.get().getRabbitConnectionFactory()));
-    }
-
-    private void loadSQL() {
-        Optional<Configuration> config = ConfigUtil.getConfig();
-        Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
-        if (!config.isPresent() || !cachedConfig.isPresent()) {
-            return;
-        }
-
-        if (cachedConfig.get().getSQLType() == SQLType.MySQL) {
-            MySQL.createTables(cachedConfig.get().getSQL(), config.get().getNode("storage")).thenRun(() ->
-                    MySQL.loadInfo(cachedConfig.get().getSQL(), config.get().getNode("storage")).thenAccept(v -> {
-                        Redis.updateFromQueue(v, cachedConfig.get().getSourceCacheTime(), cachedConfig.get().getRedisPool(), config.get().getNode("redis"));
-                        updateSQL();
-                    })
-            );
-        } else if (cachedConfig.get().getSQLType() == SQLType.SQLite) {
-            SQLite.createTables(cachedConfig.get().getSQL(), config.get().getNode("storage")).thenRun(() ->
-                    SQLite.loadInfo(cachedConfig.get().getSQL(), config.get().getNode("storage")).thenAccept(v -> {
-                        Redis.updateFromQueue(v, cachedConfig.get().getSourceCacheTime(), cachedConfig.get().getRedisPool(), config.get().getNode("redis"));
-                        updateSQL();
-                    })
-            );
-        }
-    }
-
-    public void loadSQLExternal() {
-        Optional<Configuration> config = ConfigUtil.getConfig();
-        Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
-        if (!config.isPresent() || !cachedConfig.isPresent()) {
-            return;
-        }
-
-        if (cachedConfig.get().getSQLType() == SQLType.MySQL) {
-            MySQL.createTables(cachedConfig.get().getSQL(), config.get().getNode("storage")).thenRun(() ->
-                    MySQL.loadInfo(cachedConfig.get().getSQL(), config.get().getNode("storage")).thenAccept(v -> {
-                        Redis.updateFromQueue(v, cachedConfig.get().getSourceCacheTime(), cachedConfig.get().getRedisPool(), config.get().getNode("redis"));
-                    })
-            );
-        } else if (cachedConfig.get().getSQLType() == SQLType.SQLite) {
-            SQLite.createTables(cachedConfig.get().getSQL(), config.get().getNode("storage")).thenRun(() ->
-                    SQLite.loadInfo(cachedConfig.get().getSQL(), config.get().getNode("storage")).thenAccept(v -> {
-                        Redis.updateFromQueue(v, cachedConfig.get().getSourceCacheTime(), cachedConfig.get().getRedisPool(), config.get().getNode("redis"));
-                    })
-            );
-        }
-    }
-
-    private void updateSQL() {
-        workPool.submit(() -> {
-            try {
-                Thread.sleep(10000L);
-            } catch (InterruptedException ex) {
-                Thread.currentThread().interrupt();
-            }
-
-            Optional<Configuration> config = ConfigUtil.getConfig();
-            Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
-            if (!config.isPresent() || !cachedConfig.isPresent()) {
-                return;
-            }
-
-            SQLFetchResult result = null;
-
-            try {
-                if (cachedConfig.get().getSQLType() == SQLType.MySQL) {
-                    result = MySQL.fetchQueue(cachedConfig.get().getSQL(), config.get().getNode("storage"), cachedConfig.get().getSourceCacheTime()).get();
-                }
-
-                if (result != null) {
-                    Redis.updateFromQueue(result, cachedConfig.get().getSourceCacheTime(), cachedConfig.get().getRedisPool(), config.get().getNode("redis")).get();
-                }
-            } catch (ExecutionException ex) {
-                logger.error(ex.getMessage(), ex);
-            } catch (InterruptedException ex) {
-                Thread.currentThread().interrupt();
-            }
-
-            updateSQL();
-        });
     }
 
     private void loadCommands() {
@@ -235,7 +141,7 @@ public class AntiVPN {
             return ImmutableList.copyOf(commands);
         });
 
-        commandManager.registerCommand(new AntiVPNCommand(this, plugin));
+        commandManager.registerCommand(new AntiVPNCommand(plugin));
     }
 
     private void loadEvents() {
@@ -370,65 +276,36 @@ public class AntiVPN {
                 return;
             }
 
-            if (config.get().getNode("update", "notify").getBoolean(true)) {
-                try {
-                    plugin.getProxy().getConsole().sendMessage(new TextComponent(LogUtil.getHeading() + ChatColor.AQUA + " has an " + ChatColor.GREEN + "update" + ChatColor.AQUA + " available! New version: " + ChatColor.YELLOW + updater.getLatestVersion().get()));
-                } catch (ExecutionException ex) {
-                    logger.error(ex.getMessage(), ex);
-                } catch (InterruptedException ex) {
-                    logger.error(ex.getMessage(), ex);
-                    Thread.currentThread().interrupt();
-                }
+            try {
+                plugin.getProxy().getConsole().sendMessage(new TextComponent(LogUtil.getHeading() + ChatColor.AQUA + " has an " + ChatColor.GREEN + "update" + ChatColor.AQUA + " available! New version: " + ChatColor.YELLOW + updater.getLatestVersion().get()));
+            } catch (ExecutionException ex) {
+                logger.error(ex.getMessage(), ex);
+            } catch (InterruptedException ex) {
+                logger.error(ex.getMessage(), ex);
+                Thread.currentThread().interrupt();
             }
         });
+
+        try {
+            Thread.sleep(60L * 60L * 1000L);
+        } catch (InterruptedException ignored) {
+            Thread.currentThread().interrupt();
+        }
+
+        workPool.submit(this::checkUpdate);
     }
 
     private void unloadHooks() {
-        Optional<? extends PluginHook> plan;
-        try {
-            plan = ServiceLocator.getOptional(PlayerAnalyticsHook.class);
-        } catch (InstantiationException | IllegalAccessException ex) {
-            logger.error(ex.getMessage(), ex);
-            plan = Optional.empty();
+        Set<? extends PluginHook> hooks = ServiceLocator.remove(PluginHook.class);
+        for (PluginHook hook : hooks) {
+            hook.cancel();
         }
-        plan.ifPresent(v -> v.cancel());
     }
 
     public void unloadServices() {
-        Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
-        if (!cachedConfig.isPresent()) {
-            return;
-        }
-
-        RabbitMQReceiver rabbitReceiver;
-
-        try {
-            rabbitReceiver = ServiceLocator.get(RabbitMQReceiver.class);
-        } catch (InstantiationException | IllegalAccessException | ServiceNotFoundException ex) {
-            logger.error(ex.getMessage(), ex);
-            return;
-        }
-
-        if (cachedConfig.get().getRedisPool() != null) {
-            cachedConfig.get().getRedisPool().close();
-        }
-
-        try {
-            rabbitReceiver.close();
-        } catch (IOException | TimeoutException ignored) {}
-
-        if (!workPool.isShutdown()) {
-            workPool.shutdown();
-            try {
-                if (!workPool.awaitTermination(8L, TimeUnit.SECONDS)) {
-                    workPool.shutdownNow();
-                }
-            } catch (InterruptedException ignored) {
-                workPool.shutdownNow();
-                Thread.currentThread().interrupt();
-            }
-        }
-
-        cachedConfig.get().getSQL().close();
+        ServiceUtil.unregisterWorkPool();
+        ServiceUtil.unregisterRedis();
+        ServiceUtil.unregisterRabbit();
+        ServiceUtil.unregisterSQL();
     }
 }
