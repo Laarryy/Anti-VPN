@@ -115,6 +115,7 @@ public class BukkitBootstrap extends JavaPlugin {
                 .build();
         injectArtifact(taskchainBukkit, jarsDir, classLoader, "Taskchain", 1);
 
+        printLatest("ACF");
         Artifact acfPaper = Artifact.builder("co.aikar", "acf-paper", "0.5.0-SNAPSHOT", cacheDir)
                 .addDirectJarURL("https://nexus.egg82.me/repository/aikar/{GROUP}/{ARTIFACT}/{VERSION}/{ARTIFACT}-{SNAPSHOT}-shaded.jar")
                 .addDirectJarURL("https://repo.aikar.co/nexus/content/groups/aikar/{GROUP}/{ARTIFACT}/{VERSION}/{ARTIFACT}-{SNAPSHOT}-shaded.jar")
@@ -157,6 +158,7 @@ public class BukkitBootstrap extends JavaPlugin {
                 .build();
         injectArtifact(commonsNet, jarsDir, classLoader, "Apache Commons (Net)");
 
+        printLatest("SQLite");
         Artifact sqlite = Artifact.builder("org.xerial", "sqlite-jdbc", "latest", cacheDir)
                 .addRepository("https://nexus.egg82.me/repository/maven-central/")
                 .build();
@@ -168,6 +170,7 @@ public class BukkitBootstrap extends JavaPlugin {
             logger.error(ex.getMessage(), ex);
         }
 
+        printLatest("MySQL");
         Artifact mysql = Artifact.builder("mysql", "mysql-connector-java", "latest", cacheDir)
                 .addRepository("https://nexus.egg82.me/repository/maven-central/")
                 .build();
@@ -186,7 +189,7 @@ public class BukkitBootstrap extends JavaPlugin {
                 .build();
         injectArtifact(caffeine, jarsDir, classLoader, "Caffeine");
 
-        Artifact concurrentlinkedhashmap = Artifact.builder("com.googlecode.concurrentlinkedhashmap", "concurrentlinkedhashmap-lru", "latest", cacheDir)
+        Artifact concurrentlinkedhashmap = Artifact.builder("com.googlecode.concurrentlinkedhashmap", "concurrentlinkedhashmap-lru", "1.4.2", cacheDir)
                 .addRepository("https://nexus.egg82.me/repository/maven-central/")
                 .build();
         injectArtifact(concurrentlinkedhashmap, jarsDir, classLoader, "ConcurrentLinkedHashMap");
@@ -196,12 +199,12 @@ public class BukkitBootstrap extends JavaPlugin {
                 .build();
         injectArtifact(amqpClient, jarsDir, classLoader, "RabbitMQ");
 
-        Artifact javassist = Artifact.builder("org.javassist", "javassist", "latest", cacheDir)
+        Artifact javassist = Artifact.builder("org.javassist", "javassist", "3.25.0-GA", cacheDir)
                 .addRepository("https://nexus.egg82.me/repository/maven-central/")
                 .build();
         injectArtifact(javassist, jarsDir, classLoader, "Javassist");
 
-        Artifact javaxAnnotationApi = Artifact.builder("javax.annotation", "javax.annotation-api", "latest", cacheDir)
+        Artifact javaxAnnotationApi = Artifact.builder("javax.annotation", "javax.annotation-api", "1.3.2", cacheDir)
                 .addRepository("https://nexus.egg82.me/repository/maven-central/")
                 .build();
         injectArtifact(javaxAnnotationApi, jarsDir, classLoader, "Javax Annotations");
@@ -257,10 +260,10 @@ public class BukkitBootstrap extends JavaPlugin {
                 .addRepository("https://nexus.egg82.me/repository/maven-central/")
                 .build();
         injectArtifact(jedis, jarsDir, classLoader, "Jedis", 1);
+    }
 
-        // Last
-
-        injectArtifact(guava, jarsDir, classLoader, "Google Guava", 1);
+    private void printLatest(String friendlyName) {
+        log(Level.INFO, LogUtil.getHeading() + ChatColor.YELLOW + "Checking version for " + ChatColor.WHITE + friendlyName);
     }
 
     private void injectArtifact(Artifact artifact, File jarsDir, URLClassLoader classLoader, String friendlyName) throws IOException, IllegalAccessException, InvocationTargetException, URISyntaxException, XPathExpressionException, SAXException {
