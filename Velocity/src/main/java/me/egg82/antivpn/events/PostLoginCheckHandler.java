@@ -6,6 +6,8 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.Optional;
 import java.util.function.Consumer;
+
+import me.egg82.antivpn.APIException;
 import me.egg82.antivpn.VPNAPI;
 import me.egg82.antivpn.extended.CachedConfigValues;
 import me.egg82.antivpn.extended.Configuration;
@@ -62,9 +64,19 @@ public class PostLoginCheckHandler implements Consumer<PostLoginEvent> {
 
         if (config.get().getNode("kick", "algorithm", "method").getString("cascade").equalsIgnoreCase("consensus")) {
             double consensus = clamp(0.0d, 1.0d, config.get().getNode("kick", "algorithm", "min-consensus").getDouble(0.6d));
-            isVPN = api.consensus(ip) >= consensus;
+            try {
+                isVPN = api.consensus(ip) >= consensus;
+            } catch (APIException ex) {
+                logger.error(ex.getMessage(), ex);
+                isVPN = false;
+            }
         } else {
-            isVPN = api.cascade(ip);
+            try {
+                isVPN = api.cascade(ip);
+            } catch (APIException ex) {
+                logger.error(ex.getMessage(), ex);
+                isVPN = false;
+            }
         }
 
         if (isVPN) {

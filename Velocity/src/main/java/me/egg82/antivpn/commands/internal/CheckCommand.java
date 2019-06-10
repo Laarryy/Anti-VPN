@@ -2,6 +2,8 @@ package me.egg82.antivpn.commands.internal;
 
 import com.velocitypowered.api.command.CommandSource;
 import java.util.Optional;
+
+import me.egg82.antivpn.APIException;
 import me.egg82.antivpn.VPNAPI;
 import me.egg82.antivpn.extended.Configuration;
 import me.egg82.antivpn.utils.ConfigUtil;
@@ -33,15 +35,28 @@ public class CheckCommand implements Runnable {
             return;
         }
 
-        boolean isVPN;
+        Optional<Boolean> isVPN = Optional.empty();
         if (config.get().getNode("kick", "algorithm", "method").getString("cascade").equalsIgnoreCase("consensus")) {
             double consensus = clamp(0.0d, 1.0d, config.get().getNode("kick", "algorithm", "min-consensus").getDouble(0.6d));
-            isVPN = api.consensus(ip) >= consensus;
+            try {
+                isVPN = Optional.of(api.consensus(ip) >= consensus);
+            } catch (APIException ex) {
+                logger.error(ex.getMessage(), ex);
+            }
         } else {
-            isVPN = api.cascade(ip);
+            try {
+                isVPN = Optional.of(api.cascade(ip));
+            } catch (APIException ex) {
+                logger.error(ex.getMessage(), ex);
+            }
         }
 
-        if (isVPN) {
+        if (!isVPN.isPresent()) {
+            source.sendMessage(LogUtil.getHeading().append(TextComponent.of("Internal error").color(TextColor.DARK_RED)).build());
+            return;
+        }
+
+        if (isVPN.get()) {
             source.sendMessage(LogUtil.getHeading().append(TextComponent.of("VPN/PRoxy detected").color(TextColor.DARK_RED)).build());
         } else {
             source.sendMessage(LogUtil.getHeading().append(TextComponent.of("No VPN/Proxy detected").color(TextColor.GREEN)).build());

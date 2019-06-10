@@ -5,6 +5,8 @@ import com.djrapitops.plan.data.element.AnalysisContainer;
 import com.djrapitops.plan.data.element.InspectContainer;
 import com.djrapitops.plan.data.plugin.ContainerSize;
 import com.djrapitops.plan.data.plugin.PluginData;
+import com.djrapitops.plan.utilities.html.icon.Color;
+import com.djrapitops.plan.utilities.html.icon.Icon;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import java.net.InetAddress;
@@ -12,6 +14,8 @@ import java.net.InetSocketAddress;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.UUID;
+
+import me.egg82.antivpn.APIException;
 import me.egg82.antivpn.VPNAPI;
 import me.egg82.antivpn.extended.Configuration;
 import me.egg82.antivpn.services.AnalyticsHelper;
@@ -35,8 +39,7 @@ public class PlayerAnalyticsHook implements PluginHook {
 
         private Data(ProxyServer proxy) {
             super(ContainerSize.THIRD, "Anti-VPN");
-            setPluginIcon("ban");
-            setIconColor("red");
+            setPluginIcon(Icon.called("ban").of(Color.RED).build());
 
             this.proxy = proxy;
         }
@@ -57,16 +60,24 @@ public class PlayerAnalyticsHook implements PluginHook {
                 return container;
             }
 
-            boolean isVPN;
+            Optional<Boolean> isVPN = Optional.empty();
 
             if (config.get().getNode("kick", "algorithm", "method").getString("cascade").equalsIgnoreCase("consensus")) {
                 double consensus = clamp(0.0d, 1.0d, config.get().getNode("kick", "algorithm", "min-consensus").getDouble(0.6d));
-                isVPN = api.consensus(ip) >= consensus;
+                try {
+                    isVPN = Optional.of(api.consensus(ip) >= consensus);
+                } catch (APIException ex) {
+                    logger.error(ex.getMessage(), ex);
+                }
             } else {
-                isVPN = api.cascade(ip);
+                try {
+                    isVPN = Optional.of(api.cascade(ip));
+                } catch (APIException ex) {
+                    logger.error(ex.getMessage(), ex);
+                }
             }
 
-            container.addValue("Using VPN/Proxy", (isVPN) ? "Yes" : "No");
+            container.addValue("Using VPN/Proxy", (isVPN.isPresent()) ? (isVPN.get() ? "Yes" : "No") : "ERROR");
 
             return container;
         }
@@ -97,9 +108,19 @@ public class PlayerAnalyticsHook implements PluginHook {
 
                 if (config.get().getNode("kick", "algorithm", "method").getString("cascade").equalsIgnoreCase("consensus")) {
                     double consensus = clamp(0.0d, 1.0d, config.get().getNode("kick", "algorithm", "min-consensus").getDouble(0.6d));
-                    isVPN = api.consensus(ip) >= consensus;
+                    try {
+                        isVPN = api.consensus(ip) >= consensus;
+                    } catch (APIException ex) {
+                        logger.error(ex.getMessage(), ex);
+                        isVPN = false;
+                    }
                 } else {
-                    isVPN = api.cascade(ip);
+                    try {
+                        isVPN = api.cascade(ip);
+                    } catch (APIException ex) {
+                        logger.error(ex.getMessage(), ex);
+                        isVPN = false;
+                    }
                 }
 
                 if (isVPN) {

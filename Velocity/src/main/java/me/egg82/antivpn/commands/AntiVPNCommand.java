@@ -15,14 +15,12 @@ import me.egg82.antivpn.commands.internal.TestCommand;
 
 @CommandAlias("antivpn|avpn")
 public class AntiVPNCommand extends BaseCommand {
-    private final AntiVPN concrete;
-    private final VelocityBootstrap bootstrap;
+    private final Object plugin;
     private final ProxyServer proxy;
     private final PluginDescription pluginDescription;
 
-    public AntiVPNCommand(AntiVPN concrete, VelocityBootstrap bootstrap, ProxyServer proxy, PluginDescription description) {
-        this.concrete = concrete;
-        this.bootstrap = bootstrap;
+    public AntiVPNCommand(Object plugin, ProxyServer proxy, PluginDescription description) {
+        this.plugin = plugin;
         this.proxy = proxy;
         this.pluginDescription = description;
     }
@@ -31,7 +29,7 @@ public class AntiVPNCommand extends BaseCommand {
     @CommandPermission("avpn.admin")
     @Description("Reloads the plugin.")
     public void onReload(CommandSource source) {
-        new ReloadCommand(concrete, bootstrap, proxy, pluginDescription, source).run();
+        new ReloadCommand(plugin, proxy, pluginDescription, source).run();
     }
 
     @Subcommand("test")
@@ -56,6 +54,12 @@ public class AntiVPNCommand extends BaseCommand {
     @Syntax("<ip>")
     public void onCheck(CommandSource source, @Conditions("ip") String ip) {
         new CheckCommand(source, ip).run();
+    }
+
+    @CatchUnknown @Default
+    @CommandCompletion("@subcommand")
+    public void onDefault(CommandSource source, String[] args) {
+        proxy.getCommandManager().execute(source, "antivpn help");
     }
 
     @HelpCommand

@@ -3,12 +3,18 @@ package me.egg82.antivpn.commands.internal;
 import com.velocitypowered.api.command.CommandSource;
 import java.util.Map;
 import java.util.Optional;
+
+import me.egg82.antivpn.APIException;
 import me.egg82.antivpn.VPNAPI;
 import me.egg82.antivpn.utils.LogUtil;
 import net.kyori.text.TextComponent;
 import net.kyori.text.format.TextColor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class TestCommand implements Runnable {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+
     private final CommandSource source;
     private final String ip;
 
@@ -22,7 +28,15 @@ public class TestCommand implements Runnable {
     public void run() {
         source.sendMessage(LogUtil.getHeading().append(TextComponent.of("Testing with ").color(TextColor.YELLOW)).append(TextComponent.of(ip).color(TextColor.WHITE)).append(TextComponent.of(", please wait..").color(TextColor.YELLOW)).build());
 
-        Map<String, Optional<Boolean>> results = api.testAllSources(ip);
+        Map<String, Optional<Boolean>> results;
+        try {
+            results = api.testAllSources(ip);
+        } catch (APIException ex) {
+            logger.error(ex.getMessage(), ex);
+            source.sendMessage(LogUtil.getHeading().append(TextComponent.of("Internal error").color(TextColor.DARK_RED)).build());
+            return;
+        }
+
         for (Map.Entry<String, Optional<Boolean>> kvp : results.entrySet()) {
             if (!kvp.getValue().isPresent()) {
                 source.sendMessage(LogUtil.getHeading().append(LogUtil.getSourceHeading(kvp.getKey())).append(TextComponent.of("Source error").color(TextColor.YELLOW)).build());
