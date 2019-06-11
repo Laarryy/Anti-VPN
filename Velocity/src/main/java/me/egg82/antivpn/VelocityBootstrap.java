@@ -4,6 +4,8 @@ import com.velocitypowered.api.event.PostOrder;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
+import com.velocitypowered.api.plugin.Dependency;
+import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.PluginDescription;
 import com.velocitypowered.api.proxy.ProxyServer;
 import java.io.*;
@@ -14,7 +16,6 @@ import java.nio.file.Files;
 import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.logging.Logger;
 import javax.inject.Inject;
 import javax.xml.xpath.XPathExpressionException;
 
@@ -25,14 +26,22 @@ import ninja.egg82.maven.Artifact;
 import ninja.egg82.maven.Scope;
 import ninja.egg82.services.ProxiedURLClassLoader;
 import ninja.egg82.utils.InjectUtil;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
+@Plugin(
+        id = "antivpn",
+        name = "AntiVPN",
+        version = "4.6.24",
+        authors = "egg82",
+        description = "Get the best; save money on overpriced plugins and block VPN users!",
+        dependencies = @Dependency(id = "plan", optional = true)
+)
 public class VelocityBootstrap {
-    private final org.slf4j.Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private ProxyServer proxy;
-    private Logger pluginLogger;
     private PluginDescription description;
 
     private Object concrete;
@@ -41,9 +50,8 @@ public class VelocityBootstrap {
     private URLClassLoader proxiedClassLoader;
 
     @Inject
-    public VelocityBootstrap(ProxyServer proxy, Logger pluginLogger, PluginDescription description) {
+    public VelocityBootstrap(ProxyServer proxy, PluginDescription description) {
         this.proxy = proxy;
-        this.pluginLogger = pluginLogger;
         this.description = description;
 
         if (!description.getSource().isPresent()) {
@@ -64,7 +72,7 @@ public class VelocityBootstrap {
 
         try {
             concreteClass = proxiedClassLoader.loadClass("me.egg82.antivpn.AntiVPN");
-            concrete = concreteClass.getDeclaredConstructor(Object.class, ProxyServer.class, Logger.class, PluginDescription.class).newInstance(this, proxy, pluginLogger, description);
+            concrete = concreteClass.getDeclaredConstructor(Object.class, ProxyServer.class, PluginDescription.class).newInstance(this, proxy, description);
             concreteClass.getMethod("onLoad").invoke(concrete);
         } catch (ClassNotFoundException | NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException ex) {
             logger.error(ex.getMessage(), ex);
@@ -182,9 +190,10 @@ public class VelocityBootstrap {
                 .build();
         injectArtifact(mysql, jarsDir, classLoader, "MySQL", 1);
 
+        // MySQL is automatically registered
         try {
-            DriverManager.registerDriver((Driver) Class.forName("com.mysql.jdbc.Driver", true, classLoader).newInstance());
-        } catch (ClassNotFoundException | InstantiationException | SQLException ex) {
+            Class.forName("com.mysql.cj.jdbc.Driver", true, classLoader).newInstance();
+        } catch (ClassNotFoundException | InstantiationException ex) {
             logger.error(ex.getMessage(), ex);
         }
 

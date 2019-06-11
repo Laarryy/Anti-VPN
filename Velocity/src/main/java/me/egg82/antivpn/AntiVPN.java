@@ -5,7 +5,6 @@ import co.aikar.commands.RegisteredCommand;
 import co.aikar.commands.VelocityCommandManager;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.SetMultimap;
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.velocitypowered.api.event.PostOrder;
 import com.velocitypowered.api.event.connection.PostLoginEvent;
 import com.velocitypowered.api.plugin.PluginDescription;
@@ -13,30 +12,19 @@ import com.velocitypowered.api.plugin.PluginManager;
 import com.velocitypowered.api.proxy.ProxyServer;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.*;
 import me.egg82.antivpn.commands.AntiVPNCommand;
-import me.egg82.antivpn.core.SQLFetchResult;
-import me.egg82.antivpn.enums.SQLType;
 import me.egg82.antivpn.events.PostLoginCheckHandler;
 import me.egg82.antivpn.extended.CachedConfigValues;
-import me.egg82.antivpn.extended.Configuration;
-import me.egg82.antivpn.extended.RabbitMQReceiver;
-import me.egg82.antivpn.extended.RedisSubscriber;
 import me.egg82.antivpn.hooks.PlayerAnalyticsHook;
 import me.egg82.antivpn.hooks.PluginHook;
 import me.egg82.antivpn.services.GameAnalyticsErrorHandler;
-import me.egg82.antivpn.services.Redis;
-import me.egg82.antivpn.sql.MySQL;
-import me.egg82.antivpn.sql.SQLite;
 import me.egg82.antivpn.utils.*;
 import net.kyori.text.TextComponent;
 import net.kyori.text.format.TextColor;
 import ninja.egg82.events.VelocityEventSubscriber;
 import ninja.egg82.events.VelocityEvents;
 import ninja.egg82.service.ServiceLocator;
-import ninja.egg82.service.ServiceNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,13 +37,21 @@ public class AntiVPN {
 
     private Object plugin;
     private ProxyServer proxy;
-    private java.util.logging.Logger pluginLogger;
     private PluginDescription description;
 
-    public AntiVPN(VelocityBootstrap plugin, ProxyServer proxy, java.util.logging.Logger pluginLogger, PluginDescription description) {
+    public AntiVPN(Object plugin, ProxyServer proxy, PluginDescription description) {
+        if (plugin == null) {
+            throw new IllegalArgumentException("plugin cannot be null.");
+        }
+        if (proxy == null) {
+            throw new IllegalArgumentException("proxy cannot be null.");
+        }
+        if (description == null) {
+            throw new IllegalArgumentException("description cannot be null.");
+        }
+
         this.plugin = plugin;
         this.proxy = proxy;
-        this.pluginLogger = pluginLogger;
         this.description = description;
     }
 

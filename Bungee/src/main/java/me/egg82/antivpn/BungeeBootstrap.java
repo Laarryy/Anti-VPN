@@ -160,9 +160,10 @@ public class BungeeBootstrap extends Plugin {
                 .build();
         injectArtifact(mysql, jarsDir, classLoader, "MySQL", 1);
 
+        // MySQL is automatically registered
         try {
-            DriverManager.registerDriver((Driver) Class.forName("com.mysql.jdbc.Driver", true, classLoader).newInstance());
-        } catch (ClassNotFoundException | InstantiationException | SQLException ex) {
+            Class.forName("com.mysql.cj.jdbc.Driver", true, classLoader).newInstance();
+        } catch (ClassNotFoundException | InstantiationException ex) {
             logger.error(ex.getMessage(), ex);
         }
 

@@ -179,7 +179,7 @@ public class ConfigurationFileUtil {
         }
 
         if (!fileOnDisk.exists()) {
-            try (InputStreamReader reader = new InputStreamReader(plugin.getClass().getResourceAsStream(resourcePath));
+            try (InputStreamReader reader = new InputStreamReader(plugin.getClass().getClassLoader().getResourceAsStream(resourcePath));
                  BufferedReader in = new BufferedReader(reader);
                  FileWriter writer = new FileWriter(fileOnDisk);
                  BufferedWriter out = new BufferedWriter(writer)) {
