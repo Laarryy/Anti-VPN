@@ -43,7 +43,7 @@ public class APITests {
         }
         if (!ServiceLocator.isInitialized(CachedConfigValues.class)) {
             Optional<Configuration> config = ConfigUtil.getConfig();
-            if (config.isPresent()) {
+            if (!config.isPresent()) {
                 throw new APIException(true, "Could not get config.");
             }
 
