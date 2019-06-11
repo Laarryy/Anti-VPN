@@ -10,7 +10,6 @@ import com.velocitypowered.api.event.connection.PostLoginEvent;
 import com.velocitypowered.api.plugin.PluginDescription;
 import com.velocitypowered.api.plugin.PluginManager;
 import com.velocitypowered.api.proxy.ProxyServer;
-
 import java.io.File;
 import java.util.*;
 import me.egg82.antivpn.commands.AntiVPNCommand;

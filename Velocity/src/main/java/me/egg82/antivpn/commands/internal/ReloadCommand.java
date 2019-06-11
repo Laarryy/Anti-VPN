@@ -3,8 +3,6 @@ package me.egg82.antivpn.commands.internal;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.plugin.PluginDescription;
 import com.velocitypowered.api.proxy.ProxyServer;
-import me.egg82.antivpn.AntiVPN;
-import me.egg82.antivpn.VelocityBootstrap;
 import me.egg82.antivpn.utils.ConfigurationFileUtil;
 import me.egg82.antivpn.utils.LogUtil;
 import me.egg82.antivpn.utils.ServiceUtil;

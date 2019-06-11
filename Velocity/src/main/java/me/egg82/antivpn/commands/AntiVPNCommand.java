@@ -6,8 +6,6 @@ import co.aikar.commands.annotation.*;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.plugin.PluginDescription;
 import com.velocitypowered.api.proxy.ProxyServer;
-import me.egg82.antivpn.AntiVPN;
-import me.egg82.antivpn.VelocityBootstrap;
 import me.egg82.antivpn.commands.internal.CheckCommand;
 import me.egg82.antivpn.commands.internal.ReloadCommand;
 import me.egg82.antivpn.commands.internal.ScoreCommand;

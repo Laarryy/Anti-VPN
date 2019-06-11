@@ -10,7 +10,6 @@ import java.nio.file.Files;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import me.egg82.antivpn.VelocityBootstrap;
 import me.egg82.antivpn.apis.API;
 import me.egg82.antivpn.enums.SQLType;
 import me.egg82.antivpn.extended.CachedConfigValues;

@@ -3,7 +3,6 @@ package me.egg82.antivpn.commands;
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.CommandHelp;
 import co.aikar.commands.annotation.*;
-import me.egg82.antivpn.AntiVPN;
 import me.egg82.antivpn.commands.internal.CheckCommand;
 import me.egg82.antivpn.commands.internal.ReloadCommand;
 import me.egg82.antivpn.commands.internal.ScoreCommand;

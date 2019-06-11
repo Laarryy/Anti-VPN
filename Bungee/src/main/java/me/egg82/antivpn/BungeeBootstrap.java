@@ -1,6 +1,7 @@
 package me.egg82.antivpn;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URISyntaxException;
 import java.net.URLClassLoader;
@@ -8,6 +9,7 @@ import java.nio.file.Files;
 import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import javax.xml.xpath.XPathExpressionException;
 import me.egg82.antivpn.utils.LogUtil;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.plugin.Plugin;
@@ -18,8 +20,6 @@ import ninja.egg82.utils.InjectUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
-
-import javax.xml.xpath.XPathExpressionException;
 
 public class BungeeBootstrap extends Plugin {
     private final Logger logger = LoggerFactory.getLogger(getClass());

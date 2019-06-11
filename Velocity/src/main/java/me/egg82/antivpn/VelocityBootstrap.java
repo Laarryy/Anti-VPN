@@ -8,7 +8,8 @@ import com.velocitypowered.api.plugin.Dependency;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.PluginDescription;
 import com.velocitypowered.api.proxy.ProxyServer;
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URISyntaxException;
 import java.net.URLClassLoader;
@@ -18,7 +19,6 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import javax.inject.Inject;
 import javax.xml.xpath.XPathExpressionException;
-
 import me.egg82.antivpn.utils.LogUtil;
 import net.kyori.text.TextComponent;
 import net.kyori.text.format.TextColor;

@@ -8,6 +8,8 @@ import java.util.concurrent.TimeoutException;
 import me.egg82.antivpn.extended.CachedConfigValues;
 
 public class RabbitMQUtil {
+    private RabbitMQUtil() {}
+
     public static Connection getConnection() throws IOException, TimeoutException {
         Optional<CachedConfigValues> configValues = ConfigUtil.getCachedConfig();
         if (!configValues.isPresent()) {

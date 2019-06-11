@@ -4,9 +4,7 @@ import com.velocitypowered.api.command.CommandSource;
 import java.net.InetAddress;
 import java.text.DecimalFormat;
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
-
 import me.egg82.antivpn.APIException;
 import me.egg82.antivpn.VPNAPI;
 import me.egg82.antivpn.utils.LogUtil;

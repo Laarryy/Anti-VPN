@@ -2,7 +2,6 @@ package me.egg82.antivpn.commands.internal;
 
 import java.util.Map;
 import java.util.Optional;
-
 import me.egg82.antivpn.APIException;
 import me.egg82.antivpn.VPNAPI;
 import me.egg82.antivpn.utils.LogUtil;
