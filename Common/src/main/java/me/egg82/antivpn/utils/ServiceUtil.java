@@ -93,7 +93,9 @@ public class ServiceUtil {
                 Redis.updateFromQueue(MySQL.fetchQueue());
             }
         } catch (APIException | SQLException ex) {
-            logger.error(ex.getMessage(), ex);
+            if (!ex.getMessage().endsWith("has been closed.")) {
+                logger.error(ex.getMessage(), ex);
+            }
             return;
         }
 
