@@ -34,7 +34,7 @@ public class PlayerAnalyticsHook implements PluginHook {
 
         private Data() {
             super(ContainerSize.THIRD, "Anti-VPN");
-            setPluginIcon(Icon.called("ban").of(Color.RED).build());
+            setPluginIcon(Icon.called("shield").of(Color.BLUE).build());
         }
 
         public InspectContainer getPlayerData(UUID uuid, InspectContainer container) {

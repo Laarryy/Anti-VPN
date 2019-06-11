@@ -36,7 +36,7 @@ public class PlayerAnalyticsHook implements PluginHook {
 
         private Data(ProxyServer proxy) {
             super(ContainerSize.THIRD, "Anti-VPN");
-            setPluginIcon(Icon.called("ban").of(Color.RED).build());
+            setPluginIcon(Icon.called("shield").of(Color.BLUE).build());
 
             this.proxy = proxy;
         }
