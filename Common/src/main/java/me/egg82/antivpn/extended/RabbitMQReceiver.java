@@ -4,13 +4,12 @@ import com.rabbitmq.client.*;
 import java.io.IOException;
 import java.util.UUID;
 import java.util.concurrent.TimeoutException;
+import me.egg82.antivpn.APIException;
 import me.egg82.antivpn.services.InternalAPI;
 import me.egg82.antivpn.services.RabbitMQ;
 import me.egg82.antivpn.utils.RabbitMQUtil;
 import me.egg82.antivpn.utils.ValidationUtil;
 import ninja.egg82.json.JSONUtil;
-import ninja.egg82.service.ServiceLocator;
-import ninja.egg82.service.ServiceNotFoundException;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
@@ -22,9 +21,9 @@ public class RabbitMQReceiver {
     private Connection connection = null;
     private Channel channel = null;
 
-    public RabbitMQReceiver(ConnectionFactory factory) {
+    public RabbitMQReceiver() {
         try {
-            connection = RabbitMQUtil.getConnection(factory);
+            connection = RabbitMQUtil.getConnection();
             channel = RabbitMQUtil.getChannel(connection);
 
             if (channel == null) {
@@ -65,11 +64,8 @@ public class RabbitMQReceiver {
                             return;
                         }
 
-                        CachedConfigValues cachedConfig = ServiceLocator.get(CachedConfigValues.class);
-                        Configuration config = ServiceLocator.get(Configuration.class);
-
-                        InternalAPI.set(ip, value, created, cachedConfig.getSQL(), config.getNode("storage"), cachedConfig.getSQLType());
-                    } catch (ParseException | ClassCastException | NullPointerException | IllegalAccessException | InstantiationException | ServiceNotFoundException ex) {
+                        InternalAPI.set(ip, value, created);
+                    } catch (APIException | ParseException | ClassCastException | NullPointerException ex) {
                         logger.error(ex.getMessage(), ex);
                     }
                 }
@@ -97,11 +93,8 @@ public class RabbitMQReceiver {
                             return;
                         }
 
-                        CachedConfigValues cachedConfig = ServiceLocator.get(CachedConfigValues.class);
-                        Configuration config = ServiceLocator.get(Configuration.class);
-
-                        InternalAPI.set(ip, value, created, cachedConfig.getSQL(), config.getNode("storage"), cachedConfig.getSQLType());
-                    } catch (ParseException | ClassCastException | NullPointerException | IllegalAccessException | InstantiationException | ServiceNotFoundException ex) {
+                        InternalAPI.set(ip, value, created);
+                    } catch (APIException | ParseException | ClassCastException | NullPointerException ex) {
                         logger.error(ex.getMessage(), ex);
                     }
                 }
@@ -112,19 +105,12 @@ public class RabbitMQReceiver {
                 public void handleDelivery(String tag, Envelope envelope, AMQP.BasicProperties properies, byte[] body) throws IOException {
                     String message = new String(body, "UTF-8");
 
-                    CachedConfigValues cachedConfig;
-                    Configuration config;
-
-                    try {
-                        cachedConfig = ServiceLocator.get(CachedConfigValues.class);
-                        config = ServiceLocator.get(Configuration.class);
-                    } catch (IllegalAccessException | InstantiationException | ServiceNotFoundException ex) {
-                        logger.error(ex.getMessage(), ex);
-                        return;
-                    }
-
                     // In this case, the message is the "IP"
-                    InternalAPI.delete(message, cachedConfig.getSQL(), config.getNode("storage"), cachedConfig.getSQLType());
+                    try {
+                        InternalAPI.delete(message);
+                    } catch (APIException ex) {
+                        logger.error(ex.getMessage(), ex);
+                    }
                 }
             };
             channel.basicConsume(deleteQueueName, true, deleteConsumer);

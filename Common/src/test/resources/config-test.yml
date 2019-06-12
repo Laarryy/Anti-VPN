@@ -51,7 +51,7 @@ storage:
 # You will need to install the (external) Redis server software if you haven't already
 # https://redis.io/
 redis:
-  enabled: false
+  enabled: true
   # Address and port of the remote Redis server
   address: '127.0.0.1:6379'
   # Redis credentials
@@ -61,7 +61,7 @@ redis:
 # You will need to install the (external) RabbitMQ server software if you haven't already
 # https://www.rabbitmq.com/
 rabbitmq:
-  enabled: false
+  enabled: true
   # Address and port of the remote RabbitMQ server
   address: '127.0.0.1:5672'
   # RabbitMQ credentials
@@ -84,7 +84,6 @@ sources:
   - 'vpnblocker'
   - 'voxprox'
   - 'shodan'
-  - 'ipwarner'
 
   # https://iphub.info/
   # Results updated Sep 6, 2018
@@ -166,12 +165,6 @@ sources:
     # API key to use (Required for this service)
     key: ''
 
-  # https://ipwarner.com/
-  ipwarner:
-    enabled: false
-    # API key to use (Required for this service, free one available at https://ipwarner.com/register )
-    key: ''
-
 kick:
   # When true, will kick players found to be using VPNs
   # Disable this is you intend to use your own kicking/tagging systems using the API
@@ -211,7 +204,7 @@ kick:
 # Generally the default is good enough to prevent many sequential lookups from choking resources, but still keep memory usage low
 cacheTime: '1minute'
 # When true, logs some extra output to the console so you can see if/why things might be failing
-debug: false
+debug: true
 # The number of threads to use for web operations
 threads: 4
 
@@ -232,4 +225,4 @@ update:
   notify: true
 
 # Config version, no touchy plz
-version: 3.6
+version: 3.5

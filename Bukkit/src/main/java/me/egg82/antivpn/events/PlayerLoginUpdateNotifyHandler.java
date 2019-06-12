@@ -1,8 +1,10 @@
 package me.egg82.antivpn.events;
 
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 import me.egg82.antivpn.extended.Configuration;
+import me.egg82.antivpn.utils.ConfigUtil;
 import me.egg82.antivpn.utils.LogUtil;
 import ninja.egg82.service.ServiceLocator;
 import ninja.egg82.service.ServiceNotFoundException;
@@ -26,18 +28,21 @@ public class PlayerLoginUpdateNotifyHandler implements Consumer<PlayerLoginEvent
             return;
         }
 
-        Configuration config;
+        Optional<Configuration> config = ConfigUtil.getConfig();
+        if (!config.isPresent()) {
+            return;
+        }
+
         SpigotUpdater updater;
 
         try {
-            config = ServiceLocator.get(Configuration.class);
             updater = ServiceLocator.get(SpigotUpdater.class);
         } catch (InstantiationException | IllegalAccessException | ServiceNotFoundException ex) {
             logger.error(ex.getMessage(), ex);
             return;
         }
 
-        if (!config.getNode("update", "check").getBoolean(true)) {
+        if (!config.get().getNode("update", "check").getBoolean(true)) {
             return;
         }
 
@@ -46,7 +51,7 @@ public class PlayerLoginUpdateNotifyHandler implements Consumer<PlayerLoginEvent
                 return;
             }
 
-            if (config.getNode("update", "notify").getBoolean(true)) {
+            if (config.get().getNode("update", "notify").getBoolean(true)) {
                 try {
                     String message = LogUtil.getHeading() + ChatColor.AQUA + " (Bukkit) has an " + ChatColor.GREEN + "update" + ChatColor.AQUA + " available! New version: " + ChatColor.YELLOW + updater.getLatestVersion().get();
                     Bukkit.getScheduler().runTask(plugin, () -> event.getPlayer().sendMessage(message));

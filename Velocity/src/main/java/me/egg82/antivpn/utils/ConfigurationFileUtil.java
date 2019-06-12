@@ -10,11 +10,12 @@ import java.nio.file.Files;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import me.egg82.antivpn.VelocityBootstrap;
+import me.egg82.antivpn.apis.API;
 import me.egg82.antivpn.enums.SQLType;
 import me.egg82.antivpn.extended.CachedConfigValues;
 import me.egg82.antivpn.extended.Configuration;
 import me.egg82.antivpn.extended.RabbitMQReceiver;
+import me.egg82.antivpn.services.InternalAPI;
 import net.kyori.text.TextComponent;
 import net.kyori.text.format.TextColor;
 import ninja.egg82.service.ServiceLocator;
@@ -34,10 +35,10 @@ public class ConfigurationFileUtil {
 
     private ConfigurationFileUtil() {}
 
-    public static void reloadConfig(VelocityBootstrap bootstrap, ProxyServer proxy, PluginDescription description) {
+    public static void reloadConfig(Object plugin, ProxyServer proxy, PluginDescription description) {
         Configuration config;
         try {
-            config = getConfig(bootstrap, "config.yml", new File(new File(description.getSource().get().getParent().toFile(), description.getName().get()), "config.yml"));
+            config = getConfig(plugin, "config.yml", new File(new File(description.getSource().get().getParent().toFile(), description.getName().get()), "config.yml"));
         } catch (IOException ex) {
             logger.error(ex.getMessage(), ex);
             return;
@@ -103,12 +104,8 @@ public class ConfigurationFileUtil {
                 continue;
             }
 
-            if ((source.equalsIgnoreCase("iphub")
-                    || source.equalsIgnoreCase("ipqualityscore")
-                    || source.equalsIgnoreCase("voxprox")
-                    || source.equalsIgnoreCase("shodan"))
-                    && config.getNode("sources", source, "key").getString("").isEmpty()
-            ) {
+            Optional<API> api = InternalAPI.getAPI(source);
+            if (api.isPresent() && api.get().isKeyRequired() && config.getNode("sources", source, "key").getString("").isEmpty()) {
                 if (debug) {
                     proxy.getConsoleCommandSource().sendMessage(LogUtil.getHeading().append(TextComponent.of(source + " requires a key which was not provided. Removing.").color(TextColor.DARK_RED)).build());
                 }
@@ -166,7 +163,7 @@ public class ConfigurationFileUtil {
         }
     }
 
-    public static Configuration getConfig(VelocityBootstrap bootstrap, String resourcePath, File fileOnDisk) throws IOException {
+    public static Configuration getConfig(Object plugin, String resourcePath, File fileOnDisk) throws IOException {
         File parentDir = fileOnDisk.getParentFile();
         if (parentDir.exists() && !parentDir.isDirectory()) {
             Files.delete(parentDir.toPath());
@@ -181,7 +178,7 @@ public class ConfigurationFileUtil {
         }
 
         if (!fileOnDisk.exists()) {
-            try (InputStreamReader reader = new InputStreamReader(bootstrap.getResourceAsStream(resourcePath));
+            try (InputStreamReader reader = new InputStreamReader(plugin.getClass().getClassLoader().getResourceAsStream(resourcePath));
                  BufferedReader in = new BufferedReader(reader);
                  FileWriter writer = new FileWriter(fileOnDisk);
                  BufferedWriter out = new BufferedWriter(writer)) {

@@ -1,11 +1,12 @@
 package me.egg82.antivpn.commands.internal;
 
 import co.aikar.taskchain.TaskChain;
+import java.util.Optional;
+import me.egg82.antivpn.APIException;
 import me.egg82.antivpn.VPNAPI;
 import me.egg82.antivpn.extended.Configuration;
+import me.egg82.antivpn.utils.ConfigUtil;
 import me.egg82.antivpn.utils.LogUtil;
-import ninja.egg82.service.ServiceLocator;
-import ninja.egg82.service.ServiceNotFoundException;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.slf4j.Logger;
@@ -31,20 +32,27 @@ public class CheckCommand implements Runnable {
 
         chain
                 .<String>asyncCallback((v, f) -> {
-                    Configuration config;
-                    try {
-                        config = ServiceLocator.get(Configuration.class);
-                    } catch (InstantiationException | IllegalAccessException | ServiceNotFoundException ex) {
-                        logger.error(ex.getMessage(), ex);
+                    Optional<Configuration> config = ConfigUtil.getConfig();
+                    if (!config.isPresent()) {
                         f.accept(ChatColor.DARK_RED + "Internal error");
                         return;
                     }
 
-                    if (config.getNode("kick", "algorithm", "method").getString("cascade").equalsIgnoreCase("consensus")) {
-                        double consensus = clamp(0.0d, 1.0d, config.getNode("kick", "algorithm", "min-consensus").getDouble(0.6d));
-                        f.accept(api.consensus(ip) >= consensus ? ChatColor.DARK_RED + "VPN/PRoxy detected" : ChatColor.GREEN + "No VPN/Proxy detected");
+                    if (config.get().getNode("kick", "algorithm", "method").getString("cascade").equalsIgnoreCase("consensus")) {
+                        double consensus = clamp(0.0d, 1.0d, config.get().getNode("kick", "algorithm", "min-consensus").getDouble(0.6d));
+                        try {
+                            f.accept(api.consensus(ip) >= consensus ? ChatColor.DARK_RED + "VPN/PRoxy detected" : ChatColor.GREEN + "No VPN/Proxy detected");
+                        } catch (APIException ex) {
+                            logger.error(ex.getMessage(), ex);
+                            f.accept(ChatColor.DARK_RED + "Internal error");
+                        }
                     } else {
-                        f.accept(api.cascade(ip) ? ChatColor.DARK_RED + "VPN/PRoxy detected" : ChatColor.GREEN + "No VPN/Proxy detected");
+                        try {
+                            f.accept(api.cascade(ip) ? ChatColor.DARK_RED + "VPN/PRoxy detected" : ChatColor.GREEN + "No VPN/Proxy detected");
+                        } catch (APIException ex) {
+                            logger.error(ex.getMessage(), ex);
+                            f.accept(ChatColor.DARK_RED + "Internal error");
+                        }
                     }
                 })
                 .syncLast(v -> sender.sendMessage(LogUtil.getHeading() + v))

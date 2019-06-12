@@ -1,21 +1,19 @@
 package me.egg82.antivpn.commands.internal;
 
 import co.aikar.taskchain.TaskChain;
-import me.egg82.antivpn.AntiVPN;
 import me.egg82.antivpn.utils.ConfigurationFileUtil;
 import me.egg82.antivpn.utils.LogUtil;
+import me.egg82.antivpn.utils.ServiceUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.Plugin;
 
 public class ReloadCommand implements Runnable {
-    private final AntiVPN concrete;
     private final Plugin plugin;
     private final TaskChain<?> chain;
     private final CommandSender sender;
 
-    public ReloadCommand(AntiVPN concrete, Plugin plugin, TaskChain<?> chain, CommandSender sender) {
-        this.concrete = concrete;
+    public ReloadCommand(Plugin plugin, TaskChain<?> chain, CommandSender sender) {
         this.plugin = plugin;
         this.chain = chain;
         this.sender = sender;
@@ -25,10 +23,15 @@ public class ReloadCommand implements Runnable {
         sender.sendMessage(LogUtil.getHeading() + ChatColor.YELLOW + "Reloading, please wait..");
 
         chain
-                .async(concrete::unloadServices)
+                .async(ServiceUtil::unregisterWorkPool)
+                .async(ServiceUtil::unregisterRedis)
+                .async(ServiceUtil::unregisterRabbit)
+                .async(ServiceUtil::unregisterSQL)
                 .async(() -> ConfigurationFileUtil.reloadConfig(plugin))
-                .async(concrete::loadServicesExternal)
-                .async(concrete::loadSQLExternal)
+                .async(ServiceUtil::registerWorkPool)
+                .async(ServiceUtil::registerRedis)
+                .async(ServiceUtil::registerRabbit)
+                .async(ServiceUtil::registerSQL)
                 .sync(() -> sender.sendMessage(LogUtil.getHeading() + ChatColor.GREEN + "Configuration reloaded!"))
                 .execute();
     }

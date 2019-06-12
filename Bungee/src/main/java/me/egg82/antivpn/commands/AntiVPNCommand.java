@@ -3,7 +3,6 @@ package me.egg82.antivpn.commands;
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.CommandHelp;
 import co.aikar.commands.annotation.*;
-import me.egg82.antivpn.AntiVPN;
 import me.egg82.antivpn.commands.internal.CheckCommand;
 import me.egg82.antivpn.commands.internal.ReloadCommand;
 import me.egg82.antivpn.commands.internal.ScoreCommand;
@@ -13,11 +12,9 @@ import net.md_5.bungee.api.plugin.Plugin;
 
 @CommandAlias("antivpn|avpn")
 public class AntiVPNCommand extends BaseCommand {
-    private final AntiVPN concrete;
     private final Plugin plugin;
 
-    public AntiVPNCommand(AntiVPN concrete, Plugin plugin) {
-        this.concrete = concrete;
+    public AntiVPNCommand(Plugin plugin) {
         this.plugin = plugin;
     }
 
@@ -25,7 +22,7 @@ public class AntiVPNCommand extends BaseCommand {
     @CommandPermission("avpn.admin")
     @Description("Reloads the plugin.")
     public void onReload(CommandSender sender) {
-        new ReloadCommand(concrete, plugin, sender).run();
+        new ReloadCommand(plugin, sender).run();
     }
 
     @Subcommand("test")

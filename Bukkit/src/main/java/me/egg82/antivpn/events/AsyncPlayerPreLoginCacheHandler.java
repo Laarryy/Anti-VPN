@@ -1,13 +1,14 @@
 package me.egg82.antivpn.events;
 
 import java.net.InetAddress;
+import java.util.Optional;
 import java.util.function.Consumer;
+import me.egg82.antivpn.APIException;
 import me.egg82.antivpn.VPNAPI;
 import me.egg82.antivpn.extended.CachedConfigValues;
 import me.egg82.antivpn.extended.Configuration;
+import me.egg82.antivpn.utils.ConfigUtil;
 import me.egg82.antivpn.utils.LogUtil;
-import ninja.egg82.service.ServiceLocator;
-import ninja.egg82.service.ServiceNotFoundException;
 import org.bukkit.ChatColor;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.slf4j.Logger;
@@ -26,28 +27,31 @@ public class AsyncPlayerPreLoginCacheHandler implements Consumer<AsyncPlayerPreL
             return;
         }
 
-        Configuration config;
-        CachedConfigValues cachedConfig;
-
-        try {
-            config = ServiceLocator.get(Configuration.class);
-            cachedConfig = ServiceLocator.get(CachedConfigValues.class);
-        } catch (InstantiationException | IllegalAccessException | ServiceNotFoundException ex) {
-            logger.error(ex.getMessage(), ex);
+        Optional<Configuration> config = ConfigUtil.getConfig();
+        Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+        if (!config.isPresent() || !cachedConfig.isPresent()) {
             return;
         }
 
-        if (cachedConfig.getIgnoredIps().contains(ip)) {
-            if (cachedConfig.getDebug()) {
+        if (cachedConfig.get().getIgnoredIps().contains(ip)) {
+            if (ConfigUtil.getDebugOrFalse()) {
                 logger.info(LogUtil.getHeading() + ChatColor.WHITE + event.getUniqueId() + ChatColor.YELLOW + " is using an ignored IP " + ChatColor.WHITE + ip +  ChatColor.YELLOW + ". Ignoring.");
             }
             return;
         }
 
-        if (config.getNode("kick", "algorithm", "method").getString("cascade").equalsIgnoreCase("consensus")) {
-            api.consensus(ip); // Calling this will cache the result internally, even if the value is unused
+        if (config.get().getNode("kick", "algorithm", "method").getString("cascade").equalsIgnoreCase("consensus")) {
+            try {
+                api.consensus(ip); // Calling this will cache the result internally, even if the value is unused
+            } catch (APIException ex) {
+                logger.error(ex.getMessage(), ex);
+            }
         } else {
-            api.cascade(ip); // Calling this will cache the result internally, even if the value is unused
+            try {
+                api.cascade(ip); // Calling this will cache the result internally, even if the value is unused
+            } catch (APIException ex) {
+                logger.error(ex.getMessage(), ex);
+            }
         }
     }
 

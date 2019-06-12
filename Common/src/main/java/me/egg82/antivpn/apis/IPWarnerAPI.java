@@ -12,12 +12,12 @@ import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class VPNBlockerAPI implements API {
+public class IPWarnerAPI implements API {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    public String getName() { return "vpnblocker"; }
+    public String getName() { return "ipwarner"; }
 
-    public boolean isKeyRequired() { return false; }
+    public boolean isKeyRequired() { return true; }
 
     public boolean getResult(String ip) throws APIException {
         if (ip == null) {
@@ -27,28 +27,27 @@ public class VPNBlockerAPI implements API {
         ConfigurationNode sourceConfigNode = getSourceConfigNode();
 
         String key = sourceConfigNode.getNode("key").getString();
+        if (key == null || key.isEmpty()) {
+            throw new APIException(true, "Key is not defined for " + getName());
+        }
 
         JSONObject json;
         try {
-            json = JSONWebUtil.getJsonObject("http" + ((key != null && !key.isEmpty()) ? "s" : "") + "://api.vpnblocker.net/v2/json/" + ip + ((key != null && !key.isEmpty()) ? "/" + key : ""), "egg82/AntiVPN");
+            json = JSONWebUtil.getJsonObject("https://api.ipwarner.com/" + key + "/" + ip, "egg82/AntiVPN");
         } catch (IOException | ParseException ex) {
             logger.error(ex.getMessage(), ex);
-            throw new APIException(false, "Could not get result from " + getName());
+            throw new APIException(false, ex);
         }
-        if (json == null || json.get("status") == null) {
-            throw new APIException(false, "Could not get result from " + getName());
-        }
-
-        String status = (String) json.get("status");
-        if (!status.equalsIgnoreCase("success")) {
+        if (json == null || json.get("goodIp") == null) {
             throw new APIException(false, "Could not get result from " + getName());
         }
 
-        if (json.get("host-ip") == null) {
+        short retVal = ((Number) json.get("goodIp")).shortValue();
+        if (retVal < 0) {
             throw new APIException(false, "Could not get result from " + getName());
         }
 
-        return (Boolean) json.get("host-ip");
+        return retVal == 1;
     }
 
     private ConfigurationNode getSourceConfigNode() throws APIException {
