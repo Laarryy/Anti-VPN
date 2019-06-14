@@ -17,6 +17,9 @@ import java.nio.file.Files;
 import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 import javax.xml.xpath.XPathExpressionException;
 import me.egg82.antivpn.utils.LogUtil;
@@ -33,7 +36,7 @@ import org.xml.sax.SAXException;
 @Plugin(
         id = "antivpn",
         name = "AntiVPN",
-        version = "4.6.24",
+        version = "4.6.25",
         authors = "egg82",
         description = "Get the best; save money on overpriced plugins and block VPN users!",
         dependencies = @Dependency(id = "plan", optional = true)
@@ -48,6 +51,7 @@ public class VelocityBootstrap {
     private Class<?> concreteClass;
 
     private URLClassLoader proxiedClassLoader;
+    private final ExecutorService downloadPool = Executors.newWorkStealingPool(Math.max(4, Runtime.getRuntime().availableProcessors()));
 
     @Inject
     public VelocityBootstrap(ProxyServer proxy, PluginDescription description) {
@@ -65,9 +69,33 @@ public class VelocityBootstrap {
 
         try {
             loadJars(new File(new File(description.getSource().get().getParent().toFile(), description.getName().get()), "external"), proxiedClassLoader);
-        } catch (ClassCastException | IOException | IllegalAccessException | InvocationTargetException | URISyntaxException | XPathExpressionException | SAXException ex) {
+        } catch (ClassCastException | IOException | IllegalAccessException | InvocationTargetException ex) {
             logger.error(ex.getMessage(), ex);
             throw new RuntimeException("Could not load required deps.");
+        }
+
+        downloadPool.shutdown();
+        try {
+            if (!downloadPool.awaitTermination(1L, TimeUnit.HOURS)) {
+                logger.error("Could not download all dependencies. Please try again later.");
+                return;
+            }
+        } catch (InterruptedException ex) {
+            logger.error(ex.getMessage(), ex);
+            Thread.currentThread().interrupt();
+        }
+
+        try {
+            DriverManager.registerDriver((Driver) Class.forName("org.sqlite.JDBC", true, proxiedClassLoader).newInstance());
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | SQLException ex) {
+            logger.error(ex.getMessage(), ex);
+        }
+
+        // MySQL is automatically registered
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver", true, proxiedClassLoader).newInstance();
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException ex) {
+            logger.error(ex.getMessage(), ex);
         }
 
         try {
@@ -104,7 +132,7 @@ public class VelocityBootstrap {
         }
     }
 
-    private void loadJars(File jarsDir, URLClassLoader classLoader) throws IOException, IllegalAccessException, InvocationTargetException, URISyntaxException, XPathExpressionException, SAXException {
+    private void loadJars(File jarsDir, URLClassLoader classLoader) throws IOException, IllegalAccessException, InvocationTargetException {
         if (jarsDir.exists() && !jarsDir.isDirectory()) {
             Files.delete(jarsDir.toPath());
         }
@@ -118,10 +146,9 @@ public class VelocityBootstrap {
 
         // First
 
-        Artifact guava = Artifact.builder("com.google.guava", "guava", "27.1-jre", cacheDir)
-                .addRepository("https://nexus.egg82.me/repository/maven-central/")
-                .build();
-        injectArtifact(guava, jarsDir, classLoader, "Google Guava", 1);
+        Artifact.Builder guava = Artifact.builder("com.google.guava", "guava", "27.1-jre", cacheDir)
+                .addRepository("https://nexus.egg82.me/repository/maven-central/");
+        buildInject(guava, jarsDir, classLoader, "Google Guava", 1);
 
         // Same file
 
@@ -130,159 +157,139 @@ public class VelocityBootstrap {
         // Local
 
         printLatest("ACF");
-        Artifact acfVelocity = Artifact.builder("co.aikar", "acf-velocity", "0.5.0-SNAPSHOT", cacheDir)
+        Artifact.Builder acfVelocity = Artifact.builder("co.aikar", "acf-velocity", "0.5.0-SNAPSHOT", cacheDir)
                 .addDirectJarURL("https://nexus.egg82.me/repository/aikar/{GROUP}/{ARTIFACT}/{VERSION}/{ARTIFACT}-{SNAPSHOT}-shaded.jar")
                 .addDirectJarURL("https://repo.aikar.co/nexus/content/groups/aikar/{GROUP}/{ARTIFACT}/{VERSION}/{ARTIFACT}-{SNAPSHOT}-shaded.jar")
                 .addRepository("https://nexus.egg82.me/repository/aikar/")
                 .addRepository("https://repo.aikar.co/nexus/content/groups/aikar/")
-                .addRepository("https://nexus.egg82.me/repository/maven-central/")
-                .build();
-        injectArtifact(acfVelocity, jarsDir, classLoader, "ACF", 0);
+                .addRepository("https://nexus.egg82.me/repository/maven-central/");
+        buildInject(acfVelocity, jarsDir, classLoader, "ACF");
 
-        Artifact eventChainVelocity = Artifact.builder("ninja.egg82", "event-chain-velocity", "1.0.9", cacheDir)
+        Artifact.Builder eventChainVelocity = Artifact.builder("ninja.egg82", "event-chain-velocity", "1.0.9", cacheDir)
                 .addRepository("https://nexus.egg82.me/repository/egg82/")
                 .addRepository("https://www.myget.org/F/egg82-java/maven/")
-                .addRepository("https://nexus.egg82.me/repository/maven-central/")
-                .build();
-        injectArtifact(eventChainVelocity, jarsDir, classLoader, "Event Chain");
+                .addRepository("https://nexus.egg82.me/repository/maven-central/");
+        buildInject(eventChainVelocity, jarsDir, classLoader, "Event Chain");
 
-        Artifact configurateYaml = Artifact.builder("org.spongepowered", "configurate-yaml", "3.6.1", cacheDir)
+        Artifact.Builder configurateYaml = Artifact.builder("org.spongepowered", "configurate-yaml", "3.6.1", cacheDir)
                 .addRepository("https://nexus.egg82.me/repository/sponge/")
                 .addRepository("https://repo.spongepowered.org/maven/")
-                .addRepository("https://nexus.egg82.me/repository/maven-central/")
-                .build();
-        injectArtifact(configurateYaml, jarsDir, classLoader, "Configurate", 2);
+                .addRepository("https://nexus.egg82.me/repository/maven-central/");
+        buildInject(configurateYaml, jarsDir, classLoader, "Configurate", 2);
 
-        Artifact spigotUpdater = Artifact.builder("ninja.egg82", "spigot-updater", "1.0.1", cacheDir)
+        Artifact.Builder spigotUpdater = Artifact.builder("ninja.egg82", "spigot-updater", "1.0.1", cacheDir)
                 .addRepository("https://nexus.egg82.me/repository/egg82/")
                 .addRepository("https://www.myget.org/F/egg82-java/maven/")
-                .addRepository("https://nexus.egg82.me/repository/maven-central/")
-                .build();
-        injectArtifact(spigotUpdater, jarsDir, classLoader, "Spigot Updater");
+                .addRepository("https://nexus.egg82.me/repository/maven-central/");
+        buildInject(spigotUpdater, jarsDir, classLoader, "Spigot Updater");
 
-        Artifact serviceLocator = Artifact.builder("ninja.egg82", "service-locator", "1.0.1", cacheDir)
+        Artifact.Builder serviceLocator = Artifact.builder("ninja.egg82", "service-locator", "1.0.1", cacheDir)
                 .addRepository("https://nexus.egg82.me/repository/egg82/")
                 .addRepository("https://www.myget.org/F/egg82-java/maven/")
-                .addRepository("https://nexus.egg82.me/repository/maven-central/")
-                .build();
-        injectArtifact(serviceLocator, jarsDir, classLoader, "Service Locator");
+                .addRepository("https://nexus.egg82.me/repository/maven-central/");
+        buildInject(serviceLocator, jarsDir, classLoader, "Service Locator");
 
-        Artifact commonsNet = Artifact.builder("commons-net", "commons-net", "3.6", cacheDir)
-                .addRepository("https://nexus.egg82.me/repository/maven-central/")
-                .build();
-        injectArtifact(commonsNet, jarsDir, classLoader, "Apache Commons (Net)");
+        Artifact.Builder commonsNet = Artifact.builder("commons-net", "commons-net", "3.6", cacheDir)
+                .addRepository("https://nexus.egg82.me/repository/maven-central/");
+        buildInject(commonsNet, jarsDir, classLoader, "Apache Commons (Net)");
+
+        Artifact.Builder commonsLang3 = Artifact.builder("org.apache.commons", "commons-lang3", "3.9", cacheDir)
+                .addRepository("https://nexus.egg82.me/repository/maven-central/");
+        buildInject(commonsLang3, jarsDir, classLoader, "Apache Commons (Lang 3)");
 
         printLatest("SQLite");
-        Artifact sqlite = Artifact.builder("org.xerial", "sqlite-jdbc", "latest", cacheDir)
-                .addRepository("https://nexus.egg82.me/repository/maven-central/")
-                .build();
-        injectArtifact(sqlite, jarsDir, classLoader, "SQLite");
-
-        try {
-            DriverManager.registerDriver((Driver) Class.forName("org.sqlite.JDBC", true, classLoader).newInstance());
-        } catch (ClassNotFoundException | InstantiationException | SQLException ex) {
-            logger.error(ex.getMessage(), ex);
-        }
+        Artifact.Builder sqlite = Artifact.builder("org.xerial", "sqlite-jdbc", "latest", cacheDir)
+                .addRepository("https://nexus.egg82.me/repository/maven-central/");
+        buildInject(sqlite, jarsDir, classLoader, "SQLite");
 
         printLatest("MySQL");
-        Artifact mysql = Artifact.builder("mysql", "mysql-connector-java", "latest", cacheDir)
-                .addRepository("https://nexus.egg82.me/repository/maven-central/")
-                .build();
-        injectArtifact(mysql, jarsDir, classLoader, "MySQL", 1);
-
-        // MySQL is automatically registered
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver", true, classLoader).newInstance();
-        } catch (ClassNotFoundException | InstantiationException ex) {
-            logger.error(ex.getMessage(), ex);
-        }
+        Artifact.Builder mysql = Artifact.builder("mysql", "mysql-connector-java", "latest", cacheDir)
+                .addRepository("https://nexus.egg82.me/repository/maven-central/");
+        buildInject(mysql, jarsDir, classLoader, "MySQL", 1);
 
         // Global
 
-        Artifact caffeine = Artifact.builder("com.github.ben-manes.caffeine", "caffeine", "2.7.0", cacheDir)
-                .addRepository("https://nexus.egg82.me/repository/maven-central/")
-                .build();
-        injectArtifact(caffeine, jarsDir, classLoader, "Caffeine");
+        Artifact.Builder caffeine = Artifact.builder("com.github.ben-manes.caffeine", "caffeine", "2.7.0", cacheDir)
+                .addRepository("https://nexus.egg82.me/repository/maven-central/");
+        buildInject(caffeine, jarsDir, classLoader, "Caffeine");
 
-        Artifact concurrentlinkedhashmap = Artifact.builder("com.googlecode.concurrentlinkedhashmap", "concurrentlinkedhashmap-lru", "1.4.2", cacheDir)
-                .addRepository("https://nexus.egg82.me/repository/maven-central/")
-                .build();
-        injectArtifact(concurrentlinkedhashmap, jarsDir, classLoader, "ConcurrentLinkedHashMap");
+        Artifact.Builder concurrentlinkedhashmap = Artifact.builder("com.googlecode.concurrentlinkedhashmap", "concurrentlinkedhashmap-lru", "1.4.2", cacheDir)
+                .addRepository("https://nexus.egg82.me/repository/maven-central/");
+        buildInject(concurrentlinkedhashmap, jarsDir, classLoader, "ConcurrentLinkedHashMap");
 
-        Artifact amqpClient = Artifact.builder("com.rabbitmq", "amqp-client", "5.7.1", cacheDir)
-                .addRepository("https://nexus.egg82.me/repository/maven-central/")
-                .build();
-        injectArtifact(amqpClient, jarsDir, classLoader, "RabbitMQ");
+        Artifact.Builder amqpClient = Artifact.builder("com.rabbitmq", "amqp-client", "5.7.1", cacheDir)
+                .addRepository("https://nexus.egg82.me/repository/maven-central/");
+        buildInject(amqpClient, jarsDir, classLoader, "RabbitMQ");
 
-        Artifact javassist = Artifact.builder("org.javassist", "javassist", "3.25.0-GA", cacheDir)
-                .addRepository("https://nexus.egg82.me/repository/maven-central/")
-                .build();
-        injectArtifact(javassist, jarsDir, classLoader, "Javassist");
+        Artifact.Builder javassist = Artifact.builder("org.javassist", "javassist", "3.25.0-GA", cacheDir)
+                .addRepository("https://nexus.egg82.me/repository/maven-central/");
+        buildInject(javassist, jarsDir, classLoader, "Javassist");
 
-        Artifact javaxAnnotationApi = Artifact.builder("javax.annotation", "javax.annotation-api", "1.3.2", cacheDir)
-                .addRepository("https://nexus.egg82.me/repository/maven-central/")
-                .build();
-        injectArtifact(javaxAnnotationApi, jarsDir, classLoader, "Javax Annotations");
+        Artifact.Builder javaxAnnotationApi = Artifact.builder("javax.annotation", "javax.annotation-api", "1.3.2", cacheDir)
+                .addRepository("https://nexus.egg82.me/repository/maven-central/");
+        buildInject(javaxAnnotationApi, jarsDir, classLoader, "Javax Annotations");
 
-        Artifact gameanalyticsApi = Artifact.builder("ninja.egg82", "gameanalytics-api", "1.0.1", cacheDir)
+        Artifact.Builder gameanalyticsApi = Artifact.builder("ninja.egg82", "gameanalytics-api", "1.0.1", cacheDir)
                 .addRepository("https://nexus.egg82.me/repository/egg82/")
                 .addRepository("https://www.myget.org/F/egg82-java/maven/")
-                .addRepository("https://nexus.egg82.me/repository/maven-central/")
-                .build();
-        injectArtifact(gameanalyticsApi, jarsDir, classLoader, "GameAnalytics API", 1);
+                .addRepository("https://nexus.egg82.me/repository/maven-central/");
+        buildInject(gameanalyticsApi, jarsDir, classLoader, "GameAnalytics API", 1);
 
-        Artifact abstractConfiguration = Artifact.builder("ninja.egg82", "abstract-configuration", "1.0.1", cacheDir)
+        Artifact.Builder abstractConfiguration = Artifact.builder("ninja.egg82", "abstract-configuration", "1.0.1", cacheDir)
                 .addRepository("https://nexus.egg82.me/repository/egg82/")
                 .addRepository("https://www.myget.org/F/egg82-java/maven/")
-                .addRepository("https://nexus.egg82.me/repository/maven-central/")
-                .build();
-        injectArtifact(abstractConfiguration, jarsDir, classLoader, "Abstract Configuration");
+                .addRepository("https://nexus.egg82.me/repository/maven-central/");
+        buildInject(abstractConfiguration, jarsDir, classLoader, "Abstract Configuration");
 
-        Artifact jsonWeb = Artifact.builder("ninja.egg82", "json-web", "1.0.1", cacheDir)
+        Artifact.Builder jsonWeb = Artifact.builder("ninja.egg82", "json-web", "1.0.1", cacheDir)
                 .addRepository("https://nexus.egg82.me/repository/egg82/")
                 .addRepository("https://www.myget.org/F/egg82-java/maven/")
-                .addRepository("https://nexus.egg82.me/repository/maven-central/")
-                .build();
-        injectArtifact(jsonWeb, jarsDir, classLoader, "JSON Web");
+                .addRepository("https://nexus.egg82.me/repository/maven-central/");
+        buildInject(jsonWeb, jarsDir, classLoader, "JSON Web");
 
-        Artifact reflectionUtils = Artifact.builder("ninja.egg82", "reflection-utils", "1.0.2", cacheDir)
+        Artifact.Builder reflectionUtils = Artifact.builder("ninja.egg82", "reflection-utils", "1.0.2", cacheDir)
                 .addRepository("https://nexus.egg82.me/repository/egg82/")
                 .addRepository("https://www.myget.org/F/egg82-java/maven/")
-                .addRepository("https://nexus.egg82.me/repository/maven-central/")
-                .build();
-        injectArtifact(reflectionUtils, jarsDir, classLoader, "Reflection Utils");
+                .addRepository("https://nexus.egg82.me/repository/maven-central/");
+        buildInject(reflectionUtils, jarsDir, classLoader, "Reflection Utils");
 
-        Artifact easySql = Artifact.builder("ninja.egg82", "easy-sql", "1.0.1", cacheDir)
+        Artifact.Builder easySql = Artifact.builder("ninja.egg82", "easy-sql", "1.0.1", cacheDir)
                 .addRepository("https://nexus.egg82.me/repository/egg82/")
                 .addRepository("https://www.myget.org/F/egg82-java/maven/")
-                .addRepository("https://nexus.egg82.me/repository/maven-central/")
-                .build();
-        injectArtifact(easySql, jarsDir, classLoader, "EasySQL");
+                .addRepository("https://nexus.egg82.me/repository/maven-central/");
+        buildInject(easySql, jarsDir, classLoader, "EasySQL");
 
-        Artifact collections = Artifact.builder("ninja.egg82", "collections", "1.0.0", cacheDir)
+        Artifact.Builder collections = Artifact.builder("ninja.egg82", "collections", "1.0.0", cacheDir)
                 .addRepository("https://nexus.egg82.me/repository/egg82/")
                 .addRepository("https://www.myget.org/F/egg82-java/maven/")
-                .addRepository("https://nexus.egg82.me/repository/maven-central/")
-                .build();
-        injectArtifact(collections, jarsDir, classLoader, "Collections");
+                .addRepository("https://nexus.egg82.me/repository/maven-central/");
+        buildInject(collections, jarsDir, classLoader, "Collections");
 
-        Artifact commonsValidator = Artifact.builder("commons-validator", "commons-validator", "1.6", cacheDir)
-                .addRepository("https://nexus.egg82.me/repository/maven-central/")
-                .build();
-        injectArtifact(commonsValidator, jarsDir, classLoader, "Apache Commons Validator", 1);
+        Artifact.Builder commonsValidator = Artifact.builder("commons-validator", "commons-validator", "1.6", cacheDir)
+                .addRepository("https://nexus.egg82.me/repository/maven-central/");
+        buildInject(commonsValidator, jarsDir, classLoader, "Apache Commons Validator", 1);
 
-        Artifact jedis = Artifact.builder("redis.clients", "jedis", "3.0.1", cacheDir)
-                .addRepository("https://nexus.egg82.me/repository/maven-central/")
-                .build();
-        injectArtifact(jedis, jarsDir, classLoader, "Jedis", 1);
+        Artifact.Builder jedis = Artifact.builder("redis.clients", "jedis", "3.0.1", cacheDir)
+                .addRepository("https://nexus.egg82.me/repository/maven-central/");
+        buildInject(jedis, jarsDir, classLoader, "Jedis", 1);
     }
 
     private void printLatest(String friendlyName) {
         proxy.getConsoleCommandSource().sendMessage(LogUtil.getHeading().append(TextComponent.of("Checking version of ").color(TextColor.YELLOW)).append(TextComponent.of(friendlyName).color(TextColor.WHITE)).build());
     }
 
-    private void injectArtifact(Artifact artifact, File jarsDir, URLClassLoader classLoader, String friendlyName) throws IOException, IllegalAccessException, InvocationTargetException, URISyntaxException, XPathExpressionException, SAXException {
-        injectArtifact(artifact, jarsDir, classLoader, friendlyName, 0);
+    private void buildInject(Artifact.Builder builder, File jarsDir, URLClassLoader classLoader, String friendlyName) {
+        buildInject(builder, jarsDir, classLoader, friendlyName, 0);
+    }
+
+    private void buildInject(Artifact.Builder builder, File jarsDir, URLClassLoader classLoader, String friendlyName, int depth) {
+        downloadPool.submit(() -> {
+            try {
+                injectArtifact(builder.build(), jarsDir, classLoader, friendlyName, depth);
+            } catch (IOException | IllegalAccessException | InvocationTargetException | URISyntaxException | XPathExpressionException | SAXException ex) {
+                logger.error(ex.getMessage(), ex);
+            }
+        });
     }
 
     private void injectArtifact(Artifact artifact, File jarsDir, URLClassLoader classLoader, String friendlyName, int depth) throws IOException, IllegalAccessException, InvocationTargetException, URISyntaxException, XPathExpressionException, SAXException {
