@@ -436,7 +436,7 @@ public class InternalAPI {
 
         double result = currentValue.get() / servicesCount.get();
         if (Double.isNaN(result) || Double.isInfinite(result)) {
-            throw new APIException(true, "consensus had no valid/usable sources.");
+            throw new APIException(true, "Consensus had no valid/usable sources.");
         }
 
         if (ConfigUtil.getDebugOrFalse()) {
