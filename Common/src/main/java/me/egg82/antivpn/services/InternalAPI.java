@@ -435,6 +435,12 @@ public class InternalAPI {
         }
 
         double result = currentValue.get() / servicesCount.get();
+        if (Double.isNaN(result)) {
+            throw new APIException(true, "Consensus had no valid/usable sources. (NaN result)");
+        }
+        if (Double.isInfinite(result)) {
+            throw new APIException(true, "Consensus had an infinite result. (result with no valid sources)");
+        }
 
         if (ConfigUtil.getDebugOrFalse()) {
             logger.info(ip + " consensus fetched via defined sources. Value: " + result);
