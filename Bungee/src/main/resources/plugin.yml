@@ -1,6 +1,6 @@
 name: AntiVPN
 main: me.egg82.antivpn.BungeeBootstrap
-version: 4.6.25
+version: 4.6.26
 author: egg82
 api-version: 1.13
 description: Get the best; save money on overpriced plugins and block VPN users!

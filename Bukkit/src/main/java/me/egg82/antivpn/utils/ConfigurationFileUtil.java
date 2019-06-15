@@ -234,6 +234,8 @@ public class ConfigurationFileUtil {
         hikariConfig.setConnectionTimeout(storageConfigNode.getNode("settings", "timeout").getLong(5000L));
         hikariConfig.addDataSourceProperty("useUnicode", String.valueOf(storageConfigNode.getNode("settings", "properties", "unicode").getBoolean(true)));
         hikariConfig.addDataSourceProperty("characterEncoding", storageConfigNode.getNode("settings", "properties", "encoding").getString("utf8"));
+        hikariConfig.addDataSourceProperty("useLegacyDatetimeCode", false);
+        hikariConfig.addDataSourceProperty("serverTimezone", "UTC");
         hikariConfig.setAutoCommit(true);
 
         // Optimizations
