@@ -94,6 +94,7 @@ public class ConfigurationFileUtil {
             sources = new LinkedHashSet<>();
         }
 
+        InternalAPI.initialize(debug);
         for (Iterator<String> i = sources.iterator(); i.hasNext();) {
             String source = i.next();
             if (!config.getNode("sources", source, "enabled").getBoolean()) {
