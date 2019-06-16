@@ -36,9 +36,10 @@ public class RabbitMQ {
                 return;
             }
 
-            int offset = (int) Math.floorDiv((cachedConfig.get().getSourceCacheTime() + sqlResult.getCreated()) - System.currentTimeMillis(), 1000L);
+            int offset = (int) Math.floorDiv(sqlResult.getCreated() - System.currentTimeMillis(), 1000L);
+            int cacheTime = (int) Math.floorDiv(cachedConfig.get().getSourceCacheTime(), 1000L);
 
-            if (offset > 0) {
+            if (offset < cacheTime) {
                 JSONObject obj = new JSONObject();
                 obj.put("ip", sqlResult.getIp());
                 obj.put("value", sqlResult.getValue());
@@ -67,9 +68,10 @@ public class RabbitMQ {
                 return;
             }
 
-            int offset = (int) Math.floorDiv((cachedConfig.get().getSourceCacheTime() + sqlResult.getCreated()) - System.currentTimeMillis(), 1000L);
+            int offset = (int) Math.floorDiv(sqlResult.getCreated() - System.currentTimeMillis(), 1000L);
+            int cacheTime = (int) Math.floorDiv(cachedConfig.get().getSourceCacheTime(), 1000L);
 
-            if (offset > 0) {
+            if (offset < cacheTime) {
                 JSONObject obj = new JSONObject();
                 obj.put("ip", sqlResult.getIp());
                 obj.put("value", sqlResult.getValue());
