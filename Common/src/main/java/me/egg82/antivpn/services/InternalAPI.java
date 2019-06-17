@@ -34,19 +34,25 @@ public class InternalAPI {
     private final Object ipCacheLock = new Object();
     private final Object ipConsensusCacheLock = new Object();
 
-    private static final ImmutableMap<String, API> apis;
+    private static ImmutableMap<String, API> apis = ImmutableMap.of();
 
-    static {
+    public static void initialize(boolean debug) {
         ImmutableMap.Builder<String, API> apiBuilder = ImmutableMap.builder();
 
         List<Class<API>> list = PackageFilter.getClasses(API.class, "me.egg82.antivpn.apis", false, false, false);
+        if (debug) {
+            logger.info("Initializing " + list.size() + " APIs..");
+        }
         for (Class<API> clazz : list) {
+            if (debug) {
+                logger.info("Initializing API " + clazz.getName());
+            }
+
             try {
                 API api = clazz.newInstance();
                 apiBuilder.put(api.getName(), api);
             } catch (InstantiationException | IllegalAccessException ex) {
                 logger.error(ex.getMessage(), ex);
-                throw new RuntimeException("Could not initialize API.", ex);
             }
         }
 
@@ -71,8 +77,8 @@ public class InternalAPI {
 
         for (String source : cachedConfig.get().getSources()) {
             threadPool.submit(() -> {
-                API api = apis.get(source);
-                if (api == null) {
+                Optional<API> api = getAPI(source);
+                if (!api.isPresent()) {
                     if (ConfigUtil.getDebugOrFalse()) {
                         logger.info(source + " has an invalid/missing API.");
                     }
@@ -81,7 +87,7 @@ public class InternalAPI {
                 }
 
                 try {
-                    retVal.put(source, Optional.of(api.getResult(ip)));
+                    retVal.put(source, Optional.of(api.get().getResult(ip)));
                 } catch (APIException ex) {
                     if (ex.isHard()) {
                         logger.error(ex.getMessage(), ex);
@@ -103,11 +109,11 @@ public class InternalAPI {
     }
 
     public boolean getSourceResult(String ip, String source) throws APIException {
-        API api = apis.get(source);
-        if (api == null) {
+        Optional<API> api = getAPI(source);
+        if (!api.isPresent()) {
             throw new APIException(true, "Source does not exist.");
         }
-        return api.getResult(ip);
+        return api.get().getResult(ip);
     }
 
     public boolean cascade(String ip, boolean expensive) throws APIException {
@@ -232,7 +238,7 @@ public class InternalAPI {
 
             if (result.isPresent()) {
                 if (ConfigUtil.getDebugOrFalse()) {
-                    logger.info(ip + " cascade found in storage. Value: " + result.get());
+                    logger.info(ip + " cascade found in storage. Value: " + result.get().getValue());
                 }
                 // Update messaging/Redis
                 Redis.update(result.get());
@@ -267,8 +273,8 @@ public class InternalAPI {
                 logger.info("Trying " + source + " as next cascade source for " + ip + ".");
             }
 
-            API api = apis.get(source);
-            if (api == null) {
+            Optional<API> api = getAPI(source);
+            if (!api.isPresent()) {
                 if (ConfigUtil.getDebugOrFalse()) {
                     logger.info(source + " has an invalid/missing API for " + ip + " cascade.");
                 }
@@ -277,7 +283,7 @@ public class InternalAPI {
 
             boolean result;
             try {
-                result = api.getResult(ip);
+                result = api.get().getResult(ip);
             } catch (APIException ex) {
                 if (ex.isHard()) {
                     throw ex;
@@ -392,8 +398,8 @@ public class InternalAPI {
                     logger.info("Trying " + source + " as next consensus source for " + ip + ".");
                 }
 
-                API api = apis.get(source);
-                if (api == null) {
+                Optional<API> api = getAPI(source);
+                if (!api.isPresent()) {
                     if (ConfigUtil.getDebugOrFalse()) {
                         logger.info(source + " has an invalid/missing API for " + ip + "  consensus.");
                     }
@@ -403,7 +409,7 @@ public class InternalAPI {
 
                 boolean result;
                 try {
-                    result = api.getResult(ip);
+                    result = api.get().getResult(ip);
                 } catch (APIException ex) {
                     if (ex.isHard()) {
                         logger.error(ex.getMessage(), ex);

@@ -25,6 +25,7 @@ import ninja.leaping.configurate.ConfigurationOptions;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import ninja.leaping.configurate.yaml.YAMLConfigurationLoader;
+import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.DumperOptions;
@@ -48,6 +49,10 @@ public class ConfigurationFileUtil {
 
         if (debug) {
             proxy.getConsoleCommandSource().sendMessage(LogUtil.getHeading().append(TextComponent.of("Debug ").color(TextColor.YELLOW)).append(TextComponent.of("enabled").color(TextColor.WHITE)).build());
+        }
+
+        if (!debug) {
+            Reflections.log = null;
         }
 
         String sourceCacheTime = config.getNode("sources", "cacheTime").getString("6hours");
@@ -94,6 +99,7 @@ public class ConfigurationFileUtil {
             sources = new LinkedHashSet<>();
         }
 
+        InternalAPI.initialize(debug);
         for (Iterator<String> i = sources.iterator(); i.hasNext();) {
             String source = i.next();
             if (!config.getNode("sources", source, "enabled").getBoolean()) {

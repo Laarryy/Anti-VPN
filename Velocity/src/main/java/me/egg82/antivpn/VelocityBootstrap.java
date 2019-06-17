@@ -36,7 +36,7 @@ import org.xml.sax.SAXException;
 @Plugin(
         id = "antivpn",
         name = "AntiVPN",
-        version = "4.6.26",
+        version = "4.6.27",
         authors = "egg82",
         description = "Get the best; save money on overpriced plugins and block VPN users!",
         dependencies = @Dependency(id = "plan", optional = true)
@@ -247,7 +247,7 @@ public class VelocityBootstrap {
                 .addRepository("https://nexus.egg82.me/repository/maven-central/");
         buildInject(jsonWeb, jarsDir, classLoader, "JSON Web");
 
-        Artifact.Builder reflectionUtils = Artifact.builder("ninja.egg82", "reflection-utils", "1.0.2", cacheDir)
+        Artifact.Builder reflectionUtils = Artifact.builder("ninja.egg82", "reflection-utils", "1.0.4", cacheDir)
                 .addRepository("https://nexus.egg82.me/repository/egg82/")
                 .addRepository("https://www.myget.org/F/egg82-java/maven/")
                 .addRepository("https://nexus.egg82.me/repository/maven-central/");

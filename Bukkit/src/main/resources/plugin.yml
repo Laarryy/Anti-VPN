@@ -1,7 +1,8 @@
 name: AntiVPN
 main: me.egg82.antivpn.BukkitBootstrap
-version: 4.6.26
+version: 4.6.27
 author: egg82
 api-version: 1.13
 description: Get the best; save money on overpriced plugins and block VPN users!
 softdepend: [Plan, PlaceholderAPI]
+loadbefore: [ChatControl] # This is absolutely insane, but this somehow solves a random bug. Somehow.

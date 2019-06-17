@@ -10,7 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>antivpn-common</artifactId>
-    <version>4.6.26</version>
+    <version>4.6.27</version>
 
     <build>
         <sourceDirectory>src/main/java</sourceDirectory>
@@ -83,7 +83,7 @@
         <dependency>
             <groupId>ninja.egg82</groupId>
             <artifactId>reflection-utils</artifactId>
-            <version>1.0.2</version>
+            <version>1.0.4</version>
         </dependency>
 
         <dependency>
