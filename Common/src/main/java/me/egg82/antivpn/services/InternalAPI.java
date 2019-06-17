@@ -238,7 +238,7 @@ public class InternalAPI {
 
             if (result.isPresent()) {
                 if (ConfigUtil.getDebugOrFalse()) {
-                    logger.info(ip + " cascade found in storage. Value: " + result.get());
+                    logger.info(ip + " cascade found in storage. Value: " + result.get().getValue());
                 }
                 // Update messaging/Redis
                 Redis.update(result.get());

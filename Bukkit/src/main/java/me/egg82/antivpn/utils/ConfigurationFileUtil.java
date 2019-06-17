@@ -23,6 +23,7 @@ import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import ninja.leaping.configurate.yaml.YAMLConfigurationLoader;
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.Plugin;
+import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.DumperOptions;
@@ -46,6 +47,10 @@ public class ConfigurationFileUtil {
 
         if (debug) {
             logger.info(LogUtil.getHeading() + ChatColor.YELLOW + "Debug " + ChatColor.WHITE + "enabled");
+        }
+
+        if (!debug) {
+            Reflections.log = null;
         }
 
         String sourceCacheTime = config.getNode("sources", "cacheTime").getString("6hours");
