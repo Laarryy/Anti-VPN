@@ -40,7 +40,7 @@ public class AsyncPlayerPreLoginCacheHandler implements Consumer<AsyncPlayerPreL
             return;
         }
 
-        if (config.get().getNode("kick", "algorithm", "method").getString("cascade").equalsIgnoreCase("consensus")) {
+        if (config.get().getNode("action", "algorithm", "method").getString("cascade").equalsIgnoreCase("consensus")) {
             try {
                 api.consensus(ip); // Calling this will cache the result internally, even if the value is unused
             } catch (APIException ex) {

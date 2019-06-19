@@ -59,8 +59,8 @@ public class PlayerAnalyticsHook implements PluginHook {
 
             Optional<Boolean> isVPN = Optional.empty();
 
-            if (config.get().getNode("kick", "algorithm", "method").getString("cascade").equalsIgnoreCase("consensus")) {
-                double consensus = clamp(0.0d, 1.0d, config.get().getNode("kick", "algorithm", "min-consensus").getDouble(0.6d));
+            if (config.get().getNode("action", "algorithm", "method").getString("cascade").equalsIgnoreCase("consensus")) {
+                double consensus = clamp(0.0d, 1.0d, config.get().getNode("action", "algorithm", "min-consensus").getDouble(0.6d));
                 try {
                     isVPN = Optional.of(api.consensus(ip) >= consensus);
                 } catch (APIException ex) {
@@ -85,8 +85,8 @@ public class PlayerAnalyticsHook implements PluginHook {
                 return container;
             }
 
-            if (config.get().getNode("kick", "enabled").getBoolean(true)) {
-                container.addValue("Proxies/VPNs blocked", AnalyticsHelper.getBlocked() + " since startup.");
+            if (!config.get().getNode("action", "kick-message").getString("").isEmpty() || !config.get().getNode("action", "command").getString("").isEmpty()) {
+                container.addValue("Proxies/VPNs actioned upon", AnalyticsHelper.getBlocked() + " since startup.");
             }
 
             int vpns = 0;
@@ -103,8 +103,8 @@ public class PlayerAnalyticsHook implements PluginHook {
 
                 boolean isVPN;
 
-                if (config.get().getNode("kick", "algorithm", "method").getString("cascade").equalsIgnoreCase("consensus")) {
-                    double consensus = clamp(0.0d, 1.0d, config.get().getNode("kick", "algorithm", "min-consensus").getDouble(0.6d));
+                if (config.get().getNode("action", "algorithm", "method").getString("cascade").equalsIgnoreCase("consensus")) {
+                    double consensus = clamp(0.0d, 1.0d, config.get().getNode("action", "algorithm", "min-consensus").getDouble(0.6d));
                     try {
                         isVPN = api.consensus(ip) >= consensus;
                     } catch (APIException ex) {

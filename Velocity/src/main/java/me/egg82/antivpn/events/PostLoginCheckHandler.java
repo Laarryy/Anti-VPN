@@ -1,6 +1,7 @@
 package me.egg82.antivpn.events;
 
 import com.velocitypowered.api.event.connection.PostLoginEvent;
+import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -48,7 +49,7 @@ public class PostLoginCheckHandler implements Consumer<PostLoginEvent> {
             return;
         }
 
-        if (!config.get().getNode("kick", "enabled").getBoolean(true)) {
+        if (config.get().getNode("action", "kick-message").getString("").isEmpty() && config.get().getNode("action", "command").getString("").isEmpty()) {
             if (ConfigUtil.getDebugOrFalse()) {
                 proxy.getConsoleCommandSource().sendMessage(LogUtil.getHeading().append(TextComponent.of("Plugin set to API-only. Ignoring ").color(TextColor.YELLOW)).append(TextComponent.of(event.getPlayer().getUsername()).color(TextColor.WHITE)).build());
             }
@@ -61,8 +62,8 @@ public class PostLoginCheckHandler implements Consumer<PostLoginEvent> {
 
         boolean isVPN;
 
-        if (config.get().getNode("kick", "algorithm", "method").getString("cascade").equalsIgnoreCase("consensus")) {
-            double consensus = clamp(0.0d, 1.0d, config.get().getNode("kick", "algorithm", "min-consensus").getDouble(0.6d));
+        if (config.get().getNode("action", "algorithm", "method").getString("cascade").equalsIgnoreCase("consensus")) {
+            double consensus = clamp(0.0d, 1.0d, config.get().getNode("action", "algorithm", "min-consensus").getDouble(0.6d));
             try {
                 isVPN = api.consensus(ip) >= consensus;
             } catch (APIException ex) {
@@ -81,13 +82,37 @@ public class PostLoginCheckHandler implements Consumer<PostLoginEvent> {
         if (isVPN) {
             AnalyticsHelper.incrementBlocked();
             if (ConfigUtil.getDebugOrFalse()) {
-                proxy.getConsoleCommandSource().sendMessage(LogUtil.getHeading().append(TextComponent.of(event.getPlayer().getUsername()).color(TextColor.WHITE)).append(TextComponent.of(" found using a VPN. Kicking with defined message.").color(TextColor.DARK_RED)).build());
+                proxy.getConsoleCommandSource().sendMessage(LogUtil.getHeading().append(TextComponent.of(event.getPlayer().getUsername()).color(TextColor.WHITE)).append(TextComponent.of(" found using a VPN. Running required actions.").color(TextColor.DARK_RED)).build());
             }
 
-            event.getPlayer().disconnect(TextComponent.of(config.get().getNode("kick", "message").getString("")));
+            tryRunCommand(config.get(), event.getPlayer());
+            tryKickPlayer(config.get(), event.getPlayer());
         } else {
             proxy.getConsoleCommandSource().sendMessage(LogUtil.getHeading().append(TextComponent.of(event.getPlayer().getUsername()).color(TextColor.WHITE)).append(TextComponent.of(" passed VPN check.").color(TextColor.GREEN)).build());
         }
+    }
+
+    private void tryRunCommand(Configuration config, Player player) {
+        String command = config.getNode("action", "command").getString("");
+        if (command.isEmpty()) {
+            return;
+        }
+
+        command = command.replace("%player%", player.getUsername()).replace("%uuid%", player.getUniqueId().toString());
+        if (command.charAt(0) == '/') {
+            command = command.substring(1);
+        }
+
+        proxy.getCommandManager().execute(proxy.getConsoleCommandSource(), command);
+    }
+
+    private void tryKickPlayer(Configuration config, Player player) {
+        String message = config.getNode("action", "kick-message").getString("");
+        if (message.isEmpty()) {
+            return;
+        }
+
+        player.disconnect(TextComponent.of(message));
     }
 
     private String getIp(InetSocketAddress address) {

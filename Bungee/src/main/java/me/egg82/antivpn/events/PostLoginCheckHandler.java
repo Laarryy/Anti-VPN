@@ -12,7 +12,9 @@ import me.egg82.antivpn.services.AnalyticsHelper;
 import me.egg82.antivpn.utils.ConfigUtil;
 import me.egg82.antivpn.utils.LogUtil;
 import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PostLoginEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +43,7 @@ public class PostLoginCheckHandler implements Consumer<PostLoginEvent> {
             return;
         }
 
-        if (!config.get().getNode("kick", "enabled").getBoolean(true)) {
+        if (config.get().getNode("action", "kick-message").getString("").isEmpty() && config.get().getNode("action", "command").getString("").isEmpty()) {
             if (ConfigUtil.getDebugOrFalse()) {
                 logger.info(LogUtil.getHeading() + ChatColor.YELLOW + "Plugin set to API-only. Ignoring " + ChatColor.WHITE + event.getPlayer().getName());
             }
@@ -54,8 +56,8 @@ public class PostLoginCheckHandler implements Consumer<PostLoginEvent> {
 
         boolean isVPN;
 
-        if (config.get().getNode("kick", "algorithm", "method").getString("cascade").equalsIgnoreCase("consensus")) {
-            double consensus = clamp(0.0d, 1.0d, config.get().getNode("kick", "algorithm", "min-consensus").getDouble(0.6d));
+        if (config.get().getNode("action", "algorithm", "method").getString("cascade").equalsIgnoreCase("consensus")) {
+            double consensus = clamp(0.0d, 1.0d, config.get().getNode("action", "algorithm", "min-consensus").getDouble(0.6d));
             try {
                 isVPN = api.consensus(ip) >= consensus;
             } catch (APIException ex) {
@@ -74,13 +76,37 @@ public class PostLoginCheckHandler implements Consumer<PostLoginEvent> {
         if (isVPN) {
             AnalyticsHelper.incrementBlocked();
             if (ConfigUtil.getDebugOrFalse()) {
-                logger.info(LogUtil.getHeading() + ChatColor.WHITE + event.getPlayer().getName() + ChatColor.DARK_RED + " found using a VPN. Kicking with defined message.");
+                logger.info(LogUtil.getHeading() + ChatColor.WHITE + event.getPlayer().getName() + ChatColor.DARK_RED + " found using a VPN. Running required actions.");
             }
 
-            event.getPlayer().disconnect(new TextComponent(config.get().getNode("kick", "message").getString("")));
+            tryRunCommand(config.get(), event.getPlayer());
+            tryKickPlayer(config.get(), event.getPlayer());
         } else {
             logger.info(LogUtil.getHeading() + ChatColor.WHITE + event.getPlayer().getName() + ChatColor.GREEN + " passed VPN check.");
         }
+    }
+
+    private void tryRunCommand(Configuration config, ProxiedPlayer player) {
+        String command = config.getNode("action", "command").getString("");
+        if (command.isEmpty()) {
+            return;
+        }
+
+        command = command.replace("%player%", player.getName()).replace("%uuid%", player.getUniqueId().toString());
+        if (command.charAt(0) == '/') {
+            command = command.substring(1);
+        }
+
+        ProxyServer.getInstance().getPluginManager().dispatchCommand(ProxyServer.getInstance().getConsole(), command);
+    }
+
+    private void tryKickPlayer(Configuration config, ProxiedPlayer player) {
+        String message = config.getNode("action", "kick-message").getString("");
+        if (message.isEmpty()) {
+            return;
+        }
+
+        player.disconnect(new TextComponent(message));
     }
 
     private String getIp(InetSocketAddress address) {

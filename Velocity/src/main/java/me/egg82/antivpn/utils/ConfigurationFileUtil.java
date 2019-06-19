@@ -99,7 +99,9 @@ public class ConfigurationFileUtil {
             sources = new LinkedHashSet<>();
         }
 
-        InternalAPI.initialize(debug);
+        if (!InternalAPI.isInitialized()) {
+            InternalAPI.initialize(debug);
+        }
         for (Iterator<String> i = sources.iterator(); i.hasNext();) {
             String source = i.next();
             if (!config.getNode("sources", source, "enabled").getBoolean()) {
@@ -127,7 +129,7 @@ public class ConfigurationFileUtil {
 
         Set<String> ignoredIps;
         try {
-            ignoredIps = new HashSet<>(config.getNode("kick", "ignore").getList(TypeToken.of(String.class)));
+            ignoredIps = new HashSet<>(config.getNode("action", "ignore").getList(TypeToken.of(String.class)));
         } catch (ObjectMappingException ex) {
             logger.error(ex.getMessage(), ex);
             ignoredIps = new HashSet<>();

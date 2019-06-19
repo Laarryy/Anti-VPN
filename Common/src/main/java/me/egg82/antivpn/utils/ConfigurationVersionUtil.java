@@ -45,6 +45,9 @@ public class ConfigurationVersionUtil {
         if (config.getNode("version").getDouble() == 3.5d) {
             to36(config);
         }
+        if (config.getNode("version").getDouble() == 3.6d) {
+            to37(config);
+        }
 
         if (config.getNode("version").getDouble() != oldVersion) {
             File backupFile = new File(fileOnDisk.getParent(), fileOnDisk.getName() + ".bak");
@@ -272,5 +275,40 @@ public class ConfigurationVersionUtil {
 
         // Version
         config.getNode("version").setValue(3.6d);
+    }
+
+    private static void to37(ConfigurationNode config) {
+        // Remove kick->enabled
+        boolean kickEnabled = config.getNode("kick", "enabled").getBoolean(true);
+
+        // Rename kick->message to action->kick-message
+        String kickMessage = config.getNode("kick", "message").getString("");
+        config.getNode("action", "kick-message").setValue(kickEnabled ? kickMessage : "");
+
+        // Rename kick->algorithm to action->algorithm
+        String algorithmMethod = config.getNode("kick", "algorithm", "method").getString("");
+        double algorithmConsensus = config.getNode("kick", "algorithm", "min-consensus").getDouble(0.6d);
+
+        config.getNode("action", "algorithm", "method").setValue(algorithmMethod);
+        config.getNode("action", "algorithm", "min-consensus").setValue(algorithmConsensus);
+
+        // Rename kick->ignore to action->ignore
+        List<String> ignore;
+        try {
+            ignore = new ArrayList<>(config.getNode("kick", "ignore").getList(TypeToken.of(String.class)));
+        } catch (Exception ex) {
+            ignore = new ArrayList<>();
+        }
+
+        config.getNode("action", "ignore").setValue(ignore);
+
+        // Remove kick
+        config.removeChild("kick");
+
+        // Add action->command
+        config.getNode("action", "command").setValue("");
+
+        // Version
+        config.getNode("version").setValue(3.7d);
     }
 }
