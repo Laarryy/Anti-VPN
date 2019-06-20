@@ -172,12 +172,15 @@ sources:
     # API key to use (Required for this service, free one available at https://ipwarner.com/register )
     key: ''
 
-kick:
-  # When true, will kick players found to be using VPNs
-  # Disable this is you intend to use your own kicking/tagging systems using the API
-  enabled: true
-  # The message to kick VPN users with
-  message: '&cPlease disconnect from your proxy or VPN before re-joining!'
+action:
+  # The kick message to display to players who are using VPNs
+  # If left blank, will not kick the player
+  kick-message: '&cPlease disconnect from your proxy or VPN before re-joining!'
+  # The command that CONSOLE will run for players who are using VPNs
+  # Use %player% as a placeholder for the player's (real) name
+  # Use %uuid% as a placeholder for the player's uuid
+  # If left blank, will not run anything
+  command: ''
 
   algorithm:
     # The algorithm method
@@ -232,4 +235,4 @@ update:
   notify: true
 
 # Config version, no touchy plz
-version: 3.6
+version: 3.7

@@ -35,8 +35,8 @@ public class CheckCommand implements Runnable {
         }
 
         Optional<Boolean> isVPN = Optional.empty();
-        if (config.get().getNode("kick", "algorithm", "method").getString("cascade").equalsIgnoreCase("consensus")) {
-            double consensus = clamp(0.0d, 1.0d, config.get().getNode("kick", "algorithm", "min-consensus").getDouble(0.6d));
+        if (config.get().getNode("action", "algorithm", "method").getString("cascade").equalsIgnoreCase("consensus")) {
+            double consensus = clamp(0.0d, 1.0d, config.get().getNode("action", "algorithm", "min-consensus").getDouble(0.6d));
             try {
                 isVPN = Optional.of(api.consensus(ip) >= consensus);
             } catch (APIException ex) {

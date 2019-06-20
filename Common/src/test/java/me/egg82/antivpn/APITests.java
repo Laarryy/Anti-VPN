@@ -88,7 +88,7 @@ public class APITests {
                 }
             }
 
-            Set<String> ignoredIps = new HashSet<>(config.get().getNode("kick", "ignore").getList(TypeToken.of(String.class)));
+            Set<String> ignoredIps = new HashSet<>(config.get().getNode("action", "ignore").getList(TypeToken.of(String.class)));
 
             ServiceLocator.register(CachedConfigValues.builder()
                     .sources(sources)

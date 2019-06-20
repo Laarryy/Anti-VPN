@@ -36,6 +36,8 @@ public class InternalAPI {
 
     private static ImmutableMap<String, API> apis = ImmutableMap.of();
 
+    public static boolean isInitialized() { return !apis.isEmpty(); }
+
     public static void initialize(boolean debug) {
         ImmutableMap.Builder<String, API> apiBuilder = ImmutableMap.builder();
 

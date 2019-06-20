@@ -242,7 +242,7 @@ public class AntiVPN {
             }
             return values;
         }));
-        metrics.addCustomChart(new Metrics.SimplePie("kick", () -> {
+        metrics.addCustomChart(new Metrics.SimplePie("action", () -> {
             Optional<Configuration> config = ConfigUtil.getConfig();
             if (!config.isPresent()) {
                 return null;
@@ -252,7 +252,15 @@ public class AntiVPN {
                 return null;
             }
 
-            return config.get().getNode("kick", "enabled").getBoolean(true) ? "yes" : "no";
+            if (!config.get().getNode("action", "kick-message").getString("").isEmpty() && !config.get().getNode("action", "command").getString("").isEmpty()) {
+                return "dual";
+            } else if (!config.get().getNode("action", "kick-message").getString("").isEmpty()) {
+                return "kick";
+            } else if (!config.get().getNode("action", "command").getString("").isEmpty()) {
+                return "command";
+            }
+
+            return "none";
         }));
         metrics.addCustomChart(new Metrics.SimplePie("algorithm", () -> {
             Optional<Configuration> config = ConfigUtil.getConfig();
@@ -264,7 +272,7 @@ public class AntiVPN {
                 return null;
             }
 
-            return config.get().getNode("kick", "method").getString("cascade");
+            return config.get().getNode("action", "method").getString("cascade");
         }));
         metrics.addCustomChart(new Metrics.SingleLineChart("blocked", () -> {
             Optional<Configuration> config = ConfigUtil.getConfig();
