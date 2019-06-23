@@ -36,7 +36,7 @@ import org.xml.sax.SAXException;
 @Plugin(
         id = "antivpn",
         name = "AntiVPN",
-        version = "4.7.28",
+        version = "4.7.29",
         authors = "egg82",
         description = "Get the best; save money on overpriced plugins and block VPN users!",
         dependencies = @Dependency(id = "plan", optional = true)

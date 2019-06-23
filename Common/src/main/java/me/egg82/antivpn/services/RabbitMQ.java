@@ -36,7 +36,7 @@ public class RabbitMQ {
                 return;
             }
 
-            int offset = (int) Math.floorDiv(sqlResult.getCreated() - System.currentTimeMillis(), 1000L);
+            int offset = (int) Math.floorDiv(System.currentTimeMillis() - sqlResult.getCreated(), 1000L);
             int cacheTime = (int) Math.floorDiv(cachedConfig.get().getSourceCacheTime(), 1000L);
 
             if (offset < cacheTime) {
@@ -68,7 +68,7 @@ public class RabbitMQ {
                 return;
             }
 
-            int offset = (int) Math.floorDiv(sqlResult.getCreated() - System.currentTimeMillis(), 1000L);
+            int offset = (int) Math.floorDiv(System.currentTimeMillis() - sqlResult.getCreated(), 1000L);
             int cacheTime = (int) Math.floorDiv(cachedConfig.get().getSourceCacheTime(), 1000L);
 
             if (offset < cacheTime) {

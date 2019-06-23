@@ -40,15 +40,15 @@ public class Redis {
 
             for (DataResult result : sqlResult.getData()) {
                 String key = "avpn:" + result.getIp();
-                int offset = (int) Math.floorDiv(result.getCreated() - System.currentTimeMillis(), 1000L);
+                int offset = (int) Math.floorDiv(System.currentTimeMillis() - result.getCreated(), 1000L);
                 int cacheTime = (int) Math.floorDiv(cachedConfig.get().getSourceCacheTime(), 1000L);
                 if (offset < cacheTime) {
-                    redis.setex(key, offset - cacheTime, String.valueOf(result.getValue()));
+                    redis.setex(key, cacheTime - offset, String.valueOf(result.getValue()));
                 } else {
                     redis.del(key);
                 }
 
-                if (offset < cacheTime) {
+                if (offset > cacheTime) {
                     JSONObject obj = new JSONObject();
                     obj.put("ip", result.getIp());
                     obj.put("value", result.getValue());
@@ -62,10 +62,10 @@ public class Redis {
 
             for (ConsensusResult result : sqlResult.getConsensus()) {
                 String key = "avpn:consensus:" + result.getIp();
-                int offset = (int) Math.floorDiv(result.getCreated() - System.currentTimeMillis(), 1000L);
+                int offset = (int) Math.floorDiv(System.currentTimeMillis() - result.getCreated(), 1000L);
                 int cacheTime = (int) Math.floorDiv(cachedConfig.get().getSourceCacheTime(), 1000L);
                 if (offset < cacheTime) {
-                    redis.setex(key, offset - cacheTime, String.valueOf(result.getValue()));
+                    redis.setex(key, cacheTime - offset, String.valueOf(result.getValue()));
                 } else {
                     redis.del(key);
                 }
@@ -98,10 +98,10 @@ public class Redis {
             }
 
             String key = "avpn:" + sqlResult.getIp();
-            int offset = (int) Math.floorDiv(sqlResult.getCreated() - System.currentTimeMillis(), 1000L);
+            int offset = (int) Math.floorDiv(System.currentTimeMillis() - sqlResult.getCreated(), 1000L);
             int cacheTime = (int) Math.floorDiv(cachedConfig.get().getSourceCacheTime(), 1000L);
             if (offset < cacheTime) {
-                redis.setex(key, offset - cacheTime, String.valueOf(sqlResult.getValue()));
+                redis.setex(key, cacheTime - offset, String.valueOf(sqlResult.getValue()));
             } else {
                 redis.del(key);
             }
@@ -133,10 +133,10 @@ public class Redis {
             }
 
             String key = "avpn:consensus:" + sqlResult.getIp();
-            int offset = (int) Math.floorDiv(sqlResult.getCreated() - System.currentTimeMillis(), 1000L);
+            int offset = (int) Math.floorDiv(System.currentTimeMillis() - sqlResult.getCreated(), 1000L);
             int cacheTime = (int) Math.floorDiv(cachedConfig.get().getSourceCacheTime(), 1000L);
             if (offset < cacheTime) {
-                redis.setex(key, offset - cacheTime, String.valueOf(sqlResult.getValue()));
+                redis.setex(key, cacheTime - offset, String.valueOf(sqlResult.getValue()));
             } else {
                 redis.del(key);
             }
