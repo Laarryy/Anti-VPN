@@ -125,7 +125,6 @@ public class CachedConfigValues {
         }
 
         public CachedConfigValues build() {
-            InternalAPI.changeThreadCount(values.threads);
             InternalAPI.changeCacheTime(values.cacheTime.getFirst(), values.cacheTime.getSecond());
             return values;
         }

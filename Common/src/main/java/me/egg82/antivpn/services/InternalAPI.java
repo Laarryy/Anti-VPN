@@ -5,12 +5,14 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.util.concurrent.AtomicDouble;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.googlecode.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import me.egg82.antivpn.APIException;
 import me.egg82.antivpn.apis.API;
 import me.egg82.antivpn.core.ConsensusResult;
@@ -61,8 +63,6 @@ public class InternalAPI {
         apis = apiBuilder.build();
     }
 
-    private static ExecutorService threadPool = Executors.newWorkStealingPool(4);
-
     public InternalAPI() { }
 
     public static Optional<API> getAPI(String name) { return Optional.ofNullable(apis.getOrDefault(name, null)); }
@@ -73,6 +73,7 @@ public class InternalAPI {
             throw new APIException(true, "Could not get cached config.");
         }
 
+        ExecutorService threadPool = Executors.newWorkStealingPool(cachedConfig.get().getThreads());
         CountDownLatch latch = new CountDownLatch(cachedConfig.get().getSources().size());
 
         ConcurrentMap<String, Optional<Boolean>> retVal = new ConcurrentLinkedHashMap.Builder<String, Optional<Boolean>>().maximumWeightedCapacity(Long.MAX_VALUE).build();
@@ -101,11 +102,15 @@ public class InternalAPI {
         }
 
         try {
-            latch.await();
+            if (!latch.await(20L, TimeUnit.SECONDS)) {
+                logger.warn("Timeout reached before all sources could be queried.");
+            }
         } catch (InterruptedException ex) {
             logger.error(ex.getMessage(), ex);
             Thread.currentThread().interrupt();
         }
+
+        threadPool.shutdownNow(); // Kill it with fire
 
         return retVal;
     }
@@ -150,10 +155,6 @@ public class InternalAPI {
             logger.info(ip + " consensus value cached. Value: " + retVal.get());
         }
         return retVal.get();
-    }
-
-    public static void changeThreadCount(int newThreadCount) {
-        threadPool = Executors.newWorkStealingPool(newThreadCount);
     }
 
     public static void changeCacheTime(long duration, TimeUnit unit) {
@@ -261,62 +262,86 @@ public class InternalAPI {
         }
 
         // API lookup
-        boolean retVal = false;
+        ExecutorService threadPool = Executors.newSingleThreadExecutor();
+        CountDownLatch latch = new CountDownLatch(1);
+
+        AtomicBoolean retVal = new AtomicBoolean(false);
+        AtomicBoolean validResult = new AtomicBoolean(false);
 
         for (String source : cachedConfig.get().getSources()) {
-            if (!sourceValidationCache.get(source)) {
-                if (ConfigUtil.getDebugOrFalse()) {
-                    logger.info("Skipping " + source + " for " + ip + " cascade due to recently bad/failed check.");
-                }
-                continue;
-            }
-
-            if (ConfigUtil.getDebugOrFalse()) {
-                logger.info("Trying " + source + " as next cascade source for " + ip + ".");
-            }
-
-            Optional<API> api = getAPI(source);
-            if (!api.isPresent()) {
-                if (ConfigUtil.getDebugOrFalse()) {
-                    logger.info(source + " has an invalid/missing API for " + ip + " cascade.");
-                }
-                continue;
-            }
-
-            boolean result;
-            try {
-                result = api.get().getResult(ip);
-            } catch (APIException ex) {
-                if (ex.isHard()) {
-                    throw ex;
+            threadPool.submit(() -> {
+                if (!sourceValidationCache.get(source)) {
+                    if (ConfigUtil.getDebugOrFalse()) {
+                        logger.info("Skipping " + source + " for " + ip + " cascade due to recently bad/failed check.");
+                    }
+                    return;
                 }
 
                 if (ConfigUtil.getDebugOrFalse()) {
-                    logger.info(source + " returned a bad/failed result for " + ip + " cascade. Skipping source for a while.");
+                    logger.info("Trying " + source + " as next cascade source for " + ip + ".");
                 }
-                sourceValidationCache.put(source, Boolean.FALSE);
-                continue;
-            }
 
-            if (ConfigUtil.getDebugOrFalse()) {
-                logger.info(source + " returned value \"" + result + "\" for " + ip + " cascade.");
-            }
+                Optional<API> api = getAPI(source);
+                if (!api.isPresent()) {
+                    if (ConfigUtil.getDebugOrFalse()) {
+                        logger.info(source + " has an invalid/missing API for " + ip + " cascade.");
+                    }
+                    return;
+                }
 
-            retVal = result;
-            break;
+                boolean result;
+                try {
+                    result = api.get().getResult(ip);
+                } catch (APIException ex) {
+                    if (ex.isHard()) {
+                        logger.error(ex.getMessage(), ex);
+                    }
+
+                    if (ConfigUtil.getDebugOrFalse()) {
+                        logger.info(source + " returned a bad/failed result for " + ip + " cascade. Skipping source for a while.");
+                    }
+                    sourceValidationCache.put(source, Boolean.FALSE);
+                    return;
+                }
+
+                if (ConfigUtil.getDebugOrFalse()) {
+                    logger.info(source + " returned value \"" + result + "\" for " + ip + " cascade.");
+                }
+
+                retVal.set(result);
+                validResult.set(true);
+                latch.countDown();
+            });
+        }
+
+        threadPool.submit(latch::countDown); // If all sources failed, at least it'll pass the wait check
+
+        try {
+            if (!latch.await(20L, TimeUnit.SECONDS)) {
+                logger.warn("Timeout reached before all sources could be queried.");
+            }
+        } catch (InterruptedException ex) {
+            logger.error(ex.getMessage(), ex);
+            Thread.currentThread().interrupt();
+        }
+
+        threadPool.shutdownNow(); // Kill it with fire
+
+        if (!validResult.get()) {
+            throw new APIException(true, "Cascade had no valid/usable sources.");
         }
 
         if (ConfigUtil.getDebugOrFalse()) {
-            logger.info(ip + " cascade fetched via defined sources. Value: " + retVal);
+            logger.info(ip + " cascade fetched via defined sources. Value: " + retVal.get());
         }
 
         // Update SQL
         DataResult sqlResult = null;
         try {
             if (cachedConfig.get().getSQLType() == SQLType.MySQL) {
-                sqlResult = MySQL.update(ip, retVal);
+                sqlResult = MySQL.update(ip, retVal.get());
             } else if (cachedConfig.get().getSQLType() == SQLType.SQLite) {
-                sqlResult = SQLite.update(ip, retVal);
+                sqlResult = SQLite.update(ip, retVal.get());
             }
         } catch (SQLException ex) {
             logger.error(ex.getMessage(), ex);
@@ -327,7 +352,7 @@ public class InternalAPI {
         Redis.update(sqlResult);
         RabbitMQ.broadcast(sqlResult);
 
-        return retVal;
+        return retVal.get();
     }
 
     private double consensusExpensive(String ip, boolean expensive) throws APIException {
@@ -360,7 +385,7 @@ public class InternalAPI {
 
             if (result.isPresent()) {
                 if (ConfigUtil.getDebugOrFalse()) {
-                    logger.info(ip + " consensus found in storage. Value: " + result.get());
+                    logger.info(ip + " consensus found in storage. Value: " + result.get().getValue());
                 }
                 // Update messaging/Redis
                 Redis.update(result.get());
@@ -384,6 +409,7 @@ public class InternalAPI {
         AtomicDouble servicesCount = new AtomicDouble(0.0d);
         AtomicDouble currentValue = new AtomicDouble(0.0d);
 
+        ExecutorService threadPool = Executors.newWorkStealingPool(cachedConfig.get().getThreads());
         CountDownLatch latch = new CountDownLatch(cachedConfig.get().getSources().size());
 
         for (String source : cachedConfig.get().getSources()) {
@@ -436,11 +462,15 @@ public class InternalAPI {
         }
 
         try {
-            latch.await();
+            if (!latch.await(20L, TimeUnit.SECONDS)) {
+                logger.warn("Timeout reached before all sources could be queried.");
+            }
         } catch (InterruptedException ex) {
             logger.error(ex.getMessage(), ex);
             Thread.currentThread().interrupt();
         }
+
+        threadPool.shutdownNow(); // Kill it with fire
 
         double result = currentValue.get() / servicesCount.get();
         if (Double.isNaN(result)) {
