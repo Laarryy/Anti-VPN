@@ -258,6 +258,10 @@ public class BukkitBootstrap extends JavaPlugin {
         Artifact.Builder jedis = Artifact.builder("redis.clients", "jedis", "3.0.1", cacheDir)
                 .addRepository("https://nexus.egg82.me/repository/maven-central/");
         buildInject(jedis, jarsDir, classLoader, "Jedis", 1);
+
+        // Last
+
+        buildInject(guava, jarsDir, classLoader, "Google Guava", 1); // I swear to god, I WILL fix this Guava CL issue
     }
 
     private void printLatest(String friendlyName) {
