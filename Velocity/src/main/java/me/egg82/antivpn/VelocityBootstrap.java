@@ -148,7 +148,7 @@ public class VelocityBootstrap {
 
         Artifact.Builder guava = Artifact.builder("com.google.guava", "guava", "27.1-jre", cacheDir)
                 .addRepository("https://nexus.egg82.me/repository/maven-central/");
-        buildInject(guava, jarsDir, classLoader, "Google Guava", 1);
+        buildInjectWait(guava, jarsDir, classLoader, "Google Guava", 1);
 
         // Same file
 
@@ -272,10 +272,6 @@ public class VelocityBootstrap {
         Artifact.Builder jedis = Artifact.builder("redis.clients", "jedis", "3.0.1", cacheDir)
                 .addRepository("https://nexus.egg82.me/repository/maven-central/");
         buildInject(jedis, jarsDir, classLoader, "Jedis", 1);
-
-        // Last
-
-        buildInject(guava, jarsDir, classLoader, "Google Guava", 1); // I swear to god, I WILL fix this Guava CL issue
     }
 
     private void printLatest(String friendlyName) {
@@ -287,13 +283,15 @@ public class VelocityBootstrap {
     }
 
     private void buildInject(Artifact.Builder builder, File jarsDir, URLClassLoader classLoader, String friendlyName, int depth) {
-        downloadPool.submit(() -> {
-            try {
-                injectArtifact(builder.build(), jarsDir, classLoader, friendlyName, depth);
-            } catch (IOException | IllegalAccessException | InvocationTargetException | URISyntaxException | XPathExpressionException | SAXException ex) {
-                logger.error(ex.getMessage(), ex);
-            }
-        });
+        downloadPool.submit(() -> buildInjectWait(builder, jarsDir, classLoader, friendlyName, depth));
+    }
+
+    private void buildInjectWait(Artifact.Builder builder, File jarsDir, URLClassLoader classLoader, String friendlyName, int depth) {
+        try {
+            injectArtifact(builder.build(), jarsDir, classLoader, friendlyName, depth);
+        } catch (IOException | IllegalAccessException | InvocationTargetException | URISyntaxException | XPathExpressionException | SAXException ex) {
+            logger.error(ex.getMessage(), ex);
+        }
     }
 
     private void injectArtifact(Artifact artifact, File jarsDir, URLClassLoader classLoader, String friendlyName, int depth) throws IOException, IllegalAccessException, InvocationTargetException, URISyntaxException, XPathExpressionException, SAXException {
