@@ -340,6 +340,11 @@ public class ConfigurationVersionUtil {
         // Add teoh
         config.getNode("sources", "teoh", "enabled").setValue(Boolean.TRUE);
 
+        // Add iphunter
+        config.getNode("sources", "iphunter", "enabled").setValue(Boolean.FALSE);
+        config.getNode("sources", "iphunter", "key").setValue("");
+        config.getNode("sources", "iphunter", "block").setValue(1);
+
         List<String> sources;
         try {
             sources = new ArrayList<>(config.getNode("sources", "order").getList(TypeToken.of(String.class)));
@@ -349,12 +354,10 @@ public class ConfigurationVersionUtil {
         if (!sources.contains("teoh")) {
             sources.add("teoh");
         }
+        if (!sources.contains("iphunter")) {
+            sources.add("iphunter");
+        }
         config.getNode("sources", "order").setValue(sources);
-
-        // Add iphunter
-        config.getNode("sources", "iphunter", "enabled").setValue(Boolean.FALSE);
-        config.getNode("sources", "iphunter", "key").setValue("");
-        config.getNode("sources", "iphunter", "block").setValue(1);
 
         // Version
         config.getNode("version").setValue(3.8d);
