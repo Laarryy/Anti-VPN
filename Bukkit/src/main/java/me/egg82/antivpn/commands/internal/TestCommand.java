@@ -54,7 +54,7 @@ public class TestCommand implements Runnable {
                             continue;
                         }
 
-                        sender.sendMessage(LogUtil.getHeading() + LogUtil.getSourceHeading(kvp.getKey()) + (kvp.getValue().get() ? ChatColor.DARK_RED + "VPN/PRoxy detected" : ChatColor.GREEN + "No VPN/Proxy detected"));
+                        sender.sendMessage(LogUtil.getHeading() + LogUtil.getSourceHeading(kvp.getKey()) + (kvp.getValue().get() ? ChatColor.DARK_RED + "VPN/Proxy detected" : ChatColor.GREEN + "No VPN/Proxy detected"));
                     }
                     sender.sendMessage(LogUtil.getHeading() + ChatColor.GREEN + "Test for " + ChatColor.YELLOW + ip + ChatColor.GREEN + " complete!");
                 })

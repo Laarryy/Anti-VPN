@@ -56,7 +56,7 @@ public class CheckCommand implements Runnable {
         }
 
         if (isVPN.get()) {
-            source.sendMessage(LogUtil.getHeading().append(TextComponent.of("VPN/PRoxy detected").color(TextColor.DARK_RED)).build());
+            source.sendMessage(LogUtil.getHeading().append(TextComponent.of("VPN/Proxy detected").color(TextColor.DARK_RED)).build());
         } else {
             source.sendMessage(LogUtil.getHeading().append(TextComponent.of("No VPN/Proxy detected").color(TextColor.GREEN)).build());
         }

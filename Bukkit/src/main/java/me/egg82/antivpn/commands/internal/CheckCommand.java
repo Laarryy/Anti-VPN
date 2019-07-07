@@ -41,14 +41,14 @@ public class CheckCommand implements Runnable {
                     if (config.get().getNode("action", "algorithm", "method").getString("cascade").equalsIgnoreCase("consensus")) {
                         double consensus = clamp(0.0d, 1.0d, config.get().getNode("action", "algorithm", "min-consensus").getDouble(0.6d));
                         try {
-                            f.accept(api.consensus(ip) >= consensus ? ChatColor.DARK_RED + "VPN/PRoxy detected" : ChatColor.GREEN + "No VPN/Proxy detected");
+                            f.accept(api.consensus(ip) >= consensus ? ChatColor.DARK_RED + "VPN/Proxy detected" : ChatColor.GREEN + "No VPN/Proxy detected");
                         } catch (APIException ex) {
                             logger.error(ex.getMessage(), ex);
                             f.accept(ChatColor.DARK_RED + "Internal error");
                         }
                     } else {
                         try {
-                            f.accept(api.cascade(ip) ? ChatColor.DARK_RED + "VPN/PRoxy detected" : ChatColor.GREEN + "No VPN/Proxy detected");
+                            f.accept(api.cascade(ip) ? ChatColor.DARK_RED + "VPN/Proxy detected" : ChatColor.GREEN + "No VPN/Proxy detected");
                         } catch (APIException ex) {
                             logger.error(ex.getMessage(), ex);
                             f.accept(ChatColor.DARK_RED + "Internal error");

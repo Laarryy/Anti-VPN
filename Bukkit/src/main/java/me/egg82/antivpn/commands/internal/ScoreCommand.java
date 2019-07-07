@@ -93,9 +93,9 @@ public class ScoreCommand implements Runnable {
     }
 
     private Set<String> getNordVPNIPs() {
-        String[] dns = new String[] { "al9.nordvpn.com", "au154.nordvpn.com", "ca419.nordvpn.com", "ca398.nordvpn.com", "cz23.nordvpn.com", "fr33.nordvpn.com", "de114.nordvpn.com", "hk45.nordvpn.com",
-                "id2.nordvpn.com", "jp15.nordvpn.com", "mx6.nordvpn.com", "nz20.nordvpn.com", "pl43.nordvpn.com", "ru13.nordvpn.com", "sg37.nordvpn.com", "kr13.nordvpn.com", "se140.nordvpn.com",
-                "ua3.nordvpn.com", "uk357.nordvpn.com", "us2580.nordvpn.com", "vn4.nordvpn.com" };
+        String[] dns = new String[] { "al9.nordvpn.com", "au306.nordvpn.com", "ca419.nordvpn.com", "ca398.nordvpn.com", "cz81.nordvpn.com", "fr345.nordvpn.com", "de114.nordvpn.com", "hk85.nordvpn.com",
+                "id6.nordvpn.com", "jp224.nordvpn.com", "mx19.nordvpn.com", "nz46.nordvpn.com", "pl110.nordvpn.com", "cy9.nordvpn.com", "rs15.nordvpn.com", "kr24.nordvpn.com", "ee27.nordvpn.com",
+                "at46.nordvpn.com", "uk1183.nordvpn.com", "us2580.nordvpn.com", "vn4.nordvpn.com" };
         return getIPs(dns);
     }
 

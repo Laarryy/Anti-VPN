@@ -35,8 +35,12 @@ public class IPWarnerAPI implements API {
         try {
             json = JSONWebUtil.getJsonObject("https://api.ipwarner.com/" + key + "/" + ip, "egg82/AntiVPN");
         } catch (IOException | ParseException ex) {
-            logger.error(ex.getMessage(), ex);
-            throw new APIException(false, ex);
+            try {
+                json = JSONWebUtil.getJsonObject("http://api.ipwarner.com/" + key + "/" + ip, "egg82/AntiVPN"); // Temporary (hopefully) hack
+            } catch (IOException | ParseException ex2) {
+                logger.error(ex.getMessage(), ex2);
+                throw new APIException(false, ex2);
+            }
         }
         if (json == null || json.get("goodIp") == null) {
             throw new APIException(false, "Could not get result from " + getName());

@@ -77,20 +77,22 @@ sources:
 
   # The order to try results in
   order:
-  - 'iphub'
-  - 'proxycheck'
-  - 'getipintel'
-  - 'ipqualityscore'
-  - 'vpnblocker'
-  - 'voxprox'
-  - 'shodan'
+    - 'iphub'
+    - 'proxycheck'
+    - 'iphunter'
+    - 'getipintel'
+    - 'ipqualityscore'
+    - 'vpnblocker'
+    - 'teoh'
+    - 'shodan'
+    - 'ipwarner'
 
   # https://iphub.info/
-  # Results updated Sep 6, 2018
+  # Results updated Jul 7, 2019
   # Error rate: 0%
-  # NordVPN detection rate: 90.48%
-  # Cryptostorm detection rate: 90%
-  # False-flagged homes: 20%
+  # NordVPN detection rate: 85.71%
+  # Cryptostorm detection rate: 100%
+  # False-flagged homes: 0%
   iphub:
     enabled: false
     # API key to use (Required for this service, free one available at https://iphub.info/apiKey/newFree )
@@ -99,15 +101,28 @@ sources:
     block: 1
 
   # https://proxycheck.io
-  # Results updated Sep 6, 2018
-  # Error rate: 5%
-  # NordVPN detection rate: 85.71%
-  # Cryptostorm detection rate: 94.74%
-  # False-flagged homes: 10%
+  # Results updated Jul 7, 2019
+  # Error rate: 0%
+  # NordVPN detection rate: 80.95%
+  # Cryptostorm detection rate: 100%
+  # False-flagged homes: 0%
   proxycheck:
     enabled: true
     # Optional API key to use
     key: ''
+
+  # https://www.iphunter.info/
+  # Results updated Jul 7, 2019
+  # Error rate: 0%
+  # NordVPN detection rate: 95.24%
+  # Cryptostorm detection rate: 90%
+  # False-flagged homes: 40%
+  iphunter:
+    enabled: false
+    # API key to use (Required for this service, free one available at https://www.iphunter.info/user/register )
+    key: ''
+    # The block type at which an IP is considered "bad"
+    block: 1
 
   # https://www.getipintel.net/
   # Results updated Sep 6, 2018
@@ -123,10 +138,10 @@ sources:
     threshold: 0.98
 
   # https://www.ipqualityscore.com/
-  # Results updated Sep 6, 2018
+  # Results updated Jul 7, 2019
   # Error rate: 0%
   # NordVPN detection rate: 90.48%
-  # Cryptostorm detection rate: 85%
+  # Cryptostorm detection rate: 90%
   # False-flagged homes: 40%
   ipqualityscore:
     enabled: false
@@ -136,41 +151,51 @@ sources:
     threshold: 0.65
 
   # https://vpnblocker.net/usage
+  # Results updated Jul 7, 2019
   # Error rate: 0%
   # NordVPN detection rate: 66.67%
-  # Cryptostorm detection rate: 70%
+  # Cryptostorm detection rate: 95%
   # False-flagged homes: 10%
   vpnblocker:
     enabled: true
     # Optional API key to use
     key: ''
 
-  # https://www.voxprox.com
-  # Error rate: 0%
-  # NordVPN detection rate: 66.67%
-  # Cryptostorm detection rate: 70%
-  # False-flagged homes: 40%
-  voxprox:
-    enabled: false
-    # API key to use (Required for this service)
-    key: ''
+  # https://ip.teoh.io/vpn-detection
+  # Results updated Jul 7, 2019
+  # Error rate: 10%
+  # NordVPN detection rate: 61.90%
+  # Cryptostorm detection rate: 100%
+  # False-flagged homes: 0%
+  teoh:
+    enabled: true
 
   # https://www.shodan.io/
+  # Results updated Jul 7, 2019
   # Error rate: 94.52%
-  # NordVPN detection rate: 89.47%
-  # Cryptostorm detection rate: 0%
+  # NordVPN detection rate: 95.24%
+  # Cryptostorm detection rate: 60%
   # False-flagged homes: 0%
   shodan:
     enabled: false
     # API key to use (Required for this service)
     key: ''
 
-kick:
-  # When true, will kick players found to be using VPNs
-  # Disable this is you intend to use your own kicking/tagging systems using the API
-  enabled: true
-  # The message to kick VPN users with
-  message: '&cPlease disconnect from your proxy or VPN before re-joining!'
+  # https://ipwarner.com/
+  ipwarner:
+    enabled: false
+    # API key to use (Required for this service, free one available at https://ipwarner.com/register )
+    key: ''
+
+action:
+  # The kick message to display to players who are using VPNs
+  # If left blank, will not kick the player
+  kick-message: '&cPlease disconnect from your proxy or VPN before re-joining!'
+  # The command that CONSOLE will run for players who are using VPNs
+  # Use %player% as a placeholder for the player's (real) name
+  # Use %uuid% as a placeholder for the player's uuid
+  # If left blank, will not run anything
+  command: ''
 
   algorithm:
     # The algorithm method
@@ -194,9 +219,9 @@ kick:
 
   # IPs to ignore when checking for VPNs
   ignore:
-  - '127.0.0.1'
-  - 'localhost'
-  - '::1'
+    - '127.0.0.1'
+    - 'localhost'
+    - '::1'
 
 # The amount of time to cache lookups in-memory
 # Higher values require more memory
@@ -225,4 +250,4 @@ update:
   notify: true
 
 # Config version, no touchy plz
-version: 3.5
+version: 3.8

@@ -48,6 +48,9 @@ public class ConfigurationVersionUtil {
         if (config.getNode("version").getDouble() == 3.6d) {
             to37(config);
         }
+        if (config.getNode("version").getDouble() == 3.7d) {
+            to38(config);
+        }
 
         if (config.getNode("version").getDouble() != oldVersion) {
             File backupFile = new File(fileOnDisk.getParent(), fileOnDisk.getName() + ".bak");
@@ -310,5 +313,50 @@ public class ConfigurationVersionUtil {
 
         // Version
         config.getNode("version").setValue(3.7d);
+    }
+
+    private static void to38(ConfigurationNode config) {
+        // Remove voxprox
+        List<String> order;
+        try {
+            order = new ArrayList<>(config.getNode("sources", "order").getList(TypeToken.of(String.class)));
+        } catch (ObjectMappingException ex) {
+            logger.error(ex.getMessage(), ex);
+            return;
+        }
+
+        List<String> removed = new ArrayList<>();
+        for (String source : order) {
+            if (source.equalsIgnoreCase("voxprox")) { // sources are case-insensitive when loaded
+                removed.add(source);
+            }
+        }
+
+        order.removeAll(removed);
+        config.getNode("sources", "order").setValue(order);
+
+        config.getNode("sources").removeChild("voxprox");
+
+        // Add teoh
+        config.getNode("sources", "teoh", "enabled").setValue(Boolean.TRUE);
+
+        List<String> sources;
+        try {
+            sources = new ArrayList<>(config.getNode("sources", "order").getList(TypeToken.of(String.class)));
+        } catch (Exception ex) {
+            sources = new ArrayList<>();
+        }
+        if (!sources.contains("teoh")) {
+            sources.add("teoh");
+        }
+        config.getNode("sources", "order").setValue(sources);
+
+        // Add iphunter
+        config.getNode("sources", "iphunter", "enabled").setValue(Boolean.FALSE);
+        config.getNode("sources", "iphunter", "key").setValue("");
+        config.getNode("sources", "iphunter", "block").setValue(1);
+
+        // Version
+        config.getNode("version").setValue(3.8d);
     }
 }
