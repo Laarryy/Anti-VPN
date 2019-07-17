@@ -5,9 +5,8 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.util.concurrent.AtomicDouble;
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import com.googlecode.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
 import java.sql.SQLException;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -76,8 +75,9 @@ public class InternalAPI {
         ExecutorService threadPool = Executors.newWorkStealingPool(cachedConfig.get().getThreads());
         CountDownLatch latch = new CountDownLatch(cachedConfig.get().getSources().size());
 
-        ConcurrentMap<String, Optional<Boolean>> retVal = new ConcurrentLinkedHashMap.Builder<String, Optional<Boolean>>().maximumWeightedCapacity(Long.MAX_VALUE).build();
+        Map<String, Optional<Boolean>> retVal;
 
+        ConcurrentMap<String, Optional<Boolean>> results = new ConcurrentHashMap<>();
         for (String source : cachedConfig.get().getSources()) {
             threadPool.submit(() -> {
                 Optional<API> api = getAPI(source);
@@ -90,12 +90,12 @@ public class InternalAPI {
                 }
 
                 try {
-                    retVal.put(source, Optional.of(api.get().getResult(ip)));
+                    results.put(source, Optional.of(api.get().getResult(ip)));
                 } catch (APIException ex) {
                     if (ex.isHard()) {
                         logger.error(ex.getMessage(), ex);
                     }
-                    retVal.put(source, Optional.empty());
+                    results.put(source, Optional.empty());
                 }
                 latch.countDown();
             });
@@ -111,6 +111,12 @@ public class InternalAPI {
         }
 
         threadPool.shutdownNow(); // Kill it with fire
+
+        // Re-order sources
+        retVal = new LinkedHashMap<>();
+        for (String source : cachedConfig.get().getSources()) {
+            retVal.put(source, results.get(source) == null ? Optional.empty() : results.get(source)); // Null check for safety, since sources could change
+        }
 
         return retVal;
     }
@@ -328,7 +334,7 @@ public class InternalAPI {
         threadPool.shutdownNow(); // Kill it with fire
 
         if (!validResult.get()) {
-            throw new APIException(true, "Cascade had no valid/usable sources.");
+            throw new APIException(true, "Cascade had no valid/usable sources. Please see https://github.com/egg82/AntiVPN/wiki/FAQ#Errors");
         }
 
         if (ConfigUtil.getDebugOrFalse()) {
@@ -474,7 +480,7 @@ public class InternalAPI {
 
         double result = currentValue.get() / servicesCount.get();
         if (Double.isNaN(result)) {
-            throw new APIException(true, "Consensus had no valid/usable sources. (NaN result)");
+            throw new APIException(true, "Consensus had no valid/usable sources. (NaN result). Please see https://github.com/egg82/AntiVPN/wiki/FAQ#Errors");
         }
         if (Double.isInfinite(result)) {
             throw new APIException(true, "Consensus had an infinite result. (result with no valid sources)");
