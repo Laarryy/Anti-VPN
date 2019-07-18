@@ -83,6 +83,7 @@ sources:
     - 'getipintel'
     - 'ipqualityscore'
     - 'vpnblocker'
+    - 'ip2proxy'
     - 'teoh'
     - 'shodan'
     - 'ipwarner'
@@ -160,6 +161,17 @@ sources:
     enabled: true
     # Optional API key to use
     key: ''
+
+  # https://www.ip2location.com/web-service/ip2proxy
+  # Results updated Jul 18, 2019
+  # Error rate: 0%
+  # NordVPN detection rate: 100%
+  # Cryptostorm detection rate: 60%
+  # False-flagged homes: 0%
+  ip2proxy:
+    enabled: true
+    # API key to use (Required for this service, free one available using 'demo' or at https://www.ip2location.com/register?id=1006 )
+    key: 'demo'
 
   # https://ip.teoh.io/vpn-detection
   # Results updated Jul 7, 2019
