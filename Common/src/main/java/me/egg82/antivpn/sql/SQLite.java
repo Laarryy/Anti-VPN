@@ -33,7 +33,7 @@ public class SQLite {
             cachedConfig.get().getSQL().execute("CREATE TABLE `" + tablePrefix.substring(0, tablePrefix.length() - 1) + "` ("
                     + "`ip` TEXT(45) NOT NULL,"
                     + "`value` INTEGER(1) NOT NULL,"
-                    + "`created` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,"
+                    + "`created` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,"
                     + "UNIQUE(`ip`)"
                     + ");");
         }
@@ -42,7 +42,7 @@ public class SQLite {
             cachedConfig.get().getSQL().execute("CREATE TABLE `" + tablePrefix + "consensus` ("
                     + "`ip` TEXT(45) NOT NULL,"
                     + "`value` DOUBLE NOT NULL,"
-                    + "`created` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,"
+                    + "`created` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,"
                     + "UNIQUE(`ip`)"
                     + ");");
         }

@@ -36,7 +36,7 @@ import org.xml.sax.SAXException;
 @Plugin(
         id = "antivpn",
         name = "AntiVPN",
-        version = "4.9.31",
+        version = "4.9.32",
         authors = "egg82",
         description = "Get the best; save money on overpriced plugins and block VPN users!",
         dependencies = @Dependency(id = "plan", optional = true)
@@ -146,7 +146,7 @@ public class VelocityBootstrap {
 
         // First
 
-        Artifact.Builder guava = Artifact.builder("com.google.guava", "guava", "27.1-jre", cacheDir)
+        Artifact.Builder guava = Artifact.builder("com.google.guava", "guava", "28.0-jre", cacheDir)
                 .addRepository("https://nexus.egg82.me/repository/maven-central/");
         buildInjectWait(guava, jarsDir, classLoader, "Google Guava", 1);
 
@@ -217,7 +217,7 @@ public class VelocityBootstrap {
                 .addRepository("https://nexus.egg82.me/repository/maven-central/");
         buildInject(concurrentlinkedhashmap, jarsDir, classLoader, "ConcurrentLinkedHashMap");
 
-        Artifact.Builder amqpClient = Artifact.builder("com.rabbitmq", "amqp-client", "5.7.1", cacheDir)
+        Artifact.Builder amqpClient = Artifact.builder("com.rabbitmq", "amqp-client", "5.7.3", cacheDir)
                 .addRepository("https://nexus.egg82.me/repository/maven-central/");
         buildInject(amqpClient, jarsDir, classLoader, "RabbitMQ");
 
@@ -269,7 +269,7 @@ public class VelocityBootstrap {
                 .addRepository("https://nexus.egg82.me/repository/maven-central/");
         buildInject(commonsValidator, jarsDir, classLoader, "Apache Commons Validator", 1);
 
-        Artifact.Builder jedis = Artifact.builder("redis.clients", "jedis", "3.0.1", cacheDir)
+        Artifact.Builder jedis = Artifact.builder("redis.clients", "jedis", "3.1.0", cacheDir)
                 .addRepository("https://nexus.egg82.me/repository/maven-central/");
         buildInject(jedis, jarsDir, classLoader, "Jedis", 1);
     }
