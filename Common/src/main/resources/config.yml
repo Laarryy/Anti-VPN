@@ -206,6 +206,7 @@ action:
   # The command that CONSOLE will run for players who are using VPNs
   # Use %player% as a placeholder for the player's (real) name
   # Use %uuid% as a placeholder for the player's uuid
+  # Use %ip% as a placeholder for the player's IP
   # If left blank, will not run anything
   command: ''
 

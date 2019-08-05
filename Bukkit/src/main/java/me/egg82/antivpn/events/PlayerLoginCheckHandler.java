@@ -79,14 +79,14 @@ public class PlayerLoginCheckHandler implements Consumer<PlayerLoginEvent> {
                 logger.info(LogUtil.getHeading() + ChatColor.WHITE + event.getPlayer().getName() + ChatColor.DARK_RED + " found using a VPN. Running required actions.");
             }
 
-            tryRunCommand(config.get(), event.getPlayer());
+            tryRunCommand(config.get(), event.getPlayer(), ip);
             tryKickPlayer(config.get(), event.getPlayer(), event);
         } else {
             logger.info(LogUtil.getHeading() + ChatColor.WHITE + event.getPlayer().getName() + ChatColor.GREEN + " passed VPN check.");
         }
     }
 
-    private void tryRunCommand(Configuration config, Player player) {
+    private void tryRunCommand(Configuration config, Player player, String ip) {
         Optional<PlaceholderAPIHook> placeholderapi;
         try {
             placeholderapi = ServiceLocator.getOptional(PlaceholderAPIHook.class);
@@ -100,7 +100,7 @@ public class PlayerLoginCheckHandler implements Consumer<PlayerLoginEvent> {
             return;
         }
 
-        command = command.replace("%player%", player.getName()).replace("%uuid%", player.getUniqueId().toString());
+        command = command.replace("%player%", player.getName()).replace("%uuid%", player.getUniqueId().toString()).replace("%ip%", ip);
         if (command.charAt(0) == '/') {
             command = command.substring(1);
         }

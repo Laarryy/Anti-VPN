@@ -85,20 +85,20 @@ public class PostLoginCheckHandler implements Consumer<PostLoginEvent> {
                 proxy.getConsoleCommandSource().sendMessage(LogUtil.getHeading().append(TextComponent.of(event.getPlayer().getUsername()).color(TextColor.WHITE)).append(TextComponent.of(" found using a VPN. Running required actions.").color(TextColor.DARK_RED)).build());
             }
 
-            tryRunCommand(config.get(), event.getPlayer());
+            tryRunCommand(config.get(), event.getPlayer(), ip);
             tryKickPlayer(config.get(), event.getPlayer());
         } else {
             proxy.getConsoleCommandSource().sendMessage(LogUtil.getHeading().append(TextComponent.of(event.getPlayer().getUsername()).color(TextColor.WHITE)).append(TextComponent.of(" passed VPN check.").color(TextColor.GREEN)).build());
         }
     }
 
-    private void tryRunCommand(Configuration config, Player player) {
+    private void tryRunCommand(Configuration config, Player player, String ip) {
         String command = config.getNode("action", "command").getString("");
         if (command.isEmpty()) {
             return;
         }
 
-        command = command.replace("%player%", player.getUsername()).replace("%uuid%", player.getUniqueId().toString());
+        command = command.replace("%player%", player.getUsername()).replace("%uuid%", player.getUniqueId().toString()).replace("%ip%", ip);
         if (command.charAt(0) == '/') {
             command = command.substring(1);
         }

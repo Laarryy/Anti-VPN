@@ -79,20 +79,20 @@ public class PostLoginCheckHandler implements Consumer<PostLoginEvent> {
                 logger.info(LogUtil.getHeading() + ChatColor.WHITE + event.getPlayer().getName() + ChatColor.DARK_RED + " found using a VPN. Running required actions.");
             }
 
-            tryRunCommand(config.get(), event.getPlayer());
+            tryRunCommand(config.get(), event.getPlayer(), ip);
             tryKickPlayer(config.get(), event.getPlayer());
         } else {
             logger.info(LogUtil.getHeading() + ChatColor.WHITE + event.getPlayer().getName() + ChatColor.GREEN + " passed VPN check.");
         }
     }
 
-    private void tryRunCommand(Configuration config, ProxiedPlayer player) {
+    private void tryRunCommand(Configuration config, ProxiedPlayer player, String ip) {
         String command = config.getNode("action", "command").getString("");
         if (command.isEmpty()) {
             return;
         }
 
-        command = command.replace("%player%", player.getName()).replace("%uuid%", player.getUniqueId().toString());
+        command = command.replace("%player%", player.getName()).replace("%uuid%", player.getUniqueId().toString()).replace("%ip%", ip);
         if (command.charAt(0) == '/') {
             command = command.substring(1);
         }
