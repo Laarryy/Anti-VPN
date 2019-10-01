@@ -35,9 +35,12 @@ import ninja.egg82.updater.SpigotUpdater;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
+import org.bukkit.event.server.PluginEnableEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.slf4j.Logger;
@@ -172,9 +175,24 @@ public class AntiVPN {
     private void loadHooks() {
         PluginManager manager = plugin.getServer().getPluginManager();
 
-        if (manager.getPlugin("Plan") != null) {
-            plugin.getServer().getConsoleSender().sendMessage(LogUtil.getHeading() + ChatColor.GREEN + "Enabling support for Plan.");
-            ServiceLocator.register(new PlayerAnalyticsHook());
+        Plugin p;
+        if ((p = manager.getPlugin("Plan")) != null) {
+            if(p.isEnabled()) {
+                plugin.getServer().getConsoleSender().sendMessage(LogUtil.getHeading() + ChatColor.GREEN + "Enabling support for Plan.");
+                ServiceLocator.register(new PlayerAnalyticsHook());
+            } else {
+                // softdepend is treated as a "please" and doesn't guarantee that the plugin is loaded before ours
+                Listener planEnableListener = new Listener() {
+                    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+                    public void onPluginEnable(PluginEnableEvent event) {
+                        if (event.getPlugin().getName().equalsIgnoreCase("Plan")) {
+                            plugin.getServer().getConsoleSender().sendMessage(LogUtil.getHeading() + ChatColor.GREEN + "Enabling support for Plan.");
+                            ServiceLocator.register(new PlayerAnalyticsHook());
+                        }
+                    }
+                };
+                manager.registerEvents(planEnableListener, plugin);
+            }
         } else {
             plugin.getServer().getConsoleSender().sendMessage(LogUtil.getHeading() + ChatColor.YELLOW + "Plan was not found. Personal analytics support has been disabled.");
         }
