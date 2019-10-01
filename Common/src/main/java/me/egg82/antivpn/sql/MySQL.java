@@ -33,7 +33,7 @@ public class MySQL {
             cachedConfig.get().getSQL().execute("CREATE TABLE `" + tablePrefix.substring(0, tablePrefix.length() - 1) + "` ("
                     + "`ip` VARCHAR(45) NOT NULL,"
                     + "`value` BOOLEAN NOT NULL,"
-                    + "`created` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP"
+                    + "`created` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP"
                     + ");");
             cachedConfig.get().getSQL().execute("ALTER TABLE `" + tablePrefix.substring(0, tablePrefix.length() - 1) + "` ADD UNIQUE (`ip`);");
         }
@@ -42,7 +42,7 @@ public class MySQL {
             cachedConfig.get().getSQL().execute("CREATE TABLE `" + tablePrefix + "consensus` ("
                     + "`ip` VARCHAR(45) NOT NULL,"
                     + "`value` DOUBLE NOT NULL,"
-                    + "`created` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP"
+                    + "`created` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP"
                     + ");");
             cachedConfig.get().getSQL().execute("ALTER TABLE `" + tablePrefix + "consensus` ADD UNIQUE (`ip`);");
         }
@@ -51,8 +51,8 @@ public class MySQL {
             cachedConfig.get().getSQL().execute("CREATE TABLE `" + tablePrefix + "queue` ("
                     + "`ip` VARCHAR(45) NOT NULL,"
                     + "`value` BOOLEAN NOT NULL,"
-                    + "`created` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,"
-                    + "`updated` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP"
+                    + "`created` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,"
+                    + "`updated` TIMESTAMP NOT NULL"
                     + ");");
             cachedConfig.get().getSQL().execute("ALTER TABLE `" + tablePrefix + "queue` ADD UNIQUE (`ip`);");
         }
@@ -61,8 +61,8 @@ public class MySQL {
             cachedConfig.get().getSQL().execute("CREATE TABLE `" + tablePrefix + "consensus_queue` ("
                     + "`ip` VARCHAR(45) NOT NULL,"
                     + "`value` DOUBLE NOT NULL,"
-                    + "`created` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,"
-                    + "`updated` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP"
+                    + "`created` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,"
+                    + "`updated` TIMESTAMP NOT NULL"
                     + ");");
             cachedConfig.get().getSQL().execute("ALTER TABLE `" + tablePrefix + "consensus_queue` ADD UNIQUE (`ip`);");
         }
@@ -265,7 +265,7 @@ public class MySQL {
         DataResult result = null;
 
         try {
-            cachedConfig.get().getSQL().execute("INSERT INTO `" + tablePrefix.substring(0, tablePrefix.length() - 1) + "` (`ip`, `value`) VALUES(?, ?) ON DUPLICATE KEY UPDATE `value`=?, `created`=CURRENT_TIMESTAMP();", ip, (value) ? 1 : 0, (value) ? 1 : 0);
+            cachedConfig.get().getSQL().execute("INSERT INTO `" + tablePrefix.substring(0, tablePrefix.length() - 1) + "` (`ip`, `value`, `updated`) VALUES(?, ?, CURRENT_TIMESTAMP()) ON DUPLICATE KEY UPDATE `value`=?, `created`=CURRENT_TIMESTAMP();", ip, (value) ? 1 : 0, (value) ? 1 : 0);
             SQLQueryResult query = cachedConfig.get().getSQL().query("SELECT `created` FROM `" + tablePrefix.substring(0, tablePrefix.length() - 1) + "` WHERE `ip`=?;", ip);
 
             Timestamp sqlCreated = null;
