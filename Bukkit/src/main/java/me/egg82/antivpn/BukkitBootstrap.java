@@ -127,7 +127,8 @@ public class BukkitBootstrap extends JavaPlugin {
         // First
 
         Artifact.Builder guava = Artifact.builder("com.google.guava", "guava", "28.0-jre", cacheDir)
-                .addRepository("https://nexus.egg82.me/repository/maven-central/");
+                .addRepository("https://nexus.egg82.me/repository/maven-central/")
+                .addRepository("http://central.maven.org/maven2/");
         buildInjectWait(guava, jarsDir, classLoader, "Google Guava", 1);
 
         // Same file
@@ -176,43 +177,52 @@ public class BukkitBootstrap extends JavaPlugin {
         buildInject(serviceLocator, jarsDir, classLoader, "Service Locator");
 
         Artifact.Builder commonsNet = Artifact.builder("commons-net", "commons-net", "3.6", cacheDir)
-                .addRepository("https://nexus.egg82.me/repository/maven-central/");
+                .addRepository("https://nexus.egg82.me/repository/maven-central/")
+                .addRepository("http://central.maven.org/maven2/");
         buildInject(commonsNet, jarsDir, classLoader, "Apache Commons (Net)");
 
         Artifact.Builder commonsLang3 = Artifact.builder("org.apache.commons", "commons-lang3", "3.9", cacheDir)
-                .addRepository("https://nexus.egg82.me/repository/maven-central/");
+                .addRepository("https://nexus.egg82.me/repository/maven-central/")
+                .addRepository("http://central.maven.org/maven2/");
         buildInject(commonsLang3, jarsDir, classLoader, "Apache Commons (Lang 3)");
 
         printLatest("SQLite");
         Artifact.Builder sqlite = Artifact.builder("org.xerial", "sqlite-jdbc", "latest", cacheDir)
-                .addRepository("https://nexus.egg82.me/repository/maven-central/");
+                .addRepository("https://nexus.egg82.me/repository/maven-central/")
+                .addRepository("http://central.maven.org/maven2/");
         buildInject(sqlite, jarsDir, classLoader, "SQLite");
 
         printLatest("MySQL");
         Artifact.Builder mysql = Artifact.builder("mysql", "mysql-connector-java", "latest", cacheDir)
-                .addRepository("https://nexus.egg82.me/repository/maven-central/");
+                .addRepository("https://nexus.egg82.me/repository/maven-central/")
+                .addRepository("http://central.maven.org/maven2/");
         buildInject(mysql, jarsDir, classLoader, "MySQL", 1);
 
         // Global
 
         Artifact.Builder caffeine = Artifact.builder("com.github.ben-manes.caffeine", "caffeine", "2.7.0", cacheDir)
-                .addRepository("https://nexus.egg82.me/repository/maven-central/");
+                .addRepository("https://nexus.egg82.me/repository/maven-central/")
+                .addRepository("http://central.maven.org/maven2/");
         buildInject(caffeine, jarsDir, classLoader, "Caffeine");
 
         Artifact.Builder concurrentlinkedhashmap = Artifact.builder("com.googlecode.concurrentlinkedhashmap", "concurrentlinkedhashmap-lru", "1.4.2", cacheDir)
-                .addRepository("https://nexus.egg82.me/repository/maven-central/");
+                .addRepository("https://nexus.egg82.me/repository/maven-central/")
+                .addRepository("http://central.maven.org/maven2/");
         buildInject(concurrentlinkedhashmap, jarsDir, classLoader, "ConcurrentLinkedHashMap");
 
         Artifact.Builder amqpClient = Artifact.builder("com.rabbitmq", "amqp-client", "5.7.3", cacheDir)
-                .addRepository("https://nexus.egg82.me/repository/maven-central/");
+                .addRepository("https://nexus.egg82.me/repository/maven-central/")
+                .addRepository("http://central.maven.org/maven2/");
         buildInject(amqpClient, jarsDir, classLoader, "RabbitMQ");
 
         Artifact.Builder javassist = Artifact.builder("org.javassist", "javassist", "3.25.0-GA", cacheDir)
-                .addRepository("https://nexus.egg82.me/repository/maven-central/");
+                .addRepository("https://nexus.egg82.me/repository/maven-central/")
+                .addRepository("http://central.maven.org/maven2/");
         buildInject(javassist, jarsDir, classLoader, "Javassist");
 
         Artifact.Builder javaxAnnotationApi = Artifact.builder("javax.annotation", "javax.annotation-api", "1.3.2", cacheDir)
-                .addRepository("https://nexus.egg82.me/repository/maven-central/");
+                .addRepository("https://nexus.egg82.me/repository/maven-central/")
+                .addRepository("http://central.maven.org/maven2/");
         buildInject(javaxAnnotationApi, jarsDir, classLoader, "Javax Annotations");
 
         Artifact.Builder gameanalyticsApi = Artifact.builder("ninja.egg82", "gameanalytics-api", "1.0.1", cacheDir)
@@ -252,11 +262,13 @@ public class BukkitBootstrap extends JavaPlugin {
         buildInject(collections, jarsDir, classLoader, "Collections");
 
         Artifact.Builder commonsValidator = Artifact.builder("commons-validator", "commons-validator", "1.6", cacheDir)
-                .addRepository("https://nexus.egg82.me/repository/maven-central/");
+                .addRepository("https://nexus.egg82.me/repository/maven-central/")
+                .addRepository("http://central.maven.org/maven2/");
         buildInject(commonsValidator, jarsDir, classLoader, "Apache Commons Validator", 1);
 
         Artifact.Builder jedis = Artifact.builder("redis.clients", "jedis", "3.1.0", cacheDir)
-                .addRepository("https://nexus.egg82.me/repository/maven-central/");
+                .addRepository("https://nexus.egg82.me/repository/maven-central/")
+                .addRepository("http://central.maven.org/maven2/");
         buildInject(jedis, jarsDir, classLoader, "Jedis", 1);
     }
 
