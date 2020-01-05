@@ -3,7 +3,6 @@ package me.egg82.antivpn.commands.internal;
 import co.aikar.taskchain.TaskChain;
 import me.egg82.antivpn.utils.ConfigurationFileUtil;
 import me.egg82.antivpn.utils.LogUtil;
-import me.egg82.antivpn.utils.ServiceUtil;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.Plugin;

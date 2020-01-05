@@ -2,7 +2,6 @@ package me.egg82.antivpn.commands.internal;
 
 import me.egg82.antivpn.utils.ConfigurationFileUtil;
 import me.egg82.antivpn.utils.LogUtil;
-import me.egg82.antivpn.utils.ServiceUtil;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.TextComponent;

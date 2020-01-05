@@ -5,7 +5,6 @@ import com.velocitypowered.api.plugin.PluginDescription;
 import com.velocitypowered.api.proxy.ProxyServer;
 import me.egg82.antivpn.utils.ConfigurationFileUtil;
 import me.egg82.antivpn.utils.LogUtil;
-import me.egg82.antivpn.utils.ServiceUtil;
 import net.kyori.text.TextComponent;
 import net.kyori.text.format.TextColor;
 

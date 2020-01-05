@@ -10,12 +10,14 @@ public class ValidationUtil {
      * maintain this
      */
     private static final InetAddressValidator ipValidator = InetAddressValidator.getInstance();
+
     /**
      * UUID_PATTERN_6 compiled and benchmarked from
      * https://github.com/tinnet/java-uuid-validation-benchmark
      * Results on my machine, 06/22/18: https://pastebin.com/hWs62pV2
+     * Update: modified for less-than-great UUIDs
      */
-    private static final Pattern uuidValidator = Pattern.compile("^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$", Pattern.CASE_INSENSITIVE);
+    private static final Pattern uuidValidator = Pattern.compile("^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$", Pattern.CASE_INSENSITIVE);
 
     private ValidationUtil() {}
 

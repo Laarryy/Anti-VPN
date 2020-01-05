@@ -4,7 +4,6 @@ import java.util.UUID;
 import me.egg82.antivpn.APIException;
 import me.egg82.antivpn.services.InternalAPI;
 import me.egg82.antivpn.services.Redis;
-import me.egg82.antivpn.utils.RedisUtil;
 import me.egg82.antivpn.utils.ValidationUtil;
 import ninja.egg82.json.JSONUtil;
 import org.json.simple.JSONObject;

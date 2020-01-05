@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
@@ -53,6 +54,9 @@ public class ConfigurationVersionUtil {
         }
         if (config.getNode("version").getDouble() == 3.8d) {
             to39(config);
+        }
+        if (config.getNode("version").getDouble() == 3.9d) {
+            to49(config);
         }
 
         if (config.getNode("version").getDouble() != oldVersion) {
@@ -384,5 +388,96 @@ public class ConfigurationVersionUtil {
 
         // Version
         config.getNode("version").setValue(3.9d);
+    }
+
+    private static void to49(ConfigurationNode config) {
+        // Move storage
+        String storageMethod = config.getNode("storage", "method").getString("sqlite");
+        String storageAddress = config.getNode("storage", "data", "address").getString("127.0.0.1:3306");
+        String storageDatabase = config.getNode("storage", "data", "database").getString("anti_vpn");
+        String storagePrefix = config.getNode("storage", "data", "prefix").getString("avpn_");
+        String storageUser = config.getNode("storage", "data", "username").getString("");
+        String storagePass = config.getNode("storage", "data", "password").getString("");
+        boolean storageSSL = config.getNode("storage", "data", "ssl").getBoolean(false);
+        int storageMaxPoolSize = config.getNode("storage", "settings", "max-pool-size").getInt(4);
+        int storageMinIdle = config.getNode("storage", "settings", "min-idle").getInt(4);
+        long storageMaxLifetime = config.getNode("storage", "settings", "max-lifetime").getLong(1800000L);
+        long storageTimeout = config.getNode("storage", "settings", "timeout").getLong(5000L);
+        boolean storageUnicode = config.getNode("storage", "settings", "unicode").getBoolean(true);
+        String storageEncoding = config.getNode("storage", "settings", "encoding").getString("utf8");
+
+        config.removeChild("storage");
+
+        config.getNode("storage", "engines", "mysql", "enabled").setValue(storageMethod.equalsIgnoreCase("mysql"));
+        config.getNode("storage", "engines", "mysql", "connection", "address").setValue(storageAddress);
+        config.getNode("storage", "engines", "mysql", "connection", "database").setValue(storageDatabase);
+        config.getNode("storage", "engines", "mysql", "connection", "prefix").setValue(storagePrefix);
+        config.getNode("storage", "engines", "mysql", "connection", "username").setValue(storageUser);
+        config.getNode("storage", "engines", "mysql", "connection", "password").setValue(storagePass);
+        config.getNode("storage", "engines", "mysql", "connection", "options").setValue("useSSL=" + storageSSL + "&useUnicode=" + storageUnicode + "&characterEncoding=" + storageEncoding);
+        config.getNode("storage", "engines", "redis", "enabled").setValue(Boolean.FALSE);
+        config.getNode("storage", "engines", "redis", "connection", "address").setValue("127.0.0.1:6379");
+        config.getNode("storage", "engines", "redis", "connection", "password").setValue("");
+        config.getNode("storage", "engines", "redis", "connection", "prefix").setValue("avpn:");
+        config.getNode("storage", "engines", "sqlite", "enabled").setValue(storageMethod.equalsIgnoreCase("sqlite"));
+        config.getNode("storage", "engines", "sqlite", "connection", "file").setValue(storageDatabase + ".db");
+        config.getNode("storage", "engines", "sqlite", "connection", "prefix").setValue(storagePrefix);
+        config.getNode("storage", "engines", "sqlite", "connection", "options").setValue("useUnicode=" + storageUnicode + "&characterEncoding=" + storageEncoding);
+        config.getNode("storage", "settings", "max-pool-size").setValue(storageMaxPoolSize);
+        config.getNode("storage", "settings", "min-idle").setValue(storageMinIdle);
+        config.getNode("storage", "settings", "max-lifetime").setValue(storageMaxLifetime);
+        config.getNode("storage", "settings", "timeout").setValue(storageTimeout);
+        config.getNode("storage", "order").setValue(Arrays.asList("mysql", "redis", "sqlite"));
+
+        // Move messaging
+        boolean redisEnabled = config.getNode("redis", "enabled").getBoolean(false);
+        String redisAddress = config.getNode("redis", "address").getString("127.0.0.1:6379");
+        String redisPass = config.getNode("redis", "password").getString("");
+        boolean rabbitEnabled = config.getNode("rabbitmq", "enabled").getBoolean(false);
+        String rabbitAddress = config.getNode("rabbitmq", "address").getString("127.0.0.1:5672");
+        String rabbitUser = config.getNode("rabbitmq", "username").getString("guest");
+        String rabbitPass = config.getNode("rabbitmq", "password").getString("guest");
+        int messagingMaxPoolSize = config.getNode("messaging", "settings", "max-pool-size").getInt(4);
+        int messagingMinIdle = config.getNode("messaging", "settings", "min-idle").getInt(4);
+        long messagingMaxLifetime = config.getNode("messaging", "settings", "max-lifetime").getLong(1800000L);
+        long messagingTimeout = config.getNode("messaging", "settings", "timeout").getLong(5000L);
+
+        config.removeChild("redis");
+        config.removeChild("rabbitmq");
+
+        config.getNode("messaging", "engines", "redis", "enabled").setValue(redisEnabled);
+        config.getNode("messaging", "engines", "redis", "connection", "address").setValue(redisAddress);
+        config.getNode("messaging", "engines", "redis", "connection", "password").setValue(redisPass);
+        config.getNode("messaging", "engines", "rabbitmq", "enabled").setValue(rabbitEnabled);
+        config.getNode("messaging", "engines", "rabbitmq", "connection", "address").setValue(rabbitAddress);
+        config.getNode("messaging", "engines", "rabbitmq", "connection", "v-host").setValue("/");
+        config.getNode("messaging", "engines", "rabbitmq", "connection", "username").setValue(rabbitUser);
+        config.getNode("messaging", "engines", "rabbitmq", "connection", "password").setValue(rabbitPass);
+        config.getNode("messaging", "settings", "max-pool-size").setValue(messagingMaxPoolSize);
+        config.getNode("messaging", "settings", "min-idle").setValue(messagingMinIdle);
+        config.getNode("messaging", "settings", "max-lifetime").setValue(messagingMaxLifetime);
+        config.getNode("messaging", "settings", "timeout").setValue(messagingTimeout);
+        config.getNode("messaging", "order").setValue(Arrays.asList("rabbitmq", "redis"));
+
+        // action->command to action->commands
+        String actionCommand = config.getNode("action", "command").getString("");
+        config.getNode("action").removeChild("command");
+        config.getNode("action", "commands").setValue(Collections.singleton(""));
+
+        // cacheTime & threads to connection->cache-time & threads
+        String cacheTime = config.getNode("cacheTime").getString("1minute");
+        int threads = config.getNode("threads").getInt(4);
+        config.removeChild("cacheTime");
+        config.removeChild("threads");
+        config.getNode("connection", "cache-time").setValue(cacheTime);
+        config.getNode("connection", "threads").setValue(threads);
+
+        // sources->cacheTime to sources->cache-time
+        String sourcesCacheTime = config.getNode("sources", "cacheTime").getString("6hours");
+        config.getNode("sources").removeChild("cacheTime");
+        config.getNode("sources", "cache-time").setValue(sourcesCacheTime);
+
+        // Version
+        config.getNode("version").setValue(4.9d);
     }
 }

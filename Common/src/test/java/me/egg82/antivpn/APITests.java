@@ -12,7 +12,6 @@ import me.egg82.antivpn.enums.SQLType;
 import me.egg82.antivpn.extended.CachedConfigValues;
 import me.egg82.antivpn.extended.Configuration;
 import me.egg82.antivpn.utils.ConfigUtil;
-import me.egg82.antivpn.utils.ServiceUtil;
 import me.egg82.antivpn.utils.TimeUtil;
 import ninja.egg82.service.ServiceLocator;
 import ninja.egg82.sql.SQL;

@@ -7,7 +7,6 @@ import me.egg82.antivpn.core.DataResult;
 import me.egg82.antivpn.core.SQLFetchResult;
 import me.egg82.antivpn.extended.CachedConfigValues;
 import me.egg82.antivpn.utils.ConfigUtil;
-import me.egg82.antivpn.utils.RedisUtil;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

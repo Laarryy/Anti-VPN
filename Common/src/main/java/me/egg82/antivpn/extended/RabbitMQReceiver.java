@@ -7,7 +7,6 @@ import java.util.concurrent.TimeoutException;
 import me.egg82.antivpn.APIException;
 import me.egg82.antivpn.services.InternalAPI;
 import me.egg82.antivpn.services.RabbitMQ;
-import me.egg82.antivpn.utils.RabbitMQUtil;
 import me.egg82.antivpn.utils.ValidationUtil;
 import ninja.egg82.json.JSONUtil;
 import org.json.simple.JSONObject;
