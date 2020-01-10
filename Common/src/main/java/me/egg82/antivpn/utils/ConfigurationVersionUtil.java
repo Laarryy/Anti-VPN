@@ -459,10 +459,20 @@ public class ConfigurationVersionUtil {
         config.getNode("messaging", "settings", "timeout").setValue(messagingTimeout);
         config.getNode("messaging", "order").setValue(Arrays.asList("rabbitmq", "redis"));
 
-        // action->command to action->commands
+        // action to action->vpn
+        String kickMessage = config.getNode("action", "kick-message").getString("&cPlease disconnect from your proxy or VPN before re-joining!");
+        String algorithmMethod = config.getNode("action", "algorithm", "method").getString("cascade");
+        double algorithmMinConsensus = config.getNode("action", "algorithm", "min-consensus").getDouble(0.6d);
         String actionCommand = config.getNode("action", "command").getString("");
+
+        config.getNode("action").removeChild("kick-message");
         config.getNode("action").removeChild("command");
-        config.getNode("action", "commands").setValue(Collections.singleton(""));
+        config.getNode("action").removeChild("algorithm");
+
+        config.getNode("action", "vpn", "kick-message").setValue(kickMessage);
+        config.getNode("action", "vpn", "commands").setValue(Collections.singleton(actionCommand));
+        config.getNode("action", "vpn", "algorithm", "method").setValue(algorithmMethod);
+        config.getNode("action", "vpn", "algorithm", "min-consensus").setValue(algorithmMinConsensus);
 
         // cacheTime & threads to connection->cache-time & threads
         String cacheTime = config.getNode("cacheTime").getString("1minute");
@@ -476,6 +486,12 @@ public class ConfigurationVersionUtil {
         String sourcesCacheTime = config.getNode("sources", "cacheTime").getString("6hours");
         config.getNode("sources").removeChild("cacheTime");
         config.getNode("sources", "cache-time").setValue(sourcesCacheTime);
+
+        // Add mcleaks
+        config.getNode("mcleaks", "cache-time").setValue("1day");
+        config.getNode("mcleaks", "key").setValue("");
+        config.getNode("action", "mcleaks", "kick-message").setValue("&cPlease discontinue your use of an MCLeaks account!");
+        config.getNode("action", "mcleaks", "commands").setValue(Collections.singleton(""));
 
         // Version
         config.getNode("version").setValue(4.9d);

@@ -238,39 +238,58 @@ sources:
     # API key to use (Required for this service, free one available at https://ipwarner.com/register )
     key: ''
 
+mcleaks:
+  # The amount of time to globally cache results
+  # This should be as high as possible to avoid rate-limits but as low as possible to ensure results are always up-to-date and accurate
+  cache-time: '1day'
+  # Optional API key to use (e-mail API author, following instructions from "I'm frequently hitting your rate limit/my server has large influxes of players" at https://github.com/TheMrGong/MCLeaksApiClient#faq )
+  key: ''
+
 action:
-  # The kick message to display to players who are using VPNs
-  # If left blank, will not kick the player
-  kick-message: '&cPlease disconnect from your proxy or VPN before re-joining!'
-  # The commands that CONSOLE will run for players who are using VPNs
-  # Use %player% as a placeholder for the player's (real) name
-  # Use %uuid% as a placeholder for the player's uuid
-  # Use %ip% as a placeholder for the player's IP
-  # If left blank, will not run anything
-  commands:
-    - ''
+  vpn:
+    # The kick message to display to players who are using VPNs
+    # If left blank, will not kick the player
+    kick-message: '&cPlease disconnect from your proxy or VPN before re-joining!'
+    # The commands that CONSOLE will run for players who are using VPNs
+    # Use %player% as a placeholder for the player's (real) name
+    # Use %uuid% as a placeholder for the player's uuid
+    # Use %ip% as a placeholder for the player's IP
+    # If left blank, will not run anything
+    commands:
+      - ''
 
-  algorithm:
-    # The algorithm method
-    #
-    # Options:
-    # - Cascade
-    #   The plugin will go down the "sources" list, sequentially, until a valid source is found
-    #   It will then query that source and return the result
-    #   This will result in essentially "the first valid result" being returned
-    # - Consensus
-    #   The plugin will try every source in the "sources" list at once
-    #   It will then strip invalid results, and calculate the ratio of results from the remaining sources
-    #   This will result in essentially "the ratio of valid results" being returned
-    method: 'cascade'
+    algorithm:
+      # The algorithm method
+      #
+      # Options:
+      # - Cascade
+      #   The plugin will go down the "sources" list, sequentially, until a valid source is found
+      #   It will then query that source and return the result
+      #   This will result in essentially "the first valid result" being returned
+      # - Consensus
+      #   The plugin will try every source in the "sources" list at once
+      #   It will then strip invalid results, and calculate the ratio of results from the remaining sources
+      #   This will result in essentially "the ratio of valid results" being returned
+      method: 'cascade'
 
-    # Only used for "consensus" mode
-    # The minimum ratio of APIs that must agree before a player is kicked
-    # For example, if set to "0.6" then at least 60% of sources must agree that the IP is a VPN
-    # The value can range from 0 to 1, and will be clipped at those values
-    min-consensus: 0.6
+      # Only used for "consensus" mode
+      # The minimum ratio of APIs that must agree before a player is kicked
+      # For example, if set to "0.6" then at least 60% of sources must agree that the IP is a VPN
+      # The value can range from 0 to 1, and will be clipped at those values
+      min-consensus: 0.6
+  mcleaks:
+    # The kick message to display to players who are using MCLeaks accounts
+    # If left blank, will not kick the player
+    kick-message: '&cPlease discontinue your use of an MCLeaks account!'
+    # The commands that CONSOLE will run for players who are using MCLeaks accounts
+    # Use %player% as a placeholder for the player's (real) name
+    # Use %uuid% as a placeholder for the player's uuid
+    # Use %ip% as a placeholder for the player's IP
+    # If left blank, will not run anything
+    commands:
+      - ''
 
-  # IPs to ignore when checking for VPNs
+  # IPs to ignore when checking for VPNs and/or MCLeaks accounts
   ignore:
   - '127.0.0.1'
   - 'localhost'

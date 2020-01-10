@@ -270,6 +270,11 @@ public class BukkitBootstrap extends JavaPlugin {
                 .addRepository("https://nexus.egg82.me/repository/maven-central/")
                 .addRepository("http://central.maven.org/maven2/");
         buildInject(jedis, jarsDir, classLoader, "Jedis", 1);
+
+        Artifact.Builder mcleaks = Artifact.builder("me.gong", "mcleaks-api", "1.9.5-SNAPSHOT", cacheDir)
+                .addRepository("https://nexus.egg82.me/repository/wesjd/")
+                .addRepository("https://nexus.wesjd.net/repository/thirdparty/");
+        buildInject(mcleaks, jarsDir, classLoader, "MCLeaks API");
     }
 
     private void printLatest(String friendlyName) {

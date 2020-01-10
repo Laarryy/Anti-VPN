@@ -161,6 +161,10 @@
             <id>placeholderapi</id>
             <url>http://repo.extendedclip.com/content/repositories/placeholderapi/</url>
         </repository>
+        <repository>
+            <id>wesjd-repo</id>
+            <url>https://nexus.wesjd.net/repository/thirdparty/</url>
+        </repository>
 
         <repository>
             <id>papermc</id>
@@ -249,6 +253,12 @@
             <groupId>me.clip</groupId>
             <artifactId>placeholderapi</artifactId>
             <version>2.10.3</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>me.gong</groupId>
+            <artifactId>mcleaks-api</artifactId>
+            <version>1.9.5-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
 
