@@ -203,7 +203,7 @@ public class RabbitMQ implements Messaging {
         }
     }
 
-    public void sendVPN(UUID messageID, long id, long longIPID, String ip, Optional<Boolean> cascade, Optional<Double> consensus, long created) throws MessagingException {
+    public void sendPostVPN(UUID messageID, long id, long longIPID, String ip, Optional<Boolean> cascade, Optional<Double> consensus, long created) throws MessagingException {
         if (messageID == null) {
             throw new IllegalArgumentException("messageID cannot be null.");
         }
@@ -238,7 +238,7 @@ public class RabbitMQ implements Messaging {
         }
     }
 
-    public void sendMCLeaks(UUID messageID, long id, long longPlayerID, UUID playerID, boolean value, long created) throws MessagingException {
+    public void sendPostMCLeaks(UUID messageID, long id, long longPlayerID, UUID playerID, boolean value, long created) throws MessagingException {
         if (messageID == null) {
             throw new IllegalArgumentException("messageID cannot be null.");
         }
@@ -384,7 +384,7 @@ public class RabbitMQ implements Messaging {
 
     private void receivePostMCLeaks(AMQP.BasicProperties props, String json) throws UnsupportedEncodingException, ParseException, ClassCastException {
         if (props.getHeaders() == null || props.getHeaders().isEmpty()) {
-            logger.warn("Properties for received post VPN was null or empty.");
+            logger.warn("Properties for received post MCLeaks was null or empty.");
             return;
         }
         String sender = new String(((LongString) props.getHeaders().get("sender")).getBytes(), props.getContentEncoding());
