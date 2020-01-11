@@ -23,7 +23,7 @@ public class ValidationUtil {
     private ValidationUtil() {}
 
     public static boolean isValidIPRange(String range) {
-        if (range == null) {
+        if (range == null || range.isEmpty()) {
             return false;
         }
 
@@ -34,14 +34,14 @@ public class ValidationUtil {
     }
 
     public static boolean isValidIp(String ip) {
-        if (ip == null) {
+        if (ip == null || ip.isEmpty()) {
             return false;
         }
         return ipValidator.isValid(ip);
     }
 
     public static boolean isValidUuid(String uuid) {
-        if (uuid == null) {
+        if (uuid == null || uuid.isEmpty()) {
             return false;
         }
         return uuidValidator.matcher(uuid).matches();

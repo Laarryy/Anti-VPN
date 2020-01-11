@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import me.egg82.antivpn.apis.SourceAPI;
+import me.egg82.antivpn.enums.VPNAlgorithmMethod;
 import me.egg82.antivpn.messaging.Messaging;
 import me.egg82.antivpn.storage.Storage;
 import me.egg82.antivpn.utils.TimeUtil;
@@ -45,11 +46,23 @@ public class CachedConfigValues {
     private long timeout = 5000L;
     public long getTimeout() { return timeout; }
 
+    private String vpnKickMessage = "&cPlease disconnect from your proxy or VPN before re-joining!";
+    public String getVPNKickMessage() { return vpnKickMessage; }
+
     private ImmutableList<String> vpnActionCommands = ImmutableList.of();
     public ImmutableList<String> getVPNActionCommands() { return vpnActionCommands; }
 
+    private String mcleaksKickMessage = "&cPlease discontinue your use of an MCLeaks account!";
+    public String getMCLeaksKickMessage() { return mcleaksKickMessage; }
+
     private ImmutableList<String> mcleaksActionCommands = ImmutableList.of();
     public ImmutableList<String> getMCLeaksActionCommands() { return mcleaksActionCommands; }
+
+    private VPNAlgorithmMethod vpnAlgorithmMethod = VPNAlgorithmMethod.CASCADE;
+    public VPNAlgorithmMethod getVPNAlgorithmMethod() { return vpnAlgorithmMethod; }
+
+    private double vpnAlgorithmConsensus = 0.6d;
+    public double getVPNAlgorithmConsensus() { return vpnAlgorithmConsensus; }
 
     public static CachedConfigValues.Builder builder() { return new CachedConfigValues.Builder(); }
 
@@ -143,6 +156,14 @@ public class CachedConfigValues {
             return this;
         }
 
+        public CachedConfigValues.Builder vpnKickMessage(String value) {
+            if (value == null) {
+                throw new IllegalArgumentException("value cannot be null.");
+            }
+            values.vpnKickMessage = value;
+            return this;
+        }
+
         public CachedConfigValues.Builder vpnActionCommands(Collection<String> value) {
             if (value == null) {
                 throw new IllegalArgumentException("value cannot be null.");
@@ -151,11 +172,38 @@ public class CachedConfigValues {
             return this;
         }
 
+        public CachedConfigValues.Builder mcleaksKickMessage(String value) {
+            if (value == null) {
+                throw new IllegalArgumentException("value cannot be null.");
+            }
+            values.mcleaksKickMessage = value;
+            return this;
+        }
+
         public CachedConfigValues.Builder mcleaksActionCommands(Collection<String> value) {
             if (value == null) {
                 throw new IllegalArgumentException("value cannot be null.");
             }
             values.mcleaksActionCommands = ImmutableList.copyOf(value);
+            return this;
+        }
+
+        public CachedConfigValues.Builder vpnAlgorithmMethod(VPNAlgorithmMethod value) {
+            if (value == null) {
+                throw new IllegalArgumentException("value cannot be null.");
+            }
+            values.vpnAlgorithmMethod = value;
+            return this;
+        }
+
+        public CachedConfigValues.Builder vpnAlgorithmConsensus(double value) {
+            if (value < 0.0d) {
+                throw new IllegalArgumentException("value cannot be < 0.");
+            }
+            if (value > 1.0d) {
+                throw new IllegalArgumentException("value cannot be > 1.");
+            }
+            values.vpnAlgorithmConsensus = value;
             return this;
         }
 

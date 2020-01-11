@@ -1,31 +1,29 @@
 package me.egg82.antivpn;
 
-import co.aikar.commands.ConditionFailedException;
-import co.aikar.commands.PaperCommandManager;
-import co.aikar.commands.RegisteredCommand;
+import co.aikar.commands.*;
 import co.aikar.taskchain.BukkitTaskChainFactory;
 import co.aikar.taskchain.TaskChainFactory;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.SetMultimap;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.logging.Level;
+import me.egg82.antivpn.apis.SourceAPI;
 import me.egg82.antivpn.commands.AntiVPNCommand;
-import me.egg82.antivpn.events.AsyncPlayerPreLoginCacheHandler;
-import me.egg82.antivpn.events.PlayerLoginCheckHandler;
-import me.egg82.antivpn.events.PlayerLoginUpdateNotifyHandler;
+import me.egg82.antivpn.enums.Message;
+import me.egg82.antivpn.events.*;
 import me.egg82.antivpn.extended.CachedConfigValues;
 import me.egg82.antivpn.extended.Configuration;
 import me.egg82.antivpn.hooks.PlaceholderAPIHook;
 import me.egg82.antivpn.hooks.PlayerAnalyticsHook;
 import me.egg82.antivpn.hooks.PluginHook;
-import me.egg82.antivpn.services.AnalyticsHelper;
 import me.egg82.antivpn.services.GameAnalyticsErrorHandler;
+import me.egg82.antivpn.services.PluginMessageFormatter;
+import me.egg82.antivpn.services.StorageMessagingHandler;
+import me.egg82.antivpn.storage.Storage;
 import me.egg82.antivpn.utils.*;
 import ninja.egg82.events.BukkitEventSubscriber;
 import ninja.egg82.events.BukkitEvents;
@@ -35,8 +33,8 @@ import ninja.egg82.updater.SpigotUpdater;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
@@ -51,12 +49,16 @@ public class AntiVPN {
     private TaskChainFactory taskFactory;
     private PaperCommandManager commandManager;
 
+    private List<EventHolder> eventHolders = new ArrayList<>();
     private List<BukkitEventSubscriber<?>> events = new ArrayList<>();
+    private List<Integer> tasks = new ArrayList<>();
 
     private Metrics metrics = null;
 
     private final Plugin plugin;
     private final boolean isBukkit;
+
+    private CommandIssuer consoleCommandIssuer = null;
 
     public AntiVPN(Plugin plugin) {
         isBukkit = BukkitEnvironmentUtil.getEnvironment() == BukkitEnvironmentUtil.Environment.BUKKIT;
@@ -66,7 +68,7 @@ public class AntiVPN {
     public void onLoad() {
         if (BukkitEnvironmentUtil.getEnvironment() != BukkitEnvironmentUtil.Environment.PAPER) {
             log(Level.INFO, ChatColor.AQUA + "====================================");
-            log(Level.INFO, ChatColor.YELLOW + "Anti-VPN runs better on Paper!");
+            log(Level.INFO, ChatColor.YELLOW + "AntiVPN runs better on Paper!");
             log(Level.INFO, ChatColor.YELLOW + "https://whypaper.emc.gs/");
             log(Level.INFO, ChatColor.AQUA + "====================================");
         }
@@ -86,27 +88,54 @@ public class AntiVPN {
         commandManager = new PaperCommandManager(plugin);
         commandManager.enableUnstableAPI("help");
 
+        consoleCommandIssuer = commandManager.getCommandIssuer(plugin.getServer().getConsoleSender());
+
+        loadLanguages();
         loadServices();
         loadCommands();
         loadEvents();
+        loadTasks();
         loadHooks();
         loadMetrics();
 
-        plugin.getServer().getConsoleSender().sendMessage(LogUtil.getHeading() + ChatColor.GREEN + "Enabled");
+        int numEvents = events.size();
+        for (EventHolder eventHolder : eventHolders) {
+            numEvents += eventHolder.numEvents();
+        }
 
-        plugin.getServer().getConsoleSender().sendMessage(LogUtil.getHeading()
-                + ChatColor.YELLOW + "[" + ChatColor.AQUA + "Version " + ChatColor.WHITE + plugin.getDescription().getVersion() + ChatColor.YELLOW +  "] "
-                + ChatColor.YELLOW + "[" + ChatColor.WHITE + commandManager.getRegisteredRootCommands().size() + ChatColor.GOLD + " Commands" + ChatColor.YELLOW +  "] "
-                + ChatColor.YELLOW + "[" + ChatColor.WHITE + events.size() + ChatColor.BLUE + " Events" + ChatColor.YELLOW +  "]"
+        consoleCommandIssuer.sendInfo(Message.GENERAL__ENABLED);
+        consoleCommandIssuer.sendInfo(Message.GENERAL__LOAD,
+                "{version}", plugin.getDescription().getVersion(),
+                "{commands}", String.valueOf(commandManager.getRegisteredRootCommands().size()),
+                "{events}", String.valueOf(numEvents),
+                "{tasks}", String.valueOf(tasks.size())
         );
 
-        workPool.submit(this::checkUpdate);
+        workPool.execute(this::checkUpdate);
     }
 
     public void onDisable() {
-        taskFactory.shutdown(8, TimeUnit.SECONDS);
+        workPool.shutdown();
+        try {
+            if (!workPool.awaitTermination(4L, TimeUnit.SECONDS)) {
+                workPool.shutdownNow();
+            }
+        } catch (InterruptedException ignored) {
+            Thread.currentThread().interrupt();
+        }
+
+        taskFactory.shutdown(4, TimeUnit.SECONDS);
         commandManager.unregisterCommands();
 
+        for (int task : tasks) {
+            Bukkit.getScheduler().cancelTask(task);
+        }
+        tasks.clear();
+
+        for (EventHolder eventHolder : eventHolders) {
+            eventHolder.cancel();
+        }
+        eventHolders.clear();
         for (BukkitEventSubscriber<?> event : events) {
             event.cancel();
         }
@@ -115,18 +144,39 @@ public class AntiVPN {
         unloadHooks();
         unloadServices();
 
-        plugin.getServer().getConsoleSender().sendMessage(LogUtil.getHeading() + ChatColor.DARK_RED + "Disabled");
+        consoleCommandIssuer.sendInfo(Message.GENERAL__DISABLED);
 
         GameAnalyticsErrorHandler.close();
     }
 
-    private void loadServices() {
-        ConfigurationFileUtil.reloadConfig(plugin);
+    private void loadLanguages() {
+        BukkitLocales locales = commandManager.getLocales();
 
-        ServiceUtil.registerWorkPool();
-        ServiceUtil.registerRedis();
-        ServiceUtil.registerRabbit();
-        ServiceUtil.registerSQL();
+        try {
+            for (Locale locale : Locale.getAvailableLocales()) {
+                Optional<File> localeFile = LanguageFileUtil.getLanguage(plugin, locale);
+                if (localeFile.isPresent()) {
+                    commandManager.addSupportedLanguage(locale);
+                    locales.loadYamlLanguageFile(localeFile.get(), locale);
+                }
+            }
+        } catch (IOException | InvalidConfigurationException ex) {
+            logger.error(ex.getMessage(), ex);
+        }
+
+        locales.loadLanguages();
+        commandManager.usePerIssuerLocale(true, true);
+
+        commandManager.setFormat(MessageType.ERROR, new PluginMessageFormatter(commandManager, Message.GENERAL__HEADER));
+        commandManager.setFormat(MessageType.INFO, new PluginMessageFormatter(commandManager, Message.GENERAL__HEADER));
+        commandManager.setFormat(MessageType.ERROR, ChatColor.DARK_RED, ChatColor.YELLOW, ChatColor.AQUA, ChatColor.WHITE);
+        commandManager.setFormat(MessageType.INFO, ChatColor.WHITE, ChatColor.YELLOW, ChatColor.AQUA, ChatColor.GREEN, ChatColor.RED, ChatColor.GOLD, ChatColor.BLUE, ChatColor.GRAY);
+    }
+
+    private void loadServices() {
+        StorageMessagingHandler handler = new StorageMessagingHandler();
+        ServiceLocator.register(handler);
+        ConfigurationFileUtil.reloadConfig(plugin, handler, handler);
 
         ServiceLocator.register(new SpigotUpdater(plugin, 58291));
     }
@@ -137,15 +187,49 @@ public class AntiVPN {
                 throw new ConditionFailedException("Value must be a valid IP address.");
             }
         });
+
         commandManager.getCommandConditions().addCondition(String.class, "source", (c, exec, value) -> {
             Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
             if (!cachedConfig.isPresent()) {
                 return;
             }
-
-            if (!cachedConfig.get().getSources().contains(value)) {
-                throw new ConditionFailedException("Value must be a valid source name.");
+            for (Map.Entry<String, SourceAPI> kvp : cachedConfig.get().getSources().entrySet()) {
+                if (kvp.getKey().equalsIgnoreCase(value)) {
+                    return;
+                }
             }
+            throw new ConditionFailedException("Value must be a valid source name.");
+        });
+
+        commandManager.getCommandConditions().addCondition(String.class, "storage", (c, exec, value) -> {
+            String v = value.replace(" ", "_");
+            Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+            if (!cachedConfig.isPresent()) {
+                return;
+            }
+            for (Storage s : cachedConfig.get().getStorage()) {
+                if (s.getClass().getSimpleName().equalsIgnoreCase(v)) {
+                    return;
+                }
+            }
+            throw new ConditionFailedException("Value must be a valid storage name.");
+        });
+
+        commandManager.getCommandCompletions().registerCompletion("storage", c -> {
+            String lower = c.getInput().toLowerCase().replace(" ", "_");
+            Set<String> storage = new LinkedHashSet<>();
+            Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+            if (!cachedConfig.isPresent()) {
+                logger.error("Cached config could not be fetched.");
+                return ImmutableList.copyOf(storage);
+            }
+            for (Storage s : cachedConfig.get().getStorage()) {
+                String ss = s.getClass().getSimpleName();
+                if (ss.toLowerCase().startsWith(lower)) {
+                    storage.add(ss);
+                }
+            }
+            return ImmutableList.copyOf(storage);
         });
 
         commandManager.getCommandCompletions().registerCompletion("subcommand", c -> {
@@ -164,32 +248,34 @@ public class AntiVPN {
     }
 
     private void loadEvents() {
-        events.add(BukkitEvents.subscribe(plugin, AsyncPlayerPreLoginEvent.class, EventPriority.HIGH).handler(e -> new AsyncPlayerPreLoginCacheHandler().accept(e)));
-        events.add(BukkitEvents.subscribe(plugin, PlayerLoginEvent.class, EventPriority.LOWEST).handler(e -> new PlayerLoginCheckHandler().accept(e)));
-        events.add(BukkitEvents.subscribe(plugin, PlayerLoginEvent.class, EventPriority.LOW).handler(e -> new PlayerLoginUpdateNotifyHandler(plugin).accept(e)));
+        events.add(BukkitEvents.subscribe(plugin, PlayerLoginEvent.class, EventPriority.LOW).handler(e -> new PlayerLoginUpdateNotifyHandler(plugin, commandManager).accept(e)));
+        eventHolders.add(new PlayerEvents(plugin));
     }
+
+    private void loadTasks() { }
 
     private void loadHooks() {
         PluginManager manager = plugin.getServer().getPluginManager();
 
         if (manager.getPlugin("Plan") != null) {
-            plugin.getServer().getConsoleSender().sendMessage(LogUtil.getHeading() + ChatColor.GREEN + "Enabling support for Plan.");
+            consoleCommandIssuer.sendInfo(Message.GENERAL__HOOK_ENABLE, "{plugin}", "Plan");
             ServiceLocator.register(new PlayerAnalyticsHook());
         } else {
-            plugin.getServer().getConsoleSender().sendMessage(LogUtil.getHeading() + ChatColor.YELLOW + "Plan was not found. Personal analytics support has been disabled.");
+            consoleCommandIssuer.sendInfo(Message.GENERAL__HOOK_DISABLE, "{plugin}", "Plan");
         }
 
         if (manager.getPlugin("PlaceholderAPI") != null) {
-            plugin.getServer().getConsoleSender().sendMessage(LogUtil.getHeading() + ChatColor.GREEN + "Enabling support for PlaceholderAPI.");
+            consoleCommandIssuer.sendInfo(Message.GENERAL__HOOK_ENABLE, "{plugin}", "PlaceholderAPI");
             ServiceLocator.register(new PlaceholderAPIHook());
         } else {
-            plugin.getServer().getConsoleSender().sendMessage(LogUtil.getHeading() + ChatColor.YELLOW + "PlaceholderAPI was not found. Skipping support for placeholders.");
+            consoleCommandIssuer.sendInfo(Message.GENERAL__HOOK_DISABLE, "{plugin}", "PlaceholderAPI");
         }
     }
 
     private void loadMetrics() {
         metrics = new Metrics(plugin);
-        metrics.addCustomChart(new Metrics.SimplePie("sql", () -> {
+        // TODO: Add new metrics
+        /*metrics.addCustomChart(new Metrics.SimplePie("sql", () -> {
             Optional<Configuration> config = ConfigUtil.getConfig();
             if (!config.isPresent()) {
                 return null;
@@ -285,7 +371,7 @@ public class AntiVPN {
             }
 
             return (int) AnalyticsHelper.getBlocked();
-        }));
+        }));*/
     }
 
     private void checkUpdate() {
@@ -312,7 +398,7 @@ public class AntiVPN {
             }
 
             try {
-                plugin.getServer().getConsoleSender().sendMessage(LogUtil.getHeading() + ChatColor.AQUA + " has an " + ChatColor.GREEN + "update" + ChatColor.AQUA + " available! New version: " + ChatColor.YELLOW + updater.getLatestVersion().get());
+                consoleCommandIssuer.sendInfo(Message.GENERAL__UPDATE, "{version}", updater.getLatestVersion().get());
             } catch (ExecutionException ex) {
                 logger.error(ex.getMessage(), ex);
             } catch (InterruptedException ex) {
@@ -327,7 +413,9 @@ public class AntiVPN {
             Thread.currentThread().interrupt();
         }
 
-        workPool.submit(this::checkUpdate);
+        try {
+            workPool.execute(this::checkUpdate);
+        } catch (RejectedExecutionException ignored) { }
     }
 
     private void unloadHooks() {
@@ -338,10 +426,13 @@ public class AntiVPN {
     }
 
     public void unloadServices() {
-        ServiceUtil.unregisterWorkPool();
-        ServiceUtil.unregisterRedis();
-        ServiceUtil.unregisterRabbit();
-        ServiceUtil.unregisterSQL();
+        Optional<StorageMessagingHandler> storageMessagingHandler;
+        try {
+            storageMessagingHandler = ServiceLocator.getOptional(StorageMessagingHandler.class);
+        } catch (IllegalAccessException | InstantiationException ex) {
+            storageMessagingHandler = Optional.empty();
+        }
+        storageMessagingHandler.ifPresent(StorageMessagingHandler::close);
     }
 
     private void log(Level level, String message) {

@@ -7,6 +7,7 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 import me.egg82.antivpn.VPNAPI;
 import me.egg82.antivpn.apis.SourceAPI;
+import me.egg82.antivpn.enums.VPNAlgorithmMethod;
 import me.egg82.antivpn.extended.CachedConfigValues;
 import me.egg82.antivpn.extended.Configuration;
 import me.egg82.antivpn.messaging.Messaging;
@@ -182,10 +183,44 @@ public class ConfigurationFileUtil {
             logger.info(LogUtil.getHeading() + ChatColor.YELLOW + "Memory cache time: " + ChatColor.WHITE + cacheTime.get().getMillis() + "ms");
         }
 
+        List<String> vpnActionCommands;
+        try {
+            vpnActionCommands = new ArrayList<>(config.getNode("action", "vpn", "commands").getList(TypeToken.of(String.class)));
+        } catch (ObjectMappingException ex) {
+            logger.error(ex.getMessage(), ex);
+            vpnActionCommands = new ArrayList<>();
+        }
+        vpnActionCommands.removeIf(action -> action == null || action.isEmpty());
 
+        if (debug) {
+            for (String action : vpnActionCommands) {
+                logger.info(LogUtil.getHeading() + ChatColor.YELLOW + "Including command action for VPN usage: " + ChatColor.WHITE + action);
+            }
+        }
 
+        List<String> mcleaksActionCommands;
+        try {
+            mcleaksActionCommands = new ArrayList<>(config.getNode("action", "mcleaks", "commands").getList(TypeToken.of(String.class)));
+        } catch (ObjectMappingException ex) {
+            logger.error(ex.getMessage(), ex);
+            mcleaksActionCommands = new ArrayList<>();
+        }
+        mcleaksActionCommands.removeIf(action -> action == null || action.isEmpty());
 
+        if (debug) {
+            for (String action : mcleaksActionCommands) {
+                logger.info(LogUtil.getHeading() + ChatColor.YELLOW + "Including command action for MCLeaks usage: " + ChatColor.WHITE + action);
+            }
+        }
 
+        VPNAlgorithmMethod vpnAlgorithmMethod = VPNAlgorithmMethod.getByName(config.getNode("action", "vpn", "algorithm", "method").getString("cascade"));
+        if (vpnAlgorithmMethod == null) {
+            logger.warn("action.vpn.algorithm.method is not a valid type. Using default value.");
+            vpnAlgorithmMethod = VPNAlgorithmMethod.CASCADE;
+        }
+
+        double vpnAlgorithmConsensus = config.getNode("action", "vpn", "algorithm", "min-consensus").getDouble(0.6d);
+        vpnAlgorithmConsensus = Math.max(0.0d, Math.min(1.0d, vpnAlgorithmConsensus));
 
         CachedConfigValues cachedValues = CachedConfigValues.builder()
                 .debug(debug)
@@ -198,8 +233,12 @@ public class ConfigurationFileUtil {
                 .cacheTime(cacheTime.get())
                 .threads(config.getNode("connection", "threads").getInt(4))
                 .timeout(config.getNode("connection", "timeout").getLong(5000L))
+                .vpnKickMessage(config.getNode("action", "vpn", "kick-message").getString("&cPlease disconnect from your proxy or VPN before re-joining!"))
                 .vpnActionCommands(vpnActionCommands)
+                .mcleaksKickMessage(config.getNode("action", "mcleaks", "kick-message").getString("&cPlease discontinue your use of an MCLeaks account!"))
                 .mcleaksActionCommands(mcleaksActionCommands)
+                .vpnAlgorithmMethod(vpnAlgorithmMethod)
+                .vpnAlgorithmConsensus(vpnAlgorithmConsensus)
                 .build();
 
         ConfigUtil.setConfiguration(config, cachedValues);
@@ -282,8 +321,8 @@ public class ConfigurationFileUtil {
                         logger.error("Could not create MySQL instance.", ex);
                     }
                     break;
-                }
-                case "redis": {
+                }// TODO: Add Redis
+                /*case "redis": {
                     if (!enginesNode.getNode(name, "enabled").getBoolean()) {
                         if (debug) {
                             logger.info(LogUtil.getHeading() + ChatColor.DARK_RED + name + " is disabled. Removing.");
@@ -305,7 +344,7 @@ public class ConfigurationFileUtil {
                         logger.error("Could not create Redis instance.", ex);
                     }
                     break;
-                }
+                }*/
                 case "sqlite": {
                     if (!enginesNode.getNode(name, "enabled").getBoolean()) {
                         if (debug) {
