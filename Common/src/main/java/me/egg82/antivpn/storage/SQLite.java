@@ -2,8 +2,8 @@ package me.egg82.antivpn.storage;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
-import com.mysql.cj.exceptions.MysqlErrorNumbers;
 import com.zaxxer.hikari.HikariConfig;
+import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.sql.SQLException;
@@ -17,8 +17,9 @@ import ninja.egg82.core.SQLQueryResult;
 import ninja.egg82.sql.SQL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.sqlite.SQLiteErrorCode;
 
-public class MySQL extends AbstractSQL {
+public class SQLite extends AbstractSQL {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final LoadingCache<String, Long> longIPIDCache = Caffeine.newBuilder().build(this::getLongIPIDExpensive);
@@ -28,7 +29,7 @@ public class MySQL extends AbstractSQL {
     private volatile long lastMCLeaksID;
     private StorageHandler handler;
 
-    private MySQL() { }
+    private SQLite() { }
 
     private volatile boolean closed = false;
 
@@ -39,10 +40,10 @@ public class MySQL extends AbstractSQL {
 
     public boolean isClosed() { return closed || sql.isClosed(); }
 
-    public static MySQL.Builder builder(StorageHandler handler) { return new MySQL.Builder(handler); }
+    public static SQLite.Builder builder(StorageHandler handler) { return new SQLite.Builder(handler); }
 
     public static class Builder {
-        private final MySQL result = new MySQL();
+        private final SQLite result = new SQLite();
         private final HikariConfig config = new HikariConfig();
 
         private Builder(StorageHandler handler) {
@@ -57,40 +58,16 @@ public class MySQL extends AbstractSQL {
             config.setAutoCommit(true);
             config.addDataSourceProperty("useLegacyDatetimeCode", "false");
             config.addDataSourceProperty("serverTimezone", "UTC");
-
-            // Optimizations
-            // http://assets.en.oreilly.com/1/event/21/Connector_J%20Performance%20Gems%20Presentation.pdf
-            // https://webcache.googleusercontent.com/search?q=cache:GqZCOIZxeK0J:assets.en.oreilly.com/1/event/21/Connector_J%2520Performance%2520Gems%2520Presentation.pdf+&cd=1&hl=en&ct=clnk&gl=us
-            config.addDataSourceProperty("cacheServerConfiguration", "true");
-            config.addDataSourceProperty("useLocalSessionState", "true");
-            config.addDataSourceProperty("useLocalTransactionState", "true");
-            config.addDataSourceProperty("rewriteBatchedStatements", "true");
-            config.addDataSourceProperty("useServerPrepStmts", "true");
-            config.addDataSourceProperty("cachePrepStmts", "true");
-            config.addDataSourceProperty("maintainTimeStats", "false");
-            config.addDataSourceProperty("useUnbufferedIO", "false");
-            config.addDataSourceProperty("useReadAheadInput", "false");
-            // https://github.com/brettwooldridge/HikariCP/wiki/MySQL-Configuration
-            config.addDataSourceProperty("prepStmtCacheSize", "250");
-            config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
-            config.addDataSourceProperty("cacheResultSetMetadata", "true");
-            config.addDataSourceProperty("elideSetAutoCommits", "true");
         }
 
-        public MySQL.Builder url(String address, int port, String database, String prefix) {
-            config.setJdbcUrl("jdbc:mysql://" + address + ":" + port + "/" + database);
-            result.database = database;
+        public SQLite.Builder file(File file, String prefix) {
+            config.setJdbcUrl("jdbc:sqlite:" + file.getAbsolutePath());
+            result.database = "";
             result.prefix = prefix;
             return this;
         }
 
-        public MySQL.Builder credentials(String user, String pass) {
-            config.setUsername(user);
-            config.setPassword(pass);
-            return this;
-        }
-
-        public MySQL.Builder options(String options) throws IOException {
+        public SQLite.Builder options(String options) throws IOException {
             options = options.charAt(0) == '?' ? options.substring(1) : options;
             Properties p = new Properties();
             p.load(new StringReader(options.replace("&", "\n")));
@@ -98,21 +75,21 @@ public class MySQL extends AbstractSQL {
             return this;
         }
 
-        public MySQL.Builder poolSize(int min, int max) {
+        public SQLite.Builder poolSize(int min, int max) {
             config.setMaximumPoolSize(max);
             config.setMinimumIdle(min);
             return this;
         }
 
-        public MySQL.Builder life(long lifetime, long timeout) {
+        public SQLite.Builder life(long lifetime, long timeout) {
             config.setMaxLifetime(lifetime);
             config.setConnectionTimeout(timeout);
             return this;
         }
 
-        public MySQL build() throws IOException, StorageException {
+        public SQLite build() throws IOException, StorageException {
             result.sql = new SQL(config);
-            SQLVersionUtil.conformVersion(result, "mysql");
+            SQLVersionUtil.conformVersion(result, "sqlite");
             result.lastVPNID = getLastVPNID();
             result.lastMCLeaksID = getLastMCLeaksID();
             return result;
@@ -149,7 +126,17 @@ public class MySQL extends AbstractSQL {
         Set<VPNResult> retVal = new LinkedHashSet<>();
         SQLQueryResult result;
         try {
-            result = sql.call("call `" + prefix + "get_vpn_queue_id`(?);", lastVPNID);
+            result = sql.query(
+                        "SELECT" +
+                        "  `v`.`id`," +
+                        "  `i`.`ip` AS `ip`," +
+                        "  `v`.`cascade`," +
+                        "  `v`.`consensus`," +
+                        "  `v`.`created`" +
+                        "FROM `{prefix}vpn_values` `v`" +
+                        "JOIN `{prefix}ips` `i` ON `i`.`id` = `v`.`ip_id`" +
+                        "WHERE `v`.`id` > ?;",
+                    lastVPNID);
         } catch (SQLException ex) {
             throw new StorageException(isAutomaticallyRecoverable(ex), ex);
         }
@@ -167,7 +154,16 @@ public class MySQL extends AbstractSQL {
         Set<MCLeaksResult> retVal = new LinkedHashSet<>();
         SQLQueryResult result;
         try {
-            result = sql.call("call `" + prefix + "get_mcleaks_queue_id`(?);", lastMCLeaksID);
+            result = sql.query(
+                    "SELECT" +
+                        "  `v`.`id`," +
+                        "  `p`.`uuid` AS `player_id`," +
+                        "  `v`.`value`," +
+                        "  `v`.`created`" +
+                        "FROM `{prefix}mcleaks_values` `v`" +
+                        "JOIN `{prefix}players` `p` ON `p`.`id` = `v`.`player_id`" +
+                        "WHERE `v`.`id` > ?;",
+                    lastMCLeaksID);
         } catch (SQLException ex) {
             throw new StorageException(isAutomaticallyRecoverable(ex), ex);
         }
@@ -192,7 +188,17 @@ public class MySQL extends AbstractSQL {
         long longIPID = longIPIDCache.get(ip);
         SQLQueryResult result;
         try {
-            result = sql.call("call `" + prefix + "get_vpn_ip`(?);", longIPID);
+            result = sql.query(
+                    "SELECT" +
+                        "  `v`.`id`," +
+                        "  `i`.`ip` AS `ip`," +
+                        "  `v`.`cascade`," +
+                        "  `v`.`consensus`," +
+                        "  `v`.`created`" +
+                        "FROM `{prefix}vpn_values` `v`" +
+                        "JOIN `{prefix}ips` `i` ON `i`.`id` = `v`.`ip_id`" +
+                        "WHERE `v`.`ip_id` = ?;",
+                    longIPID);
         } catch (SQLException ex) {
             throw new StorageException(isAutomaticallyRecoverable(ex), ex);
         }
@@ -210,7 +216,16 @@ public class MySQL extends AbstractSQL {
         long longPlayerID = longPlayerIDCache.get(playerID);
         SQLQueryResult result;
         try {
-            result = sql.call("call `" + prefix + "get_mcleaks_player`(?);", longPlayerID);
+            result = sql.query(
+                    "SELECT" +
+                        "  `v`.`id`," +
+                        "  `p`.`uuid` AS `player_id`," +
+                        "  `v`.`value`," +
+                        "  `v`.`created`" +
+                        "FROM `{prefix}mcleaks_values` `v`" +
+                        "JOIN `{prefix}players` `p` ON `p`.`id` = `v`.`player_id`" +
+                        "WHERE `v`.`player_id` = ?;",
+                    longPlayerID);
         } catch (SQLException ex) {
             throw new StorageException(isAutomaticallyRecoverable(ex), ex);
         }
@@ -262,7 +277,7 @@ public class MySQL extends AbstractSQL {
                 longIPID,
                 cascade,
                 consensus,
-                ((Timestamp) query.getData()[0][0]).getTime()
+                getTime(query.getData()[0][0]).getTime()
         );
     }
 
@@ -298,13 +313,13 @@ public class MySQL extends AbstractSQL {
                 id,
                 longPlayerID,
                 value,
-                ((Timestamp) query.getData()[0][0]).getTime()
+                getTime(query.getData()[0][0]).getTime()
         );
     }
 
     public void setIPRaw(long longIPID, String ip) throws StorageException {
         try {
-            sql.execute("INSERT INTO `" + prefix + "ips` (`id`, `ip`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `ip`=?, `uuid`=?;", longIPID, ip, longIPID, ip);
+            sql.execute("INSERT INTO `" + prefix + "ips` (`id`, `ip`) VALUES (?, ?) ON CONFLICT(`id`) DO UPDATE `ip`=?, ON CONFLICT(`ip`) DO UPDATE SET `id`=?;", longIPID, ip, ip, longIPID);
         } catch (SQLException ex) {
             throw new StorageException(isAutomaticallyRecoverable(ex), ex);
         }
@@ -313,7 +328,7 @@ public class MySQL extends AbstractSQL {
 
     public void setPlayerRaw(long longPlayerID, UUID playerID) throws StorageException {
         try {
-            sql.execute("INSERT INTO `" + prefix + "players` (`id`, `uuid`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `id`=?, `uuid`=?;", longPlayerID, playerID.toString(), longPlayerID, playerID.toString());
+            sql.execute("INSERT INTO `" + prefix + "players` (`id`, `uuid`) VALUES (?, ?) ON CONFLICT(`id`) DO UPDATE SET `uuid`=? ON CONFLICT(`uuid`) DO UPDATE SET `id`=?;", longPlayerID, playerID.toString(), playerID.toString(), longPlayerID);
         } catch (SQLException ex) {
             throw new StorageException(isAutomaticallyRecoverable(ex), ex);
         }
@@ -322,7 +337,7 @@ public class MySQL extends AbstractSQL {
 
     public void postVPNRaw(long id, long longIPID, Optional<Boolean> cascade, Optional<Double> consensus, long created) throws StorageException {
         try {
-            sql.execute("INSERT IGNORE INTO `" + prefix + "vpn_values` (`id`, `ip_id`, `cascade`, `consensus`, `created`) VALUES (?, ?, ?, ?, ?);", id, longIPID, cascade.orElse(null), consensus.orElse(null), new Timestamp(created));
+            sql.execute("INSERT OR IGNORE INTO `" + prefix + "vpn_values` (`id`, `ip_id`, `cascade`, `consensus`, `created`) VALUES (?, ?, ?, ?, ?);", id, longIPID, cascade.orElse(null), consensus.orElse(null), new Timestamp(created));
         } catch (SQLException ex) {
             throw new StorageException(isAutomaticallyRecoverable(ex), ex);
         }
@@ -330,13 +345,13 @@ public class MySQL extends AbstractSQL {
 
     public void postMCLeaksRaw(long id, long longPlayerID, boolean value, long created) throws StorageException {
         try {
-            sql.execute("INSERT IGNORE INTO `" + prefix + "mcleaks_values` (`id`, `player_id`, `value`, `created`) VALUES (?, ?, ?, ?);", id, longPlayerID, value, new Timestamp(created));
+            sql.execute("INSERT OR IGNORE INTO `" + prefix + "mcleaks_values` (`id`, `player_id`, `value`, `created`) VALUES (?, ?, ?, ?);", id, longPlayerID, value, new Timestamp(created));
         } catch (SQLException ex) {
             throw new StorageException(isAutomaticallyRecoverable(ex), ex);
         }
     }
 
-    protected void setKey(String key, String value) throws SQLException { sql.execute("INSERT INTO `" + prefix + "data` (`key`, `value`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `value`=?;", key, value, value); }
+    protected void setKey(String key, String value) throws SQLException { sql.execute("INSERT INTO `" + prefix + "data` (`key`, `value`) VALUES (?, ?) ON CONFLICT(`key`) DO UPDATE SET `value`=?;", key, value, value); }
 
     protected double getDouble(String key) throws SQLException {
         SQLQueryResult result = sql.query("SELECT `value` FROM `" + prefix + "data` WHERE `key`=?;", key);
@@ -380,8 +395,9 @@ public class MySQL extends AbstractSQL {
         // TODO: Batch execute
         try {
             if (truncate) {
-                sql.execute("SET FOREIGN_KEY_CHECKS = 0;");
-                sql.execute("TRUNCATE `" + prefix + "ips`;");
+                sql.execute("PRAGMA foreign_keys = OFF;");
+                sql.execute("DELETE FROM `" + prefix + "ips`;");
+                sql.execute("VACUUM;");
                 longIPIDCache.invalidateAll();
             }
             for (IPResult ip : ips) {
@@ -389,7 +405,7 @@ public class MySQL extends AbstractSQL {
                 longIPIDCache.put(ip.getIP(), ip.getLongIPID());
             }
             if (truncate) {
-                sql.execute("SET FOREIGN_KEY_CHECKS = 1;");
+                sql.execute("PRAGMA foreign_keys = ON;");
             }
         } catch (SQLException ex) {
             throw new StorageException(isAutomaticallyRecoverable(ex), ex);
@@ -426,8 +442,9 @@ public class MySQL extends AbstractSQL {
         // TODO: Batch execute
         try {
             if (truncate) {
-                sql.execute("SET FOREIGN_KEY_CHECKS = 0;");
-                sql.execute("TRUNCATE `" + prefix + "players`;");
+                sql.execute("PRAGMA foreign_keys = OFF;");
+                sql.execute("DELETE FROM `" + prefix + "players`;");
+                sql.execute("VACUUM;");
                 longPlayerIDCache.invalidateAll();
             }
             for (PlayerResult player : players) {
@@ -435,7 +452,7 @@ public class MySQL extends AbstractSQL {
                 longPlayerIDCache.put(player.getPlayerID(), player.getLongPlayerID());
             }
             if (truncate) {
-                sql.execute("SET FOREIGN_KEY_CHECKS = 1;");
+                sql.execute("PRAGMA foreign_keys = ON;");
             }
         } catch (SQLException ex) {
             throw new StorageException(isAutomaticallyRecoverable(ex), ex);
@@ -458,7 +475,7 @@ public class MySQL extends AbstractSQL {
                     ((Number) row[1]).longValue(),
                     row[2] == null ? Optional.empty() : Optional.of(((Boolean) row[2])),
                     row[3] == null ? Optional.empty() : Optional.of(((Double) row[3])),
-                    ((Timestamp) row[4]).getTime()
+                    getTime(row[4]).getTime()
             ));
         }
 
@@ -469,14 +486,15 @@ public class MySQL extends AbstractSQL {
         // TODO: Batch execute
         try {
             if (truncate) {
-                sql.execute("SET FOREIGN_KEY_CHECKS = 0;");
-                sql.execute("TRUNCATE `" + prefix + "vpn_values`;");
+                sql.execute("PRAGMA foreign_keys = OFF;");
+                sql.execute("DELETE FROM `" + prefix + "vpn_values`;");
+                sql.execute("VACUUM;");
             }
             for (RawVPNResult value : values) {
                 sql.execute("INSERT INTO `" + prefix + "vpn_values` (`id`, `ip_id`, `cascade`, `consensus`, `created`) VALUES (?, ?, ?, ?, ?);", value.getID(), value.getIPID(), value.getCascade().orElse(null), value.getConsensus().orElse(null), new Timestamp(value.getCreated()));
             }
             if (truncate) {
-                sql.execute("SET FOREIGN_KEY_CHECKS = 1;");
+                sql.execute("PRAGMA foreign_keys = ON;");
             }
         } catch (SQLException ex) {
             throw new StorageException(isAutomaticallyRecoverable(ex), ex);
@@ -498,7 +516,7 @@ public class MySQL extends AbstractSQL {
                     ((Number) row[0]).longValue(),
                     ((Number) row[1]).longValue(),
                     ((Boolean) row[2]).booleanValue(),
-                    ((Timestamp) row[3]).getTime()
+                    getTime(row[3]).getTime()
             ));
         }
 
@@ -509,14 +527,15 @@ public class MySQL extends AbstractSQL {
         // TODO: Batch execute
         try {
             if (truncate) {
-                sql.execute("SET FOREIGN_KEY_CHECKS = 0;");
-                sql.execute("TRUNCATE `" + prefix + "mcleaks_values`;");
+                sql.execute("PRAGMA foreign_keys = OFF;");
+                sql.execute("DELETE FROM `" + prefix + "mcleaks_values`;");
+                sql.execute("VACUUM;");
             }
             for (RawMCLeaksResult value : values) {
                 sql.execute("INSERT INTO `" + prefix + "mcleaks_values` (`id`, `player_id`, `value`, `created`) VALUES (?, ?, ?, ?);", value.getID(), value.getLongPlayerID(), value.getValue(), new Timestamp(value.getCreated()));
             }
             if (truncate) {
-                sql.execute("SET FOREIGN_KEY_CHECKS = 1;");
+                sql.execute("PRAGMA foreign_keys = ON;");
             }
         } catch (SQLException ex) {
             throw new StorageException(isAutomaticallyRecoverable(ex), ex);
@@ -535,7 +554,7 @@ public class MySQL extends AbstractSQL {
                 ip,
                 row[2] == null ? Optional.empty() : Optional.of(((Boolean) row[2])),
                 row[3] == null ? Optional.empty() : Optional.of(((Double) row[3])),
-                ((Timestamp) row[4]).getTime()
+                getTime(row[4]).getTime()
         );
     }
 
@@ -550,7 +569,7 @@ public class MySQL extends AbstractSQL {
                 ((Number) row[0]).longValue(),
                 UUID.fromString(playerID),
                 ((Boolean) row[2]).booleanValue(),
-                ((Timestamp) row[3]).getTime()
+                getTime(row[3]).getTime()
         );
     }
 
@@ -588,19 +607,29 @@ public class MySQL extends AbstractSQL {
         return id;
     }
 
+    private Timestamp getTime(Object o) {
+        if (o instanceof String) {
+            try {
+                return Timestamp.valueOf((String) o);
+            } catch (IllegalArgumentException ignored) {
+                return new Timestamp(Long.valueOf((String) o));
+            }
+        } else if (o instanceof Number) {
+            return new Timestamp(((Number) o).longValue());
+        }
+        logger.warn("Could not parse time.");
+        return new Timestamp(0L);
+    }
+
     protected boolean isAutomaticallyRecoverable(SQLException ex) {
         if (
-                ex.getErrorCode() == MysqlErrorNumbers.ER_LOCK_WAIT_TIMEOUT
-                        || ex.getErrorCode() == MysqlErrorNumbers.ER_QUERY_TIMEOUT
-                        || ex.getErrorCode() == MysqlErrorNumbers.ER_CON_COUNT_ERROR
-                        || ex.getErrorCode() == MysqlErrorNumbers.ER_TOO_MANY_DELAYED_THREADS
-                        || ex.getErrorCode() == MysqlErrorNumbers.ER_BINLOG_PURGE_EMFILE
-                        || ex.getErrorCode() == MysqlErrorNumbers.ER_TOO_MANY_CONCURRENT_TRXS
-                        || ex.getErrorCode() == MysqlErrorNumbers.ER_OUTOFMEMORY
-                        || ex.getErrorCode() == MysqlErrorNumbers.ER_OUT_OF_SORTMEMORY
-                        || ex.getErrorCode() == MysqlErrorNumbers.ER_CANT_CREATE_THREAD
-                        || ex.getErrorCode() == MysqlErrorNumbers.ER_OUT_OF_RESOURCES
-                        || ex.getErrorCode() == MysqlErrorNumbers.ER_ENGINE_OUT_OF_MEMORY
+                ex.getErrorCode() == SQLiteErrorCode.SQLITE_BUSY.code
+                        || ex.getErrorCode() == SQLiteErrorCode.SQLITE_LOCKED.code
+                        || ex.getErrorCode() == SQLiteErrorCode.SQLITE_NOMEM.code
+                        || ex.getErrorCode() == SQLiteErrorCode.SQLITE_BUSY_RECOVERY.code
+                        || ex.getErrorCode() == SQLiteErrorCode.SQLITE_LOCKED_SHAREDCACHE.code
+                        || ex.getErrorCode() == SQLiteErrorCode.SQLITE_BUSY_SNAPSHOT.code
+                        || ex.getErrorCode() == SQLiteErrorCode.SQLITE_IOERR_NOMEM.code
         ) {
             return true;
         }
