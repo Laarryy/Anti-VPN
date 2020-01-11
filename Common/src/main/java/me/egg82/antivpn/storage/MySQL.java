@@ -456,8 +456,8 @@ public class MySQL extends AbstractSQL {
             retVal.add(new RawVPNResult(
                     ((Number) row[0]).longValue(),
                     ((Number) row[1]).longValue(),
-                    row[2] == null ? Optional.empty() : Optional.of(((Boolean) row[2])),
-                    row[3] == null ? Optional.empty() : Optional.of(((Double) row[3])),
+                    row[2] == null ? Optional.empty() : Optional.of((Boolean) row[2]),
+                    row[3] == null ? Optional.empty() : Optional.of(((Number) row[3]).doubleValue()),
                     ((Timestamp) row[4]).getTime()
             ));
         }
@@ -533,8 +533,8 @@ public class MySQL extends AbstractSQL {
         return new VPNResult(
                 ((Number) row[0]).longValue(),
                 ip,
-                row[2] == null ? Optional.empty() : Optional.of(((Boolean) row[2])),
-                row[3] == null ? Optional.empty() : Optional.of(((Double) row[3])),
+                row[2] == null ? Optional.empty() : Optional.of((Boolean) row[2]),
+                row[3] == null ? Optional.empty() : Optional.of(((Number) row[3]).doubleValue()),
                 ((Timestamp) row[4]).getTime()
         );
     }
