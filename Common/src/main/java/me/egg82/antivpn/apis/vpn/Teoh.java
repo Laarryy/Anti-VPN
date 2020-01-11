@@ -1,7 +1,8 @@
-package me.egg82.antivpn.apis;
+package me.egg82.antivpn.apis.vpn;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import java.io.IOException;
+import java.net.URL;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -13,7 +14,7 @@ import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class TeohAPI implements API {
+public class Teoh extends AbstractVPNAPI {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     public String getName() { return "teoh"; }
@@ -38,8 +39,8 @@ public class TeohAPI implements API {
 
         JSONObject json;
         try {
-            json = JSONWebUtil.getJsonObject("https://ip.teoh.io/api/vpn/" + ip, "egg82/AntiVPN");
-        } catch (IOException | ParseException ex) {
+            json = JSONWebUtil.getJSONObject(new URL("https://ip.teoh.io/api/vpn/" + ip), "GET", (int) getCachedConfig().getTimeout(), "egg82/AntiVPN");
+        } catch (IOException | ParseException | ClassCastException ex) {
             logger.error(ex.getMessage(), ex);
             throw new APIException(false, ex);
         }

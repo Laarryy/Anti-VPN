@@ -1,12 +1,10 @@
-package me.egg82.antivpn.apis;
+package me.egg82.antivpn.apis.vpn;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import me.egg82.antivpn.APIException;
-import me.egg82.antivpn.extended.Configuration;
-import me.egg82.antivpn.utils.ConfigUtil;
 import ninja.egg82.json.JSONWebUtil;
 import ninja.leaping.configurate.ConfigurationNode;
 import org.json.simple.JSONObject;
@@ -14,7 +12,7 @@ import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class IPHunterAPI implements API {
+public class IPHunter extends AbstractVPNAPI {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     public String getName() { return "iphunter"; }
@@ -40,8 +38,8 @@ public class IPHunterAPI implements API {
 
         JSONObject json;
         try {
-            json = JSONWebUtil.getJsonObject("https://www.iphunter.info:8082/v1/ip/" + ip, "egg82/AntiVPN", headers);
-        } catch (IOException | ParseException ex) {
+            json = JSONWebUtil.getJSONObject(new URL("https://www.iphunter.info:8082/v1/ip/" + ip), "GET", (int) getCachedConfig().getTimeout(), "egg82/AntiVPN", headers);
+        } catch (IOException | ParseException | ClassCastException ex) {
             logger.error(ex.getMessage(), ex);
             throw new APIException(false, ex);
         }
@@ -65,14 +63,5 @@ public class IPHunterAPI implements API {
 
         int block = ((Number) data.get("block")).intValue();
         return block == blockType;
-    }
-
-    private ConfigurationNode getSourceConfigNode() throws APIException {
-        Optional<Configuration> config = ConfigUtil.getConfig();
-        if (!config.isPresent()) {
-            throw new APIException(true, "Could not get configuration.");
-        }
-
-        return config.get().getNode("sources", getName());
     }
 }

@@ -1,10 +1,8 @@
-package me.egg82.antivpn.apis;
+package me.egg82.antivpn.apis.vpn;
 
 import java.io.IOException;
-import java.util.Optional;
+import java.net.URL;
 import me.egg82.antivpn.APIException;
-import me.egg82.antivpn.extended.Configuration;
-import me.egg82.antivpn.utils.ConfigUtil;
 import ninja.egg82.json.JSONWebUtil;
 import ninja.leaping.configurate.ConfigurationNode;
 import org.json.simple.JSONObject;
@@ -12,7 +10,7 @@ import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class GetIPIntelAPI implements API {
+public class GetIPIntel extends AbstractVPNAPI {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     public String getName() { return "getipintel"; }
@@ -28,8 +26,8 @@ public class GetIPIntelAPI implements API {
 
         JSONObject json;
         try {
-            json = JSONWebUtil.getJsonObject("https://check.getipintel.net/check.php?ip=" + ip + "&contact=" + sourceConfigNode.getNode("contact").getString("") + "&format=json&flags=b", "egg82/AntiVPN");
-        } catch (IOException | ParseException ex) {
+            json = JSONWebUtil.getJSONObject(new URL("https://check.getipintel.net/check.php?ip=" + ip + "&contact=" + sourceConfigNode.getNode("contact").getString("") + "&format=json&flags=b"), "GET", (int) getCachedConfig().getTimeout(), "egg82/AntiVPN");
+        } catch (IOException | ParseException | ClassCastException ex) {
             logger.error(ex.getMessage(), ex);
             throw new APIException(false, ex);
         }
@@ -43,14 +41,5 @@ public class GetIPIntelAPI implements API {
         }
 
         return retVal >= sourceConfigNode.getNode("threshold").getDouble();
-    }
-
-    private ConfigurationNode getSourceConfigNode() throws APIException {
-        Optional<Configuration> config = ConfigUtil.getConfig();
-        if (!config.isPresent()) {
-            throw new APIException(true, "Could not get configuration.");
-        }
-
-        return config.get().getNode("sources", getName());
     }
 }

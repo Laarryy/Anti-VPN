@@ -1,10 +1,8 @@
-package me.egg82.antivpn.apis;
+package me.egg82.antivpn.apis.vpn;
 
 import java.io.IOException;
-import java.util.Optional;
+import java.net.URL;
 import me.egg82.antivpn.APIException;
-import me.egg82.antivpn.extended.Configuration;
-import me.egg82.antivpn.utils.ConfigUtil;
 import ninja.egg82.json.JSONWebUtil;
 import ninja.leaping.configurate.ConfigurationNode;
 import org.json.simple.JSONObject;
@@ -12,12 +10,12 @@ import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class IP2ProxyAPI implements API {
+public class IP2Proxy extends AbstractVPNAPI {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     public String getName() { return "ip2proxy"; }
 
-    public boolean isKeyRequired() { return false; }
+    public boolean isKeyRequired() { return true; }
 
     public boolean getResult(String ip) throws APIException {
         if (ip == null) {
@@ -33,8 +31,8 @@ public class IP2ProxyAPI implements API {
 
         JSONObject json;
         try {
-            json = JSONWebUtil.getJsonObject("https://api.ip2proxy.com/?ip=" + ip + "&key=" + key + "&package=PX1&format=json", "egg82/AntiVPN");
-        } catch (IOException | ParseException ex) {
+            json = JSONWebUtil.getJSONObject(new URL("https://api.ip2proxy.com/?ip=" + ip + "&key=" + key + "&package=PX1&format=json"), "GET", (int) getCachedConfig().getTimeout(), "egg82/AntiVPN");
+        } catch (IOException | ParseException | ClassCastException ex) {
             logger.error(ex.getMessage(), ex);
             throw new APIException(false, "Could not get result from " + getName());
         }
@@ -53,14 +51,5 @@ public class IP2ProxyAPI implements API {
         String proxy = (String) json.get("isProxy");
 
         return proxy.equalsIgnoreCase("YES");
-    }
-
-    private ConfigurationNode getSourceConfigNode() throws APIException {
-        Optional<Configuration> config = ConfigUtil.getConfig();
-        if (!config.isPresent()) {
-            throw new APIException(true, "Could not get configuration.");
-        }
-
-        return config.get().getNode("sources", getName());
     }
 }

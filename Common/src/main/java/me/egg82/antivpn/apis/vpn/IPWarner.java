@@ -1,10 +1,8 @@
-package me.egg82.antivpn.apis;
+package me.egg82.antivpn.apis.vpn;
 
 import java.io.IOException;
-import java.util.Optional;
+import java.net.URL;
 import me.egg82.antivpn.APIException;
-import me.egg82.antivpn.extended.Configuration;
-import me.egg82.antivpn.utils.ConfigUtil;
 import ninja.egg82.json.JSONWebUtil;
 import ninja.leaping.configurate.ConfigurationNode;
 import org.json.simple.JSONObject;
@@ -12,7 +10,7 @@ import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class IPWarnerAPI implements API {
+public class IPWarner extends AbstractVPNAPI {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     public String getName() { return "ipwarner"; }
@@ -33,13 +31,13 @@ public class IPWarnerAPI implements API {
 
         JSONObject json;
         try {
-            json = JSONWebUtil.getJsonObject("https://api.ipwarner.com/" + key + "/" + ip, "egg82/AntiVPN");
-        } catch (IOException | ParseException ex) {
+            json = JSONWebUtil.getJSONObject(new URL("https://api.ipwarner.com/" + key + "/" + ip), "GET", (int) getCachedConfig().getTimeout(), "egg82/AntiVPN");
+        } catch (IOException | ParseException | ClassCastException ignored) {
             try {
-                json = JSONWebUtil.getJsonObject("http://api.ipwarner.com/" + key + "/" + ip, "egg82/AntiVPN"); // Temporary (hopefully) hack
-            } catch (IOException | ParseException ex2) {
-                logger.error(ex.getMessage(), ex2);
-                throw new APIException(false, ex2);
+                json = JSONWebUtil.getJSONObject(new URL("http://api.ipwarner.com/" + key + "/" + ip), "GET", (int) getCachedConfig().getTimeout(), "egg82/AntiVPN"); // Temporary (hopefully) hack
+            } catch (IOException | ParseException | ClassCastException ex) {
+                logger.error(ex.getMessage(), ex);
+                throw new APIException(false, ex);
             }
         }
         if (json == null || json.get("goodIp") == null) {
@@ -52,14 +50,5 @@ public class IPWarnerAPI implements API {
         }
 
         return retVal == 1;
-    }
-
-    private ConfigurationNode getSourceConfigNode() throws APIException {
-        Optional<Configuration> config = ConfigUtil.getConfig();
-        if (!config.isPresent()) {
-            throw new APIException(true, "Could not get configuration.");
-        }
-
-        return config.get().getNode("sources", getName());
     }
 }
