@@ -23,7 +23,7 @@ import:
   same_storage: "The specified master and slave are the same!"
   no_master: "The specified master storage was not found."
   no_slave: "The specified slave storage was not found."
-  ips: "<c2>Importing IPs..</c2>"
+  ips: "<c2>Importing IPs..</c2> <c8>[</c8><c2>ID:</c2> <c3>{id}</c3><c8>]</c8>"
   players: "<c2>Importing players..</c2> <c8>[</c8><c2>ID:</c2> <c3>{id}</c3><c8>]</c8>"
   vpns: "<c2>Importing VPN data..</c2> <c8>[</c8><c2>ID:</c2> <c3>{id}</c3><c8>]</c8>"
   mcleaks: "<c2>Importing MCLeaks data..</c2> <c8>[</c8><c2>ID:</c2> <c3>{id}</c3><c8>]</c8>"

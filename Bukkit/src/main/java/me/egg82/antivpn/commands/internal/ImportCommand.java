@@ -5,7 +5,10 @@ import co.aikar.taskchain.TaskChain;
 import co.aikar.taskchain.TaskChainAbortAction;
 import java.util.Optional;
 import java.util.Set;
+import me.egg82.antivpn.core.IPResult;
 import me.egg82.antivpn.core.PlayerResult;
+import me.egg82.antivpn.core.RawMCLeaksResult;
+import me.egg82.antivpn.core.RawVPNResult;
 import me.egg82.antivpn.enums.Message;
 import me.egg82.antivpn.extended.CachedConfigValues;
 import me.egg82.antivpn.storage.Storage;
@@ -81,31 +84,22 @@ public class ImportCommand implements Runnable {
         Storage slave = cachedConfig.get().getStorage().get(slaveIndex);
 
         chain
-                .sync(() -> issuer.sendInfo(Message.IMPORT__LEVELS))
+                .sync(() -> issuer.sendInfo(Message.IMPORT__IPS, "{id}", "0"))
                 .<Boolean>asyncCallback((v, f) -> {
-                    try {
-                        slave.loadLevels(master.dumpLevels());
-                    } catch (StorageException ex) {
-                        logger.error("Could not import levels.", ex);
-                        f.accept(null);
-                        return;
-                    }
-                    f.accept(Boolean.TRUE);
-                })
-                .abortIfNull(new TaskChainAbortAction<Object, Object, Object>() {
-                    public void onAbort(TaskChain<?> chain, Object arg1) {
-                        issuer.sendError(Message.ERROR__INTERNAL);
-                    }
-                })
-                .sync(() -> issuer.sendInfo(Message.IMPORT__SERVERS))
-                .<Boolean>asyncCallback((v, f) -> {
-                    try {
-                        slave.loadServers(master.dumpServers());
-                    } catch (StorageException ex) {
-                        logger.error("Could not import servers.", ex);
-                        f.accept(null);
-                        return;
-                    }
+                    long start = 1L;
+                    Set<IPResult> ips;
+                    do {
+                        try {
+                            ips = master.dumpIPs(start, max);
+                            slave.loadIPs(ips, start == 1L);
+                        } catch (StorageException ex) {
+                            logger.error("Could not import IPs.", ex);
+                            f.accept(null);
+                            return;
+                        }
+                        issuer.sendInfo(Message.IMPORT__IPS, "{id}", String.valueOf(start + ips.size()));
+                        start += max;
+                    } while (ips.size() == max);
                     f.accept(Boolean.TRUE);
                 })
                 .abortIfNull(new TaskChainAbortAction<Object, Object, Object>() {
@@ -136,22 +130,45 @@ public class ImportCommand implements Runnable {
                         issuer.sendError(Message.ERROR__INTERNAL);
                     }
                 })
-                .sync(() -> issuer.sendInfo(Message.IMPORT__CHAT, "{id}", "0"))
+                .sync(() -> issuer.sendInfo(Message.IMPORT__VPNS, "{id}", "0"))
                 .<Boolean>asyncCallback((v, f) -> {
                     long start = 1L;
-                    Set<RawChatResult> chat;
+                    Set<RawVPNResult> vpns;
                     do {
                         try {
-                            chat = master.dumpChat(start, max);
-                            slave.loadChat(chat, start == 1L);
+                            vpns = master.dumpVPNValues(start, max);
+                            slave.loadVPNValues(vpns, start == 1L);
                         } catch (StorageException ex) {
-                            logger.error("Could not import chat.", ex);
+                            logger.error("Could not import VPN values.", ex);
                             f.accept(null);
                             return;
                         }
-                        issuer.sendInfo(Message.IMPORT__CHAT, "{id}", String.valueOf(start + chat.size()));
+                        issuer.sendInfo(Message.IMPORT__VPNS, "{id}", String.valueOf(start + vpns.size()));
                         start += max;
-                    } while (chat.size() == max);
+                    } while (vpns.size() == max);
+                    f.accept(Boolean.TRUE);
+                })
+                .abortIfNull(new TaskChainAbortAction<Object, Object, Object>() {
+                    public void onAbort(TaskChain<?> chain, Object arg1) {
+                        issuer.sendError(Message.ERROR__INTERNAL);
+                    }
+                })
+                .sync(() -> issuer.sendInfo(Message.IMPORT__MCLEAKS, "{id}", "0"))
+                .<Boolean>asyncCallback((v, f) -> {
+                    long start = 1L;
+                    Set<RawMCLeaksResult> mcleaks;
+                    do {
+                        try {
+                            mcleaks = master.dumpMCLeaksValues(start, max);
+                            slave.loadMCLeaksValues(mcleaks, start == 1L);
+                        } catch (StorageException ex) {
+                            logger.error("Could not import MCLeaks values.", ex);
+                            f.accept(null);
+                            return;
+                        }
+                        issuer.sendInfo(Message.IMPORT__MCLEAKS, "{id}", String.valueOf(start + mcleaks.size()));
+                        start += max;
+                    } while (mcleaks.size() == max);
                     f.accept(Boolean.TRUE);
                 })
                 .abortIfNull(new TaskChainAbortAction<Object, Object, Object>() {
