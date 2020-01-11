@@ -20,6 +20,9 @@ public class CachedConfigValues {
     private LongObjectPair<TimeUnit> sourceCacheTime = new LongObjectPair<>(6L, TimeUnit.HOURS);
     public long getSourceCacheTime() { return sourceCacheTime.getSecond().toMillis(sourceCacheTime.getFirst()); }
 
+    private LongObjectPair<TimeUnit> mcleaksCacheTime = new LongObjectPair<>(1L, TimeUnit.DAYS);
+    public long getMcleaksCacheTime() { return mcleaksCacheTime.getSecond().toMillis(mcleaksCacheTime.getFirst()); }
+
     private ImmutableSet<String> ignoredIps = ImmutableSet.of();
     public ImmutableSet<String> getIgnoredIps() { return ignoredIps; }
 
@@ -44,8 +47,11 @@ public class CachedConfigValues {
     private SQLType sqlType = SQLType.SQLite;
     public SQLType getSQLType() { return sqlType; }
 
-    private ImmutableList<String> actionCommands = ImmutableList.of();
-    public ImmutableList<String> getActionCommands() { return actionCommands; }
+    private ImmutableList<String> vpnActionCommands = ImmutableList.of();
+    public ImmutableList<String> getVPNActionCommands() { return vpnActionCommands; }
+
+    private ImmutableList<String> mcleaksActionCommands = ImmutableList.of();
+    public ImmutableList<String> getMCLeaksActionCommands() { return mcleaksActionCommands; }
 
     public static CachedConfigValues.Builder builder() { return new CachedConfigValues.Builder(); }
 
@@ -68,6 +74,15 @@ public class CachedConfigValues {
             }
 
             values.sourceCacheTime = new LongObjectPair<>(value, unit);
+            return this;
+        }
+
+        public CachedConfigValues.Builder mcleaksCacheTime(long value, TimeUnit unit) {
+            if (value <= 0L) {
+                throw new IllegalArgumentException("value cannot be <= 0.");
+            }
+
+            values.mcleaksCacheTime = new LongObjectPair<>(value, unit);
             return this;
         }
 
@@ -128,11 +143,19 @@ public class CachedConfigValues {
             return this;
         }
 
-        public CachedConfigValues.Builder actionCommands(Collection<String> value) {
+        public CachedConfigValues.Builder vpnActionCommands(Collection<String> value) {
             if (value == null) {
                 throw new IllegalArgumentException("value cannot be null.");
             }
-            values.actionCommands = ImmutableList.copyOf(value);
+            values.vpnActionCommands = ImmutableList.copyOf(value);
+            return this;
+        }
+
+        public CachedConfigValues.Builder mcleaksActionCommands(Collection<String> value) {
+            if (value == null) {
+                throw new IllegalArgumentException("value cannot be null.");
+            }
+            values.mcleaksActionCommands = ImmutableList.copyOf(value);
             return this;
         }
 

@@ -17,6 +17,7 @@ import javax.xml.xpath.XPathExpressionException;
 import me.egg82.antivpn.utils.BukkitEnvironmentUtil;
 import me.egg82.antivpn.utils.LogUtil;
 import ninja.egg82.maven.Artifact;
+import ninja.egg82.maven.Repository;
 import ninja.egg82.maven.Scope;
 import ninja.egg82.services.ProxiedURLClassLoader;
 import ninja.egg82.utils.InjectUtil;
@@ -126,9 +127,8 @@ public class BukkitBootstrap extends JavaPlugin {
 
         // First
 
-        Artifact.Builder guava = Artifact.builder("com.google.guava", "guava", "28.0-jre", cacheDir)
-                .addRepository("https://nexus.egg82.me/repository/maven-central/")
-                .addRepository("http://central.maven.org/maven2/");
+        Artifact.Builder guava = Artifact.builder("com.google.guava", "guava", "28.2-jre", cacheDir)
+                .addRepository(Repository.builder("http://central.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
         buildInjectWait(guava, jarsDir, classLoader, "Google Guava", 1);
 
         // Same file
@@ -138,143 +138,107 @@ public class BukkitBootstrap extends JavaPlugin {
         // Local
 
         Artifact.Builder taskchainBukkit = Artifact.builder("co.aikar", "taskchain-bukkit", "3.7.2", cacheDir)
-                .addRepository("https://nexus.egg82.me/repository/aikar/")
-                .addRepository("https://repo.aikar.co/nexus/content/groups/aikar/")
-                .addRepository("https://nexus.egg82.me/repository/maven-central/");
+                .addRepository(Repository.builder("https://repo.aikar.co/nexus/content/groups/aikar/").addProxy("https://nexus.egg82.me/repository/aikar/").build())
+                .addRepository(Repository.builder("http://central.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
         buildInject(taskchainBukkit, jarsDir, classLoader, "Taskchain", 1);
 
         printLatest("ACF");
         Artifact.Builder acfPaper = Artifact.builder("co.aikar", "acf-paper", "0.5.0-SNAPSHOT", cacheDir)
                 .addDirectJarURL("https://nexus.egg82.me/repository/aikar/{GROUP}/{ARTIFACT}/{VERSION}/{ARTIFACT}-{SNAPSHOT}-shaded.jar")
                 .addDirectJarURL("https://repo.aikar.co/nexus/content/groups/aikar/{GROUP}/{ARTIFACT}/{VERSION}/{ARTIFACT}-{SNAPSHOT}-shaded.jar")
-                .addRepository("https://nexus.egg82.me/repository/aikar/")
-                .addRepository("https://repo.aikar.co/nexus/content/groups/aikar/")
-                .addRepository("https://nexus.egg82.me/repository/maven-central/");
+                .addRepository(Repository.builder("https://repo.aikar.co/nexus/content/groups/aikar/").addProxy("https://nexus.egg82.me/repository/aikar/").build())
+                .addRepository(Repository.builder("http://central.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
         buildInject(acfPaper, jarsDir, classLoader, "ACF");
 
         Artifact.Builder eventChainBukkit = Artifact.builder("ninja.egg82", "event-chain-bukkit", "1.0.9", cacheDir)
-                .addRepository("https://nexus.egg82.me/repository/egg82/")
-                .addRepository("https://www.myget.org/F/egg82-java/maven/")
-                .addRepository("https://nexus.egg82.me/repository/maven-central/");
+                .addRepository(Repository.builder("https://www.myget.org/F/egg82-java/maven/").addProxy("https://nexus.egg82.me/repository/egg82/").build())
+                .addRepository(Repository.builder("http://central.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
         buildInject(eventChainBukkit, jarsDir, classLoader, "Event Chain");
 
         Artifact.Builder configurateYaml = Artifact.builder("org.spongepowered", "configurate-yaml", "3.6.1", cacheDir)
-                .addRepository("https://nexus.egg82.me/repository/sponge/")
-                .addRepository("https://repo.spongepowered.org/maven/")
-                .addRepository("https://nexus.egg82.me/repository/maven-central/");
+                .addRepository(Repository.builder("https://repo.spongepowered.org/maven/").addProxy("https://nexus.egg82.me/repository/sponge/").build())
+                .addRepository(Repository.builder("http://central.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
         buildInject(configurateYaml, jarsDir, classLoader, "Configurate", 2);
 
-        Artifact.Builder spigotUpdater = Artifact.builder("ninja.egg82", "spigot-updater", "1.0.1", cacheDir)
-                .addRepository("https://nexus.egg82.me/repository/egg82/")
-                .addRepository("https://www.myget.org/F/egg82-java/maven/")
-                .addRepository("https://nexus.egg82.me/repository/maven-central/");
+        Artifact.Builder spigotUpdater = Artifact.builder("ninja.egg82", "spigot-updater", "1.0.3", cacheDir)
+                .addRepository(Repository.builder("https://www.myget.org/F/egg82-java/maven/").addProxy("https://nexus.egg82.me/repository/egg82/").build())
+                .addRepository(Repository.builder("http://central.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
         buildInject(spigotUpdater, jarsDir, classLoader, "Spigot Updater");
 
         Artifact.Builder serviceLocator = Artifact.builder("ninja.egg82", "service-locator", "1.0.1", cacheDir)
-                .addRepository("https://nexus.egg82.me/repository/egg82/")
-                .addRepository("https://www.myget.org/F/egg82-java/maven/")
-                .addRepository("https://nexus.egg82.me/repository/maven-central/");
+                .addRepository(Repository.builder("https://www.myget.org/F/egg82-java/maven/").addProxy("https://nexus.egg82.me/repository/egg82/").build())
+                .addRepository(Repository.builder("http://central.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
         buildInject(serviceLocator, jarsDir, classLoader, "Service Locator");
 
         Artifact.Builder commonsNet = Artifact.builder("commons-net", "commons-net", "3.6", cacheDir)
-                .addRepository("https://nexus.egg82.me/repository/maven-central/")
-                .addRepository("http://central.maven.org/maven2/");
+                .addRepository(Repository.builder("http://central.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
         buildInject(commonsNet, jarsDir, classLoader, "Apache Commons (Net)");
 
-        Artifact.Builder commonsLang3 = Artifact.builder("org.apache.commons", "commons-lang3", "3.9", cacheDir)
-                .addRepository("https://nexus.egg82.me/repository/maven-central/")
-                .addRepository("http://central.maven.org/maven2/");
-        buildInject(commonsLang3, jarsDir, classLoader, "Apache Commons (Lang 3)");
+        Artifact.Builder javassist = Artifact.builder("org.javassist", "javassist", "3.26.0-GA", cacheDir)
+                .addRepository(Repository.builder("http://central.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
+        buildInject(javassist, jarsDir, classLoader, "Javassist");
+
+        Artifact.Builder javaxAnnotationApi = Artifact.builder("javax.annotation", "javax.annotation-api", "1.3.2", cacheDir)
+                .addRepository(Repository.builder("http://central.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
+        buildInject(javaxAnnotationApi, jarsDir, classLoader, "Javax Annotations");
+
+        Artifact.Builder reflectionUtils = Artifact.builder("ninja.egg82", "reflection-utils", "1.0.4", cacheDir)
+                .addRepository(Repository.builder("https://www.myget.org/F/egg82-java/maven/").addProxy("https://nexus.egg82.me/repository/egg82/").build())
+                .addRepository(Repository.builder("http://central.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
+        buildInject(reflectionUtils, jarsDir, classLoader, "Reflection Utils");
 
         printLatest("SQLite");
         Artifact.Builder sqlite = Artifact.builder("org.xerial", "sqlite-jdbc", "latest", cacheDir)
-                .addRepository("https://nexus.egg82.me/repository/maven-central/")
-                .addRepository("http://central.maven.org/maven2/");
+                .addRepository(Repository.builder("http://central.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
         buildInject(sqlite, jarsDir, classLoader, "SQLite");
 
         printLatest("MySQL");
         Artifact.Builder mysql = Artifact.builder("mysql", "mysql-connector-java", "latest", cacheDir)
-                .addRepository("https://nexus.egg82.me/repository/maven-central/")
-                .addRepository("http://central.maven.org/maven2/");
+                .addRepository(Repository.builder("http://central.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
         buildInject(mysql, jarsDir, classLoader, "MySQL", 1);
 
         // Global
 
-        Artifact.Builder caffeine = Artifact.builder("com.github.ben-manes.caffeine", "caffeine", "2.7.0", cacheDir)
-                .addRepository("https://nexus.egg82.me/repository/maven-central/")
-                .addRepository("http://central.maven.org/maven2/");
+        Artifact.Builder caffeine = Artifact.builder("com.github.ben-manes.caffeine", "caffeine", "2.8.0", cacheDir)
+                .addRepository(Repository.builder("http://central.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
         buildInject(caffeine, jarsDir, classLoader, "Caffeine");
 
-        Artifact.Builder concurrentlinkedhashmap = Artifact.builder("com.googlecode.concurrentlinkedhashmap", "concurrentlinkedhashmap-lru", "1.4.2", cacheDir)
-                .addRepository("https://nexus.egg82.me/repository/maven-central/")
-                .addRepository("http://central.maven.org/maven2/");
-        buildInject(concurrentlinkedhashmap, jarsDir, classLoader, "ConcurrentLinkedHashMap");
-
-        Artifact.Builder amqpClient = Artifact.builder("com.rabbitmq", "amqp-client", "5.7.3", cacheDir)
-                .addRepository("https://nexus.egg82.me/repository/maven-central/")
-                .addRepository("http://central.maven.org/maven2/");
+        Artifact.Builder amqpClient = Artifact.builder("com.rabbitmq", "amqp-client", "5.8.0", cacheDir)
+                .addRepository(Repository.builder("http://central.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
         buildInject(amqpClient, jarsDir, classLoader, "RabbitMQ");
 
-        Artifact.Builder javassist = Artifact.builder("org.javassist", "javassist", "3.25.0-GA", cacheDir)
-                .addRepository("https://nexus.egg82.me/repository/maven-central/")
-                .addRepository("http://central.maven.org/maven2/");
-        buildInject(javassist, jarsDir, classLoader, "Javassist");
-
-        Artifact.Builder javaxAnnotationApi = Artifact.builder("javax.annotation", "javax.annotation-api", "1.3.2", cacheDir)
-                .addRepository("https://nexus.egg82.me/repository/maven-central/")
-                .addRepository("http://central.maven.org/maven2/");
-        buildInject(javaxAnnotationApi, jarsDir, classLoader, "Javax Annotations");
+        Artifact.Builder mcleaks = Artifact.builder("me.gong", "mcleaks-api", "1.9.5-SNAPSHOT", cacheDir)
+                .addRepository(Repository.builder("https://nexus.egg82.me/repository/wesjd/").addProxy("https://nexus.wesjd.net/repository/thirdparty/").build())
+                .addRepository((Repository.builder("http://central.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build()));
+        buildInject(mcleaks, jarsDir, classLoader, "MCLeaks API");
 
         Artifact.Builder gameanalyticsApi = Artifact.builder("ninja.egg82", "gameanalytics-api", "1.0.1", cacheDir)
-                .addRepository("https://nexus.egg82.me/repository/egg82/")
-                .addRepository("https://www.myget.org/F/egg82-java/maven/")
-                .addRepository("https://nexus.egg82.me/repository/maven-central/");
+                .addRepository(Repository.builder("https://www.myget.org/F/egg82-java/maven/").addProxy("https://nexus.egg82.me/repository/egg82/").build())
+                .addRepository(Repository.builder("http://central.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
         buildInject(gameanalyticsApi, jarsDir, classLoader, "GameAnalytics API", 1);
 
         Artifact.Builder abstractConfiguration = Artifact.builder("ninja.egg82", "abstract-configuration", "1.0.1", cacheDir)
-                .addRepository("https://nexus.egg82.me/repository/egg82/")
-                .addRepository("https://www.myget.org/F/egg82-java/maven/")
-                .addRepository("https://nexus.egg82.me/repository/maven-central/");
+                .addRepository(Repository.builder("https://www.myget.org/F/egg82-java/maven/").addProxy("https://nexus.egg82.me/repository/egg82/").build())
+                .addRepository(Repository.builder("http://central.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
         buildInject(abstractConfiguration, jarsDir, classLoader, "Abstract Configuration");
 
-        Artifact.Builder jsonWeb = Artifact.builder("ninja.egg82", "json-web", "1.0.1", cacheDir)
-                .addRepository("https://nexus.egg82.me/repository/egg82/")
-                .addRepository("https://www.myget.org/F/egg82-java/maven/")
-                .addRepository("https://nexus.egg82.me/repository/maven-central/");
-        buildInject(jsonWeb, jarsDir, classLoader, "JSON Web");
-
-        Artifact.Builder reflectionUtils = Artifact.builder("ninja.egg82", "reflection-utils", "1.0.4", cacheDir)
-                .addRepository("https://nexus.egg82.me/repository/egg82/")
-                .addRepository("https://www.myget.org/F/egg82-java/maven/")
-                .addRepository("https://nexus.egg82.me/repository/maven-central/");
-        buildInject(reflectionUtils, jarsDir, classLoader, "Reflection Utils");
-
-        Artifact.Builder easySql = Artifact.builder("ninja.egg82", "easy-sql", "1.0.1", cacheDir)
-                .addRepository("https://nexus.egg82.me/repository/egg82/")
-                .addRepository("https://www.myget.org/F/egg82-java/maven/")
-                .addRepository("https://nexus.egg82.me/repository/maven-central/");
+        Artifact.Builder easySql = Artifact.builder("ninja.egg82", "easy-sql", "1.3.3", cacheDir)
+                .addRepository(Repository.builder("https://www.myget.org/F/egg82-java/maven/").addProxy("https://nexus.egg82.me/repository/egg82/").build())
+                .addRepository(Repository.builder("http://central.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
         buildInject(easySql, jarsDir, classLoader, "EasySQL");
 
-        Artifact.Builder collections = Artifact.builder("ninja.egg82", "collections", "1.0.0", cacheDir)
-                .addRepository("https://nexus.egg82.me/repository/egg82/")
-                .addRepository("https://www.myget.org/F/egg82-java/maven/")
-                .addRepository("https://nexus.egg82.me/repository/maven-central/");
-        buildInject(collections, jarsDir, classLoader, "Collections");
+        Artifact.Builder jsonWeb = Artifact.builder("ninja.egg82", "json-web", "2.1.2", cacheDir)
+                .addRepository(Repository.builder("https://www.myget.org/F/egg82-java/maven/").addProxy("https://nexus.egg82.me/repository/egg82/").build())
+                .addRepository(Repository.builder("http://central.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
+        buildInject(jsonWeb, jarsDir, classLoader, "JSON Web");
 
         Artifact.Builder commonsValidator = Artifact.builder("commons-validator", "commons-validator", "1.6", cacheDir)
-                .addRepository("https://nexus.egg82.me/repository/maven-central/")
-                .addRepository("http://central.maven.org/maven2/");
+                .addRepository(Repository.builder("http://central.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
         buildInject(commonsValidator, jarsDir, classLoader, "Apache Commons Validator", 1);
 
-        Artifact.Builder jedis = Artifact.builder("redis.clients", "jedis", "3.1.0", cacheDir)
-                .addRepository("https://nexus.egg82.me/repository/maven-central/")
-                .addRepository("http://central.maven.org/maven2/");
+        Artifact.Builder jedis = Artifact.builder("redis.clients", "jedis", "3.2.0", cacheDir)
+                .addRepository((Repository.builder("http://central.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build()));
         buildInject(jedis, jarsDir, classLoader, "Jedis", 1);
-
-        Artifact.Builder mcleaks = Artifact.builder("me.gong", "mcleaks-api", "1.9.5-SNAPSHOT", cacheDir)
-                .addRepository("https://nexus.egg82.me/repository/wesjd/")
-                .addRepository("https://nexus.wesjd.net/repository/thirdparty/");
-        buildInject(mcleaks, jarsDir, classLoader, "MCLeaks API");
     }
 
     private void printLatest(String friendlyName) {
