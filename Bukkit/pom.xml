@@ -90,7 +90,6 @@
                                         <exclude>com/google/errorprone/annotations/**</exclude> <!-- included with guava -->
                                         <exclude>com/google/j2objc/annotations/**</exclude> <!-- included with guava -->
                                         <exclude>com/google/thirdparty/publicsuffix/**</exclude> <!-- included with guava -->
-                                        <exclude>com/googlecode/concurrentlinkedhashmap/**</exclude>
                                         <exclude>com/rabbitmq/**</exclude>
                                         <exclude>com/zaxxer/hikari/**</exclude> <!-- included with easy-sql -->
                                         <exclude>me/gong/mcleaks/**</exclude>
@@ -103,7 +102,6 @@
                                         <exclude>ninja/egg82/reflect/**</exclude>
                                         <exclude>ninja/egg82/service/**</exclude>
                                         <exclude>ninja/egg82/sql/**</exclude>
-                                        <exclude>ninja/egg82/tuples/**</exclude>
                                         <exclude>ninja/leaping/configurate/**</exclude>
                                         <exclude>okio/**</exclude> <!-- included with mcleaks-api -->
                                         <exclude>okhttp3/**</exclude> <!-- included with mcleaks-api -->
@@ -115,9 +113,7 @@
                                         <exclude>org/apache/commons/validator/**</exclude>
                                         <exclude>org/checkerframework/**</exclude> <!-- included with configurate-core -->
                                         <exclude>org/codehaus/mojo/animal_sniffer/**</exclude> <!-- included with guava -->
-                                        <exclude>org/hamcrest/**</exclude> <!-- included with json-web -->
                                         <exclude>org/json/simple/**</exclude> <!-- included with gameanalytics-api/json-web -->
-                                        <exclude>org/junit/**</exclude> <!-- included with json-web -->
                                         <exclude>org/reflections/**</exclude> <!-- included with reflection-utils -->
                                         <exclude>redis/clients/jedis/**</exclude>
                                         <exclude>rabbitmq-amqp-client.properties</exclude> <!-- included with rabbitmq -->

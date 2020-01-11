@@ -44,20 +44,6 @@ public class ExternalAPI {
         api = new ExternalAPI(classLoader);
     }
 
-    public long getCurrentSQLTime() throws APIException {
-        try {
-            return (Long) invokeMethod("getCurrentSQLTime");
-        } catch (NoSuchMethodException | IllegalAccessException ex) {
-            throw new APIException(true, "Could not invoke base method.", ex);
-        } catch (InvocationTargetException ex) {
-            Throwable t = ex.getTargetException();
-            if (t.getClass().getName().equals("me.egg82.antivpn.APIException")) {
-                throw convertToAPIException(t);
-            }
-            throw new APIException(true, "Could not invoke base method.", ex);
-        }
-    }
-
     public Map<String, Optional<Boolean>> testAllSources(String ip) throws APIException {
         try {
             return (Map<String, Optional<Boolean>>) invokeMethod("testAllSources", ip);
