@@ -25,7 +25,7 @@ import org.junit.jupiter.api.Test;
 import org.yaml.snakeyaml.DumperOptions;
 import redis.clients.jedis.JedisPool;
 
-public class APITests {
+public class VPNAPITests {
     @Test
     public void testCurrentSQLTime() {
         Assertions.assertDoesNotThrow(() -> {

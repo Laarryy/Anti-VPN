@@ -1,33 +1,39 @@
 package me.egg82.antivpn.extended;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.rabbitmq.client.ConnectionFactory;
 import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import me.egg82.antivpn.enums.SQLType;
-import me.egg82.antivpn.services.InternalAPI;
-import ninja.egg82.sql.SQL;
-import ninja.egg82.tuples.longs.LongObjectPair;
-import redis.clients.jedis.JedisPool;
+import me.egg82.antivpn.apis.VPNAPI;
+import me.egg82.antivpn.messaging.Messaging;
+import me.egg82.antivpn.storage.Storage;
 
 public class CachedConfigValues {
     private CachedConfigValues() {}
 
-    private ImmutableSet<String> sources = ImmutableSet.of();
-    public ImmutableSet<String> getSources() { return sources; }
+    private ImmutableList<Storage> storage = ImmutableList.of();
+    public ImmutableList<Storage> getStorage() { return storage; }
 
-    private LongObjectPair<TimeUnit> sourceCacheTime = new LongObjectPair<>(6L, TimeUnit.HOURS);
-    public long getSourceCacheTime() { return sourceCacheTime.getSecond().toMillis(sourceCacheTime.getFirst()); }
+    private ImmutableList<Messaging> messaging = ImmutableList.of();
+    public ImmutableList<Messaging> getMessaging() { return messaging; }
 
-    private LongObjectPair<TimeUnit> mcleaksCacheTime = new LongObjectPair<>(1L, TimeUnit.DAYS);
-    public long getMcleaksCacheTime() { return mcleaksCacheTime.getSecond().toMillis(mcleaksCacheTime.getFirst()); }
+    private ImmutableMap<String, VPNAPI> sources = ImmutableMap.of();
+    public ImmutableMap<String, VPNAPI> getSources() { return sources; }
+
+    private long sourceCacheTime = 21600000L; // 6 hours
+    public long getSourceCacheTime() { return sourceCacheTime; }
+
+    private long mcleaksCacheTime = 86400000L; // 1 day
+    public long getMCLeaksCacheTime() { return mcleaksCacheTime; }
 
     private ImmutableSet<String> ignoredIps = ImmutableSet.of();
     public ImmutableSet<String> getIgnoredIps() { return ignoredIps; }
 
-    private LongObjectPair<TimeUnit> cacheTime = new LongObjectPair<>(1L, TimeUnit.MINUTES);
-    public long getCacheTime() { return cacheTime.getSecond().toMillis(cacheTime.getFirst()); }
+    private long cacheTime = 60000L; // 1 minute
+    public long getCacheTime() { return cacheTime; }
 
     private boolean debug = false;
     public boolean getDebug() { return debug; }
@@ -35,17 +41,8 @@ public class CachedConfigValues {
     private int threads = 4;
     public int getThreads() { return threads; }
 
-    private JedisPool redisPool = null;
-    public JedisPool getRedisPool() { return redisPool; }
-
-    private ConnectionFactory rabbitConnectionFactory = null;
-    public ConnectionFactory getRabbitConnectionFactory() { return rabbitConnectionFactory; }
-
-    private SQL sql = null;
-    public SQL getSQL() { return sql; }
-
-    private SQLType sqlType = SQLType.SQLite;
-    public SQLType getSQLType() { return sqlType; }
+    private long timeout = 5000L;
+    public long getTimeout() { return timeout; }
 
     private ImmutableList<String> vpnActionCommands = ImmutableList.of();
     public ImmutableList<String> getVPNActionCommands() { return vpnActionCommands; }
@@ -60,11 +57,21 @@ public class CachedConfigValues {
 
         private Builder() {}
 
-        public CachedConfigValues.Builder sources(Collection<String> value) {
+        public CachedConfigValues.Builder storage(List<Storage> value) {
+            values.storage = ImmutableList.copyOf(value);
+            return this;
+        }
+
+        public CachedConfigValues.Builder messaging(List<Messaging> value) {
+            values.messaging = ImmutableList.copyOf(value);
+            return this;
+        }
+
+        public CachedConfigValues.Builder sources(Map<String, VPNAPI> value) {
             if (value == null) {
                 throw new IllegalArgumentException("value cannot be null.");
             }
-            values.sources = ImmutableSet.copyOf(value);
+            values.sources = ImmutableMap.copyOf(value);
             return this;
         }
 
@@ -73,7 +80,7 @@ public class CachedConfigValues {
                 throw new IllegalArgumentException("value cannot be <= 0.");
             }
 
-            values.sourceCacheTime = new LongObjectPair<>(value, unit);
+            values.sourceCacheTime = unit.toMillis(value);
             return this;
         }
 
@@ -82,7 +89,7 @@ public class CachedConfigValues {
                 throw new IllegalArgumentException("value cannot be <= 0.");
             }
 
-            values.mcleaksCacheTime = new LongObjectPair<>(value, unit);
+            values.mcleaksCacheTime = unit.toMillis(value);
             return this;
         }
 
@@ -99,7 +106,7 @@ public class CachedConfigValues {
                 throw new IllegalArgumentException("value cannot be <= 0.");
             }
 
-            values.cacheTime = new LongObjectPair<>(value, unit);
+            values.cacheTime = unit.toMillis(value);
             return this;
         }
 
@@ -117,29 +124,12 @@ public class CachedConfigValues {
             return this;
         }
 
-        public CachedConfigValues.Builder redisPool(JedisPool value) {
-            values.redisPool = value;
-            return this;
-        }
-
-        public CachedConfigValues.Builder rabbitConnectionFactory(ConnectionFactory value) {
-            values.rabbitConnectionFactory = value;
-            return this;
-        }
-
-        public CachedConfigValues.Builder sql(SQL value) {
-            if (value == null) {
-                throw new IllegalArgumentException("value cannot be null.");
+        public CachedConfigValues.Builder timeout(long value) {
+            if (value <= 0L) {
+                throw new IllegalArgumentException("value cannot be <= 0.");
             }
-            values.sql = value;
-            return this;
-        }
 
-        public CachedConfigValues.Builder sqlType(String value) {
-            if (value == null) {
-                throw new IllegalArgumentException("value cannot be null.");
-            }
-            values.sqlType = SQLType.getByName(value);
+            values.timeout = value;
             return this;
         }
 

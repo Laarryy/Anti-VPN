@@ -298,11 +298,13 @@ action:
 connection:
   # The amount of time to cache lookups in-memory
   # Higher values require more memory
-  # Lower values will hit Redis/SQL/APIs more frequently
+  # Lower values will hit Storage/APIs more frequently
   # Generally the default is good enough to prevent many sequential lookups from choking resources, but still keep memory usage low
   cache-time: '1minute'
   # The number of threads to use for web operations
   threads: 4
+  # The maximum number of milliseconds that the plugin will wait for an API to respond before timing out
+  timeout: 5000 # 5 seconds
 
 # When true, logs some extra output to the console so you can see if/why things might be failing
 debug: false

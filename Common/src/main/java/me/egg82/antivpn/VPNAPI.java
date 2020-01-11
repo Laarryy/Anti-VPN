@@ -2,10 +2,17 @@ package me.egg82.antivpn;
 
 import com.google.common.collect.ImmutableMap;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicLong;
 import me.egg82.antivpn.utils.ValidationUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class VPNAPI {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+
     private static final VPNAPI api = new VPNAPI();
+
+    private final AtomicLong numSentMessages = new AtomicLong(0L);
 
     private VPNAPI() { }
 

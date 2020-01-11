@@ -459,7 +459,7 @@ public class ConfigurationVersionUtil {
         config.getNode("messaging", "settings", "timeout").setValue(messagingTimeout);
         config.getNode("messaging", "order").setValue(Arrays.asList("rabbitmq", "redis"));
 
-        // action to action->vpn
+        // action to action->vpn, action->command to action->vpn->commands
         String kickMessage = config.getNode("action", "kick-message").getString("&cPlease disconnect from your proxy or VPN before re-joining!");
         String algorithmMethod = config.getNode("action", "algorithm", "method").getString("cascade");
         double algorithmMinConsensus = config.getNode("action", "algorithm", "min-consensus").getDouble(0.6d);
@@ -474,13 +474,14 @@ public class ConfigurationVersionUtil {
         config.getNode("action", "vpn", "algorithm", "method").setValue(algorithmMethod);
         config.getNode("action", "vpn", "algorithm", "min-consensus").setValue(algorithmMinConsensus);
 
-        // cacheTime & threads to connection->cache-time & threads
+        // cacheTime & threads to connection->cache-time & threads, add timeout
         String cacheTime = config.getNode("cacheTime").getString("1minute");
         int threads = config.getNode("threads").getInt(4);
         config.removeChild("cacheTime");
         config.removeChild("threads");
         config.getNode("connection", "cache-time").setValue(cacheTime);
         config.getNode("connection", "threads").setValue(threads);
+        config.getNode("connection", "timeout").setValue(5000L);
 
         // sources->cacheTime to sources->cache-time
         String sourcesCacheTime = config.getNode("sources", "cacheTime").getString("6hours");
