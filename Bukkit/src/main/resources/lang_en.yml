@@ -16,8 +16,23 @@ general:
 error:
   internal: "Internal error"
 
+score:
+  begin: "<c2>Scoring</c2> {source}<c2>, please wait..</c2>"
+  type: "<c2>Scoring against</c2> {type}<c2>..</c2>"
+  sleep: "<c2>Sleeping for one minute..</c2>"
+  error: "{source} <c5>error</c5> {percent}%"
+  score: "{source} {type} <c2>score</c2> {percent}%"
+  end: "<c4>Scoring for</c4> {source} <c4>complete!</c4>"
+
+test:
+  begin: "<c2>Testing with</c2> {ip}<c2>, please wait..</c2>"
+  error: "{source} <c2>error</c2>"
+  vpn_detected: "<c5>VPN/proxy detected</c5>"
+  no_vpn_detected: "<c4>No VPN/proxy detected</c4>"
+  end: "<c4>Test for</c4> {ip} <c4>complete!</c4>"
+
 reload:
   begin: "<c2>Reloading, please wait..</c2>"
   end: "<c4>Configuration reloaded!</c4>"
 
-version: 1.1
+version: 1.2
