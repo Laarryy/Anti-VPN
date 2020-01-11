@@ -17,14 +17,14 @@ public class CheckCommand implements Runnable {
 
     private final TaskChain<?> chain;
     private final CommandSender sender;
-    private final String ip;
+    private final String type;
 
     private final VPNAPI api = VPNAPI.getInstance();
 
-    public CheckCommand(TaskChain<?> chain, CommandSender sender, String ip) {
+    public CheckCommand(TaskChain<?> chain, CommandSender sender, String type) {
         this.chain = chain;
         this.sender = sender;
-        this.ip = ip;
+        this.type = type;
     }
 
     public void run() {
