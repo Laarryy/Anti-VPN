@@ -316,5 +316,7 @@ public class AntiVPN {
         ServiceUtil.unregisterRedis();
         ServiceUtil.unregisterRabbit();
         ServiceUtil.unregisterSQL();
+
+        VPNAPI.close();
     }
 }

@@ -177,7 +177,7 @@ public class SQLite extends AbstractSQL {
         return retVal;
     }
 
-    public VPNResult getVPNByIP(String ip) throws StorageException {
+    public VPNResult getVPNByIP(String ip, long cacheTimeMillis) throws StorageException {
         if (ip == null) {
             throw new IllegalArgumentException("ip cannot be null.");
         }
@@ -197,8 +197,8 @@ public class SQLite extends AbstractSQL {
                         "  `v`.`created`" +
                         "FROM `{prefix}vpn_values` `v`" +
                         "JOIN `{prefix}ips` `i` ON `i`.`id` = `v`.`ip_id`" +
-                        "WHERE `v`.`ip_id` = ?;",
-                    longIPID);
+                        "WHERE `v`.`date` >= DATE_SUB(CURRENT_TIMESTAMP, INTERVAL ? MICROSECOND) AND `v`.`ip_id` = ?;",
+                    cacheTimeMillis, longIPID);
         } catch (SQLException ex) {
             throw new StorageException(isAutomaticallyRecoverable(ex), ex);
         }
@@ -208,7 +208,7 @@ public class SQLite extends AbstractSQL {
         return null;
     }
 
-    public MCLeaksResult getMCLeaksByPlayer(UUID playerID) throws StorageException {
+    public MCLeaksResult getMCLeaksByPlayer(UUID playerID, long cacheTimeMillis) throws StorageException {
         if (playerID == null) {
             throw new IllegalArgumentException("playerID cannot be null.");
         }
@@ -224,8 +224,8 @@ public class SQLite extends AbstractSQL {
                         "  `v`.`created`" +
                         "FROM `{prefix}mcleaks_values` `v`" +
                         "JOIN `{prefix}players` `p` ON `p`.`id` = `v`.`player_id`" +
-                        "WHERE `v`.`player_id` = ?;",
-                    longPlayerID);
+                        "WHERE `v`.`date` >= DATE_SUB(CURRENT_TIMESTAMP, INTERVAL ? MICROSECOND) AND `v`.`player_id` = ?;",
+                    cacheTimeMillis, longPlayerID);
         } catch (SQLException ex) {
             throw new StorageException(isAutomaticallyRecoverable(ex), ex);
         }
@@ -275,6 +275,7 @@ public class SQLite extends AbstractSQL {
         return new PostVPNResult(
                 id,
                 longIPID,
+                ip,
                 cascade,
                 consensus,
                 getTime(query.getData()[0][0]).getTime()
@@ -312,6 +313,7 @@ public class SQLite extends AbstractSQL {
         return new PostMCLeaksResult(
                 id,
                 longPlayerID,
+                playerID,
                 value,
                 getTime(query.getData()[0][0]).getTime()
         );

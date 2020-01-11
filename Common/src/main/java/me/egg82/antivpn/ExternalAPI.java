@@ -6,6 +6,7 @@ import java.lang.reflect.Method;
 import java.net.URLClassLoader;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -72,11 +73,9 @@ public class ExternalAPI {
         }
     }
 
-    public double consensus(String ip) throws APIException { return consensus(ip, true); }
-
-    public double consensus(String ip, boolean expensive) throws APIException {
+    public boolean cascade(String ip) throws APIException {
         try {
-            return (Double) invokeMethod("consensus", ip, expensive);
+            return (Boolean) invokeMethod("cascade", ip);
         } catch (NoSuchMethodException | IllegalAccessException ex) {
             throw new APIException(true, "Could not invoke base method.", ex);
         } catch (InvocationTargetException ex) {
@@ -88,11 +87,23 @@ public class ExternalAPI {
         }
     }
 
-    public boolean cascade(String ip) throws APIException { return cascade(ip, true); }
-
-    public boolean cascade(String ip, boolean expensive) throws APIException {
+    public double consensus(String ip) throws APIException {
         try {
-            return (Boolean) invokeMethod("cascade", ip, expensive);
+            return (Double) invokeMethod("consensus", ip);
+        } catch (NoSuchMethodException | IllegalAccessException ex) {
+            throw new APIException(true, "Could not invoke base method.", ex);
+        } catch (InvocationTargetException ex) {
+            Throwable t = ex.getTargetException();
+            if (t.getClass().getName().equals("me.egg82.antivpn.APIException")) {
+                throw convertToAPIException(t);
+            }
+            throw new APIException(true, "Could not invoke base method.", ex);
+        }
+    }
+
+    public boolean isMCLeaks(UUID playerID) throws APIException {
+        try {
+            return (Boolean) invokeMethod("isMCLeaks", playerID);
         } catch (NoSuchMethodException | IllegalAccessException ex) {
             throw new APIException(true, "Could not invoke base method.", ex);
         } catch (InvocationTargetException ex) {

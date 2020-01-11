@@ -181,7 +181,7 @@ public class MySQL extends AbstractSQL {
         return retVal;
     }
 
-    public VPNResult getVPNByIP(String ip) throws StorageException {
+    public VPNResult getVPNByIP(String ip, long cacheTimeMillis) throws StorageException {
         if (ip == null) {
             throw new IllegalArgumentException("ip cannot be null.");
         }
@@ -192,7 +192,7 @@ public class MySQL extends AbstractSQL {
         long longIPID = longIPIDCache.get(ip);
         SQLQueryResult result;
         try {
-            result = sql.call("call `" + prefix + "get_vpn_ip`(?);", longIPID);
+            result = sql.call("call `" + prefix + "get_vpn_ip`(?, ?);", longIPID, cacheTimeMillis);
         } catch (SQLException ex) {
             throw new StorageException(isAutomaticallyRecoverable(ex), ex);
         }
@@ -202,7 +202,7 @@ public class MySQL extends AbstractSQL {
         return null;
     }
 
-    public MCLeaksResult getMCLeaksByPlayer(UUID playerID) throws StorageException {
+    public MCLeaksResult getMCLeaksByPlayer(UUID playerID, long cacheTimeMillis) throws StorageException {
         if (playerID == null) {
             throw new IllegalArgumentException("playerID cannot be null.");
         }
@@ -210,7 +210,7 @@ public class MySQL extends AbstractSQL {
         long longPlayerID = longPlayerIDCache.get(playerID);
         SQLQueryResult result;
         try {
-            result = sql.call("call `" + prefix + "get_mcleaks_player`(?);", longPlayerID);
+            result = sql.call("call `" + prefix + "get_mcleaks_player`(?, ?);", longPlayerID, cacheTimeMillis);
         } catch (SQLException ex) {
             throw new StorageException(isAutomaticallyRecoverable(ex), ex);
         }
@@ -260,6 +260,7 @@ public class MySQL extends AbstractSQL {
         return new PostVPNResult(
                 id,
                 longIPID,
+                ip,
                 cascade,
                 consensus,
                 ((Timestamp) query.getData()[0][0]).getTime()
@@ -297,6 +298,7 @@ public class MySQL extends AbstractSQL {
         return new PostMCLeaksResult(
                 id,
                 longPlayerID,
+                playerID,
                 value,
                 ((Timestamp) query.getData()[0][0]).getTime()
         );

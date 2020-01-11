@@ -6,15 +6,17 @@ import java.util.Optional;
 public class PostVPNResult {
     private final long id;
     private final long ipID;
+    private final String ip;
     private final Optional<Boolean> cascade;
     private final Optional<Double> consensus;
     private final long created;
 
     private final int hc;
 
-    public PostVPNResult(long id, long ipID, Optional<Boolean> cascade, Optional<Double> consensus, long created) {
+    public PostVPNResult(long id, long ipID, String ip, Optional<Boolean> cascade, Optional<Double> consensus, long created) {
         this.id = id;
         this.ipID = ipID;
+        this.ip = ip;
         this.cascade = cascade;
         this.consensus = consensus;
         this.created = created;
@@ -25,6 +27,8 @@ public class PostVPNResult {
     public long getID() { return id; }
 
     public long getIPID() { return ipID; }
+
+    public String getIP() { return ip; }
 
     public Optional<Boolean> getCascade() { return cascade; }
 

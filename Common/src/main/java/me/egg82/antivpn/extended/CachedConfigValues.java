@@ -7,9 +7,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import me.egg82.antivpn.apis.VPNAPI;
+import me.egg82.antivpn.apis.SourceAPI;
 import me.egg82.antivpn.messaging.Messaging;
 import me.egg82.antivpn.storage.Storage;
+import me.egg82.antivpn.utils.TimeUtil;
 
 public class CachedConfigValues {
     private CachedConfigValues() {}
@@ -20,20 +21,20 @@ public class CachedConfigValues {
     private ImmutableList<Messaging> messaging = ImmutableList.of();
     public ImmutableList<Messaging> getMessaging() { return messaging; }
 
-    private ImmutableMap<String, VPNAPI> sources = ImmutableMap.of();
-    public ImmutableMap<String, VPNAPI> getSources() { return sources; }
+    private ImmutableMap<String, SourceAPI> sources = ImmutableMap.of();
+    public ImmutableMap<String, SourceAPI> getSources() { return sources; }
 
-    private long sourceCacheTime = 21600000L; // 6 hours
+    private long sourceCacheTime = new TimeUtil.Time(6L, TimeUnit.HOURS).getMillis();
     public long getSourceCacheTime() { return sourceCacheTime; }
 
-    private long mcleaksCacheTime = 86400000L; // 1 day
+    private long mcleaksCacheTime = new TimeUtil.Time(1L, TimeUnit.DAYS).getMillis();
     public long getMCLeaksCacheTime() { return mcleaksCacheTime; }
 
     private ImmutableSet<String> ignoredIps = ImmutableSet.of();
     public ImmutableSet<String> getIgnoredIps() { return ignoredIps; }
 
-    private long cacheTime = 60000L; // 1 minute
-    public long getCacheTime() { return cacheTime; }
+    private TimeUtil.Time cacheTime = new TimeUtil.Time(1L, TimeUnit.MINUTES);
+    public TimeUtil.Time getCacheTime() { return cacheTime; }
 
     private boolean debug = false;
     public boolean getDebug() { return debug; }
@@ -67,7 +68,7 @@ public class CachedConfigValues {
             return this;
         }
 
-        public CachedConfigValues.Builder sources(Map<String, VPNAPI> value) {
+        public CachedConfigValues.Builder sources(Map<String, SourceAPI> value) {
             if (value == null) {
                 throw new IllegalArgumentException("value cannot be null.");
             }
@@ -75,21 +76,27 @@ public class CachedConfigValues {
             return this;
         }
 
-        public CachedConfigValues.Builder sourceCacheTime(long value, TimeUnit unit) {
-            if (value <= 0L) {
+        public CachedConfigValues.Builder sourceCacheTime(TimeUtil.Time value) {
+            if (value == null) {
+                throw new IllegalArgumentException("value cannot be null.");
+            }
+            if (value.getMillis() <= 0L) {
                 throw new IllegalArgumentException("value cannot be <= 0.");
             }
 
-            values.sourceCacheTime = unit.toMillis(value);
+            values.sourceCacheTime = value.getMillis();
             return this;
         }
 
-        public CachedConfigValues.Builder mcleaksCacheTime(long value, TimeUnit unit) {
-            if (value <= 0L) {
+        public CachedConfigValues.Builder mcleaksCacheTime(TimeUtil.Time value) {
+            if (value == null) {
+                throw new IllegalArgumentException("value cannot be null.");
+            }
+            if (value.getMillis() <= 0L) {
                 throw new IllegalArgumentException("value cannot be <= 0.");
             }
 
-            values.mcleaksCacheTime = unit.toMillis(value);
+            values.mcleaksCacheTime = value.getMillis();
             return this;
         }
 
@@ -101,12 +108,15 @@ public class CachedConfigValues {
             return this;
         }
 
-        public CachedConfigValues.Builder cacheTime(long value, TimeUnit unit) {
-            if (value <= 0L) {
+        public CachedConfigValues.Builder cacheTime(TimeUtil.Time value) {
+            if (value == null) {
+                throw new IllegalArgumentException("value cannot be null.");
+            }
+            if (value.getMillis() <= 0L) {
                 throw new IllegalArgumentException("value cannot be <= 0.");
             }
 
-            values.cacheTime = unit.toMillis(value);
+            values.cacheTime = value;
             return this;
         }
 
@@ -149,9 +159,6 @@ public class CachedConfigValues {
             return this;
         }
 
-        public CachedConfigValues build() {
-            InternalAPI.changeCacheTime(values.cacheTime.getFirst(), values.cacheTime.getSecond());
-            return values;
-        }
+        public CachedConfigValues build() { return values; }
     }
 }

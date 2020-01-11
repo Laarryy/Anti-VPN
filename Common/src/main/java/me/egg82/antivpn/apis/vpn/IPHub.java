@@ -5,6 +5,7 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import me.egg82.antivpn.APIException;
+import me.egg82.antivpn.utils.ValidationUtil;
 import ninja.egg82.json.JSONWebUtil;
 import ninja.leaping.configurate.ConfigurationNode;
 import org.json.simple.JSONObject;
@@ -12,7 +13,7 @@ import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class IPHub extends AbstractVPNAPI {
+public class IPHub extends AbstractSourceAPI {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     public String getName() { return "iphub"; }
@@ -22,6 +23,9 @@ public class IPHub extends AbstractVPNAPI {
     public boolean getResult(String ip) throws APIException {
         if (ip == null) {
             throw new IllegalArgumentException("ip cannot be null.");
+        }
+        if (!ValidationUtil.isValidIp(ip)) {
+            throw new IllegalArgumentException("ip is invalid.");
         }
 
         ConfigurationNode sourceConfigNode = getSourceConfigNode();

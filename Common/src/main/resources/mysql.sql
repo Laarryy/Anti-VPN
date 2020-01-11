@@ -53,8 +53,9 @@ CREATE TABLE `{prefix}mcleaks_values` (
 
 DROP PROCEDURE IF EXISTS `{prefix}get_vpn_ip`;
 DELIMITER ;;
-CREATE PROCEDURE `{prefix}get_vpn_ip`(`ip_id` BIGINT UNSIGNED)
+CREATE PROCEDURE `{prefix}get_vpn_ip`(`ip_id` BIGINT UNSIGNED, `cache_time_millis` BIGINT)
 BEGIN
+  DECLARE `from` DATETIME DEFAULT DATE_SUB(CURRENT_TIMESTAMP, INTERVAL `cache_time_millis` * 1000 MICROSECOND);
   SELECT
     `v`.`id`,
     `i`.`ip` AS `ip`,
@@ -63,14 +64,15 @@ BEGIN
     `v`.`created`
   FROM `{prefix}vpn_values` `v`
   JOIN `{prefix}ips` `i` ON `i`.`id` = `v`.`ip_id`
-  WHERE `v`.`ip_id` = `ip_id`;
+  WHERE `v`.`created` >= `from` AND `v`.`ip_id` = `ip_id`;
 END ;;
 DELIMITER ;
 
 DROP PROCEDURE IF EXISTS `{prefix}get_mcleaks_player`;
 DELIMITER ;;
-CREATE PROCEDURE `{prefix}get_mcleaks_player`(`player_id` BIGINT UNSIGNED)
+CREATE PROCEDURE `{prefix}get_mcleaks_player`(`player_id` BIGINT UNSIGNED, `cache_time_millis` BIGINT)
 BEGIN
+  DECLARE `from` DATETIME DEFAULT DATE_SUB(CURRENT_TIMESTAMP, INTERVAL `cache_time_millis` * 1000 MICROSECOND);
   SELECT
     `v`.`id`,
     `p`.`uuid` AS `player_id`,
@@ -78,7 +80,7 @@ BEGIN
     `v`.`created`
   FROM `{prefix}mcleaks_values` `v`
   JOIN `{prefix}players` `p` ON `p`.`id` = `v`.`player_id`
-  WHERE `v`.`player_id` = `player_id`;
+  WHERE `v`.`created` >= `from` AND `v`.`player_id` = `player_id`;
 END ;;
 DELIMITER ;
 

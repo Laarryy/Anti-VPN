@@ -10,13 +10,13 @@ public interface Storage {
     boolean isClosed();
 
     Set<VPNResult> getVPNQueue() throws StorageException;
-    VPNResult getVPNByIP(String ip) throws StorageException;
+    VPNResult getVPNByIP(String ip, long cacheTimeMillis) throws StorageException;
     default PostVPNResult postVPN(String ip, boolean cascade) throws StorageException { return postVPN(ip, Optional.of(cascade), Optional.empty()); }
     default PostVPNResult postVPN(String ip, double consensus) throws StorageException { return postVPN(ip, Optional.empty(), Optional.of(consensus)); }
     PostVPNResult postVPN(String ip, Optional<Boolean> cascade, Optional<Double> consensus) throws StorageException;
 
     Set<MCLeaksResult> getMCLeaksQueue() throws StorageException;
-    MCLeaksResult getMCLeaksByPlayer(UUID playerID) throws StorageException;
+    MCLeaksResult getMCLeaksByPlayer(UUID playerID, long cacheTimeMillis) throws StorageException;
     PostMCLeaksResult postMCLeaks(UUID playerID, boolean value) throws StorageException;
 
     void setIPRaw(long longIPID, String ip) throws StorageException;

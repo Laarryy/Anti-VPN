@@ -2,7 +2,7 @@ package me.egg82.antivpn.apis;
 
 import me.egg82.antivpn.APIException;
 
-public interface VPNAPI {
+public interface SourceAPI {
     String getName();
 
     boolean isKeyRequired();

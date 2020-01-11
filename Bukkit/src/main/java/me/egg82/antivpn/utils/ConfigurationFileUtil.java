@@ -8,7 +8,7 @@ import java.nio.file.Files;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import me.egg82.antivpn.apis.VPNAPI;
+import me.egg82.antivpn.apis.SourceAPI;
 import me.egg82.antivpn.enums.SQLType;
 import me.egg82.antivpn.extended.CachedConfigValues;
 import me.egg82.antivpn.extended.Configuration;
@@ -110,7 +110,7 @@ public class ConfigurationFileUtil {
                 continue;
             }
 
-            Optional<VPNAPI> api = InternalAPI.getAPI(source);
+            Optional<SourceAPI> api = InternalAPI.getAPI(source);
             if (api.isPresent() && api.get().isKeyRequired() && config.getNode("sources", source, "key").getString("").isEmpty()) {
                 if (debug) {
                     logger.info(LogUtil.getHeading() + ChatColor.DARK_RED + source + " requires a key which was not provided. Removing.");

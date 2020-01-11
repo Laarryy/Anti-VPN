@@ -8,13 +8,14 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import me.egg82.antivpn.APIException;
+import me.egg82.antivpn.utils.ValidationUtil;
 import ninja.egg82.json.JSONWebUtil;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Teoh extends AbstractVPNAPI {
+public class Teoh extends AbstractSourceAPI {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     public String getName() { return "teoh"; }
@@ -31,6 +32,9 @@ public class Teoh extends AbstractVPNAPI {
     public boolean getResult(String ip) throws APIException {
         if (ip == null) {
             throw new IllegalArgumentException("ip cannot be null.");
+        }
+        if (!ValidationUtil.isValidIp(ip)) {
+            throw new IllegalArgumentException("ip is invalid.");
         }
 
         if (requests.getAndIncrement() >= 1000) {
