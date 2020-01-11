@@ -56,7 +56,12 @@ public class CachedConfigValues {
     public static class Builder {
         private final CachedConfigValues values = new CachedConfigValues();
 
-        private Builder() {}
+        private Builder() { }
+
+        public CachedConfigValues.Builder debug(boolean value) {
+            values.debug = value;
+            return this;
+        }
 
         public CachedConfigValues.Builder storage(List<Storage> value) {
             values.storage = ImmutableList.copyOf(value);
@@ -117,11 +122,6 @@ public class CachedConfigValues {
             }
 
             values.cacheTime = value;
-            return this;
-        }
-
-        public CachedConfigValues.Builder debug(boolean value) {
-            values.debug = value;
             return this;
         }
 

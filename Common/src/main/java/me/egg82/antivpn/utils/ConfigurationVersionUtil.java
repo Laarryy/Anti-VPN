@@ -474,6 +474,11 @@ public class ConfigurationVersionUtil {
         config.getNode("action", "vpn", "algorithm", "method").setValue(algorithmMethod);
         config.getNode("action", "vpn", "algorithm", "min-consensus").setValue(algorithmMinConsensus);
 
+        // sources->cacheTime to sources->cache-time
+        String sourceCacheTime = config.getNode("sources", "cacheTime").getString("6hours");
+        config.getNode("sources").removeChild("cacheTime");
+        config.getNode("sources", "cache-time").setValue(sourceCacheTime);
+
         // cacheTime & threads to connection->cache-time & threads, add timeout
         String cacheTime = config.getNode("cacheTime").getString("1minute");
         int threads = config.getNode("threads").getInt(4);

@@ -1,6 +1,7 @@
 package me.egg82.antivpn.utils;
 
 import java.util.regex.Pattern;
+import org.apache.commons.net.util.SubnetUtils;
 import org.apache.commons.validator.routines.InetAddressValidator;
 
 public class ValidationUtil {
@@ -20,6 +21,17 @@ public class ValidationUtil {
     private static final Pattern uuidValidator = Pattern.compile("^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$", Pattern.CASE_INSENSITIVE);
 
     private ValidationUtil() {}
+
+    public static boolean isValidIPRange(String range) {
+        if (range == null) {
+            return false;
+        }
+
+        try {
+            new SubnetUtils(range);
+            return true;
+        } catch (IllegalArgumentException ignored) { return false; }
+    }
 
     public static boolean isValidIp(String ip) {
         if (ip == null) {

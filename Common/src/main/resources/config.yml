@@ -289,11 +289,11 @@ action:
     commands:
       - ''
 
-  # IPs to ignore when checking for VPNs and/or MCLeaks accounts
+  # IPs and ranges to ignore when checking for VPNs and/or MCLeaks accounts
   ignore:
-  - '127.0.0.1'
+  - '127.0.0.0/8'
   - 'localhost'
-  - '::1'
+  - '::1/128'
 
 connection:
   # The amount of time to cache lookups in-memory

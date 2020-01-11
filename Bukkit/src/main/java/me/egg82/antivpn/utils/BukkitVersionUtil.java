@@ -1,7 +1,7 @@
 package me.egg82.antivpn.utils;
 
-import it.unimi.dsi.fastutil.ints.IntArrayList;
-import it.unimi.dsi.fastutil.ints.IntList;
+import com.google.common.primitives.Ints;
+import java.util.ArrayList;
 import java.util.List;
 import ninja.egg82.reflect.PackageFilter;
 import org.bukkit.Bukkit;
@@ -181,7 +181,7 @@ public class BukkitVersionUtil {
     }
 
     private static int[] parseVersion(String version, char separator) {
-        IntList ints = new IntArrayList();
+        List<Integer> ints = new ArrayList<>();
 
         int lastIndex = 0;
         int currentIndex = version.indexOf(separator);
@@ -200,7 +200,7 @@ public class BukkitVersionUtil {
             ints.add(current);
         }
 
-        return ints.toIntArray();
+        return Ints.toArray(ints);
     }
 
     private static int tryParseInt(String value) {

@@ -309,13 +309,6 @@
         </dependency>
 
         <dependency>
-            <groupId>commons-net</groupId>
-            <artifactId>commons-net</artifactId>
-            <version>3.6</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
             <groupId>me.egg82</groupId>
             <artifactId>antivpn-common</artifactId>
             <version>4.9.32</version>

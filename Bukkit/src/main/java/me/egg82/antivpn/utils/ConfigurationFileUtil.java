@@ -1,21 +1,25 @@
 package me.egg82.antivpn.utils;
 
 import com.google.common.reflect.TypeToken;
-import com.rabbitmq.client.ConnectionFactory;
-import com.zaxxer.hikari.HikariConfig;
 import java.io.*;
 import java.nio.file.Files;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+import me.egg82.antivpn.VPNAPI;
 import me.egg82.antivpn.apis.SourceAPI;
-import me.egg82.antivpn.enums.SQLType;
 import me.egg82.antivpn.extended.CachedConfigValues;
 import me.egg82.antivpn.extended.Configuration;
-import me.egg82.antivpn.extended.RabbitMQReceiver;
-import me.egg82.antivpn.services.InternalAPI;
+import me.egg82.antivpn.messaging.Messaging;
+import me.egg82.antivpn.messaging.MessagingException;
+import me.egg82.antivpn.messaging.RabbitMQ;
+import me.egg82.antivpn.services.MessagingHandler;
+import me.egg82.antivpn.services.StorageHandler;
+import me.egg82.antivpn.storage.MySQL;
+import me.egg82.antivpn.storage.SQLite;
+import me.egg82.antivpn.storage.Storage;
+import me.egg82.antivpn.storage.StorageException;
+import ninja.egg82.reflect.PackageFilter;
 import ninja.egg82.service.ServiceLocator;
-import ninja.egg82.sql.SQL;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.ConfigurationOptions;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
@@ -27,14 +31,13 @@ import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.DumperOptions;
-import redis.clients.jedis.JedisPool;
 
 public class ConfigurationFileUtil {
     private static final Logger logger = LoggerFactory.getLogger(ConfigurationFileUtil.class);
 
     private ConfigurationFileUtil() {}
 
-    public static void reloadConfig(Plugin plugin) {
+    public static void reloadConfig(Plugin plugin, StorageHandler storageHandler, MessagingHandler messagingHandler) {
         Configuration config;
         try {
             config = getConfig(plugin, "config.yml", new File(plugin.getDataFolder(), "config.yml"));
@@ -45,62 +48,54 @@ public class ConfigurationFileUtil {
 
         boolean debug = config.getNode("debug").getBoolean(false);
 
-        if (debug) {
-            logger.info(LogUtil.getHeading() + ChatColor.YELLOW + "Debug " + ChatColor.WHITE + "enabled");
-        }
-
         if (!debug) {
             Reflections.log = null;
         }
 
-        String sourceCacheTime = config.getNode("sources", "cacheTime").getString("6hours");
-        Optional<Long> sourceCacheTimeLong = TimeUtil.getTime(sourceCacheTime);
-        Optional<TimeUnit> sourceCacheTimeUnit = TimeUtil.getUnit(sourceCacheTime);
-        if (!sourceCacheTimeLong.isPresent()) {
-            logger.warn("sources.cacheTime is not a valid time pattern. Using default value.");
-            sourceCacheTimeLong = Optional.of(6L);
-            sourceCacheTimeUnit = Optional.of(TimeUnit.HOURS);
-        }
-        if (!sourceCacheTimeUnit.isPresent()) {
-            logger.warn("sources.cacheTime is not a valid time pattern. Using default value.");
-            sourceCacheTimeLong = Optional.of(6L);
-            sourceCacheTimeUnit = Optional.of(TimeUnit.HOURS);
-        }
-
         if (debug) {
-            logger.info(LogUtil.getHeading() + ChatColor.YELLOW + "Source cache time: " + ChatColor.WHITE + sourceCacheTimeUnit.get().toMillis(sourceCacheTimeLong.get()) + " millis");
+            logger.info(LogUtil.getHeading() + ChatColor.YELLOW + "Debug " + ChatColor.WHITE + "enabled");
         }
 
-        String cacheTime = config.getNode("cacheTime").getString("1minute");
-        Optional<Long> cacheTimeLong = TimeUtil.getTime(cacheTime);
-        Optional<TimeUnit> cacheTimeUnit = TimeUtil.getUnit(cacheTime);
-        if (!cacheTimeLong.isPresent()) {
-            logger.warn("cacheTime is not a valid time pattern. Using default value.");
-            cacheTimeLong = Optional.of(1L);
-            cacheTimeUnit = Optional.of(TimeUnit.MINUTES);
-        }
-        if (!cacheTimeUnit.isPresent()) {
-            logger.warn("cacheTime is not a valid time pattern. Using default value.");
-            cacheTimeLong = Optional.of(1L);
-            cacheTimeUnit = Optional.of(TimeUnit.MINUTES);
-        }
+        UUID serverID = ServerIDUtil.getID(new File(plugin.getDataFolder(), "stats-id.txt"));
 
-        if (debug) {
-            logger.info(LogUtil.getHeading() + ChatColor.YELLOW + "Memory cache time: " + ChatColor.WHITE + cacheTimeUnit.get().toMillis(cacheTimeLong.get()) + " millis");
-        }
-
-        Set<String> sources;
+        List<Storage> storage;
         try {
-            sources = new LinkedHashSet<>(config.getNode("sources", "order").getList(TypeToken.of(String.class)));
+            storage = getStorage(plugin, config.getNode("storage", "engines"), new PoolSettings(config.getNode("storage", "settings")), debug, config.getNode("storage", "order").getList(TypeToken.of(String.class)), storageHandler);
         } catch (ObjectMappingException ex) {
             logger.error(ex.getMessage(), ex);
-            sources = new LinkedHashSet<>();
+            storage = new ArrayList<>();
         }
 
-        if (!InternalAPI.isInitialized()) {
-            InternalAPI.initialize(debug);
+        if (debug) {
+            for (Storage s : storage) {
+                logger.info(LogUtil.getHeading() + ChatColor.YELLOW + "Added storage: " + ChatColor.WHITE + s.getClass().getSimpleName());
+            }
         }
-        for (Iterator<String> i = sources.iterator(); i.hasNext();) {
+
+        List<Messaging> messaging;
+        try {
+            messaging = getMessaging(config.getNode("messaging", "engines"), new PoolSettings(config.getNode("messaging", "settings")), debug, serverID, config.getNode("messaging", "order").getList(TypeToken.of(String.class)), messagingHandler);
+        } catch (ObjectMappingException ex) {
+            logger.error(ex.getMessage(), ex);
+            messaging = new ArrayList<>();
+        }
+
+        if (debug) {
+            for (Messaging m : messaging) {
+                logger.info(LogUtil.getHeading() + ChatColor.YELLOW + "Added messaging: " + ChatColor.WHITE + m.getClass().getSimpleName());
+            }
+        }
+
+        Map<String, SourceAPI> sources = getAllSources(debug);
+        Set<String> stringSources;
+        try {
+            stringSources = new LinkedHashSet<>(config.getNode("sources", "order").getList(TypeToken.of(String.class)));
+        } catch (ObjectMappingException ex) {
+            logger.error(ex.getMessage(), ex);
+            stringSources = new LinkedHashSet<>();
+        }
+
+        for (Iterator<String> i = stringSources.iterator(); i.hasNext();) {
             String source = i.next();
             if (!config.getNode("sources", source, "enabled").getBoolean()) {
                 if (debug) {
@@ -110,7 +105,7 @@ public class ConfigurationFileUtil {
                 continue;
             }
 
-            Optional<SourceAPI> api = InternalAPI.getAPI(source);
+            Optional<SourceAPI> api = getAPI(source, sources);
             if (api.isPresent() && api.get().isKeyRequired() && config.getNode("sources", source, "key").getString("").isEmpty()) {
                 if (debug) {
                     logger.info(LogUtil.getHeading() + ChatColor.DARK_RED + source + " requires a key which was not provided. Removing.");
@@ -118,11 +113,40 @@ public class ConfigurationFileUtil {
                 i.remove();
             }
         }
+        for(Iterator<Map.Entry<String, SourceAPI>> i = sources.entrySet().iterator(); i.hasNext(); ) {
+            Map.Entry<String, SourceAPI> kvp = i.next();
+            if (!stringSources.contains(kvp.getKey())) {
+                if (debug) {
+                    logger.info(LogUtil.getHeading() + ChatColor.DARK_RED + "Removed undefined source: " + ChatColor.WHITE + kvp.getKey());
+                }
+                i.remove();
+            }
+        }
 
         if (debug) {
-            for (String source : sources) {
+            for (String source : stringSources) {
                 logger.info(LogUtil.getHeading() + ChatColor.YELLOW + "Added source: " + ChatColor.WHITE + source);
             }
+        }
+
+        Optional<TimeUtil.Time> sourceCacheTime = TimeUtil.getTime(config.getNode("sources", "cache-time").getString("6hours"));
+        if (!sourceCacheTime.isPresent()) {
+            logger.warn("sources.cache-time is not a valid time pattern. Using default value.");
+            sourceCacheTime = Optional.of(new TimeUtil.Time(6L, TimeUnit.HOURS));
+        }
+
+        if (debug) {
+            logger.info(LogUtil.getHeading() + ChatColor.YELLOW + "Source cache time: " + ChatColor.WHITE + sourceCacheTime.get().getMillis() + "ms");
+        }
+
+        Optional<TimeUtil.Time> mcleaksCacheTime = TimeUtil.getTime(config.getNode("mcleaks", "cache-time").getString("1day"));
+        if (!mcleaksCacheTime.isPresent()) {
+            logger.warn("mcleaks.cache-time is not a valid time pattern. Using default value.");
+            mcleaksCacheTime = Optional.of(new TimeUtil.Time(1L, TimeUnit.DAYS));
+        }
+
+        if (debug) {
+            logger.info(LogUtil.getHeading() + ChatColor.YELLOW + "MCLeaks cache time: " + ChatColor.WHITE + mcleaksCacheTime.get().getMillis() + "ms");
         }
 
         Set<String> ignoredIps;
@@ -132,40 +156,62 @@ public class ConfigurationFileUtil {
             logger.error(ex.getMessage(), ex);
             ignoredIps = new HashSet<>();
         }
-
-        if (debug) {
-            for (String ip : ignoredIps) {
-                logger.info(LogUtil.getHeading() + ChatColor.YELLOW + "Ignoring IP: " + ChatColor.WHITE + ip);
+        for (Iterator<String> i = ignoredIps.iterator(); i.hasNext();) {
+            String ip = i.next();
+            if (!ValidationUtil.isValidIp(ip) && !ValidationUtil.isValidIPRange(ip)) {
+                if (debug) {
+                    logger.info(LogUtil.getHeading() + ChatColor.DARK_RED + "Removed invalid IP/range: " + ChatColor.WHITE + ip);
+                }
+                i.remove();
             }
         }
 
-        try {
-            destroyServices(ServiceLocator.getOptional(CachedConfigValues.class), ServiceLocator.getOptional(RabbitMQReceiver.class));
-        } catch (InstantiationException | IllegalAccessException | IOException | TimeoutException ex) {
-            logger.error(ex.getMessage(), ex);
+        if (debug) {
+            for (String ip : ignoredIps) {
+                logger.info(LogUtil.getHeading() + ChatColor.YELLOW + "Ignoring IP or range: " + ChatColor.WHITE + ip);
+            }
         }
 
+        Optional<TimeUtil.Time> cacheTime = TimeUtil.getTime(config.getNode("connection", "cache-time").getString("1minute"));
+        if (!cacheTime.isPresent()) {
+            logger.warn("connection.cache-time is not a valid time pattern. Using default value.");
+            cacheTime = Optional.of(new TimeUtil.Time(1L, TimeUnit.MINUTES));
+        }
+
+        if (debug) {
+            logger.info(LogUtil.getHeading() + ChatColor.YELLOW + "Memory cache time: " + ChatColor.WHITE + cacheTime.get().getMillis() + "ms");
+        }
+
+
+
+
+
+
         CachedConfigValues cachedValues = CachedConfigValues.builder()
-                .sources(sources)
-                .sourceCacheTime(sourceCacheTimeLong.get(), sourceCacheTimeUnit.get())
-                .ignoredIps(ignoredIps)
-                .cacheTime(cacheTimeLong.get(), cacheTimeUnit.get())
                 .debug(debug)
-                .threads(config.getNode("threads").getInt(4))
-                .redisPool(getRedisPool(config.getNode("redis")))
-                .rabbitConnectionFactory(getRabbitConnectionFactory(config.getNode("rabbitmq")))
-                .sql(getSQL(plugin, config.getNode("storage")))
-                .sqlType(config.getNode("storage", "method").getString("sqlite"))
+                .storage(storage)
+                .messaging(messaging)
+                .sources(sources)
+                .sourceCacheTime(sourceCacheTime.get())
+                .mcleaksCacheTime(mcleaksCacheTime.get())
+                .ignoredIps(ignoredIps)
+                .cacheTime(cacheTime.get())
+                .threads(config.getNode("connection", "threads").getInt(4))
+                .timeout(config.getNode("connection", "timeout").getLong(5000L))
+                .vpnActionCommands(vpnActionCommands)
+                .mcleaksActionCommands(mcleaksActionCommands)
                 .build();
+
+        ConfigUtil.setConfiguration(config, cachedValues);
 
         ServiceLocator.register(config);
         ServiceLocator.register(cachedValues);
 
+        VPNAPI.reload();
+
         if (debug) {
             logger.info(LogUtil.getHeading() + ChatColor.YELLOW + "API threads: " + ChatColor.WHITE + cachedValues.getThreads());
-            logger.info(LogUtil.getHeading() + ChatColor.YELLOW + "Using Redis: " + ChatColor.WHITE + (cachedValues.getRedisPool() != null));
-            logger.info(LogUtil.getHeading() + ChatColor.YELLOW + "Using RabbitMQ: " + ChatColor.WHITE + (cachedValues.getRabbitConnectionFactory() != null));
-            logger.info(LogUtil.getHeading() + ChatColor.YELLOW + "SQL type: " + ChatColor.WHITE + cachedValues.getSQLType().name());
+            logger.info(LogUtil.getHeading() + ChatColor.YELLOW + "API timeout: " + ChatColor.WHITE + cachedValues.getTimeout() + "ms");
         }
     }
 
@@ -203,114 +249,225 @@ public class ConfigurationFileUtil {
         return config;
     }
 
-    private static void destroyServices(Optional<CachedConfigValues> cachedConfigValues, Optional<RabbitMQReceiver> rabbitReceiver) throws IOException, TimeoutException {
-        if (!cachedConfigValues.isPresent()) {
-            return;
+    private static List<Storage> getStorage(Plugin plugin, ConfigurationNode enginesNode, PoolSettings settings, boolean debug, List<String> names, StorageHandler handler) {
+        List<Storage> retVal = new ArrayList<>();
+
+        for (String name : names) {
+            name = name.toLowerCase();
+            switch (name) {
+                case "mysql": {
+                    if (!enginesNode.getNode(name, "enabled").getBoolean()) {
+                        if (debug) {
+                            logger.info(LogUtil.getHeading() + ChatColor.DARK_RED + name + " is disabled. Removing.");
+                        }
+                        continue;
+                    }
+                    ConfigurationNode connectionNode = enginesNode.getNode(name, "connection");
+                    String options = connectionNode.getNode("options").getString("useSSL=false&useUnicode=true&characterEncoding=utf8");
+                    if (options.length() > 0 && options.charAt(0) == '?') {
+                        options = options.substring(1);
+                    }
+                    AddressPort url = new AddressPort("storage.engines." + name + ".connection.address", connectionNode.getNode("address").getString("127.0.0.1:3306"), 3306);
+                    try {
+                        retVal.add(
+                                MySQL.builder(handler)
+                                        .url(url.address, url.port, connectionNode.getNode("database").getString("simple_staff_chat"), connectionNode.getNode("prefix").getString("ssc_"))
+                                        .credentials(connectionNode.getNode("username").getString(""), connectionNode.getNode("password").getString(""))
+                                        .options(options)
+                                        .poolSize(settings.minPoolSize, settings.maxPoolSize)
+                                        .life(settings.maxLifetime, settings.timeout)
+                                        .build()
+                        );
+                    } catch (IOException | StorageException ex) {
+                        logger.error("Could not create MySQL instance.", ex);
+                    }
+                    break;
+                }
+                case "redis": {
+                    if (!enginesNode.getNode(name, "enabled").getBoolean()) {
+                        if (debug) {
+                            logger.info(LogUtil.getHeading() + ChatColor.DARK_RED + name + " is disabled. Removing.");
+                        }
+                        continue;
+                    }
+                    ConfigurationNode connectionNode = enginesNode.getNode(name, "connection");
+                    AddressPort url = new AddressPort("storage.engines." + name + ".connection.address", connectionNode.getNode("address").getString("127.0.0.1:6379"), 6379);
+                    try {
+                        retVal.add(
+                                me.egg82.antivpn.storage.Redis.builder(handler)
+                                        .url(url.address, url.port, connectionNode.getNode("prefix").getString("ssc_"))
+                                        .credentials(connectionNode.getNode("password").getString(""))
+                                        .poolSize(settings.minPoolSize, settings.maxPoolSize)
+                                        .life(settings.maxLifetime, (int) settings.timeout)
+                                        .build()
+                        );
+                    } catch (StorageException ex) {
+                        logger.error("Could not create Redis instance.", ex);
+                    }
+                    break;
+                }
+                case "sqlite": {
+                    if (!enginesNode.getNode(name, "enabled").getBoolean()) {
+                        if (debug) {
+                            logger.info(LogUtil.getHeading() + ChatColor.DARK_RED + name + " is disabled. Removing.");
+                        }
+                        continue;
+                    }
+                    ConfigurationNode connectionNode = enginesNode.getNode(name, "connection");
+                    String options = connectionNode.getNode("options").getString("useUnicode=true&characterEncoding=utf8");
+                    if (options.length() > 0 && options.charAt(0) == '?') {
+                        options = options.substring(1);
+                    }
+                    String file = connectionNode.getNode("file").getString("simple_staff_chat.db");
+                    try {
+                        retVal.add(
+                                SQLite.builder(handler)
+                                        .file(new File(plugin.getDataFolder(), file), connectionNode.getNode("prefix").getString("ssc_"))
+                                        .options(options)
+                                        .poolSize(settings.minPoolSize, settings.maxPoolSize)
+                                        .life(settings.maxLifetime, settings.timeout)
+                                        .build()
+                        );
+                    } catch (IOException | StorageException ex) {
+                        logger.error("Could not create SQLite instance.", ex);
+                    }
+                    break;
+                }
+                default: {
+                    logger.warn("Unknown storage type: \"" + name + "\"");
+                    break;
+                }
+            }
         }
 
-        cachedConfigValues.get().getSQL().close();
-
-        if (cachedConfigValues.get().getRedisPool() != null) {
-            cachedConfigValues.get().getRedisPool().close();
-        }
-
-        if (rabbitReceiver.isPresent()) {
-            rabbitReceiver.get().close();
-        }
+        return retVal;
     }
 
-    private static SQL getSQL(Plugin plugin, ConfigurationNode storageConfigNode) {
-        SQLType type = SQLType.getByName(storageConfigNode.getNode("method").getString("sqlite"));
-        if (type == SQLType.UNKNOWN) {
-            logger.warn("storage.method is an unknown value. Using default value.");
-            type = SQLType.SQLite;
+    private static List<Messaging> getMessaging(ConfigurationNode enginesNode, PoolSettings settings, boolean debug, UUID serverID, List<String> names, MessagingHandler handler) {
+        List<Messaging> retVal = new ArrayList<>();
+
+        for (String name : names) {
+            name = name.toLowerCase();
+            switch (name) {
+                case "rabbitmq": {
+                    if (!enginesNode.getNode(name, "enabled").getBoolean()) {
+                        if (debug) {
+                            logger.info(LogUtil.getHeading() + ChatColor.DARK_RED + name + " is disabled. Removing.");
+                        }
+                        continue;
+                    }
+                    ConfigurationNode connectionNode = enginesNode.getNode(name, "connection");
+                    AddressPort url = new AddressPort("messaging.engines." + name + ".connection.address", connectionNode.getNode("address").getString("127.0.0.1:6379"), 6379);
+                    try {
+                        retVal.add(
+                                RabbitMQ.builder(serverID, handler)
+                                        .url(url.address, url.port, connectionNode.getNode("v-host").getString("/"))
+                                        .credentials(connectionNode.getNode("username").getString("guest"), connectionNode.getNode("password").getString("guest"))
+                                        .timeout((int) settings.timeout)
+                                        .build()
+                        );
+                    } catch (MessagingException ex) {
+                        logger.error("Could not create RabbitMQ instance.", ex);
+                    }
+                    break;
+                }
+                case "redis": {
+                    if (!enginesNode.getNode(name, "enabled").getBoolean()) {
+                        if (debug) {
+                            logger.info(LogUtil.getHeading() + ChatColor.DARK_RED + name + " is disabled. Removing.");
+                        }
+                        continue;
+                    }
+                    ConfigurationNode connectionNode = enginesNode.getNode(name, "connection");
+                    AddressPort url = new AddressPort("messaging.engines." + name + ".connection.address", connectionNode.getNode("address").getString("127.0.0.1:6379"), 6379);
+                    try {
+                        retVal.add(
+                                me.egg82.antivpn.messaging.Redis.builder(serverID, handler)
+                                        .url(url.address, url.port)
+                                        .credentials(connectionNode.getNode("password").getString(""))
+                                        .poolSize(settings.minPoolSize, settings.maxPoolSize)
+                                        .life(settings.maxLifetime, (int) settings.timeout)
+                                        .build()
+                        );
+                    } catch (MessagingException ex) {
+                        logger.error("Could not create Redis instance.", ex);
+                    }
+                    break;
+                }
+                default: {
+                    logger.warn("Unknown messaging type: \"" + name + "\"");
+                    break;
+                }
+            }
         }
 
-        HikariConfig hikariConfig = new HikariConfig();
-        if (type == SQLType.MySQL) {
-            hikariConfig.setJdbcUrl("jdbc:mysql://" + storageConfigNode.getNode("data", "address").getString("127.0.0.1:3306") + "/" + storageConfigNode.getNode("data", "database").getString("avpn"));
-            hikariConfig.setConnectionTestQuery("SELECT 1;");
-        } else if (type == SQLType.SQLite) {
-            hikariConfig.setJdbcUrl("jdbc:sqlite:" + new File(plugin.getDataFolder(), storageConfigNode.getNode("data", "database").getString("avpn") + ".db").getAbsolutePath());
-            hikariConfig.setConnectionTestQuery("SELECT 1;");
-        }
-        hikariConfig.setUsername(storageConfigNode.getNode("data", "username").getString(""));
-        hikariConfig.setPassword(storageConfigNode.getNode("data", "password").getString(""));
-        hikariConfig.setMaximumPoolSize(storageConfigNode.getNode("settings", "max-pool-size").getInt(2));
-        hikariConfig.setMinimumIdle(storageConfigNode.getNode("settings", "min-idle").getInt(2));
-        hikariConfig.setMaxLifetime(storageConfigNode.getNode("settings", "max-lifetime").getLong(1800000L));
-        hikariConfig.setConnectionTimeout(storageConfigNode.getNode("settings", "timeout").getLong(5000L));
-        hikariConfig.addDataSourceProperty("useUnicode", String.valueOf(storageConfigNode.getNode("settings", "properties", "unicode").getBoolean(true)));
-        hikariConfig.addDataSourceProperty("characterEncoding", storageConfigNode.getNode("settings", "properties", "encoding").getString("utf8"));
-        hikariConfig.addDataSourceProperty("useLegacyDatetimeCode", false);
-        hikariConfig.addDataSourceProperty("serverTimezone", "UTC");
-        hikariConfig.setAutoCommit(true);
-
-        // Optimizations
-        if (type == SQLType.MySQL) {
-            hikariConfig.addDataSourceProperty("useSSL", String.valueOf(storageConfigNode.getNode("data", "ssl").getBoolean(false)));
-            // http://assets.en.oreilly.com/1/event/21/Connector_J%20Performance%20Gems%20Presentation.pdf
-            hikariConfig.addDataSourceProperty("cacheServerConfiguration", "true");
-            hikariConfig.addDataSourceProperty("useLocalSessionState", "true");
-            hikariConfig.addDataSourceProperty("useLocalTransactionState", "true");
-            hikariConfig.addDataSourceProperty("rewriteBatchedStatements", "true");
-            hikariConfig.addDataSourceProperty("useServerPrepStmts", "true");
-            hikariConfig.addDataSourceProperty("cachePrepStmts", "true");
-            hikariConfig.addDataSourceProperty("maintainTimeStats", "false");
-            hikariConfig.addDataSourceProperty("useUnbufferedIO", "false");
-            hikariConfig.addDataSourceProperty("useReadAheadInput", "false");
-            // https://github.com/brettwooldridge/HikariCP/wiki/MySQL-Configuration
-            hikariConfig.addDataSourceProperty("prepStmtCacheSize", "250");
-            hikariConfig.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
-            hikariConfig.addDataSourceProperty("cacheResultSetMetadata", "true");
-            hikariConfig.addDataSourceProperty("elideSetAutoCommits", "true");
-        }
-
-        return new SQL(hikariConfig);
+        return retVal;
     }
 
-    private static JedisPool getRedisPool(ConfigurationNode redisConfigNode) {
-        if (!redisConfigNode.getNode("enabled").getBoolean(false)) {
-            return null;
-        }
+    private static Optional<SourceAPI> getAPI(String name, Map<String, SourceAPI> sources) { return Optional.ofNullable(sources.getOrDefault(name, null)); }
 
-        String address = redisConfigNode.getNode("address").getString("127.0.0.1:6379");
-        int portIndex = address.indexOf(':');
-        int port;
-        if (portIndex > -1) {
-            port = Integer.parseInt(address.substring(portIndex + 1));
-            address = address.substring(0, portIndex);
-        } else {
-            logger.warn("redis.address port is an unknown value. Using default value.");
-            port = 6379;
-        }
+    private static Map<String, SourceAPI> getAllSources(boolean debug) {
+        List<Class<SourceAPI>> sourceClasses = PackageFilter.getClasses(SourceAPI.class, "me.egg82.antivpn.apis", false, false, false);
+        Map<String, SourceAPI> retVal = new HashMap<>();
+        for (Class<SourceAPI> clazz : sourceClasses) {
+            if (debug) {
+                logger.info("Initializing VPN API " + clazz.getName());
+            }
 
-        return new JedisPool(address, port);
+            try {
+                SourceAPI api = clazz.newInstance();
+                retVal.put(api.getName(), api);
+            } catch (InstantiationException | IllegalAccessException ex) {
+                logger.error(ex.getMessage(), ex);
+            }
+        }
+        return retVal;
     }
 
-    private static ConnectionFactory getRabbitConnectionFactory(ConfigurationNode rabbitConfigNode) {
-        if (!rabbitConfigNode.getNode("enabled").getBoolean(false)) {
-            return null;
+    private static class AddressPort {
+        private String address;
+        private int port;
+
+        public AddressPort(String node, String raw, int defaultPort) {
+            String address = raw;
+            int portIndex = address.indexOf(':');
+            int port;
+            if (portIndex > -1) {
+                port = Integer.parseInt(address.substring(portIndex + 1));
+                address = address.substring(0, portIndex);
+            } else {
+                logger.warn(node + " port is an unknown value. Using default value.");
+                port = defaultPort;
+            }
+
+            this.address = address;
+            this.port = port;
         }
 
-        String address = rabbitConfigNode.getNode("address").getString("127.0.0.1:5672");
-        int portIndex = address.indexOf(':');
-        int port;
-        if (portIndex > -1) {
-            port = Integer.parseInt(address.substring(portIndex + 1));
-            address = address.substring(0, portIndex);
-        } else {
-            logger.warn("rabbitmq.address port is an unknown value. Using default value.");
-            port = 5672;
+        public String getAddress() { return address; }
+
+        public int getPort() { return port; }
+    }
+
+    private static class PoolSettings {
+        private int minPoolSize;
+        private int maxPoolSize;
+        private long maxLifetime;
+        private long timeout;
+
+        public PoolSettings(ConfigurationNode settingsNode) {
+            minPoolSize = settingsNode.getNode("min-idle").getInt();
+            maxPoolSize = settingsNode.getNode("max-pool-size").getInt();
+            maxLifetime = settingsNode.getNode("max-lifetime").getLong();
+            timeout = settingsNode.getNode("timeout").getLong();
         }
 
-        ConnectionFactory factory = new ConnectionFactory();
-        factory.setHost(address);
-        factory.setPort(port);
-        factory.setVirtualHost("/");
-        factory.setUsername(rabbitConfigNode.getNode("username").getString("guest"));
-        factory.setPassword(rabbitConfigNode.getNode("password").getString("guest"));
+        public int getMinPoolSize() { return minPoolSize; }
 
-        return factory;
+        public int getMaxPoolSize() { return maxPoolSize; }
+
+        public long getMaxLifetime() { return maxLifetime; }
+
+        public long getTimeout() { return timeout; }
     }
 }

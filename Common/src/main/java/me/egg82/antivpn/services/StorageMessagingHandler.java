@@ -12,7 +12,6 @@ import java.util.concurrent.atomic.AtomicLong;
 import me.egg82.antivpn.core.MCLeaksResult;
 import me.egg82.antivpn.core.VPNResult;
 import me.egg82.antivpn.extended.CachedConfigValues;
-import me.egg82.antivpn.extended.PostHandler;
 import me.egg82.antivpn.messaging.Messaging;
 import me.egg82.antivpn.messaging.MessagingException;
 import me.egg82.antivpn.storage.Storage;
@@ -30,12 +29,9 @@ public class StorageMessagingHandler implements StorageHandler, MessagingHandler
 
     private final ExecutorService workPool = Executors.newFixedThreadPool(1, new ThreadFactoryBuilder().setNameFormat("AntiVPN-SMH-%d").build());
 
-    private final PostHandler handler;
-
     private final AtomicLong receivedMessages = new AtomicLong(0L);
 
-    public StorageMessagingHandler(PostHandler handler) {
-        this.handler = handler;
+    public StorageMessagingHandler() {
         workPool.execute(this::getQueues);
     }
 
@@ -44,10 +40,6 @@ public class StorageMessagingHandler implements StorageHandler, MessagingHandler
     public void cacheVPNPost(long id) { cachedVPNPosts.put(id, Boolean.TRUE); }
 
     public void cacheMCLeaksPost(long id) { cachedMCLeaksPosts.put(id, Boolean.TRUE); }
-
-    public void postVPNResult(VPNResult result) { handler.handle(result); }
-
-    public void postMCLeaksResult(MCLeaksResult result) { handler.handle(result); }
 
     public long numReceivedMessages() { return receivedMessages.get(); }
 
@@ -95,11 +87,6 @@ public class StorageMessagingHandler implements StorageHandler, MessagingHandler
             }
             cachedVPNPosts.put(r.getID(), Boolean.TRUE);
             receivedMessages.getAndIncrement();
-            try {
-                handler.handle(r);
-            } catch (Throwable ex) {
-                logger.error("Could not handle VPN post.", ex);
-            }
         }
 
         Set<MCLeaksResult> mcleaksQueue = new LinkedHashSet<>();
@@ -120,11 +107,6 @@ public class StorageMessagingHandler implements StorageHandler, MessagingHandler
             }
             cachedMCLeaksPosts.put(r.getID(), Boolean.TRUE);
             receivedMessages.getAndIncrement();
-            try {
-                handler.handle(r);
-            } catch (Throwable ex) {
-                logger.error("Could not handle MCLeaks post.", ex);
-            }
         }
 
         try {

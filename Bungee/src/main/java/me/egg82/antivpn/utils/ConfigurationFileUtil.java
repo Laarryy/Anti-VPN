@@ -163,8 +163,6 @@ public class ConfigurationFileUtil {
         ServiceLocator.register(config);
         ServiceLocator.register(cachedValues);
 
-        VPNAPI.reload();
-
         if (debug) {
             plugin.getProxy().getConsole().sendMessage(new TextComponent(LogUtil.getHeading() + ChatColor.YELLOW + "API threads: " + ChatColor.WHITE + cachedValues.getThreads()));
             plugin.getProxy().getConsole().sendMessage(new TextComponent(LogUtil.getHeading() + ChatColor.YELLOW + "Using Redis: " + ChatColor.WHITE + (cachedValues.getRedisPool() != null)));
