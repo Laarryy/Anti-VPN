@@ -1,43 +1,64 @@
 package me.egg82.antivpn.hooks;
 
-import com.djrapitops.plan.api.PlanAPI;
-import com.djrapitops.plan.data.element.AnalysisContainer;
-import com.djrapitops.plan.data.element.InspectContainer;
-import com.djrapitops.plan.data.plugin.ContainerSize;
-import com.djrapitops.plan.data.plugin.PluginData;
-import com.djrapitops.plan.utilities.html.icon.Color;
-import com.djrapitops.plan.utilities.html.icon.Icon;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.util.Collection;
-import java.util.Optional;
-import java.util.UUID;
-import me.egg82.antivpn.APIException;
+import com.djrapitops.plan.capability.CapabilityService;
+import com.djrapitops.plan.extension.CallEvents;
+import com.djrapitops.plan.extension.DataExtension;
+import com.djrapitops.plan.extension.ExtensionService;
+import com.djrapitops.plan.extension.annotation.PluginInfo;
+import com.djrapitops.plan.extension.icon.Color;
+import com.djrapitops.plan.extension.icon.Family;
 import me.egg82.antivpn.VPNAPI;
-import me.egg82.antivpn.extended.Configuration;
-import me.egg82.antivpn.services.AnalyticsHelper;
-import me.egg82.antivpn.utils.ConfigUtil;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class PlayerAnalyticsHook implements PluginHook {
     private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final CapabilityService capabilities;
 
-    public PlayerAnalyticsHook() { PlanAPI.getInstance().addPluginDataSource(new Data()); }
+    public PlayerAnalyticsHook() {
+        capabilities = CapabilityService.getInstance();
 
-    public void cancel() {}
-
-    class Data extends PluginData {
-        private final VPNAPI api = VPNAPI.getInstance();
-
-        private Data() {
-            super(ContainerSize.THIRD, "Anti-VPN");
-            setPluginIcon(Icon.called("shield").of(Color.BLUE).build());
+        if (isCapabilityAvailable("DATA_EXTENSION_VALUES") && isCapabilityAvailable("DATA_EXTENSION_TABLES")) {
+            try {
+                ExtensionService.getInstance().register(new Data());
+            } catch (NoClassDefFoundError ex) {
+                // Plan not installed
+                logger.error("Plan is not installed.", ex);
+            } catch (IllegalStateException ex) {
+                // Plan not enabled
+                logger.error("Plan is not enabled.", ex);
+            } catch (IllegalArgumentException ex) {
+                // DataExtension impl error
+                logger.error("DataExtension implementation exception.", ex);
+            }
         }
+    }
 
-        public InspectContainer getPlayerData(UUID uuid, InspectContainer container) {
+    public void cancel() { }
+
+    private boolean isCapabilityAvailable(String capability) {
+        try {
+            return capabilities.hasCapability(capability);
+        } catch (NoClassDefFoundError ignored) {
+            return false;
+        }
+    }
+
+    @PluginInfo(
+            name = "AntiVPN",
+            iconName = "shield",
+            iconFamily = Family.REGULAR,
+            color = Color.BLUE
+    )
+    class Data implements DataExtension {
+        private final VPNAPI api = VPNAPI.getInstance();
+        private final CallEvents[] events = new CallEvents[] { CallEvents.SERVER_PERIODICAL, CallEvents.SERVER_EXTENSION_REGISTER, CallEvents.PLAYER_JOIN };
+
+        private Data() { }
+
+        // TODO: Finish PLAN
+
+        /*public InspectContainer getPlayerData(UUID uuid, InspectContainer container) {
             Player player = Bukkit.getPlayer(uuid);
             if (player == null) {
                 return container;
@@ -136,8 +157,8 @@ public class PlayerAnalyticsHook implements PluginHook {
                 return null;
             }
             return host.getHostAddress();
-        }
+        }*/
 
-        private double clamp(double min, double max, double val) { return Math.min(max, Math.max(min, val)); }
+        public CallEvents[] callExtensionMethodsOn() { return events; }
     }
 }

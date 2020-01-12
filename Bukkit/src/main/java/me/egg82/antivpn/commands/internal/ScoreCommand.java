@@ -16,6 +16,7 @@ import org.bukkit.command.CommandSender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+// TODO: Fix
 public class ScoreCommand implements Runnable {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -87,9 +88,9 @@ public class ScoreCommand implements Runnable {
         }
 
         if (error > 0) {
-            sender.sendMessage(LogUtil.getHeading() + LogUtil.getSourceHeading(source) + ChatColor.DARK_RED + "Error " + ChatColor.WHITE + format.format((error / ips.size()) * 100.0d) + "%");
+            //sender.sendMessage(LogUtil.getHeading() + LogUtil.getSourceHeading(source) + ChatColor.DARK_RED + "Error " + ChatColor.WHITE + format.format((error / ips.size()) * 100.0d) + "%");
         }
-        sender.sendMessage(LogUtil.getHeading() + LogUtil.getSourceHeading(source) + ChatColor.YELLOW + vpnName + " score: " + ChatColor.WHITE + format.format((good / (ips.size() - error)) * 100.0d) + "%");
+        //sender.sendMessage(LogUtil.getHeading() + LogUtil.getSourceHeading(source) + ChatColor.YELLOW + vpnName + " score: " + ChatColor.WHITE + format.format((good / (ips.size() - error)) * 100.0d) + "%");
     }
 
     private Set<String> getNordVPNIPs() {

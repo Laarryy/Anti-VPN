@@ -13,6 +13,7 @@ import org.bukkit.command.CommandSender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+// TODO: Fix
 public class TestCommand implements Runnable {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -31,7 +32,7 @@ public class TestCommand implements Runnable {
     public void run() {
         sender.sendMessage(LogUtil.getHeading() + ChatColor.YELLOW + "Testing with " + ChatColor.WHITE + ip + ChatColor.YELLOW + ", please wait..");
 
-        chain
+        /*chain
                 .<ImmutableMap<String, Optional<Boolean>>>asyncCallback((v, f) -> {
                     try {
                         f.accept(api.testAllSources(ip));
@@ -58,6 +59,6 @@ public class TestCommand implements Runnable {
                     }
                     sender.sendMessage(LogUtil.getHeading() + ChatColor.GREEN + "Test for " + ChatColor.YELLOW + ip + ChatColor.GREEN + " complete!");
                 })
-                .execute();
+                .execute();*/
     }
 }

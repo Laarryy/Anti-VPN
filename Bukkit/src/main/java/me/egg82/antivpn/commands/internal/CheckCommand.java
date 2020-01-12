@@ -1,63 +1,119 @@
 package me.egg82.antivpn.commands.internal;
 
+import co.aikar.commands.CommandIssuer;
 import co.aikar.taskchain.TaskChain;
+import co.aikar.taskchain.TaskChainAbortAction;
+import java.io.IOException;
 import java.util.Optional;
+import java.util.UUID;
 import me.egg82.antivpn.APIException;
 import me.egg82.antivpn.VPNAPI;
-import me.egg82.antivpn.extended.Configuration;
+import me.egg82.antivpn.enums.Message;
+import me.egg82.antivpn.enums.VPNAlgorithmMethod;
+import me.egg82.antivpn.extended.CachedConfigValues;
+import me.egg82.antivpn.services.lookup.PlayerInfo;
+import me.egg82.antivpn.services.lookup.PlayerLookup;
 import me.egg82.antivpn.utils.ConfigUtil;
-import me.egg82.antivpn.utils.LogUtil;
-import org.bukkit.ChatColor;
-import org.bukkit.command.CommandSender;
+import me.egg82.antivpn.utils.ValidationUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class CheckCommand implements Runnable {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private final TaskChain<?> chain;
-    private final CommandSender sender;
+    private final CommandIssuer issuer;
     private final String type;
+    private final TaskChain<?> chain;
 
     private final VPNAPI api = VPNAPI.getInstance();
 
-    public CheckCommand(TaskChain<?> chain, CommandSender sender, String type) {
-        this.chain = chain;
-        this.sender = sender;
+    public CheckCommand(CommandIssuer issuer, String type, TaskChain<?> chain) {
+        this.issuer = issuer;
         this.type = type;
+        this.chain = chain;
     }
 
     public void run() {
-        sender.sendMessage(LogUtil.getHeading() + ChatColor.YELLOW + "Checking " + ChatColor.WHITE + ip + ChatColor.YELLOW + "..");
+        issuer.sendInfo(Message.CHECK__BEGIN, "{type}", type);
 
-        chain
-                .<String>asyncCallback((v, f) -> {
-                    Optional<Configuration> config = ConfigUtil.getConfig();
-                    if (!config.isPresent()) {
-                        f.accept(ChatColor.DARK_RED + "Internal error");
-                        return;
-                    }
+        if (ValidationUtil.isValidIp(type)) {
+            chain
+                    .<Optional<Boolean>>asyncCallback((v, f) -> {
+                        Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+                        if (!cachedConfig.isPresent()) {
+                            logger.error("Cached config could not be fetched.");
+                            f.accept(Optional.empty());
+                            return;
+                        }
 
-                    if (config.get().getNode("action", "algorithm", "method").getString("cascade").equalsIgnoreCase("consensus")) {
-                        double consensus = clamp(0.0d, 1.0d, config.get().getNode("action", "algorithm", "min-consensus").getDouble(0.6d));
-                        try {
-                            f.accept(api.consensus(ip) >= consensus ? ChatColor.DARK_RED + "VPN/Proxy detected" : ChatColor.GREEN + "No VPN/Proxy detected");
-                        } catch (APIException ex) {
-                            logger.error(ex.getMessage(), ex);
-                            f.accept(ChatColor.DARK_RED + "Internal error");
+                        if (cachedConfig.get().getVPNAlgorithmMethod() == VPNAlgorithmMethod.CONSESNSUS) {
+                            try {
+                                f.accept(Optional.of(api.consensus(type) >= cachedConfig.get().getVPNAlgorithmConsensus()));
+                                return;
+                            } catch (APIException ex) {
+                                logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
+                            }
+                        } else {
+                            try {
+                                f.accept(Optional.of(api.cascade(type)));
+                                return;
+                            } catch (APIException ex) {
+                                logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
+                            }
                         }
-                    } else {
-                        try {
-                            f.accept(api.cascade(ip) ? ChatColor.DARK_RED + "VPN/Proxy detected" : ChatColor.GREEN + "No VPN/Proxy detected");
-                        } catch (APIException ex) {
-                            logger.error(ex.getMessage(), ex);
-                            f.accept(ChatColor.DARK_RED + "Internal error");
+                        f.accept(Optional.empty());
+                    })
+                    .syncLast(f -> {
+                        if (!f.isPresent()) {
+                            issuer.sendError(Message.ERROR__INTERNAL);
+                            return;
                         }
-                    }
-                })
-                .syncLast(v -> sender.sendMessage(LogUtil.getHeading() + v))
-                .execute();
+                        issuer.sendInfo(f.get() ? Message.CHECK__VPN_DETECTED : Message.CHECK__NO_VPN_DETECTED);
+                    })
+                    .execute();
+        } else {
+            chain
+                    .<UUID>asyncCallback((v, f) -> f.accept(getPlayerUUID(type)))
+                    .abortIfNull(new TaskChainAbortAction<Object, Object, Object>() {
+                        public void onAbort(TaskChain<?> chain, Object arg1, Object arg2, Object arg3) {
+                            issuer.sendError(Message.ERROR__INTERNAL);
+                        }
+                    })
+                    .<Optional<Boolean>>asyncCallback((v, f) -> {
+                        Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+                        if (!cachedConfig.isPresent()) {
+                            logger.error("Cached config could not be fetched.");
+                            f.accept(Optional.empty());
+                            return;
+                        }
+
+                        try {
+                            f.accept(Optional.of(api.isMCLeaks(v)));
+                            return;
+                        } catch (APIException ex) {
+                            logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
+                        }
+                        f.accept(Optional.empty());
+                    })
+                    .syncLast(f -> {
+                        if (!f.isPresent()) {
+                            issuer.sendError(Message.ERROR__INTERNAL);
+                            return;
+                        }
+                        issuer.sendInfo(f.get() ? Message.CHECK__MCLEAKS_DETECTED : Message.CHECK__NO_MCLEAKS_DETECTED);
+                    })
+                    .execute();
+        }
     }
 
-    private double clamp(double min, double max, double val) { return Math.min(max, Math.max(min, val)); }
+    private UUID getPlayerUUID(String name) {
+        PlayerInfo info;
+        try {
+            info = PlayerLookup.get(name);
+        } catch (IOException ex) {
+            logger.warn("Could not fetch player UUID. (rate-limited?)", ex);
+            return null;
+        }
+        return info.getUUID();
+    }
 }

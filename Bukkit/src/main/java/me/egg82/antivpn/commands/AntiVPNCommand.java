@@ -30,7 +30,7 @@ public class AntiVPNCommand extends BaseCommand {
     @Subcommand("reload")
     @CommandPermission("avpn.admin")
     @Description("{@@description.reload}")
-    public void onReload(CommandSender sender) {
+    public void onReload(CommandIssuer issuer) {
         StorageMessagingHandler handler;
         try {
             handler = ServiceLocator.get(StorageMessagingHandler.class);
@@ -50,13 +50,14 @@ public class AntiVPNCommand extends BaseCommand {
         new ImportCommand(issuer, master, slave, batchSize, taskFactory.newChain()).run();
     }
 
-    @Subcommand("test")
+    // TODO: Implement rest of commands
+    /*@Subcommand("test")
     @CommandPermission("avpn.admin")
     @Description("{@@description.test}")
     @Syntax("<ip>")
     @CommandCompletion("@ip @nothing")
-    public void onTest(CommandSender sender, @Conditions("ip") String ip) {
-        new TestCommand(taskFactory.newChain(), sender, ip).run();
+    public void onTest(CommandIssuer issuer, @Conditions("ip") String ip) {
+        new TestCommand(taskFactory.newChain(), issuer, ip).run();
     }
 
     @Subcommand("score")
@@ -64,17 +65,17 @@ public class AntiVPNCommand extends BaseCommand {
     @Description("{@@description.score}")
     @Syntax("<source>")
     @CommandCompletion("@source @nothing")
-    public void onScore(CommandSender sender, @Conditions("source") String source) {
-        new ScoreCommand(taskFactory.newChain(), sender, source).run();
-    }
+    public void onScore(CommandIssuer issuer, @Conditions("source") String source) {
+        new ScoreCommand(taskFactory.newChain(), issuer, source).run();
+    }*/
 
     @Subcommand("check")
     @CommandPermission("avpn.admin")
     @Description("{@@description.check}")
     @Syntax("<ip|player>")
     @CommandCompletion("@ip|@player @nothing")
-    public void onCheck(CommandSender sender, String type) {
-        new CheckCommand(taskFactory.newChain(), sender, type).run();
+    public void onCheck(CommandIssuer issuer, String type) {
+        new CheckCommand(issuer, type, taskFactory.newChain()).run();
     }
 
     @CatchUnknown @Default
