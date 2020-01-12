@@ -208,8 +208,8 @@ public class BukkitBootstrap extends JavaPlugin {
         buildInject(amqpClient, jarsDir, classLoader, "RabbitMQ");
 
         Artifact.Builder mcleaks = Artifact.builder("me.gong", "mcleaks-api", "1.9.5-SNAPSHOT", cacheDir)
-                .addRepository(Repository.builder("https://nexus.egg82.me/repository/wesjd/").addProxy("https://nexus.wesjd.net/repository/thirdparty/").build())
-                .addRepository((Repository.builder("http://central.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build()));
+                .addRepository(Repository.builder("https://nexus.wesjd.net/repository/thirdparty/").addProxy("https://nexus.egg82.me/repository/wesjd/").build())
+                .addRepository(Repository.builder("http://central.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
         buildInject(mcleaks, jarsDir, classLoader, "MCLeaks API");
 
         Artifact.Builder gameanalyticsApi = Artifact.builder("ninja.egg82", "gameanalytics-api", "1.0.1", cacheDir)

@@ -133,8 +133,8 @@ public class SQLite extends AbstractSQL {
                         "  `v`.`cascade`," +
                         "  `v`.`consensus`," +
                         "  `v`.`created`" +
-                        "FROM `{prefix}vpn_values` `v`" +
-                        "JOIN `{prefix}ips` `i` ON `i`.`id` = `v`.`ip_id`" +
+                        "FROM `" + prefix + "vpn_values` `v`" +
+                        "JOIN `" + prefix + "ips` `i` ON `i`.`id` = `v`.`ip_id`" +
                         "WHERE `v`.`id` > ?;",
                     lastVPNID);
         } catch (SQLException ex) {
@@ -158,10 +158,10 @@ public class SQLite extends AbstractSQL {
                     "SELECT" +
                         "  `v`.`id`," +
                         "  `p`.`uuid` AS `player_id`," +
-                        "  `v`.`value`," +
+                        "  `v`.`result`," +
                         "  `v`.`created`" +
-                        "FROM `{prefix}mcleaks_values` `v`" +
-                        "JOIN `{prefix}players` `p` ON `p`.`id` = `v`.`player_id`" +
+                        "FROM `" + prefix + "mcleaks_values` `v`" +
+                        "JOIN `" + prefix + "players` `p` ON `p`.`id` = `v`.`player_id`" +
                         "WHERE `v`.`id` > ?;",
                     lastMCLeaksID);
         } catch (SQLException ex) {
@@ -195,10 +195,10 @@ public class SQLite extends AbstractSQL {
                         "  `v`.`cascade`," +
                         "  `v`.`consensus`," +
                         "  `v`.`created`" +
-                        "FROM `{prefix}vpn_values` `v`" +
-                        "JOIN `{prefix}ips` `i` ON `i`.`id` = `v`.`ip_id`" +
-                        "WHERE `v`.`date` >= DATE_SUB(CURRENT_TIMESTAMP, INTERVAL ? MICROSECOND) AND `v`.`ip_id` = ?;",
-                    cacheTimeMillis, longIPID);
+                        "FROM `" + prefix + "vpn_values` `v`" +
+                        "JOIN `" + prefix + "ips` `i` ON `i`.`id` = `v`.`ip_id`" +
+                        "WHERE `v`.`created` >= DATETIME(CURRENT_TIMESTAMP, ?) AND `v`.`ip_id` = ?;",
+                    "-" + (cacheTimeMillis / 1000L) + " seconds", longIPID);
         } catch (SQLException ex) {
             throw new StorageException(isAutomaticallyRecoverable(ex), ex);
         }
@@ -220,12 +220,12 @@ public class SQLite extends AbstractSQL {
                     "SELECT" +
                         "  `v`.`id`," +
                         "  `p`.`uuid` AS `player_id`," +
-                        "  `v`.`value`," +
+                        "  `v`.`result`," +
                         "  `v`.`created`" +
-                        "FROM `{prefix}mcleaks_values` `v`" +
-                        "JOIN `{prefix}players` `p` ON `p`.`id` = `v`.`player_id`" +
-                        "WHERE `v`.`date` >= DATE_SUB(CURRENT_TIMESTAMP, INTERVAL ? MICROSECOND) AND `v`.`player_id` = ?;",
-                    cacheTimeMillis, longPlayerID);
+                        "FROM `" + prefix + "mcleaks_values` `v`" +
+                        "JOIN `" + prefix + "players` `p` ON `p`.`id` = `v`.`player_id`" +
+                        "WHERE `v`.`created` >= DATETIME(CURRENT_TIMESTAMP, ?) AND `v`.`player_id` = ?;",
+                    "-" + (cacheTimeMillis / 1000L) + " seconds", longPlayerID);
         } catch (SQLException ex) {
             throw new StorageException(isAutomaticallyRecoverable(ex), ex);
         }
@@ -290,7 +290,7 @@ public class SQLite extends AbstractSQL {
         long longPlayerID = longPlayerIDCache.get(playerID);
         SQLExecuteResult result;
         try {
-            result = sql.execute("INSERT INTO `" + prefix + "mcleaks_values` (`player_id`, `value`) VALUES (?, ?);", longPlayerID, value);
+            result = sql.execute("INSERT INTO `" + prefix + "mcleaks_values` (`player_id`, `result`) VALUES (?, ?);", longPlayerID, value);
         } catch (SQLException ex) {
             throw new StorageException(isAutomaticallyRecoverable(ex), ex);
         }
@@ -347,13 +347,13 @@ public class SQLite extends AbstractSQL {
 
     public void postMCLeaksRaw(long id, long longPlayerID, boolean value, long created) throws StorageException {
         try {
-            sql.execute("INSERT OR IGNORE INTO `" + prefix + "mcleaks_values` (`id`, `player_id`, `value`, `created`) VALUES (?, ?, ?, ?);", id, longPlayerID, value, new Timestamp(created));
+            sql.execute("INSERT OR IGNORE INTO `" + prefix + "mcleaks_values` (`id`, `player_id`, `result`, `created`) VALUES (?, ?, ?, ?);", id, longPlayerID, value, new Timestamp(created));
         } catch (SQLException ex) {
             throw new StorageException(isAutomaticallyRecoverable(ex), ex);
         }
     }
 
-    protected void setKey(String key, String value) throws SQLException { sql.execute("INSERT INTO `" + prefix + "data` (`key`, `value`) VALUES (?, ?) ON CONFLICT(`key`) DO UPDATE SET `value`=?;", key, value, value); }
+    protected void setKey(String key, String value) throws SQLException { sql.execute("INSERT INTO `" + prefix + "data` (`key`, `value`) VALUES (?, ?) ON CONFLICT(`key`) DO UPDATE SET `result`=?;", key, value, value); }
 
     protected double getDouble(String key) throws SQLException {
         SQLQueryResult result = sql.query("SELECT `value` FROM `" + prefix + "data` WHERE `key`=?;", key);
@@ -475,7 +475,7 @@ public class SQLite extends AbstractSQL {
             retVal.add(new RawVPNResult(
                     ((Number) row[0]).longValue(),
                     ((Number) row[1]).longValue(),
-                    row[2] == null ? Optional.empty() : Optional.of((Boolean) row[2]),
+                    row[2] == null ? Optional.empty() : Optional.of(((Number) row[2]).intValue() == 1),
                     row[3] == null ? Optional.empty() : Optional.of(((Number) row[3]).doubleValue()),
                     getTime(row[4]).getTime()
             ));
@@ -517,7 +517,7 @@ public class SQLite extends AbstractSQL {
             retVal.add(new RawMCLeaksResult(
                     ((Number) row[0]).longValue(),
                     ((Number) row[1]).longValue(),
-                    ((Boolean) row[2]).booleanValue(),
+                    ((Number) row[2]).intValue() == 1,
                     getTime(row[3]).getTime()
             ));
         }
@@ -534,7 +534,7 @@ public class SQLite extends AbstractSQL {
                 sql.execute("VACUUM;");
             }
             for (RawMCLeaksResult value : values) {
-                sql.execute("INSERT INTO `" + prefix + "mcleaks_values` (`id`, `player_id`, `value`, `created`) VALUES (?, ?, ?, ?);", value.getID(), value.getLongPlayerID(), value.getValue(), new Timestamp(value.getCreated()));
+                sql.execute("INSERT INTO `" + prefix + "mcleaks_values` (`id`, `player_id`, `result`, `created`) VALUES (?, ?, ?, ?);", value.getID(), value.getLongPlayerID(), value.getValue(), new Timestamp(value.getCreated()));
             }
             if (truncate) {
                 sql.execute("PRAGMA foreign_keys = ON;");
@@ -554,7 +554,7 @@ public class SQLite extends AbstractSQL {
         return new VPNResult(
                 ((Number) row[0]).longValue(),
                 ip,
-                row[2] == null ? Optional.empty() : Optional.of((Boolean) row[2]),
+                row[2] == null ? Optional.empty() : Optional.of(((Number) row[2]).intValue() == 1),
                 row[3] == null ? Optional.empty() : Optional.of(((Number) row[3]).doubleValue()),
                 getTime(row[4]).getTime()
         );
@@ -570,7 +570,7 @@ public class SQLite extends AbstractSQL {
         return new MCLeaksResult(
                 ((Number) row[0]).longValue(),
                 UUID.fromString(playerID),
-                ((Boolean) row[2]).booleanValue(),
+                ((Number) row[2]).intValue() == 1,
                 getTime(row[3]).getTime()
         );
     }

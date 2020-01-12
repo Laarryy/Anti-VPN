@@ -54,7 +54,7 @@ public class PlayerEvents extends EventHolder {
                 return;
             } else if (ValidationUtil.isValidIPRange(testAddress) && new SubnetUtils(testAddress).getInfo().isInRange(ip)) {
                 if (ConfigUtil.getDebugOrFalse()) {
-                    logger.info(LogUtil.getHeading() + ChatColor.WHITE + event.getUniqueId() + ChatColor.YELLOW + " is under an ignored range " + ChatColor.WHITE + ip + ChatColor.YELLOW + ". Ignoring.");
+                    logger.info(LogUtil.getHeading() + ChatColor.WHITE + event.getUniqueId() + ChatColor.YELLOW + " is under an ignored range " + ChatColor.WHITE + testAddress + " (" + ip + ")" + ChatColor.YELLOW + ". Ignoring.");
                 }
                 return;
             }

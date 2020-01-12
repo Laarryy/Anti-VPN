@@ -42,7 +42,7 @@ public class IPHub extends AbstractSourceAPI {
 
         JSONObject json;
         try {
-            json = JSONWebUtil.getJSONObject(new URL("https://v2.api.iphub.info/ip/" + ip), "URL", (int) getCachedConfig().getTimeout(), "egg82/AntiVPN", headers);
+            json = JSONWebUtil.getJSONObject(new URL("https://v2.api.iphub.info/ip/" + ip), "GET", (int) getCachedConfig().getTimeout(), "egg82/AntiVPN", headers);
         } catch (IOException | ParseException | ClassCastException ex) {
             logger.error(ex.getMessage(), ex);
             throw new APIException(false, "Could not get result from " + getName());

@@ -4,10 +4,23 @@ import com.djrapitops.plan.capability.CapabilityService;
 import com.djrapitops.plan.extension.CallEvents;
 import com.djrapitops.plan.extension.DataExtension;
 import com.djrapitops.plan.extension.ExtensionService;
+import com.djrapitops.plan.extension.FormatType;
+import com.djrapitops.plan.extension.annotation.BooleanProvider;
+import com.djrapitops.plan.extension.annotation.NumberProvider;
 import com.djrapitops.plan.extension.annotation.PluginInfo;
 import com.djrapitops.plan.extension.icon.Color;
 import com.djrapitops.plan.extension.icon.Family;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.util.Optional;
+import java.util.UUID;
+import me.egg82.antivpn.APIException;
 import me.egg82.antivpn.VPNAPI;
+import me.egg82.antivpn.enums.VPNAlgorithmMethod;
+import me.egg82.antivpn.extended.CachedConfigValues;
+import me.egg82.antivpn.utils.ConfigUtil;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,7 +59,7 @@ public class PlayerAnalyticsHook implements PluginHook {
 
     @PluginInfo(
             name = "AntiVPN",
-            iconName = "shield",
+            iconName = "shield-alt",
             iconFamily = Family.REGULAR,
             color = Color.BLUE
     )
@@ -57,6 +70,67 @@ public class PlayerAnalyticsHook implements PluginHook {
         private Data() { }
 
         // TODO: Finish PLAN
+        @BooleanProvider(
+                text = "VPN",
+                description = "Using a VPN or proxy.",
+                iconName = "user-shield",
+                iconFamily = Family.SOLID,
+                iconColor = Color.NONE
+        )
+        public boolean getUsingVPN(UUID playerID) {
+            Player player = Bukkit.getPlayer(playerID);
+            if (player == null) {
+                return false;
+            }
+
+            String ip = getIp(player);
+            if (ip == null || ip.isEmpty()) {
+                return false;
+            }
+
+            Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+            if (!cachedConfig.isPresent()) {
+                logger.error("Cached config could not be fetched.");
+                return false;
+            }
+
+            if (cachedConfig.get().getVPNAlgorithmMethod() == VPNAlgorithmMethod.CONSESNSUS) {
+                try {
+                    return api.consensus(ip) >= cachedConfig.get().getVPNAlgorithmConsensus();
+                } catch (APIException ex) {
+                    logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
+                }
+            } else {
+                try {
+                    return api.cascade(ip);
+                } catch (APIException ex) {
+                    logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
+                }
+            }
+            return false;
+        }
+
+        @BooleanProvider(
+                text = "MCLeaks",
+                description = "Using an MCLeaks account.",
+                iconName = "users",
+                iconFamily = Family.SOLID,
+                iconColor = Color.NONE
+        )
+        public boolean getMCLeaks(UUID playerID) {
+            Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+            if (!cachedConfig.isPresent()) {
+                logger.error("Cached config could not be fetched.");
+                return false;
+            }
+
+            try {
+                return api.isMCLeaks(playerID);
+            } catch (APIException ex) {
+                logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
+            }
+            return false;
+        }
 
         /*public InspectContainer getPlayerData(UUID uuid, InspectContainer container) {
             Player player = Bukkit.getPlayer(uuid);
@@ -145,7 +219,7 @@ public class PlayerAnalyticsHook implements PluginHook {
             container.addValue("Proxies/VPNs in use", vpns);
 
             return container;
-        }
+        }*/
 
         private String getIp(Player player) {
             InetSocketAddress address = player.getAddress();
@@ -157,7 +231,7 @@ public class PlayerAnalyticsHook implements PluginHook {
                 return null;
             }
             return host.getHostAddress();
-        }*/
+        }
 
         public CallEvents[] callExtensionMethodsOn() { return events; }
     }

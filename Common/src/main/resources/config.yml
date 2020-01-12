@@ -292,7 +292,6 @@ action:
   # IPs and ranges to ignore when checking for VPNs and/or MCLeaks accounts
   ignore:
   - '127.0.0.0/8'
-  - 'localhost'
   - '::1/128'
 
 connection:

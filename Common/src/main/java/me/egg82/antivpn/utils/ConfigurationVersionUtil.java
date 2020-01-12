@@ -499,6 +499,25 @@ public class ConfigurationVersionUtil {
         config.getNode("action", "mcleaks", "kick-message").setValue("&cPlease discontinue your use of an MCLeaks account!");
         config.getNode("action", "mcleaks", "commands").setValue(Collections.singleton(""));
 
+        // Remove localhost from ignore
+        List<String> ignoredIPs;
+        try {
+            ignoredIPs = new ArrayList<>(config.getNode("action", "ignore").getList(TypeToken.of(String.class)));
+        } catch (ObjectMappingException ex) {
+            logger.error(ex.getMessage(), ex);
+            return;
+        }
+
+        List<String> removed = new ArrayList<>();
+        for (String ip : ignoredIPs) {
+            if (ip.equalsIgnoreCase("localhost")) { // IPs are case-insensitive when loaded
+                removed.add(ip);
+            }
+        }
+
+        ignoredIPs.removeAll(removed);
+        config.getNode("action", "ignore").setValue(ignoredIPs);
+
         // Version
         config.getNode("version").setValue(4.9d);
     }

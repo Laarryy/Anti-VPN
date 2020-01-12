@@ -161,7 +161,7 @@ public class ConfigurationFileUtil {
             String ip = i.next();
             if (!ValidationUtil.isValidIp(ip) && !ValidationUtil.isValidIPRange(ip)) {
                 if (debug) {
-                    logger.info(LogUtil.getHeading() + ChatColor.DARK_RED + "Removed invalid IP/range: " + ChatColor.WHITE + ip);
+                    logger.info(LogUtil.getHeading() + ChatColor.DARK_RED + "Removed invalid ignore IP/range: " + ChatColor.WHITE + ip);
                 }
                 i.remove();
             }
@@ -169,7 +169,7 @@ public class ConfigurationFileUtil {
 
         if (debug) {
             for (String ip : ignoredIps) {
-                logger.info(LogUtil.getHeading() + ChatColor.YELLOW + "Ignoring IP or range: " + ChatColor.WHITE + ip);
+                logger.info(LogUtil.getHeading() + ChatColor.YELLOW + "Adding ignored IP or range: " + ChatColor.WHITE + ip);
             }
         }
 
@@ -446,7 +446,7 @@ public class ConfigurationFileUtil {
     private static Optional<SourceAPI> getAPI(String name, Map<String, SourceAPI> sources) { return Optional.ofNullable(sources.getOrDefault(name, null)); }
 
     private static Map<String, SourceAPI> getAllSources(boolean debug) {
-        List<Class<SourceAPI>> sourceClasses = PackageFilter.getClasses(SourceAPI.class, "me.egg82.antivpn.apis", false, false, false);
+        List<Class<SourceAPI>> sourceClasses = PackageFilter.getClasses(SourceAPI.class, "me.egg82.antivpn.apis.vpn", false, false, false);
         Map<String, SourceAPI> retVal = new HashMap<>();
         for (Class<SourceAPI> clazz : sourceClasses) {
             if (debug) {

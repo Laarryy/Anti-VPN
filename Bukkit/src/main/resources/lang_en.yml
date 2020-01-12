@@ -3,6 +3,7 @@ acf-minecraft:
 
 description:
   reload: "Reloads the plugin."
+  import: "Imports data from one storage engine to another."
   check: "Check an IP or player using the default system. This will return exactly the same value as any other API call."
   score: "Scores a particular source based on a pre-made list of known good and bad IPs. Note that this forces a check so will use credits every time it's run."
   test: "Test an IP through the various (enabled) services. Note that this forces a check so will use credits every time it's run."
