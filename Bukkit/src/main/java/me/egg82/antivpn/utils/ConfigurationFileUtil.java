@@ -310,7 +310,7 @@ public class ConfigurationFileUtil {
                     try {
                         retVal.add(
                                 MySQL.builder(handler)
-                                        .url(url.address, url.port, connectionNode.getNode("database").getString("simple_staff_chat"), connectionNode.getNode("prefix").getString("ssc_"))
+                                        .url(url.address, url.port, connectionNode.getNode("database").getString("anti_vpn"), connectionNode.getNode("prefix").getString("avpn_"))
                                         .credentials(connectionNode.getNode("username").getString(""), connectionNode.getNode("password").getString(""))
                                         .options(options)
                                         .poolSize(settings.minPoolSize, settings.maxPoolSize)
@@ -321,8 +321,8 @@ public class ConfigurationFileUtil {
                         logger.error("Could not create MySQL instance.", ex);
                     }
                     break;
-                }// TODO: Add Redis
-                /*case "redis": {
+                }
+                case "redis": {
                     if (!enginesNode.getNode(name, "enabled").getBoolean()) {
                         if (debug) {
                             logger.info(LogUtil.getHeading() + ChatColor.DARK_RED + name + " is disabled. Removing.");
@@ -334,7 +334,7 @@ public class ConfigurationFileUtil {
                     try {
                         retVal.add(
                                 me.egg82.antivpn.storage.Redis.builder(handler)
-                                        .url(url.address, url.port, connectionNode.getNode("prefix").getString("ssc_"))
+                                        .url(url.address, url.port, connectionNode.getNode("prefix").getString("avpn_"))
                                         .credentials(connectionNode.getNode("password").getString(""))
                                         .poolSize(settings.minPoolSize, settings.maxPoolSize)
                                         .life(settings.maxLifetime, (int) settings.timeout)
@@ -344,7 +344,7 @@ public class ConfigurationFileUtil {
                         logger.error("Could not create Redis instance.", ex);
                     }
                     break;
-                }*/
+                }
                 case "sqlite": {
                     if (!enginesNode.getNode(name, "enabled").getBoolean()) {
                         if (debug) {
@@ -357,11 +357,11 @@ public class ConfigurationFileUtil {
                     if (options.length() > 0 && options.charAt(0) == '?') {
                         options = options.substring(1);
                     }
-                    String file = connectionNode.getNode("file").getString("simple_staff_chat.db");
+                    String file = connectionNode.getNode("file").getString("anti_vpn.db");
                     try {
                         retVal.add(
                                 SQLite.builder(handler)
-                                        .file(new File(plugin.getDataFolder(), file), connectionNode.getNode("prefix").getString("ssc_"))
+                                        .file(new File(plugin.getDataFolder(), file), connectionNode.getNode("prefix").getString("avpn_"))
                                         .options(options)
                                         .poolSize(settings.minPoolSize, settings.maxPoolSize)
                                         .life(settings.maxLifetime, settings.timeout)
@@ -396,7 +396,7 @@ public class ConfigurationFileUtil {
                         continue;
                     }
                     ConfigurationNode connectionNode = enginesNode.getNode(name, "connection");
-                    AddressPort url = new AddressPort("messaging.engines." + name + ".connection.address", connectionNode.getNode("address").getString("127.0.0.1:6379"), 6379);
+                    AddressPort url = new AddressPort("messaging.engines." + name + ".connection.address", connectionNode.getNode("address").getString("127.0.0.1:5672"), 5672);
                     try {
                         retVal.add(
                                 RabbitMQ.builder(serverID, handler)
