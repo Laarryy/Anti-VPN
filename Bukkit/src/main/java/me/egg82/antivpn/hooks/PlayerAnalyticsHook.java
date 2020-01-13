@@ -60,7 +60,7 @@ public class PlayerAnalyticsHook implements PluginHook {
     @PluginInfo(
             name = "AntiVPN",
             iconName = "shield-alt",
-            iconFamily = Family.REGULAR,
+            iconFamily = Family.SOLID,
             color = Color.BLUE
     )
     class Data implements DataExtension {
