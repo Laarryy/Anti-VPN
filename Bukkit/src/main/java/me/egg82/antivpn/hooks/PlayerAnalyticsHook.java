@@ -69,7 +69,79 @@ public class PlayerAnalyticsHook implements PluginHook {
 
         private Data() { }
 
-        // TODO: Finish PLAN
+        @NumberProvider(
+                text = "VPN Users",
+                description = "Number of online VPN users.",
+                priority = 2,
+                iconName = "user-shield",
+                iconFamily = Family.SOLID,
+                iconColor = Color.NONE,
+                format = FormatType.NONE
+        )
+        public long getVPNs() {
+            Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+            if (!cachedConfig.isPresent()) {
+                logger.error("Cached config could not be fetched.");
+                return 0L;
+            }
+
+            long retVal = 0L;
+            for (Player p : Bukkit.getOnlinePlayers()) {
+                String ip = getIp(p);
+                if (ip == null || ip.isEmpty()) {
+                    continue;
+                }
+
+                if (cachedConfig.get().getVPNAlgorithmMethod() == VPNAlgorithmMethod.CONSESNSUS) {
+                    try {
+                        if (api.consensus(ip) >= cachedConfig.get().getVPNAlgorithmConsensus()) {
+                            retVal++;
+                        }
+                    } catch (APIException ex) {
+                        logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
+                    }
+                } else {
+                    try {
+                        if (api.cascade(ip)) {
+                            retVal++;
+                        }
+                    } catch (APIException ex) {
+                        logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
+                    }
+                }
+            }
+            return retVal;
+        }
+
+        @NumberProvider(
+                text = "MCLeaks Users",
+                description = "Number of online MCLeaks users.",
+                priority = 1,
+                iconName = "users",
+                iconFamily = Family.SOLID,
+                iconColor = Color.NONE,
+                format = FormatType.NONE
+        )
+        public long getMCLeaks() {
+            Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+            if (!cachedConfig.isPresent()) {
+                logger.error("Cached config could not be fetched.");
+                return 0L;
+            }
+
+            long retVal = 0L;
+            for (Player p : Bukkit.getOnlinePlayers()) {
+                try {
+                    if (api.isMCLeaks(p.getUniqueId())) {
+                        retVal++;
+                    }
+                } catch (APIException ex) {
+                    logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
+                }
+            }
+            return retVal;
+        }
+
         @BooleanProvider(
                 text = "VPN",
                 description = "Using a VPN or proxy.",
@@ -131,95 +203,6 @@ public class PlayerAnalyticsHook implements PluginHook {
             }
             return false;
         }
-
-        /*public InspectContainer getPlayerData(UUID uuid, InspectContainer container) {
-            Player player = Bukkit.getPlayer(uuid);
-            if (player == null) {
-                return container;
-            }
-
-            String ip = getIp(player);
-            if (ip == null || ip.isEmpty()) {
-                return container;
-            }
-
-            Optional<Configuration> config = ConfigUtil.getConfig();
-            if (!config.isPresent()) {
-                return container;
-            }
-
-            Optional<Boolean> isVPN = Optional.empty();
-
-            if (config.get().getNode("action", "algorithm", "method").getString("cascade").equalsIgnoreCase("consensus")) {
-                double consensus = clamp(0.0d, 1.0d, config.get().getNode("action", "algorithm", "min-consensus").getDouble(0.6d));
-                try {
-                    isVPN = Optional.of(api.consensus(ip) >= consensus);
-                } catch (APIException ex) {
-                    logger.error(ex.getMessage(), ex);
-                }
-            } else {
-                try {
-                    isVPN = Optional.of(api.cascade(ip));
-                } catch (APIException ex) {
-                    logger.error(ex.getMessage(), ex);
-                }
-            }
-
-            container.addValue("Using VPN/Proxy", (isVPN.isPresent()) ? (isVPN.get() ? "Yes" : "No") : "ERROR");
-
-            return container;
-        }
-
-        public AnalysisContainer getServerData(Collection<UUID> uuids, AnalysisContainer container) {
-            Optional<Configuration> config = ConfigUtil.getConfig();
-            if (!config.isPresent()) {
-                return container;
-            }
-
-            if (!config.get().getNode("action", "kick-message").getString("").isEmpty() || !config.get().getNode("action", "command").getString("").isEmpty()) {
-                container.addValue("Proxies/VPNs actioned upon", AnalyticsHelper.getBlocked() + " since startup.");
-            }
-
-            int vpns = 0;
-            for (UUID uuid : uuids) {
-                Player player = Bukkit.getPlayer(uuid);
-                if (player == null) {
-                    continue;
-                }
-
-                String ip = getIp(player);
-                if (ip == null || ip.isEmpty()) {
-                    continue;
-                }
-
-                boolean isVPN;
-
-                if (config.get().getNode("action", "algorithm", "method").getString("cascade").equalsIgnoreCase("consensus")) {
-                    double consensus = clamp(0.0d, 1.0d, config.get().getNode("action", "algorithm", "min-consensus").getDouble(0.6d));
-                    try {
-                        isVPN = api.consensus(ip) >= consensus;
-                    } catch (APIException ex) {
-                        logger.error(ex.getMessage(), ex);
-                        isVPN = false;
-                    }
-                } else {
-                    try {
-                        isVPN = api.cascade(ip);
-                    } catch (APIException ex) {
-                        logger.error(ex.getMessage(), ex);
-                        isVPN = false;
-                    }
-                }
-
-                if (isVPN) {
-                    vpns++;
-                }
-            }
-
-            container.addValue("Proxies/VPNs in use", vpns);
-
-            return container;
-        }*/
 
         private String getIp(Player player) {
             InetSocketAddress address = player.getAddress();
