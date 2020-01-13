@@ -93,6 +93,7 @@
                                         <exclude>com/rabbitmq/**</exclude>
                                         <exclude>com/zaxxer/hikari/**</exclude> <!-- included with easy-sql -->
                                         <exclude>me/gong/mcleaks/**</exclude>
+                                        <exclude>inet/ipaddr/**</exclude>
                                         <exclude>javassist/**</exclude>
                                         <exclude>javax/annotation/**</exclude>
                                         <exclude>ninja/egg82/analytics/**</exclude>
@@ -105,13 +106,7 @@
                                         <exclude>ninja/leaping/configurate/**</exclude>
                                         <exclude>okio/**</exclude> <!-- included with mcleaks-api -->
                                         <exclude>okhttp3/**</exclude> <!-- included with mcleaks-api -->
-                                        <exclude>org/apache/commons/beanutils/**</exclude> <!-- included with validator -->
-                                        <exclude>org/apache/commons/collections/**</exclude> <!-- included with validator -->
-                                        <exclude>org/apache/commons/digester/**</exclude> <!-- included with validator -->
-                                        <exclude>org/apache/commons/logging/**</exclude> <!-- included with validator -->
-                                        <exclude>org/apache/commons/net/**</exclude>
                                         <exclude>org/apache/commons/pool2/**</exclude> <!-- included with jedis -->
-                                        <exclude>org/apache/commons/validator/**</exclude>
                                         <exclude>org/checkerframework/**</exclude> <!-- included with configurate-core -->
                                         <exclude>org/codehaus/mojo/animal_sniffer/**</exclude> <!-- included with guava -->
                                         <exclude>org/json/simple/**</exclude> <!-- included with gameanalytics-api/json-web -->

@@ -1,5 +1,6 @@
 package me.egg82.antivpn.events;
 
+import inet.ipaddr.IPAddressString;
 import java.net.InetAddress;
 import java.util.List;
 import java.util.Optional;
@@ -13,7 +14,6 @@ import me.egg82.antivpn.utils.LogUtil;
 import me.egg82.antivpn.utils.ValidationUtil;
 import ninja.egg82.events.BukkitEvents;
 import ninja.egg82.service.ServiceLocator;
-import org.apache.commons.net.util.SubnetUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -52,7 +52,7 @@ public class PlayerEvents extends EventHolder {
                     logger.info(LogUtil.getHeading() + ChatColor.WHITE + event.getUniqueId() + ChatColor.YELLOW + " is using an ignored IP " + ChatColor.WHITE + ip + ChatColor.YELLOW + ". Ignoring.");
                 }
                 return;
-            } else if (ValidationUtil.isValidIPRange(testAddress) && new SubnetUtils(testAddress).getInfo().isInRange(ip)) {
+            } else if (ValidationUtil.isValidIPRange(testAddress) && rangeContains(testAddress, ip)) {
                 if (ConfigUtil.getDebugOrFalse()) {
                     logger.info(LogUtil.getHeading() + ChatColor.WHITE + event.getUniqueId() + ChatColor.YELLOW + " is under an ignored range " + ChatColor.WHITE + testAddress + " (" + ip + ")" + ChatColor.YELLOW + ". Ignoring.");
                 }
@@ -102,7 +102,7 @@ public class PlayerEvents extends EventHolder {
         for (String testAddress : cachedConfig.get().getIgnoredIps()) {
             if (ValidationUtil.isValidIp(testAddress) && ip.equalsIgnoreCase(testAddress)) {
                 return;
-            } else if (ValidationUtil.isValidIPRange(testAddress) && new SubnetUtils(testAddress).getInfo().isInRange(ip)) {
+            } else if (ValidationUtil.isValidIPRange(testAddress) && rangeContains(testAddress, ip)) {
                 return;
             }
         }
@@ -223,4 +223,6 @@ public class PlayerEvents extends EventHolder {
 
         return address.getHostAddress();
     }
+
+    private boolean rangeContains(String range, String ip) {return new IPAddressString(range).contains(new IPAddressString(ip)); }
 }

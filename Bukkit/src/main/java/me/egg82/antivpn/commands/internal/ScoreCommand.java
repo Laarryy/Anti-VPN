@@ -10,7 +10,6 @@ import me.egg82.antivpn.APIException;
 import me.egg82.antivpn.VPNAPI;
 import me.egg82.antivpn.utils.LogUtil;
 import me.egg82.antivpn.utils.ValidationUtil;
-import org.apache.commons.net.util.SubnetUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.slf4j.Logger;
@@ -147,8 +146,9 @@ public class ScoreCommand implements Runnable {
         return retVal;
     }
 
+    // TODO: Fix
     private Set<String> getIPs(String mask, int count) {
-        SubnetUtils subnet = new SubnetUtils(mask);
+        /*SubnetUtils subnet = new SubnetUtils(mask);
         String[] addresses = subnet.getInfo().getAllAddresses();
 
         Set<String> retVal = new HashSet<>();
@@ -156,7 +156,8 @@ public class ScoreCommand implements Runnable {
             retVal.add(addresses[fairRoundedRandom(0, addresses.length - 1)]);
         }
 
-        return retVal;
+        return retVal;*/
+        return null;
     }
 
     private int fairRoundedRandom(int min, int max) {

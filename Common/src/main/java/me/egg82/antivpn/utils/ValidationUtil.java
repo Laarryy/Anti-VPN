@@ -1,17 +1,10 @@
 package me.egg82.antivpn.utils;
 
+import inet.ipaddr.AddressStringException;
+import inet.ipaddr.IPAddressString;
 import java.util.regex.Pattern;
-import org.apache.commons.net.util.SubnetUtils;
-import org.apache.commons.validator.routines.InetAddressValidator;
 
 public class ValidationUtil {
-    /**
-     * Apache IP validator, takes both IPv4 and IPv6 and apparently out-performs
-     * pretty much everything else (citation needed?) - point is I don't need to
-     * maintain this
-     */
-    private static final InetAddressValidator ipValidator = InetAddressValidator.getInstance();
-
     /**
      * UUID_PATTERN_6 compiled and benchmarked from
      * https://github.com/tinnet/java-uuid-validation-benchmark
@@ -22,23 +15,22 @@ public class ValidationUtil {
 
     private ValidationUtil() {}
 
-    // TODO: Replace with https://github.com/seancfoley/IPAddress or https://github.com/jgonian/commons-ip-math
     public static boolean isValidIPRange(String range) {
         if (range == null || range.isEmpty()) {
             return false;
         }
-
         try {
-            new SubnetUtils(range);
-            return true;
-        } catch (IllegalArgumentException ignored) { return false; }
+            return new IPAddressString(range).toAddress().isMultiple();
+        } catch (AddressStringException ignored) { return false; }
     }
 
     public static boolean isValidIp(String ip) {
         if (ip == null || ip.isEmpty()) {
             return false;
         }
-        return ipValidator.isValid(ip);
+        try {
+            return !new IPAddressString(ip).toAddress().isMultiple();
+        } catch (AddressStringException ignored) { return false; }
     }
 
     public static boolean isValidUuid(String uuid) {

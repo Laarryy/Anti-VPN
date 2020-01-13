@@ -170,10 +170,6 @@ public class BukkitBootstrap extends JavaPlugin {
                 .addRepository(Repository.builder("http://central.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
         buildInject(serviceLocator, jarsDir, classLoader, "Service Locator");
 
-        Artifact.Builder commonsNet = Artifact.builder("commons-net", "commons-net", "3.6", cacheDir)
-                .addRepository(Repository.builder("http://central.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
-        buildInject(commonsNet, jarsDir, classLoader, "Apache Commons (Net)");
-
         Artifact.Builder javassist = Artifact.builder("org.javassist", "javassist", "3.26.0-GA", cacheDir)
                 .addRepository(Repository.builder("http://central.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
         buildInject(javassist, jarsDir, classLoader, "Javassist");
@@ -211,6 +207,10 @@ public class BukkitBootstrap extends JavaPlugin {
                 .addRepository(Repository.builder("https://nexus.wesjd.net/repository/thirdparty/").addProxy("https://nexus.egg82.me/repository/wesjd/").build())
                 .addRepository(Repository.builder("http://central.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
         buildInject(mcleaks, jarsDir, classLoader, "MCLeaks API");
+
+        Artifact.Builder ipaddress = Artifact.builder("com.github.seancfoley", "ipaddress", "5.2.1", cacheDir)
+                .addRepository(Repository.builder("http://central.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
+        buildInject(ipaddress, jarsDir, classLoader, "IPAddress");
 
         Artifact.Builder gameanalyticsApi = Artifact.builder("ninja.egg82", "gameanalytics-api", "1.0.1", cacheDir)
                 .addRepository(Repository.builder("https://www.myget.org/F/egg82-java/maven/").addProxy("https://nexus.egg82.me/repository/egg82/").build())
