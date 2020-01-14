@@ -126,7 +126,7 @@ public class VPNAPI {
         // Re-order sources
         retVal = new LinkedHashMap<>();
         for (Map.Entry<String, SourceAPI> kvp : cachedConfig.get().getSources().entrySet()) {
-            retVal.put(kvp.getKey(), results.get(kvp.getKey()));
+            retVal.put(kvp.getKey(), results.get(kvp.getKey()) == null ? Optional.empty() : results.get(kvp.getKey()));
         }
 
         return retVal;

@@ -50,17 +50,17 @@ public class AntiVPNCommand extends BaseCommand {
         new ImportCommand(issuer, master, slave, batchSize, taskFactory.newChain()).run();
     }
 
-    // TODO: Implement rest of commands
-    /*@Subcommand("test")
+    @Subcommand("test")
     @CommandPermission("avpn.admin")
     @Description("{@@description.test}")
     @Syntax("<ip>")
-    @CommandCompletion("@ip @nothing")
+    @CommandCompletion("@nothing")
     public void onTest(CommandIssuer issuer, @Conditions("ip") String ip) {
-        new TestCommand(taskFactory.newChain(), issuer, ip).run();
+        new TestCommand(issuer, ip, taskFactory.newChain()).run();
     }
 
-    @Subcommand("score")
+    // TODO: Implement rest of commands
+    /*@Subcommand("score")
     @CommandPermission("avpn.admin")
     @Description("{@@description.score}")
     @Syntax("<source>")
@@ -73,7 +73,7 @@ public class AntiVPNCommand extends BaseCommand {
     @CommandPermission("avpn.admin")
     @Description("{@@description.check}")
     @Syntax("<ip|player>")
-    @CommandCompletion("@ip|@player @nothing")
+    @CommandCompletion("@player @nothing")
     public void onCheck(CommandIssuer issuer, String type) {
         new CheckCommand(issuer, type, taskFactory.newChain()).run();
     }

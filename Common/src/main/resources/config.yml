@@ -126,6 +126,8 @@ sources:
   - 'teoh'
   - 'shodan'
   - 'ipwarner'
+  - 'iptrooper'
+  - 'neutrino'
 
   # https://iphub.info/
   # Results updated Jul 7, 2019
@@ -236,6 +238,18 @@ sources:
   ipwarner:
     enabled: false
     # API key to use (Required for this service, free one available at https://ipwarner.com/register )
+    key: ''
+
+  # https://iptrooper.net/
+  iptrooper:
+    enabled: true
+
+  # https://www.neutrinoapi.com/
+  neutrino:
+    enabled: false
+    # User ID to use (Required for this service, create one at https://www.neutrinoapi.com/signup/ )
+    id: ''
+    # API key to use (Required for this service, free one available at https://www.neutrinoapi.com/signup/ )
     key: ''
 
 mcleaks:

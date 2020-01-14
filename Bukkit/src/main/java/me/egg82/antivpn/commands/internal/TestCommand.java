@@ -1,64 +1,58 @@
 package me.egg82.antivpn.commands.internal;
 
+import co.aikar.commands.CommandIssuer;
 import co.aikar.taskchain.TaskChain;
-import co.aikar.taskchain.TaskChainAbortAction;
-import com.google.common.collect.ImmutableMap;
 import java.util.Map;
 import java.util.Optional;
 import me.egg82.antivpn.APIException;
 import me.egg82.antivpn.VPNAPI;
-import me.egg82.antivpn.utils.LogUtil;
-import org.bukkit.ChatColor;
-import org.bukkit.command.CommandSender;
+import me.egg82.antivpn.enums.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-// TODO: Fix
 public class TestCommand implements Runnable {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private final TaskChain<?> chain;
-    private final CommandSender sender;
+    private final CommandIssuer issuer;
     private final String ip;
+    private final TaskChain<?> chain;
 
     private final VPNAPI api = VPNAPI.getInstance();
 
-    public TestCommand(TaskChain<?> chain, CommandSender sender, String ip) {
-        this.chain = chain;
-        this.sender = sender;
+    public TestCommand(CommandIssuer issuer, String ip, TaskChain<?> chain) {
+        this.issuer = issuer;
         this.ip = ip;
+        this.chain = chain;
     }
 
     public void run() {
-        sender.sendMessage(LogUtil.getHeading() + ChatColor.YELLOW + "Testing with " + ChatColor.WHITE + ip + ChatColor.YELLOW + ", please wait..");
+        issuer.sendInfo(Message.TEST__BEGIN, "{ip}", ip);
 
-        /*chain
-                .<ImmutableMap<String, Optional<Boolean>>>asyncCallback((v, f) -> {
+        chain
+                .<Optional<Map<String, Optional<Boolean>>>>asyncCallback((v, f) -> {
                     try {
-                        f.accept(api.testAllSources(ip));
+                        f.accept(Optional.of(api.testAllSources(ip)));
                         return;
                     } catch (APIException ex) {
-                        logger.error(ex.getMessage(), ex);
+                        logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
                     }
-                    f.accept(null);
+                    f.accept(Optional.empty());
                 })
-                .abortIfNull(new TaskChainAbortAction<Object, Object, Object>() {
-                    @Override
-                    public void onAbort(TaskChain<?> chain, Object arg1) {
-                        sender.sendMessage(LogUtil.getHeading() + LogUtil.getHeading() + ChatColor.YELLOW + "Internal error");
+                .syncLast(f -> {
+                    if (!f.isPresent()) {
+                        issuer.sendError(Message.ERROR__INTERNAL);
+                        return;
                     }
-                })
-                .syncLast(v -> {
-                    for (Map.Entry<String, Optional<Boolean>> kvp : v.entrySet()) {
+
+                    for (Map.Entry<String, Optional<Boolean>> kvp : f.get().entrySet()) {
                         if (!kvp.getValue().isPresent()) {
-                            sender.sendMessage(LogUtil.getHeading() + LogUtil.getSourceHeading(kvp.getKey()) + ChatColor.YELLOW + "Source error");
+                            issuer.sendInfo(Message.TEST__ERROR, "{source}", kvp.getKey());
                             continue;
                         }
-
-                        sender.sendMessage(LogUtil.getHeading() + LogUtil.getSourceHeading(kvp.getKey()) + (kvp.getValue().get() ? ChatColor.DARK_RED + "VPN/Proxy detected" : ChatColor.GREEN + "No VPN/Proxy detected"));
+                        issuer.sendInfo(kvp.getValue().get() ? Message.TEST__VPN_DETECTED : Message.TEST__NO_VPN_DETECTED, "{source}", kvp.getKey());
                     }
-                    sender.sendMessage(LogUtil.getHeading() + ChatColor.GREEN + "Test for " + ChatColor.YELLOW + ip + ChatColor.GREEN + " complete!");
+                    issuer.sendInfo(Message.TEST__END, "{ip}", ip);
                 })
-                .execute();*/
+                .execute();
     }
 }

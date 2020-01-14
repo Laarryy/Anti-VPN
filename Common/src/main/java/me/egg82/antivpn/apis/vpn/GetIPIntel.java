@@ -27,16 +27,19 @@ public class GetIPIntel extends AbstractSourceAPI {
         }
 
         ConfigurationNode sourceConfigNode = getSourceConfigNode();
+        if (sourceConfigNode.getNode("contact").getString("admin@yoursite.com").equalsIgnoreCase("admin@yoursite.com")) {
+            throw new APIException(true, "Contact is not defined for " + getName() + " (WARNING: USING AN INVALID E-MAIL FOR THE CONTACT WILL GET YOUR IP BANNED FROM THE SERVICE)");
+        }
 
         JSONObject json;
         try {
-            json = JSONWebUtil.getJSONObject(new URL("https://check.getipintel.net/check.php?ip=" + ip + "&contact=" + sourceConfigNode.getNode("contact").getString("") + "&format=json&flags=b"), "GET", (int) getCachedConfig().getTimeout(), "egg82/AntiVPN");
+            json = JSONWebUtil.getJSONObject(new URL("https://check.getipintel.net/check.php?ip=" + ip + "&contact=" + sourceConfigNode.getNode("contact").getString("admin@yoursite.com") + "&format=json&flags=b"), "GET", (int) getCachedConfig().getTimeout(), "egg82/AntiVPN");
         } catch (IOException | ParseException | ClassCastException ex) {
             logger.error(ex.getMessage(), ex);
-            throw new APIException(false, ex);
+            throw new APIException(false, "Could not get result from " + getName() + " (Is your server's IP banned due to an improper contact e-mail in the config? Send an e-mail to contact@getipintel.net for an unban)", ex);
         }
         if (json == null || json.get("result") == null) {
-            throw new APIException(false, "Could not get result from " + getName());
+            throw new APIException(false, "Could not get result from " + getName() + " (Is your server's IP banned due to an improper contact e-mail in the config? Send an e-mail to contact@getipintel.net for an unban)");
         }
 
         double retVal = Double.parseDouble((String) json.get("result"));

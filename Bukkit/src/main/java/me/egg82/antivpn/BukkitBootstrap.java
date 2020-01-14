@@ -227,7 +227,7 @@ public class BukkitBootstrap extends JavaPlugin {
                 .addRepository(Repository.builder("http://central.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
         buildInject(easySql, jarsDir, classLoader, "EasySQL");
 
-        Artifact.Builder jsonWeb = Artifact.builder("ninja.egg82", "json-web", "2.1.2", cacheDir)
+        Artifact.Builder jsonWeb = Artifact.builder("ninja.egg82", "json-web", "2.1.6", cacheDir)
                 .addRepository(Repository.builder("https://www.myget.org/F/egg82-java/maven/").addProxy("https://nexus.egg82.me/repository/egg82/").build())
                 .addRepository(Repository.builder("http://central.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
         buildInject(jsonWeb, jarsDir, classLoader, "JSON Web");

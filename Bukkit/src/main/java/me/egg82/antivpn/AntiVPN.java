@@ -34,8 +34,10 @@ import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.InvalidConfigurationException;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.PlayerLoginEvent;
+import org.bukkit.metadata.MetadataValue;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.slf4j.Logger;
@@ -230,6 +232,20 @@ public class AntiVPN {
                 }
             }
             return ImmutableList.copyOf(storage);
+        });
+
+        commandManager.getCommandCompletions().registerCompletion("player", c -> {
+            String lower = c.getInput().toLowerCase();
+            Set<String> players = new LinkedHashSet<>();
+            for (Player p : Bukkit.getOnlinePlayers()) {
+                if (lower.isEmpty() || p.getName().toLowerCase().startsWith(lower)) {
+                    Player player = c.getPlayer();
+                    if (c.getSender().isOp() || (player != null && player.canSee(p) && !isVanished(p))) {
+                        players.add(p.getName());
+                    }
+                }
+            }
+            return ImmutableList.copyOf(players);
         });
 
         commandManager.getCommandCompletions().registerCompletion("subcommand", c -> {
@@ -437,5 +453,12 @@ public class AntiVPN {
 
     private void log(Level level, String message) {
         plugin.getServer().getLogger().log(level, (isBukkit) ? ChatColor.stripColor(message) : message);
+    }
+
+    private boolean isVanished(Player player) {
+        for (MetadataValue meta : player.getMetadata("vanished")) {
+            if (meta.asBoolean()) return true;
+        }
+        return false;
     }
 }
