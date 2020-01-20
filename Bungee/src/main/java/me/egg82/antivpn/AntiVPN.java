@@ -1,29 +1,31 @@
 package me.egg82.antivpn;
 
-import co.aikar.commands.BungeeCommandManager;
-import co.aikar.commands.ConditionFailedException;
-import co.aikar.commands.RegisteredCommand;
+import co.aikar.commands.*;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.SetMultimap;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 import java.util.logging.Level;
+import me.egg82.antivpn.apis.SourceAPI;
 import me.egg82.antivpn.commands.AntiVPNCommand;
-import me.egg82.antivpn.events.PostLoginCheckHandler;
-import me.egg82.antivpn.events.PostLoginUpdateNotifyHandler;
 import me.egg82.antivpn.extended.CachedConfigValues;
 import me.egg82.antivpn.extended.Configuration;
 import me.egg82.antivpn.hooks.PlayerAnalyticsHook;
 import me.egg82.antivpn.hooks.PluginHook;
+import me.egg82.antivpn.messaging.RabbitMQ;
 import me.egg82.antivpn.services.AnalyticsHelper;
 import me.egg82.antivpn.services.GameAnalyticsErrorHandler;
+import me.egg82.antivpn.services.PluginMessageFormatter;
+import me.egg82.antivpn.services.StorageMessagingHandler;
+import me.egg82.antivpn.storage.MySQL;
+import me.egg82.antivpn.storage.SQLite;
+import me.egg82.antivpn.storage.Storage;
 import me.egg82.antivpn.utils.*;
 import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PostLoginEvent;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.api.plugin.PluginManager;
@@ -33,6 +35,7 @@ import ninja.egg82.events.BungeeEvents;
 import ninja.egg82.service.ServiceLocator;
 import ninja.egg82.service.ServiceNotFoundException;
 import ninja.egg82.updater.BungeeUpdater;
+import ninja.egg82.updater.SpigotUpdater;
 import org.bstats.bungeecord.Metrics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,15 +47,17 @@ public class AntiVPN {
 
     private BungeeCommandManager commandManager;
 
+    private List<EventHolder> eventHolders = new ArrayList<>();
     private List<BungeeEventSubscriber<?>> events = new ArrayList<>();
+    private List<Integer> tasks = new ArrayList<>();
 
     private Metrics metrics = null;
 
     private final Plugin plugin;
 
-    public AntiVPN(Plugin plugin) {
-        this.plugin = plugin;
-    }
+    private CommandIssuer consoleCommandIssuer = null;
+
+    public AntiVPN(Plugin plugin) { this.plugin = plugin; }
 
     public void onLoad() {
         if (BungeeEnvironmentUtil.getEnvironment() != BungeeEnvironmentUtil.Environment.WATERFALL) {
@@ -69,27 +74,55 @@ public class AntiVPN {
         commandManager = new BungeeCommandManager(plugin);
         commandManager.enableUnstableAPI("help");
 
+        consoleCommandIssuer = commandManager.getCommandIssuer(plugin.getProxy().getConsole());
+
+        loadLanguages();
         loadServices();
         loadCommands();
         loadEvents();
+        loadTasks();
         loadHooks();
         loadMetrics();
 
-        plugin.getProxy().getConsole().sendMessage(new TextComponent(LogUtil.getHeading() + ChatColor.GREEN + "Enabled"));
+        int numEvents = events.size();
+        for (EventHolder eventHolder : eventHolders) {
+            numEvents += eventHolder.numEvents();
+        }
 
-        plugin.getProxy().getConsole().sendMessage(new TextComponent(LogUtil.getHeading()
-                + ChatColor.YELLOW + "[" + ChatColor.AQUA + "Version " + ChatColor.WHITE + plugin.getDescription().getVersion() + ChatColor.YELLOW +  "] "
-                + ChatColor.YELLOW + "[" + ChatColor.WHITE + commandManager.getRegisteredRootCommands().size() + ChatColor.GOLD + " Commands" + ChatColor.YELLOW +  "] "
-                + ChatColor.YELLOW + "[" + ChatColor.WHITE + events.size() + ChatColor.BLUE + " Events" + ChatColor.YELLOW +  "]"
-        ));
+        consoleCommandIssuer.sendInfo(Message.GENERAL__ENABLED);
+        consoleCommandIssuer.sendInfo(Message.GENERAL__LOAD,
+                "{version}", plugin.getDescription().getVersion(),
+                "{commands}", String.valueOf(commandManager.getRegisteredRootCommands().size()),
+                "{events}", String.valueOf(numEvents),
+                "{tasks}", String.valueOf(tasks.size())
+        );
 
-        workPool.submit(this::checkUpdate);
+        workPool.execute(this::checkUpdate);
     }
 
     public void onDisable() {
+        workPool.shutdown();
+        try {
+            if (!workPool.awaitTermination(4L, TimeUnit.SECONDS)) {
+                workPool.shutdownNow();
+            }
+        } catch (InterruptedException ignored) {
+            Thread.currentThread().interrupt();
+        }
+
+        taskFactory.shutdown(4, TimeUnit.SECONDS);
         commandManager.unregisterCommands();
 
-        for (BungeeEventSubscriber<?> event : events) {
+        for (int task : tasks) {
+            Bukkit.getScheduler().cancelTask(task);
+        }
+        tasks.clear();
+
+        for (EventHolder eventHolder : eventHolders) {
+            eventHolder.cancel();
+        }
+        eventHolders.clear();
+        for (BukkitEventSubscriber<?> event : events) {
             event.cancel();
         }
         events.clear();
@@ -97,18 +130,39 @@ public class AntiVPN {
         unloadHooks();
         unloadServices();
 
-        plugin.getProxy().getConsole().sendMessage(new TextComponent(LogUtil.getHeading() + ChatColor.DARK_RED + "Disabled"));
+        consoleCommandIssuer.sendInfo(Message.GENERAL__DISABLED);
 
         GameAnalyticsErrorHandler.close();
     }
 
-    private void loadServices() {
-        ConfigurationFileUtil.reloadConfig(plugin);
+    private void loadLanguages() {
+        BukkitLocales locales = commandManager.getLocales();
 
-        ServiceUtil.registerWorkPool();
-        ServiceUtil.registerRedis();
-        ServiceUtil.registerRabbit();
-        ServiceUtil.registerSQL();
+        try {
+            for (Locale locale : Locale.getAvailableLocales()) {
+                Optional<File> localeFile = LanguageFileUtil.getLanguage(plugin, locale);
+                if (localeFile.isPresent()) {
+                    commandManager.addSupportedLanguage(locale);
+                    locales.loadYamlLanguageFile(localeFile.get(), locale);
+                }
+            }
+        } catch (IOException | InvalidConfigurationException ex) {
+            logger.error(ex.getMessage(), ex);
+        }
+
+        locales.loadLanguages();
+        commandManager.usePerIssuerLocale(true, true);
+
+        commandManager.setFormat(MessageType.ERROR, new PluginMessageFormatter(commandManager, Message.GENERAL__HEADER));
+        commandManager.setFormat(MessageType.INFO, new PluginMessageFormatter(commandManager, Message.GENERAL__HEADER));
+        commandManager.setFormat(MessageType.ERROR, ChatColor.DARK_RED, ChatColor.YELLOW, ChatColor.AQUA, ChatColor.WHITE);
+        commandManager.setFormat(MessageType.INFO, ChatColor.WHITE, ChatColor.YELLOW, ChatColor.AQUA, ChatColor.GREEN, ChatColor.RED, ChatColor.GOLD, ChatColor.BLUE, ChatColor.GRAY);
+    }
+
+    private void loadServices() {
+        StorageMessagingHandler handler = new StorageMessagingHandler();
+        ServiceLocator.register(handler);
+        ConfigurationFileUtil.reloadConfig(plugin, handler, handler);
 
         ServiceLocator.register(new BungeeUpdater(plugin, 58716));
     }
@@ -119,15 +173,60 @@ public class AntiVPN {
                 throw new ConditionFailedException("Value must be a valid IP address.");
             }
         });
+
         commandManager.getCommandConditions().addCondition(String.class, "source", (c, exec, value) -> {
             Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
             if (!cachedConfig.isPresent()) {
                 return;
             }
-
-            if (!cachedConfig.get().getSources().contains(value)) {
-                throw new ConditionFailedException("Value must be a valid source name.");
+            for (Map.Entry<String, SourceAPI> kvp : cachedConfig.get().getSources().entrySet()) {
+                if (kvp.getKey().equalsIgnoreCase(value)) {
+                    return;
+                }
             }
+            throw new ConditionFailedException("Value must be a valid source name.");
+        });
+
+        commandManager.getCommandConditions().addCondition(String.class, "storage", (c, exec, value) -> {
+            String v = value.replace(" ", "_");
+            Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+            if (!cachedConfig.isPresent()) {
+                return;
+            }
+            for (Storage s : cachedConfig.get().getStorage()) {
+                if (s.getClass().getSimpleName().equalsIgnoreCase(v)) {
+                    return;
+                }
+            }
+            throw new ConditionFailedException("Value must be a valid storage name.");
+        });
+
+        commandManager.getCommandCompletions().registerCompletion("storage", c -> {
+            String lower = c.getInput().toLowerCase().replace(" ", "_");
+            Set<String> storage = new LinkedHashSet<>();
+            Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+            if (!cachedConfig.isPresent()) {
+                logger.error("Cached config could not be fetched.");
+                return ImmutableList.copyOf(storage);
+            }
+            for (Storage s : cachedConfig.get().getStorage()) {
+                String ss = s.getClass().getSimpleName();
+                if (ss.toLowerCase().startsWith(lower)) {
+                    storage.add(ss);
+                }
+            }
+            return ImmutableList.copyOf(storage);
+        });
+
+        commandManager.getCommandCompletions().registerCompletion("player", c -> {
+            String lower = c.getInput().toLowerCase();
+            Set<String> players = new LinkedHashSet<>();
+            for (ProxiedPlayer p : plugin.getProxy().getPlayers()) {
+                if (lower.isEmpty() || p.getName().toLowerCase().startsWith(lower)) {
+                    players.add(p.getName());
+                }
+            }
+            return ImmutableList.copyOf(players);
         });
 
         commandManager.getCommandCompletions().registerCompletion("subcommand", c -> {
@@ -146,24 +245,26 @@ public class AntiVPN {
     }
 
     private void loadEvents() {
-        events.add(BungeeEvents.subscribe(plugin, PostLoginEvent.class, EventPriority.LOWEST).handler(e -> new PostLoginCheckHandler().accept(e)));
-        events.add(BungeeEvents.subscribe(plugin, PostLoginEvent.class, EventPriority.LOW).handler(e -> new PostLoginUpdateNotifyHandler().accept(e)));
+        events.add(BungeeEvents.subscribe(plugin, PostLoginEvent.class, EventPriority.LOW).handler(e -> new PlayerLoginUpdateNotifyHandler(plugin, commandManager).accept(e)));
+        eventHolders.add(new PlayerEvents(plugin));
     }
+
+    private void loadTasks() { }
 
     private void loadHooks() {
         PluginManager manager = plugin.getProxy().getPluginManager();
 
         if (manager.getPlugin("Plan") != null) {
-            plugin.getProxy().getConsole().sendMessage(new TextComponent(LogUtil.getHeading() + ChatColor.GREEN + "Enabling support for Plan."));
-            ServiceLocator.register(new PlayerAnalyticsHook(plugin));
+            consoleCommandIssuer.sendInfo(Message.GENERAL__HOOK_ENABLE, "{plugin}", "Plan");
+            ServiceLocator.register(new PlayerAnalyticsHook());
         } else {
-            plugin.getProxy().getConsole().sendMessage(new TextComponent(LogUtil.getHeading() + ChatColor.YELLOW + "Plan was not found. Personal analytics support has been disabled."));
+            consoleCommandIssuer.sendInfo(Message.GENERAL__HOOK_DISABLE, "{plugin}", "Plan");
         }
     }
 
     private void loadMetrics() {
         metrics = new Metrics(plugin);
-        metrics.addCustomChart(new Metrics.SimplePie("sql", () -> {
+        metrics.addCustomChart(new Metrics.SingleLineChart("blocked_vpns", () -> {
             Optional<Configuration> config = ConfigUtil.getConfig();
             if (!config.isPresent()) {
                 return null;
@@ -173,9 +274,9 @@ public class AntiVPN {
                 return null;
             }
 
-            return config.get().getNode("storage", "method").getString("sqlite");
+            return (int) AnalyticsHelper.getBlockedVPNs();
         }));
-        metrics.addCustomChart(new Metrics.SimplePie("redis", () -> {
+        metrics.addCustomChart(new Metrics.SingleLineChart("blocked_mcleaks", () -> {
             Optional<Configuration> config = ConfigUtil.getConfig();
             if (!config.isPresent()) {
                 return null;
@@ -185,11 +286,88 @@ public class AntiVPN {
                 return null;
             }
 
-            return config.get().getNode("redis", "enabled").getBoolean(false) ? "yes" : "no";
+            return (int) AnalyticsHelper.getBlockedMCLeaks();
+        }));
+        metrics.addCustomChart(new Metrics.SimplePie("mysql", () -> {
+            Optional<Configuration> config = ConfigUtil.getConfig();
+            Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+            if (!config.isPresent() || !cachedConfig.isPresent()) {
+                return null;
+            }
+
+            if (!config.get().getNode("stats", "usage").getBoolean(true)) {
+                return null;
+            }
+
+            for (Storage s : cachedConfig.get().getStorage()) {
+                if (s instanceof MySQL) {
+                    return "yes";
+                }
+            }
+
+            return "no";
+        }));
+        metrics.addCustomChart(new Metrics.SimplePie("redis_storage", () -> {
+            Optional<Configuration> config = ConfigUtil.getConfig();
+            Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+            if (!config.isPresent() || !cachedConfig.isPresent()) {
+                return null;
+            }
+
+            if (!config.get().getNode("stats", "usage").getBoolean(true)) {
+                return null;
+            }
+
+            for (Storage s : cachedConfig.get().getStorage()) {
+                if (s instanceof me.egg82.antivpn.storage.Redis) {
+                    return "yes";
+                }
+            }
+
+            return "no";
+        }));
+        metrics.addCustomChart(new Metrics.SimplePie("sqlite", () -> {
+            Optional<Configuration> config = ConfigUtil.getConfig();
+            Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+            if (!config.isPresent() || !cachedConfig.isPresent()) {
+                return null;
+            }
+
+            if (!config.get().getNode("stats", "usage").getBoolean(true)) {
+                return null;
+            }
+
+            for (Storage s : cachedConfig.get().getStorage()) {
+                if (s instanceof SQLite) {
+                    return "yes";
+                }
+            }
+
+            return "no";
+        }));
+        metrics.addCustomChart(new Metrics.SimplePie("redis_messaging", () -> {
+            Optional<Configuration> config = ConfigUtil.getConfig();
+            Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+            if (!config.isPresent() || !cachedConfig.isPresent()) {
+                return null;
+            }
+
+            if (!config.get().getNode("stats", "usage").getBoolean(true)) {
+                return null;
+            }
+
+            for (Storage s : cachedConfig.get().getStorage()) {
+                if (s instanceof me.egg82.antivpn.messaging.Redis) {
+                    return "yes";
+                }
+            }
+
+            return "no";
         }));
         metrics.addCustomChart(new Metrics.SimplePie("rabbitmq", () -> {
             Optional<Configuration> config = ConfigUtil.getConfig();
-            if (!config.isPresent()) {
+            Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+            if (!config.isPresent() || !cachedConfig.isPresent()) {
                 return null;
             }
 
@@ -197,7 +375,13 @@ public class AntiVPN {
                 return null;
             }
 
-            return config.get().getNode("rabbitmq", "enabled").getBoolean(false) ? "yes" : "no";
+            for (Storage s : cachedConfig.get().getStorage()) {
+                if (s instanceof RabbitMQ) {
+                    return "yes";
+                }
+            }
+
+            return "no";
         }));
         metrics.addCustomChart(new Metrics.AdvancedPie("sources", () -> {
             Optional<Configuration> config = ConfigUtil.getConfig();
@@ -211,14 +395,15 @@ public class AntiVPN {
             }
 
             Map<String, Integer> values = new HashMap<>();
-            for (String key : cachedConfig.get().getSources()) {
-                values.put(key, 1);
+            for (Map.Entry<String, SourceAPI> kvp : cachedConfig.get().getSources().entrySet()) {
+                values.put(kvp.getKey(), 1);
             }
             return values;
         }));
-        metrics.addCustomChart(new Metrics.SimplePie("kick", () -> {
+        metrics.addCustomChart(new Metrics.SimplePie("algorithm", () -> {
             Optional<Configuration> config = ConfigUtil.getConfig();
-            if (!config.isPresent()) {
+            Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+            if (!config.isPresent() || !cachedConfig.isPresent()) {
                 return null;
             }
 
@@ -226,19 +411,33 @@ public class AntiVPN {
                 return null;
             }
 
-            if (!config.get().getNode("action", "kick-message").getString("").isEmpty() && !config.get().getNode("action", "command").getString("").isEmpty()) {
-                return "dual";
-            } else if (!config.get().getNode("action", "kick-message").getString("").isEmpty()) {
+            return cachedConfig.get().getVPNAlgorithmMethod().getName();
+        }));
+        metrics.addCustomChart(new Metrics.SimplePie("vpn_action", () -> {
+            Optional<Configuration> config = ConfigUtil.getConfig();
+            Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+            if (!config.isPresent() || !cachedConfig.isPresent()) {
+                return null;
+            }
+
+            if (!config.get().getNode("stats", "usage").getBoolean(true)) {
+                return null;
+            }
+
+            if (!cachedConfig.get().getVPNKickMessage().isEmpty() && !cachedConfig.get().getVPNActionCommands().isEmpty()) {
+                return "multi";
+            } else if (!cachedConfig.get().getVPNKickMessage().isEmpty()) {
                 return "kick";
-            } else if (!config.get().getNode("action", "command").getString("").isEmpty()) {
-                return "command";
+            } else if (!cachedConfig.get().getVPNActionCommands().isEmpty()) {
+                return "commands";
             }
 
             return "none";
         }));
-        metrics.addCustomChart(new Metrics.SimplePie("algorithm", () -> {
+        metrics.addCustomChart(new Metrics.SimplePie("mcleaks_action", () -> {
             Optional<Configuration> config = ConfigUtil.getConfig();
-            if (!config.isPresent()) {
+            Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+            if (!config.isPresent() || !cachedConfig.isPresent()) {
                 return null;
             }
 
@@ -246,19 +445,15 @@ public class AntiVPN {
                 return null;
             }
 
-            return config.get().getNode("action", "method").getString("cascade");
-        }));
-        metrics.addCustomChart(new Metrics.SingleLineChart("blocked", () -> {
-            Optional<Configuration> config = ConfigUtil.getConfig();
-            if (!config.isPresent()) {
-                return null;
+            if (!cachedConfig.get().getMCLeaksKickMessage().isEmpty() && !cachedConfig.get().getMCLeaksActionCommands().isEmpty()) {
+                return "multi";
+            } else if (!cachedConfig.get().getMCLeaksKickMessage().isEmpty()) {
+                return "kick";
+            } else if (!cachedConfig.get().getMCLeaksActionCommands().isEmpty()) {
+                return "commands";
             }
 
-            if (!config.get().getNode("stats", "usage").getBoolean(true)) {
-                return null;
-            }
-
-            return (int) AnalyticsHelper.getBlocked();
+            return "none";
         }));
     }
 
@@ -268,9 +463,9 @@ public class AntiVPN {
             return;
         }
 
-        BungeeUpdater updater;
+        SpigotUpdater updater;
         try {
-            updater = ServiceLocator.get(BungeeUpdater.class);
+            updater = ServiceLocator.get(SpigotUpdater.class);
         } catch (InstantiationException | IllegalAccessException | ServiceNotFoundException ex) {
             logger.error(ex.getMessage(), ex);
             return;
@@ -286,7 +481,7 @@ public class AntiVPN {
             }
 
             try {
-                plugin.getProxy().getConsole().sendMessage(new TextComponent(LogUtil.getHeading() + ChatColor.AQUA + " has an " + ChatColor.GREEN + "update" + ChatColor.AQUA + " available! New version: " + ChatColor.YELLOW + updater.getLatestVersion().get()));
+                consoleCommandIssuer.sendInfo(Message.GENERAL__UPDATE, "{version}", updater.getLatestVersion().get());
             } catch (ExecutionException ex) {
                 logger.error(ex.getMessage(), ex);
             } catch (InterruptedException ex) {
@@ -301,7 +496,9 @@ public class AntiVPN {
             Thread.currentThread().interrupt();
         }
 
-        workPool.submit(this::checkUpdate);
+        try {
+            workPool.execute(this::checkUpdate);
+        } catch (RejectedExecutionException ignored) { }
     }
 
     private void unloadHooks() {
@@ -312,11 +509,12 @@ public class AntiVPN {
     }
 
     public void unloadServices() {
-        ServiceUtil.unregisterWorkPool();
-        ServiceUtil.unregisterRedis();
-        ServiceUtil.unregisterRabbit();
-        ServiceUtil.unregisterSQL();
-
-        VPNAPI.close();
+        Optional<StorageMessagingHandler> storageMessagingHandler;
+        try {
+            storageMessagingHandler = ServiceLocator.getOptional(StorageMessagingHandler.class);
+        } catch (IllegalAccessException | InstantiationException ex) {
+            storageMessagingHandler = Optional.empty();
+        }
+        storageMessagingHandler.ifPresent(StorageMessagingHandler::close);
     }
 }

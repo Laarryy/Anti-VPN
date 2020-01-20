@@ -1,133 +1,207 @@
 package me.egg82.antivpn.hooks;
 
-import com.djrapitops.plan.api.PlanAPI;
-import com.djrapitops.plan.data.element.AnalysisContainer;
-import com.djrapitops.plan.data.element.InspectContainer;
-import com.djrapitops.plan.data.plugin.ContainerSize;
-import com.djrapitops.plan.data.plugin.PluginData;
-import com.djrapitops.plan.utilities.html.icon.Color;
-import com.djrapitops.plan.utilities.html.icon.Icon;
+import com.djrapitops.plan.capability.CapabilityService;
+import com.djrapitops.plan.extension.CallEvents;
+import com.djrapitops.plan.extension.DataExtension;
+import com.djrapitops.plan.extension.ExtensionService;
+import com.djrapitops.plan.extension.FormatType;
+import com.djrapitops.plan.extension.annotation.BooleanProvider;
+import com.djrapitops.plan.extension.annotation.NumberProvider;
+import com.djrapitops.plan.extension.annotation.PluginInfo;
+import com.djrapitops.plan.extension.icon.Color;
+import com.djrapitops.plan.extension.icon.Family;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.util.Collection;
 import java.util.Optional;
 import java.util.UUID;
 import me.egg82.antivpn.APIException;
 import me.egg82.antivpn.VPNAPI;
-import me.egg82.antivpn.extended.Configuration;
-import me.egg82.antivpn.services.AnalyticsHelper;
+import me.egg82.antivpn.enums.VPNAlgorithmMethod;
+import me.egg82.antivpn.extended.CachedConfigValues;
 import me.egg82.antivpn.utils.ConfigUtil;
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
-import net.md_5.bungee.api.plugin.Plugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class PlayerAnalyticsHook implements PluginHook {
     private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final CapabilityService capabilities;
 
-    public PlayerAnalyticsHook(Plugin plugin) { PlanAPI.getInstance().addPluginDataSource(new Data(plugin)); }
+    public PlayerAnalyticsHook() {
+        capabilities = CapabilityService.getInstance();
 
-    public void cancel() {}
+        if (isCapabilityAvailable("DATA_EXTENSION_VALUES") && isCapabilityAvailable("DATA_EXTENSION_TABLES")) {
+            try {
+                ExtensionService.getInstance().register(new Data());
+            } catch (NoClassDefFoundError ex) {
+                // Plan not installed
+                logger.error("Plan is not installed.", ex);
+            } catch (IllegalStateException ex) {
+                // Plan not enabled
+                logger.error("Plan is not enabled.", ex);
+            } catch (IllegalArgumentException ex) {
+                // DataExtension impl error
+                logger.error("DataExtension implementation exception.", ex);
+            }
+        }
+    }
 
-    class Data extends PluginData {
+    public void cancel() { }
+
+    private boolean isCapabilityAvailable(String capability) {
+        try {
+            return capabilities.hasCapability(capability);
+        } catch (NoClassDefFoundError ignored) {
+            return false;
+        }
+    }
+
+    @PluginInfo(
+            name = "AntiVPN",
+            iconName = "shield-alt",
+            iconFamily = Family.SOLID,
+            color = Color.BLUE
+    )
+    class Data implements DataExtension {
         private final VPNAPI api = VPNAPI.getInstance();
+        private final CallEvents[] events = new CallEvents[] { CallEvents.SERVER_PERIODICAL, CallEvents.SERVER_EXTENSION_REGISTER, CallEvents.PLAYER_JOIN };
 
-        private final Plugin plugin;
+        private Data() { }
 
-        private Data(Plugin plugin) {
-            super(ContainerSize.THIRD, "Anti-VPN");
-            setPluginIcon(Icon.called("shield").of(Color.BLUE).build());
-
-            this.plugin = plugin;
-        }
-
-        public InspectContainer getPlayerData(UUID uuid, InspectContainer container) {
-            ProxiedPlayer player = plugin.getProxy().getPlayer(uuid);
-            if (player == null) {
-                return container;
+        @NumberProvider(
+                text = "VPN Users",
+                description = "Number of online VPN users.",
+                priority = 2,
+                iconName = "user-shield",
+                iconFamily = Family.SOLID,
+                iconColor = Color.NONE,
+                format = FormatType.NONE
+        )
+        public long getVPNs() {
+            Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+            if (!cachedConfig.isPresent()) {
+                logger.error("Cached config could not be fetched.");
+                return 0L;
             }
 
-            String ip = getIp(player);
-            if (ip == null || ip.isEmpty()) {
-                return container;
-            }
-
-            Optional<Configuration> config = ConfigUtil.getConfig();
-            if (!config.isPresent()) {
-                return container;
-            }
-
-            Optional<Boolean> isVPN = Optional.empty();
-
-            if (config.get().getNode("action", "algorithm", "method").getString("cascade").equalsIgnoreCase("consensus")) {
-                double consensus = clamp(0.0d, 1.0d, config.get().getNode("action", "algorithm", "min-consensus").getDouble(0.6d));
-                try {
-                    isVPN = Optional.of(api.consensus(ip) >= consensus);
-                } catch (APIException ex) {
-                    logger.error(ex.getMessage(), ex);
-                }
-            } else {
-                try {
-                    isVPN = Optional.of(api.cascade(ip));
-                } catch (APIException ex) {
-                    logger.error(ex.getMessage(), ex);
-                }
-            }
-
-            container.addValue("Using VPN/Proxy", (isVPN.isPresent()) ? (isVPN.get() ? "Yes" : "No") : "ERROR");
-
-            return container;
-        }
-
-        public AnalysisContainer getServerData(Collection<UUID> uuids, AnalysisContainer container) {
-            Optional<Configuration> config = ConfigUtil.getConfig();
-            if (!config.isPresent()) {
-                return container;
-            }
-
-            if (!config.get().getNode("action", "kick-message").getString("").isEmpty() || !config.get().getNode("action", "command").getString("").isEmpty()) {
-                container.addValue("Proxies/VPNs actioned upon", AnalyticsHelper.getBlocked() + " since startup.");
-            }
-
-            int vpns = 0;
-            for (UUID uuid : uuids) {
-                ProxiedPlayer player = plugin.getProxy().getPlayer(uuid);
-                if (player == null) {
-                    continue;
-                }
-
-                String ip = getIp(player);
+            long retVal = 0L;
+            for (ProxiedPlayer p : ProxyServer.getInstance().getPlayers()) {
+                String ip = getIp(p);
                 if (ip == null || ip.isEmpty()) {
                     continue;
                 }
 
-                boolean isVPN;
-
-                if (config.get().getNode("action", "algorithm", "method").getString("cascade").equalsIgnoreCase("consensus")) {
-                    double consensus = clamp(0.0d, 1.0d, config.get().getNode("action", "algorithm", "min-consensus").getDouble(0.6d));
+                if (cachedConfig.get().getVPNAlgorithmMethod() == VPNAlgorithmMethod.CONSESNSUS) {
                     try {
-                        isVPN = api.consensus(ip) >= consensus;
+                        if (api.consensus(ip) >= cachedConfig.get().getVPNAlgorithmConsensus()) {
+                            retVal++;
+                        }
                     } catch (APIException ex) {
-                        logger.error(ex.getMessage(), ex);
-                        isVPN = false;
+                        logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
                     }
                 } else {
                     try {
-                        isVPN = api.cascade(ip);
+                        if (api.cascade(ip)) {
+                            retVal++;
+                        }
                     } catch (APIException ex) {
-                        logger.error(ex.getMessage(), ex);
-                        isVPN = false;
+                        logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
                     }
                 }
+            }
+            return retVal;
+        }
 
-                if (isVPN) {
-                    vpns++;
-                }
+        @NumberProvider(
+                text = "MCLeaks Users",
+                description = "Number of online MCLeaks users.",
+                priority = 1,
+                iconName = "users",
+                iconFamily = Family.SOLID,
+                iconColor = Color.NONE,
+                format = FormatType.NONE
+        )
+        public long getMCLeaks() {
+            Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+            if (!cachedConfig.isPresent()) {
+                logger.error("Cached config could not be fetched.");
+                return 0L;
             }
 
-            container.addValue("Proxies/VPNs in use", vpns);
+            long retVal = 0L;
+            for (ProxiedPlayer p : ProxyServer.getInstance().getPlayers()) {
+                try {
+                    if (api.isMCLeaks(p.getUniqueId())) {
+                        retVal++;
+                    }
+                } catch (APIException ex) {
+                    logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
+                }
+            }
+            return retVal;
+        }
 
-            return container;
+        @BooleanProvider(
+                text = "VPN",
+                description = "Using a VPN or proxy.",
+                iconName = "user-shield",
+                iconFamily = Family.SOLID,
+                iconColor = Color.NONE
+        )
+        public boolean getUsingVPN(UUID playerID) {
+            ProxiedPlayer player = ProxyServer.getInstance().getPlayer(playerID);
+            if (player == null) {
+                return false;
+            }
+
+            String ip = getIp(player);
+            if (ip == null || ip.isEmpty()) {
+                return false;
+            }
+
+            Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+            if (!cachedConfig.isPresent()) {
+                logger.error("Cached config could not be fetched.");
+                return false;
+            }
+
+            if (cachedConfig.get().getVPNAlgorithmMethod() == VPNAlgorithmMethod.CONSESNSUS) {
+                try {
+                    return api.consensus(ip) >= cachedConfig.get().getVPNAlgorithmConsensus();
+                } catch (APIException ex) {
+                    logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
+                }
+            } else {
+                try {
+                    return api.cascade(ip);
+                } catch (APIException ex) {
+                    logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
+                }
+            }
+            return false;
+        }
+
+        @BooleanProvider(
+                text = "MCLeaks",
+                description = "Using an MCLeaks account.",
+                iconName = "users",
+                iconFamily = Family.SOLID,
+                iconColor = Color.NONE
+        )
+        public boolean getMCLeaks(UUID playerID) {
+            Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+            if (!cachedConfig.isPresent()) {
+                logger.error("Cached config could not be fetched.");
+                return false;
+            }
+
+            try {
+                return api.isMCLeaks(playerID);
+            } catch (APIException ex) {
+                logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
+            }
+            return false;
         }
 
         private String getIp(ProxiedPlayer player) {
@@ -142,6 +216,6 @@ public class PlayerAnalyticsHook implements PluginHook {
             return host.getHostAddress();
         }
 
-        private double clamp(double min, double max, double val) { return Math.min(max, Math.max(min, val)); }
+        public CallEvents[] callExtensionMethodsOn() { return events; }
     }
 }
