@@ -11,6 +11,10 @@ import java.util.concurrent.*;
 import java.util.logging.Level;
 import me.egg82.antivpn.apis.SourceAPI;
 import me.egg82.antivpn.commands.AntiVPNCommand;
+import me.egg82.antivpn.enums.Message;
+import me.egg82.antivpn.events.EventHolder;
+import me.egg82.antivpn.events.PlayerEvents;
+import me.egg82.antivpn.events.PostLoginUpdateNotifyHandler;
 import me.egg82.antivpn.extended.CachedConfigValues;
 import me.egg82.antivpn.extended.Configuration;
 import me.egg82.antivpn.hooks.PlayerAnalyticsHook;
@@ -35,7 +39,6 @@ import ninja.egg82.events.BungeeEvents;
 import ninja.egg82.service.ServiceLocator;
 import ninja.egg82.service.ServiceNotFoundException;
 import ninja.egg82.updater.BungeeUpdater;
-import ninja.egg82.updater.SpigotUpdater;
 import org.bstats.bungeecord.Metrics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -110,11 +113,10 @@ public class AntiVPN {
             Thread.currentThread().interrupt();
         }
 
-        taskFactory.shutdown(4, TimeUnit.SECONDS);
         commandManager.unregisterCommands();
 
         for (int task : tasks) {
-            Bukkit.getScheduler().cancelTask(task);
+            plugin.getProxy().getScheduler().cancel(task);
         }
         tasks.clear();
 
@@ -122,7 +124,7 @@ public class AntiVPN {
             eventHolder.cancel();
         }
         eventHolders.clear();
-        for (BukkitEventSubscriber<?> event : events) {
+        for (BungeeEventSubscriber<?> event : events) {
             event.cancel();
         }
         events.clear();
@@ -136,7 +138,7 @@ public class AntiVPN {
     }
 
     private void loadLanguages() {
-        BukkitLocales locales = commandManager.getLocales();
+        BungeeLocales locales = commandManager.getLocales();
 
         try {
             for (Locale locale : Locale.getAvailableLocales()) {
@@ -146,12 +148,12 @@ public class AntiVPN {
                     locales.loadYamlLanguageFile(localeFile.get(), locale);
                 }
             }
-        } catch (IOException | InvalidConfigurationException ex) {
+        } catch (IOException ex) {
             logger.error(ex.getMessage(), ex);
         }
 
         locales.loadLanguages();
-        commandManager.usePerIssuerLocale(true, true);
+        commandManager.usePerIssuerLocale(true);
 
         commandManager.setFormat(MessageType.ERROR, new PluginMessageFormatter(commandManager, Message.GENERAL__HEADER));
         commandManager.setFormat(MessageType.INFO, new PluginMessageFormatter(commandManager, Message.GENERAL__HEADER));
@@ -245,7 +247,7 @@ public class AntiVPN {
     }
 
     private void loadEvents() {
-        events.add(BungeeEvents.subscribe(plugin, PostLoginEvent.class, EventPriority.LOW).handler(e -> new PlayerLoginUpdateNotifyHandler(plugin, commandManager).accept(e)));
+        events.add(BungeeEvents.subscribe(plugin, PostLoginEvent.class, EventPriority.LOW).handler(e -> new PostLoginUpdateNotifyHandler(plugin, commandManager).accept(e)));
         eventHolders.add(new PlayerEvents(plugin));
     }
 
@@ -463,9 +465,9 @@ public class AntiVPN {
             return;
         }
 
-        SpigotUpdater updater;
+        BungeeUpdater updater;
         try {
-            updater = ServiceLocator.get(SpigotUpdater.class);
+            updater = ServiceLocator.get(BungeeUpdater.class);
         } catch (InstantiationException | IllegalAccessException | ServiceNotFoundException ex) {
             logger.error(ex.getMessage(), ex);
             return;

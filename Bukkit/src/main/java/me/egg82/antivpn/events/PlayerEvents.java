@@ -224,5 +224,5 @@ public class PlayerEvents extends EventHolder {
         return address.getHostAddress();
     }
 
-    private boolean rangeContains(String range, String ip) {return new IPAddressString(range).contains(new IPAddressString(ip)); }
+    private boolean rangeContains(String range, String ip) { return new IPAddressString(range).contains(new IPAddressString(ip)); }
 }

@@ -43,13 +43,13 @@ public class LanguageFileUtil {
                 if (inStream != null) {
                     ConfigurationLoader<ConfigurationNode> fileLoader = YAMLConfigurationLoader.builder().setFlowStyle(DumperOptions.FlowStyle.BLOCK).setIndent(2).setFile(fileOnDisk).build();
                     ConfigurationNode fileRoot = fileLoader.load();
-                    double fileVersion = fileRoot.getNode("version").getDouble(1.0d);
+                    double fileVersion = fileRoot.getNode("acf-minecraft", "version").getDouble(1.0d);
 
                     try (InputStreamReader reader = new InputStreamReader(inStream);
                          BufferedReader in = new BufferedReader(reader)) {
                         ConfigurationLoader<ConfigurationNode> streamLoader = YAMLConfigurationLoader.builder().setFlowStyle(DumperOptions.FlowStyle.BLOCK).setIndent(2).setSource(() -> in).build();
                         ConfigurationNode streamRoot = streamLoader.load();
-                        double streamVersion = streamRoot.getNode("version").getDouble(1.0d);
+                        double streamVersion = streamRoot.getNode("acf-minecraft", "version").getDouble(1.0d);
 
                         if (streamVersion > fileVersion) {
                             // Version update, backup & delete file on disk

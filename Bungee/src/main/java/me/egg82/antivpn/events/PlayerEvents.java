@@ -2,6 +2,7 @@ package me.egg82.antivpn.events;
 
 import inet.ipaddr.IPAddressString;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.Optional;
 import me.egg82.antivpn.APIException;
@@ -11,12 +12,15 @@ import me.egg82.antivpn.services.AnalyticsHelper;
 import me.egg82.antivpn.utils.ConfigUtil;
 import me.egg82.antivpn.utils.LogUtil;
 import me.egg82.antivpn.utils.ValidationUtil;
+import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PostLoginEvent;
 import net.md_5.bungee.api.event.PreLoginEvent;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.event.EventPriority;
 import ninja.egg82.events.BungeeEvents;
-import ninja.egg82.service.ServiceLocator;
 
 public class PlayerEvents extends EventHolder {
     public PlayerEvents(Plugin plugin) {
@@ -32,7 +36,7 @@ public class PlayerEvents extends EventHolder {
     }
 
     private void cachePlayer(PreLoginEvent event) {
-        String ip = getIp(event.getAddress());
+        String ip = getIp(event.getConnection().getAddress());
         if (ip == null || ip.isEmpty()) {
             return;
         }
@@ -45,12 +49,12 @@ public class PlayerEvents extends EventHolder {
         for (String testAddress : cachedConfig.get().getIgnoredIps()) {
             if (ValidationUtil.isValidIp(testAddress) && ip.equalsIgnoreCase(testAddress)) {
                 if (ConfigUtil.getDebugOrFalse()) {
-                    logger.info(LogUtil.getHeading() + ChatColor.WHITE + event.getUniqueId() + ChatColor.YELLOW + " is using an ignored IP " + ChatColor.WHITE + ip + ChatColor.YELLOW + ". Ignoring.");
+                    logger.info(LogUtil.getHeading() + ChatColor.WHITE + event.getConnection().getUniqueId() + ChatColor.YELLOW + " is using an ignored IP " + ChatColor.WHITE + ip + ChatColor.YELLOW + ". Ignoring.");
                 }
                 return;
             } else if (ValidationUtil.isValidIPRange(testAddress) && rangeContains(testAddress, ip)) {
                 if (ConfigUtil.getDebugOrFalse()) {
-                    logger.info(LogUtil.getHeading() + ChatColor.WHITE + event.getUniqueId() + ChatColor.YELLOW + " is under an ignored range " + ChatColor.WHITE + testAddress + " (" + ip + ")" + ChatColor.YELLOW + ". Ignoring.");
+                    logger.info(LogUtil.getHeading() + ChatColor.WHITE + event.getConnection().getUniqueId() + ChatColor.YELLOW + " is under an ignored range " + ChatColor.WHITE + testAddress + " (" + ip + ")" + ChatColor.YELLOW + ". Ignoring.");
                 }
                 return;
             }
@@ -71,14 +75,14 @@ public class PlayerEvents extends EventHolder {
         }
 
         try {
-            api.isMCLeaks(event.getUniqueId()); // Calling this will cache the result internally, even if the value is unused
+            api.isMCLeaks(event.getConnection().getUniqueId()); // Calling this will cache the result internally, even if the value is unused
         } catch (APIException ex) {
             logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
         }
     }
 
     private void checkPlayer(PostLoginEvent event) {
-        String ip = getIp(event.getAddress());
+        String ip = getIp(event.getPlayer().getAddress());
         if (ip == null || ip.isEmpty()) {
             return;
         }
@@ -171,54 +175,31 @@ public class PlayerEvents extends EventHolder {
         }
     }
 
-    private void tryRunCommands(List<String> commands, Player player, String ip) {
-        Optional<PlaceholderAPIHook> placeholderapi;
-        try {
-            placeholderapi = ServiceLocator.getOptional(PlaceholderAPIHook.class);
-        } catch (InstantiationException | IllegalAccessException ex) {
-            logger.error(ex.getMessage(), ex);
-            placeholderapi = Optional.empty();
-        }
-
+    private void tryRunCommands(List<String> commands, ProxiedPlayer player, String ip) {
         for (String command : commands) {
             command = command.replace("%player%", player.getName()).replace("%uuid%", player.getUniqueId().toString()).replace("%ip%", ip);
             if (command.charAt(0) == '/') {
                 command = command.substring(1);
             }
 
-            if (placeholderapi.isPresent()) {
-                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), placeholderapi.get().withPlaceholders(player, command));
-            } else {
-                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
-            }
+            ProxyServer.getInstance().getPluginManager().dispatchCommand(ProxyServer.getInstance().getConsole(), command);
         }
     }
 
-    private void tryKickPlayer(String message, Player player, PlayerLoginEvent event) {
-        Optional<PlaceholderAPIHook> placeholderapi;
-        try {
-            placeholderapi = ServiceLocator.getOptional(PlaceholderAPIHook.class);
-        } catch (InstantiationException | IllegalAccessException ex) {
-            logger.error(ex.getMessage(), ex);
-            placeholderapi = Optional.empty();
-        }
-
-        event.setResult(PlayerLoginEvent.Result.KICK_OTHER);
-
-        if (placeholderapi.isPresent()) {
-            event.setKickMessage(placeholderapi.get().withPlaceholders(player, message));
-        } else {
-            event.setKickMessage(message);
-        }
+    private void tryKickPlayer(String message, ProxiedPlayer player, PostLoginEvent event) {
+        player.disconnect(new TextComponent(message));
     }
 
-    private String getIp(InetAddress address) {
+    private String getIp(InetSocketAddress address) {
         if (address == null) {
             return null;
         }
-
-        return address.getHostAddress();
+        InetAddress host = address.getAddress();
+        if (host == null) {
+            return null;
+        }
+        return host.getHostAddress();
     }
 
-    private boolean rangeContains(String range, String ip) {return new IPAddressString(range).contains(new IPAddressString(ip)); }
+    private boolean rangeContains(String range, String ip) { return new IPAddressString(range).contains(new IPAddressString(ip)); }
 }

@@ -1,49 +1,44 @@
 package me.egg82.antivpn.commands.internal;
 
+import co.aikar.commands.CommandIssuer;
 import java.util.Map;
 import java.util.Optional;
 import me.egg82.antivpn.APIException;
 import me.egg82.antivpn.VPNAPI;
-import me.egg82.antivpn.utils.LogUtil;
-import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.CommandSender;
-import net.md_5.bungee.api.chat.TextComponent;
+import me.egg82.antivpn.enums.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class TestCommand implements Runnable {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private final CommandSender sender;
+    private final CommandIssuer issuer;
     private final String ip;
 
     private final VPNAPI api = VPNAPI.getInstance();
 
-    public TestCommand(CommandSender sender, String ip) {
-        this.sender = sender;
+    public TestCommand(CommandIssuer issuer, String ip) {
+        this.issuer = issuer;
         this.ip = ip;
     }
 
     public void run() {
-        sender.sendMessage(new TextComponent(LogUtil.getHeading() + ChatColor.YELLOW + "Testing with " + ChatColor.WHITE + ip + ChatColor.YELLOW + ", please wait.."));
+        issuer.sendInfo(Message.TEST__BEGIN, "{ip}", ip);
 
-        Map<String, Optional<Boolean>> results;
         try {
-            results = api.testAllSources(ip);
-        } catch (APIException ex) {
-            logger.error(ex.getMessage(), ex);
-            sender.sendMessage(new TextComponent(LogUtil.getHeading() + ChatColor.DARK_RED + "Internal error"));
-            return;
-        }
-
-        for (Map.Entry<String, Optional<Boolean>> kvp : results.entrySet()) {
-            if (!kvp.getValue().isPresent()) {
-                sender.sendMessage(new TextComponent(LogUtil.getHeading() + LogUtil.getSourceHeading(kvp.getKey()) + ChatColor.YELLOW + "Source error"));
-                continue;
+            Map<String, Optional<Boolean>> map = api.testAllSources(ip);
+            for (Map.Entry<String, Optional<Boolean>> kvp : map.entrySet()) {
+                if (!kvp.getValue().isPresent()) {
+                    issuer.sendInfo(Message.TEST__ERROR, "{source}", kvp.getKey());
+                    continue;
+                }
+                issuer.sendInfo(kvp.getValue().get() ? Message.TEST__VPN_DETECTED : Message.TEST__NO_VPN_DETECTED, "{source}", kvp.getKey());
             }
-
-            sender.sendMessage(new TextComponent(LogUtil.getHeading() + LogUtil.getSourceHeading(kvp.getKey()) + (kvp.getValue().get() ? ChatColor.DARK_RED + "VPN/Proxy detected" : ChatColor.GREEN + "No VPN/Proxy detected")));
+            issuer.sendInfo(Message.TEST__END, "{ip}", ip);
+            return;
+        } catch (APIException ex) {
+            logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
         }
-        sender.sendMessage(new TextComponent(LogUtil.getHeading() + ChatColor.GREEN + "Test for " + ChatColor.YELLOW + ip + ChatColor.GREEN + " complete!"));
+        issuer.sendError(Message.ERROR__INTERNAL);
     }
 }

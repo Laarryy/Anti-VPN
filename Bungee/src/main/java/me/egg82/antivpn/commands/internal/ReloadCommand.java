@@ -1,34 +1,25 @@
 package me.egg82.antivpn.commands.internal;
 
+import co.aikar.commands.CommandIssuer;
+import me.egg82.antivpn.enums.Message;
+import me.egg82.antivpn.services.StorageMessagingHandler;
 import me.egg82.antivpn.utils.ConfigurationFileUtil;
-import me.egg82.antivpn.utils.LogUtil;
-import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.CommandSender;
-import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.plugin.Plugin;
 
 public class ReloadCommand implements Runnable {
     private final Plugin plugin;
-    private final CommandSender sender;
+    private StorageMessagingHandler handler;
+    private final CommandIssuer issuer;
 
-    public ReloadCommand(Plugin plugin, CommandSender sender) {
+    public ReloadCommand(Plugin plugin, StorageMessagingHandler handler, CommandIssuer issuer) {
         this.plugin = plugin;
-        this.sender = sender;
+        this.handler = handler;
+        this.issuer = issuer;
     }
 
     public void run() {
-        sender.sendMessage(new TextComponent(LogUtil.getHeading() + ChatColor.YELLOW + "Reloading, please wait.."));
-
-        ServiceUtil.unregisterWorkPool();
-        ServiceUtil.unregisterRedis();
-        ServiceUtil.unregisterRabbit();
-        ServiceUtil.unregisterSQL();
-        ConfigurationFileUtil.reloadConfig(plugin);
-        ServiceUtil.registerWorkPool();
-        ServiceUtil.registerRedis();
-        ServiceUtil.registerRabbit();
-        ServiceUtil.registerSQL();
-
-        sender.sendMessage(new TextComponent(LogUtil.getHeading() + ChatColor.GREEN + "Configuration reloaded!"));
+        issuer.sendInfo(Message.RELOAD__BEGIN);
+        ConfigurationFileUtil.reloadConfig(plugin, handler, handler);
+        issuer.sendInfo(Message.RELOAD__END);
     }
 }

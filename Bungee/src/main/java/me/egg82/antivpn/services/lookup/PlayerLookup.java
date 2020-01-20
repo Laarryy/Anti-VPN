@@ -6,22 +6,12 @@ import java.util.UUID;
 public class PlayerLookup {
     private PlayerLookup() { }
 
-    private static boolean isPaper = true;
-
-    static {
-        try {
-            Class.forName("com.destroystokyo.paper.profile.PlayerProfile");
-        } catch (ClassNotFoundException ignored) {
-            isPaper = false;
-        }
-    }
-
     public static PlayerInfo get(UUID uuid) throws IOException {
         if (uuid == null) {
             throw new IllegalArgumentException("uuid cannot be null.");
         }
 
-        return (isPaper) ? new PaperPlayerInfo(uuid) : new BukkitPlayerInfo(uuid);
+        return new BungeePlayerInfo(uuid);
     }
 
     public static PlayerInfo get(String name) throws IOException {
@@ -29,6 +19,6 @@ public class PlayerLookup {
             throw new IllegalArgumentException("name cannot be null.");
         }
 
-        return (isPaper) ? new PaperPlayerInfo(name) : new BukkitPlayerInfo(name);
+        return new BungeePlayerInfo(name);
     }
 }

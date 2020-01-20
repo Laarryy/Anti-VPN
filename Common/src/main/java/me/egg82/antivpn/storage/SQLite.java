@@ -353,7 +353,7 @@ public class SQLite extends AbstractSQL {
         }
     }
 
-    protected void setKey(String key, String value) throws SQLException { sql.execute("INSERT INTO `" + prefix + "data` (`key`, `value`) VALUES (?, ?) ON CONFLICT(`key`) DO UPDATE SET `result`=?;", key, value, value); }
+    protected void setKey(String key, String value) throws SQLException { sql.execute("INSERT INTO `" + prefix + "data` (`key`, `value`) VALUES (?, ?) ON CONFLICT(`key`) DO UPDATE SET `value`=?;", key, value, value); }
 
     protected double getDouble(String key) throws SQLException {
         SQLQueryResult result = sql.query("SELECT `value` FROM `" + prefix + "data` WHERE `key`=?;", key);

@@ -1,56 +1,93 @@
 package me.egg82.antivpn.commands.internal;
 
+import co.aikar.commands.CommandIssuer;
+import java.io.IOException;
 import java.util.Optional;
+import java.util.UUID;
 import me.egg82.antivpn.APIException;
 import me.egg82.antivpn.VPNAPI;
-import me.egg82.antivpn.extended.Configuration;
+import me.egg82.antivpn.enums.Message;
+import me.egg82.antivpn.enums.VPNAlgorithmMethod;
+import me.egg82.antivpn.extended.CachedConfigValues;
+import me.egg82.antivpn.services.lookup.PlayerInfo;
+import me.egg82.antivpn.services.lookup.PlayerLookup;
 import me.egg82.antivpn.utils.ConfigUtil;
-import me.egg82.antivpn.utils.LogUtil;
-import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.CommandSender;
-import net.md_5.bungee.api.chat.TextComponent;
+import me.egg82.antivpn.utils.ValidationUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class CheckCommand implements Runnable {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private final CommandSender sender;
-    private final String ip;
+    private final CommandIssuer issuer;
+    private final String type;
 
     private final VPNAPI api = VPNAPI.getInstance();
 
-    public CheckCommand(CommandSender sender, String ip) {
-        this.sender = sender;
-        this.ip = ip;
+    public CheckCommand(CommandIssuer issuer, String type) {
+        this.issuer = issuer;
+        this.type = type;
     }
 
     public void run() {
-        sender.sendMessage(new TextComponent(LogUtil.getHeading() + ChatColor.YELLOW + "Checking " + ChatColor.WHITE + ip + ChatColor.YELLOW + ".."));
+        issuer.sendInfo(Message.CHECK__BEGIN, "{type}", type);
 
-        Optional<Configuration> config = ConfigUtil.getConfig();
-        if (!config.isPresent()) {
-            sender.sendMessage(new TextComponent(LogUtil.getHeading() + ChatColor.DARK_RED + "Internal error"));
-            return;
-        }
-
-        if (config.get().getNode("action", "algorithm", "method").getString("cascade").equalsIgnoreCase("consensus")) {
-            double consensus = clamp(0.0d, 1.0d, config.get().getNode("action", "algorithm", "min-consensus").getDouble(0.6d));
-            try {
-                sender.sendMessage(new TextComponent(LogUtil.getHeading() + (api.consensus(ip) >= consensus ? ChatColor.DARK_RED + "VPN/Proxy detected" : ChatColor.GREEN + "No VPN/Proxy detected")));
-            } catch (APIException ex) {
-                logger.error(ex.getMessage(), ex);
-                sender.sendMessage(new TextComponent(LogUtil.getHeading() + ChatColor.DARK_RED + "Internal error"));
+        if (ValidationUtil.isValidIp(type)) {
+            Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+            if (!cachedConfig.isPresent()) {
+                logger.error("Cached config could not be fetched.");
+                issuer.sendError(Message.ERROR__INTERNAL);
+                return;
             }
+
+            if (cachedConfig.get().getVPNAlgorithmMethod() == VPNAlgorithmMethod.CONSESNSUS) {
+                try {
+                    issuer.sendInfo(api.consensus(type) >= cachedConfig.get().getVPNAlgorithmConsensus() ? Message.CHECK__VPN_DETECTED : Message.CHECK__NO_VPN_DETECTED);
+                    return;
+                } catch (APIException ex) {
+                    logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
+                }
+            } else {
+                try {
+                    issuer.sendInfo(api.cascade(type) ? Message.CHECK__VPN_DETECTED : Message.CHECK__NO_VPN_DETECTED);
+                    return;
+                } catch (APIException ex) {
+                    logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
+                }
+            }
+            issuer.sendError(Message.ERROR__INTERNAL);
         } else {
-            try {
-                sender.sendMessage(new TextComponent(LogUtil.getHeading() + (api.cascade(ip) ? ChatColor.DARK_RED + "VPN/Proxy detected" : ChatColor.GREEN + "No VPN/Proxy detected")));
-            } catch (APIException ex) {
-                logger.error(ex.getMessage(), ex);
-                sender.sendMessage(new TextComponent(LogUtil.getHeading() + ChatColor.DARK_RED + "Internal error"));
+            UUID playerID = getPlayerUUID(type);
+            if (playerID == null) {
+                issuer.sendError(Message.ERROR__INTERNAL);
+                return;
             }
+
+            Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+            if (!cachedConfig.isPresent()) {
+                logger.error("Cached config could not be fetched.");
+                issuer.sendError(Message.ERROR__INTERNAL);
+                return;
+            }
+
+            try {
+                issuer.sendInfo(api.isMCLeaks(playerID) ? Message.CHECK__MCLEAKS_DETECTED : Message.CHECK__NO_MCLEAKS_DETECTED);
+                return;
+            } catch (APIException ex) {
+                logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
+            }
+            issuer.sendError(Message.ERROR__INTERNAL);
         }
     }
 
-    private double clamp(double min, double max, double val) { return Math.min(max, Math.max(min, val)); }
+    private UUID getPlayerUUID(String name) {
+        PlayerInfo info;
+        try {
+            info = PlayerLookup.get(name);
+        } catch (IOException ex) {
+            logger.warn("Could not fetch player UUID. (rate-limited?)", ex);
+            return null;
+        }
+        return info.getUUID();
+    }
 }

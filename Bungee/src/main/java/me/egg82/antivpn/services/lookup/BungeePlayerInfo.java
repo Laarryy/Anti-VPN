@@ -13,15 +13,15 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 import ninja.egg82.json.JSONUtil;
 import ninja.egg82.json.JSONWebUtil;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 
-public class BukkitPlayerInfo implements PlayerInfo {
+public class BungeePlayerInfo implements PlayerInfo {
     private UUID uuid;
     private String name;
 
@@ -39,7 +39,7 @@ public class BukkitPlayerInfo implements PlayerInfo {
         headers.put("Accept-Language", "en-US,en;q=0.8");
     }
 
-    BukkitPlayerInfo(UUID uuid) throws IOException {
+    BungeePlayerInfo(UUID uuid) throws IOException {
         this.uuid = uuid;
 
         Optional<String> name = Optional.ofNullable(uuidCache.getIfPresent(uuid));
@@ -56,7 +56,7 @@ public class BukkitPlayerInfo implements PlayerInfo {
         this.name = name.orElse(null);
     }
 
-    BukkitPlayerInfo(String name) throws IOException {
+    BungeePlayerInfo(String name) throws IOException {
         this.name = name;
 
         Optional<UUID> uuid = Optional.ofNullable(nameCache.getIfPresent(name));
@@ -79,7 +79,7 @@ public class BukkitPlayerInfo implements PlayerInfo {
 
     private static String nameExpensive(UUID uuid) throws IOException {
         // Currently-online lookup
-        Player player = Bukkit.getPlayer(uuid);
+        ProxiedPlayer player = ProxyServer.getInstance().getPlayer(uuid);
         if (player != null) {
             nameCache.put(player.getName(), uuid);
             return player.getName();
@@ -109,7 +109,7 @@ public class BukkitPlayerInfo implements PlayerInfo {
 
     private static UUID uuidExpensive(String name) throws IOException {
         // Currently-online lookup
-        Player player = Bukkit.getPlayer(name);
+        ProxiedPlayer player = ProxyServer.getInstance().getPlayer(name);
         if (player != null) {
             uuidCache.put(player.getUniqueId(), name);
             return player.getUniqueId();
