@@ -42,7 +42,7 @@ score:
   begin: "<c2>Scoring</c2> {source}<c2>, please wait..</c2>"
   type: "<c2>Scoring against</c2> {type}<c2>..</c2>"
   sleep: "<c2>Sleeping for one minute..</c2>"
-  error: "[{source}] <c5>error</c5> {percent}%"
+  error: "[{source}] {type} <c5>error</c5> {percent}%"
   score: "[{source}] {type} <c2>score</c2> {percent}%"
   end: "<c4>Scoring for</c4> {source} <c4>complete!</c4>"
 

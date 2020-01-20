@@ -34,6 +34,7 @@ public enum Message implements MessageKeyProvider {
     SCORE__TYPE,
     SCORE__SLEEP,
     SCORE__ERROR,
+    SCORE__SCORE,
     SCORE__END,
 
     TEST__BEGIN,

@@ -59,15 +59,14 @@ public class AntiVPNCommand extends BaseCommand {
         new TestCommand(issuer, ip, taskFactory.newChain()).run();
     }
 
-    // TODO: Implement rest of commands
-    /*@Subcommand("score")
+    @Subcommand("score")
     @CommandPermission("avpn.admin")
     @Description("{@@description.score}")
     @Syntax("<source>")
     @CommandCompletion("@source @nothing")
     public void onScore(CommandIssuer issuer, @Conditions("source") String source) {
-        new ScoreCommand(taskFactory.newChain(), issuer, source).run();
-    }*/
+        new ScoreCommand(issuer, source, taskFactory.newChain()).run();
+    }
 
     @Subcommand("check")
     @CommandPermission("avpn.admin")
