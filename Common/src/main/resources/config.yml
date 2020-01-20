@@ -327,7 +327,7 @@ stats:
   usage: true
   # Whether or not to send anonymous errors to the author
   # True: Send errors anonymously to Rollbar and/or GameAnalytics so the author can fix them!
-  # False: Do not send errors and wonder why any bugs you encounter haven't beeen fixed
+  # False: Do not send errors and wonder why any bugs you encounter haven't been fixed
   errors: true
 
 update:

@@ -20,9 +20,13 @@ import me.egg82.antivpn.extended.Configuration;
 import me.egg82.antivpn.hooks.PlaceholderAPIHook;
 import me.egg82.antivpn.hooks.PlayerAnalyticsHook;
 import me.egg82.antivpn.hooks.PluginHook;
+import me.egg82.antivpn.messaging.RabbitMQ;
+import me.egg82.antivpn.services.AnalyticsHelper;
 import me.egg82.antivpn.services.GameAnalyticsErrorHandler;
 import me.egg82.antivpn.services.PluginMessageFormatter;
 import me.egg82.antivpn.services.StorageMessagingHandler;
+import me.egg82.antivpn.storage.MySQL;
+import me.egg82.antivpn.storage.SQLite;
 import me.egg82.antivpn.storage.Storage;
 import me.egg82.antivpn.utils.*;
 import ninja.egg82.events.BukkitEventSubscriber;
@@ -290,8 +294,7 @@ public class AntiVPN {
 
     private void loadMetrics() {
         metrics = new Metrics(plugin);
-        // TODO: Add new metrics
-        /*metrics.addCustomChart(new Metrics.SimplePie("sql", () -> {
+        metrics.addCustomChart(new Metrics.SingleLineChart("blocked_vpns", () -> {
             Optional<Configuration> config = ConfigUtil.getConfig();
             if (!config.isPresent()) {
                 return null;
@@ -301,9 +304,9 @@ public class AntiVPN {
                 return null;
             }
 
-            return config.get().getNode("storage", "method").getString("sqlite");
+            return (int) AnalyticsHelper.getBlockedVPNs();
         }));
-        metrics.addCustomChart(new Metrics.SimplePie("redis", () -> {
+        metrics.addCustomChart(new Metrics.SingleLineChart("blocked_mcleaks", () -> {
             Optional<Configuration> config = ConfigUtil.getConfig();
             if (!config.isPresent()) {
                 return null;
@@ -313,11 +316,88 @@ public class AntiVPN {
                 return null;
             }
 
-            return config.get().getNode("redis", "enabled").getBoolean(false) ? "yes" : "no";
+            return (int) AnalyticsHelper.getBlockedMCLeaks();
+        }));
+        metrics.addCustomChart(new Metrics.SimplePie("mysql", () -> {
+            Optional<Configuration> config = ConfigUtil.getConfig();
+            Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+            if (!config.isPresent() || !cachedConfig.isPresent()) {
+                return null;
+            }
+
+            if (!config.get().getNode("stats", "usage").getBoolean(true)) {
+                return null;
+            }
+
+            for (Storage s : cachedConfig.get().getStorage()) {
+                if (s instanceof MySQL) {
+                    return "yes";
+                }
+            }
+
+            return "no";
+        }));
+        metrics.addCustomChart(new Metrics.SimplePie("redis_storage", () -> {
+            Optional<Configuration> config = ConfigUtil.getConfig();
+            Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+            if (!config.isPresent() || !cachedConfig.isPresent()) {
+                return null;
+            }
+
+            if (!config.get().getNode("stats", "usage").getBoolean(true)) {
+                return null;
+            }
+
+            for (Storage s : cachedConfig.get().getStorage()) {
+                if (s instanceof me.egg82.antivpn.storage.Redis) {
+                    return "yes";
+                }
+            }
+
+            return "no";
+        }));
+        metrics.addCustomChart(new Metrics.SimplePie("sqlite", () -> {
+            Optional<Configuration> config = ConfigUtil.getConfig();
+            Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+            if (!config.isPresent() || !cachedConfig.isPresent()) {
+                return null;
+            }
+
+            if (!config.get().getNode("stats", "usage").getBoolean(true)) {
+                return null;
+            }
+
+            for (Storage s : cachedConfig.get().getStorage()) {
+                if (s instanceof SQLite) {
+                    return "yes";
+                }
+            }
+
+            return "no";
+        }));
+        metrics.addCustomChart(new Metrics.SimplePie("redis_messaging", () -> {
+            Optional<Configuration> config = ConfigUtil.getConfig();
+            Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+            if (!config.isPresent() || !cachedConfig.isPresent()) {
+                return null;
+            }
+
+            if (!config.get().getNode("stats", "usage").getBoolean(true)) {
+                return null;
+            }
+
+            for (Storage s : cachedConfig.get().getStorage()) {
+                if (s instanceof me.egg82.antivpn.messaging.Redis) {
+                    return "yes";
+                }
+            }
+
+            return "no";
         }));
         metrics.addCustomChart(new Metrics.SimplePie("rabbitmq", () -> {
             Optional<Configuration> config = ConfigUtil.getConfig();
-            if (!config.isPresent()) {
+            Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+            if (!config.isPresent() || !cachedConfig.isPresent()) {
                 return null;
             }
 
@@ -325,7 +405,13 @@ public class AntiVPN {
                 return null;
             }
 
-            return config.get().getNode("rabbitmq", "enabled").getBoolean(false) ? "yes" : "no";
+            for (Storage s : cachedConfig.get().getStorage()) {
+                if (s instanceof RabbitMQ) {
+                    return "yes";
+                }
+            }
+
+            return "no";
         }));
         metrics.addCustomChart(new Metrics.AdvancedPie("sources", () -> {
             Optional<Configuration> config = ConfigUtil.getConfig();
@@ -339,14 +425,15 @@ public class AntiVPN {
             }
 
             Map<String, Integer> values = new HashMap<>();
-            for (String key : cachedConfig.get().getSources()) {
-                values.put(key, 1);
+            for (Map.Entry<String, SourceAPI> kvp : cachedConfig.get().getSources().entrySet()) {
+                values.put(kvp.getKey(), 1);
             }
             return values;
         }));
-        metrics.addCustomChart(new Metrics.SimplePie("action", () -> {
+        metrics.addCustomChart(new Metrics.SimplePie("algorithm", () -> {
             Optional<Configuration> config = ConfigUtil.getConfig();
-            if (!config.isPresent()) {
+            Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+            if (!config.isPresent() || !cachedConfig.isPresent()) {
                 return null;
             }
 
@@ -354,19 +441,33 @@ public class AntiVPN {
                 return null;
             }
 
-            if (!config.get().getNode("action", "kick-message").getString("").isEmpty() && !config.get().getNode("action", "command").getString("").isEmpty()) {
-                return "dual";
-            } else if (!config.get().getNode("action", "kick-message").getString("").isEmpty()) {
+            return cachedConfig.get().getVPNAlgorithmMethod().getName();
+        }));
+        metrics.addCustomChart(new Metrics.SimplePie("vpn_action", () -> {
+            Optional<Configuration> config = ConfigUtil.getConfig();
+            Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+            if (!config.isPresent() || !cachedConfig.isPresent()) {
+                return null;
+            }
+
+            if (!config.get().getNode("stats", "usage").getBoolean(true)) {
+                return null;
+            }
+
+            if (!cachedConfig.get().getVPNKickMessage().isEmpty() && !cachedConfig.get().getVPNActionCommands().isEmpty()) {
+                return "multi";
+            } else if (!cachedConfig.get().getVPNKickMessage().isEmpty()) {
                 return "kick";
-            } else if (!config.get().getNode("action", "command").getString("").isEmpty()) {
-                return "command";
+            } else if (!cachedConfig.get().getVPNActionCommands().isEmpty()) {
+                return "commands";
             }
 
             return "none";
         }));
-        metrics.addCustomChart(new Metrics.SimplePie("algorithm", () -> {
+        metrics.addCustomChart(new Metrics.SimplePie("mcleaks_action", () -> {
             Optional<Configuration> config = ConfigUtil.getConfig();
-            if (!config.isPresent()) {
+            Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+            if (!config.isPresent() || !cachedConfig.isPresent()) {
                 return null;
             }
 
@@ -374,20 +475,16 @@ public class AntiVPN {
                 return null;
             }
 
-            return config.get().getNode("action", "method").getString("cascade");
+            if (!cachedConfig.get().getMCLeaksKickMessage().isEmpty() && !cachedConfig.get().getMCLeaksActionCommands().isEmpty()) {
+                return "multi";
+            } else if (!cachedConfig.get().getMCLeaksKickMessage().isEmpty()) {
+                return "kick";
+            } else if (!cachedConfig.get().getMCLeaksActionCommands().isEmpty()) {
+                return "commands";
+            }
+
+            return "none";
         }));
-        metrics.addCustomChart(new Metrics.SingleLineChart("blocked", () -> {
-            Optional<Configuration> config = ConfigUtil.getConfig();
-            if (!config.isPresent()) {
-                return null;
-            }
-
-            if (!config.get().getNode("stats", "usage").getBoolean(true)) {
-                return null;
-            }
-
-            return (int) AnalyticsHelper.getBlocked();
-        }));*/
     }
 
     private void checkUpdate() {
