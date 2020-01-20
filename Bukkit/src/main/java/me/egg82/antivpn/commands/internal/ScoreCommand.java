@@ -27,7 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ScoreCommand implements Runnable {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(ScoreCommand.class);
 
     private final CommandIssuer issuer;
     private final String source;
@@ -35,7 +35,7 @@ public class ScoreCommand implements Runnable {
 
     private final VPNAPI api = VPNAPI.getInstance();
 
-    private static final DecimalFormat format = new DecimalFormat(".##");
+    private static final DecimalFormat format = new DecimalFormat("##0.00");
 
     public ScoreCommand(CommandIssuer issuer, String source, TaskChain<?> chain) {
         this.issuer = issuer;
@@ -66,17 +66,31 @@ public class ScoreCommand implements Runnable {
     }
 
     private void test(CommandIssuer issuer, String source, String vpnName, Set<String> ips, boolean flipResult) {
+        if (ConfigUtil.getDebugOrFalse()) {
+            logger.info("Testing against " + vpnName);
+        }
+
         double error = 0.0d;
         double good = 0.0d;
 
+        int i = 0;
         for (String ip : ips) {
+            i++;
             try {
-                Thread.sleep(5000L);
+                if (source.equalsIgnoreCase("getipintel")) {
+                    Thread.sleep(5000L); // 15req/min max, so every 4 seconds. 5 to be safe.
+                } else {
+                    Thread.sleep(1000L);
+                }
             } catch (IllegalArgumentException ex) {
                 logger.error(ex.getMessage(), ex);
             } catch (InterruptedException ex) {
                 logger.error(ex.getMessage(), ex);
                 Thread.currentThread().interrupt();
+            }
+
+            if (ConfigUtil.getDebugOrFalse()) {
+                logger.info("Testing " + ip + " (" + i + "/" + ips.size() + ")");
             }
 
             boolean result;
@@ -99,83 +113,74 @@ public class ScoreCommand implements Runnable {
         if (error > 0) {
             issuer.sendInfo(Message.SCORE__ERROR, "{source}", source, "{type}", vpnName, "{percent}", format.format((error / ips.size()) * 100.0d));
         }
-        issuer.sendInfo(Message.SCORE__SCORE, "{source}", vpnName, "{type}", vpnName, "{percent}", format.format((error / ips.size()) * 100.0d));
+        issuer.sendInfo(Message.SCORE__SCORE, "{source}", source, "{type}", vpnName, "{percent}", format.format((good / ips.size()) * 100.0d));
     }
 
     private Set<String> getNordVPNIPs() {
-        String[] dns = new String[] {
-                replaceNordVPN("al{}.nordvpn.com"),
-                replaceNordVPN("ar{}.nordvpn.com"),
-                replaceNordVPN("au{}.nordvpn.com"),
-                replaceNordVPN("at{}.nordvpn.com"),
-                replaceNordVPN("be{}.nordvpn.com"),
-                replaceNordVPN("ba{}.nordvpn.com"),
-                replaceNordVPN("br{}.nordvpn.com"),
-                replaceNordVPN("bg{}.nordvpn.com"),
-                replaceNordVPN("ca{}.nordvpn.com"),
-                replaceNordVPN("cl{}.nordvpn.com"),
-                replaceNordVPN("cr{}.nordvpn.com"),
-                replaceNordVPN("hr{}.nordvpn.com"),
-                replaceNordVPN("cy{}.nordvpn.com"),
-                replaceNordVPN("cz{}.nordvpn.com"),
-                replaceNordVPN("dk{}.nordvpn.com"),
-                replaceNordVPN("ee{}.nordvpn.com"),
-                replaceNordVPN("fi{}.nordvpn.com"),
-                replaceNordVPN("fr{}.nordvpn.com"),
-                replaceNordVPN("ge{}.nordvpn.com"),
-                replaceNordVPN("de{}.nordvpn.com"),
-                replaceNordVPN("gr{}.nordvpn.com"),
-                replaceNordVPN("hk{}.nordvpn.com"),
-                replaceNordVPN("hu{}.nordvpn.com"),
-                replaceNordVPN("is{}.nordvpn.com"),
-                replaceNordVPN("in{}.nordvpn.com"),
-                replaceNordVPN("id{}.nordvpn.com"),
-                replaceNordVPN("il{}.nordvpn.com"),
-                replaceNordVPN("it{}.nordvpn.com"),
-                replaceNordVPN("jp{}.nordvpn.com"),
-                replaceNordVPN("lv{}.nordvpn.com"),
-                replaceNordVPN("lu{}.nordvpn.com"),
-                replaceNordVPN("my{}.nordvpn.com"),
-                replaceNordVPN("mx{}.nordvpn.com"),
-                replaceNordVPN("md{}.nordvpn.com"),
-                replaceNordVPN("nl{}.nordvpn.com"),
-                replaceNordVPN("nz{}.nordvpn.com"),
-                replaceNordVPN("mk{}.nordvpn.com"),
-                replaceNordVPN("no{}.nordvpn.com"),
-                replaceNordVPN("pl{}.nordvpn.com"),
-                replaceNordVPN("pt{}.nordvpn.com"),
-                replaceNordVPN("ro{}.nordvpn.com"),
-                replaceNordVPN("rs{}.nordvpn.com"),
-                replaceNordVPN("sg{}.nordvpn.com"),
-                replaceNordVPN("sk{}.nordvpn.com"),
-                replaceNordVPN("si{}.nordvpn.com"),
-                replaceNordVPN("za{}.nordvpn.com"),
-                replaceNordVPN("kr{}.nordvpn.com"),
-                replaceNordVPN("es{}.nordvpn.com"),
-                replaceNordVPN("se{}.nordvpn.com"),
-                replaceNordVPN("ch{}.nordvpn.com"),
-                replaceNordVPN("tw{}.nordvpn.com"),
-                replaceNordVPN("th{}.nordvpn.com"),
-                replaceNordVPN("tr{}.nordvpn.com"),
-                replaceNordVPN("ua{}.nordvpn.com"),
-                replaceNordVPN("uk{}.nordvpn.com"),
-                replaceNordVPN("us{}.nordvpn.com"),
-                replaceNordVPN("vn{}.nordvpn.com")
-        };
-        return getIPs(dns, 50);
+        Set<String> dns = new HashSet<>();
+        dns.addAll(validNordVPN.get("al{}.nordvpn.com"));
+        dns.addAll(validNordVPN.get("ar{}.nordvpn.com"));
+        dns.addAll(validNordVPN.get("au{}.nordvpn.com"));
+        dns.addAll(validNordVPN.get("at{}.nordvpn.com"));
+        dns.addAll(validNordVPN.get("be{}.nordvpn.com"));
+        dns.addAll(validNordVPN.get("ba{}.nordvpn.com"));
+        dns.addAll(validNordVPN.get("br{}.nordvpn.com"));
+        dns.addAll(validNordVPN.get("bg{}.nordvpn.com"));
+        dns.addAll(validNordVPN.get("ca{}.nordvpn.com"));
+        dns.addAll(validNordVPN.get("cl{}.nordvpn.com"));
+        dns.addAll(validNordVPN.get("cr{}.nordvpn.com"));
+        dns.addAll(validNordVPN.get("hr{}.nordvpn.com"));
+        dns.addAll(validNordVPN.get("cy{}.nordvpn.com"));
+        dns.addAll(validNordVPN.get("cz{}.nordvpn.com"));
+        dns.addAll(validNordVPN.get("dk{}.nordvpn.com"));
+        dns.addAll(validNordVPN.get("ee{}.nordvpn.com"));
+        dns.addAll(validNordVPN.get("fi{}.nordvpn.com"));
+        dns.addAll(validNordVPN.get("fr{}.nordvpn.com"));
+        dns.addAll(validNordVPN.get("ge{}.nordvpn.com"));
+        dns.addAll(validNordVPN.get("de{}.nordvpn.com"));
+        dns.addAll(validNordVPN.get("gr{}.nordvpn.com"));
+        dns.addAll(validNordVPN.get("hk{}.nordvpn.com"));
+        dns.addAll(validNordVPN.get("hu{}.nordvpn.com"));
+        dns.addAll(validNordVPN.get("is{}.nordvpn.com"));
+        dns.addAll(validNordVPN.get("in{}.nordvpn.com"));
+        dns.addAll(validNordVPN.get("id{}.nordvpn.com"));
+        dns.addAll(validNordVPN.get("il{}.nordvpn.com"));
+        dns.addAll(validNordVPN.get("it{}.nordvpn.com"));
+        dns.addAll(validNordVPN.get("jp{}.nordvpn.com"));
+        dns.addAll(validNordVPN.get("lv{}.nordvpn.com"));
+        dns.addAll(validNordVPN.get("lu{}.nordvpn.com"));
+        dns.addAll(validNordVPN.get("my{}.nordvpn.com"));
+        dns.addAll(validNordVPN.get("mx{}.nordvpn.com"));
+        dns.addAll(validNordVPN.get("md{}.nordvpn.com"));
+        dns.addAll(validNordVPN.get("nl{}.nordvpn.com"));
+        dns.addAll(validNordVPN.get("nz{}.nordvpn.com"));
+        dns.addAll(validNordVPN.get("mk{}.nordvpn.com"));
+        dns.addAll(validNordVPN.get("no{}.nordvpn.com"));
+        dns.addAll(validNordVPN.get("pl{}.nordvpn.com"));
+        dns.addAll(validNordVPN.get("pt{}.nordvpn.com"));
+        dns.addAll(validNordVPN.get("ro{}.nordvpn.com"));
+        dns.addAll(validNordVPN.get("rs{}.nordvpn.com"));
+        dns.addAll(validNordVPN.get("sg{}.nordvpn.com"));
+        dns.addAll(validNordVPN.get("sk{}.nordvpn.com"));
+        dns.addAll(validNordVPN.get("si{}.nordvpn.com"));
+        dns.addAll(validNordVPN.get("za{}.nordvpn.com"));
+        dns.addAll(validNordVPN.get("kr{}.nordvpn.com"));
+        dns.addAll(validNordVPN.get("es{}.nordvpn.com"));
+        dns.addAll(validNordVPN.get("se{}.nordvpn.com"));
+        dns.addAll(validNordVPN.get("ch{}.nordvpn.com"));
+        dns.addAll(validNordVPN.get("tw{}.nordvpn.com"));
+        dns.addAll(validNordVPN.get("th{}.nordvpn.com"));
+        dns.addAll(validNordVPN.get("tr{}.nordvpn.com"));
+        dns.addAll(validNordVPN.get("ua{}.nordvpn.com"));
+        dns.addAll(validNordVPN.get("uk{}.nordvpn.com"));
+        dns.addAll(validNordVPN.get("us{}.nordvpn.com"));
+        dns.addAll(validNordVPN.get("vn{}.nordvpn.com"));
+        return getIPs(dns.toArray(new String[0]), 50);
     }
 
-    private LoadingCache<String, Set<String>> validNordVPN = Caffeine.newBuilder().build(this::findNordVPN);
+    private static LoadingCache<String, Set<String>> validNordVPN = Caffeine.newBuilder().build(ScoreCommand::findNordVPN);
 
-    private String replaceNordVPN(String dns) {
-        List<String> ips = new ArrayList<>(validNordVPN.get(dns));
-        if (ips.isEmpty()) {
-            return null;
-        }
-        return ips.get((int) fairRoundedRandom(0L, (long) ips.size() - 1L));
-    }
-
-    private Set<String> findNordVPN(String dns) {
+    private static Set<String> findNordVPN(String dns) {
         if (ConfigUtil.getDebugOrFalse()) {
             logger.info("Building NordVPN set " + dns.replace("{}", ""));
         }
@@ -201,12 +206,12 @@ public class ScoreCommand implements Runnable {
                 "balancer.cryptostorm.ch",
                 "balancer.cryptostorm.pw"
         };
-        return getIPs(dns, 25);
+        return getIPs(dns, 50);
     }
 
-    private LoadingCache<String, Set<String>> records = Caffeine.newBuilder().build(this::collectRecords);
+    private static LoadingCache<String, Set<String>> records = Caffeine.newBuilder().build(ScoreCommand::collectRecords);
 
-    private Set<String> collectRecords(String dns) {
+    private static Set<String> collectRecords(String dns) {
         if (ConfigUtil.getDebugOrFalse()) {
             logger.info("Collecting A records for " + dns);
         }
@@ -299,76 +304,7 @@ public class ScoreCommand implements Runnable {
                 "107.2.0.0/15",
                 "107.4.0.0/15",
                 "174.48.0.0/12",
-                "2001:558:6000::/36",
-                // Centurylink - https://www.ctl.io/knowledge-base/network/centurylink-cloud-public-ip-listing/
-                "65.127.194.144/29",
-                "65.151.184.0/22",
-                "64.69.71.128/25",
-                "65.39.180.0/24",
-                "65.39.184.0/25",
-                "65.151.128.0/22",
-                "216.187.73.144/28",
-                "216.187.110.0/24",
-                "65.151.132.0/23",
-                "66.155.96.0/24",
-                "66.155.100.0/24",
-                "69.28.224.128/25",
-                "70.33.208.0/25",
-                "70.33.239.96/28",
-                "70.33.239.128/25",
-                "107.6.43.0/24",
-                "206.152.32.0/21",
-                "206.152.45.0/24",
-                "66.151.140.0/23",
-                "66.155.4.0/24",
-                "66.155.94.0/24",
-                "65.151.172.0/22",
-                "66.155.18.0/23",
-                "66.155.27.0/24",
-                "66.155.28.0/24",
-                "176.74.168.0/25",
-                "176.74.179.0/25",
-                "206.142.240.0/21",
-                "207.82.88.0/24",
-                "64.74.98.0/24",
-                "64.74.229.0/24",
-                "64.94.35.32/28",
-                "66.150.98.0/23",
-                "66.150.105.0/24",
-                "69.25.149.0/24",
-                "72.5.194.0/24",
-                "72.5.203.0/24",
-                "74.201.4.0/24",
-                "74.217.15.0/24",
-                "74.201.135.0/24",
-                "74.201.140.0/24",
-                "74.201.165.0/24",
-                "74.201.226.0/24",
-                "74.201.232.0/24",
-                "74.201.237.0/24",
-                "74.201.240.0/24",
-                "205.139.16.0/22",
-                "205.139.24.0/25",
-                "64.15.176.0/24",
-                "64.15.180.16/28",
-                "64.15.182.0/24",
-                "64.15.183.0/24",
-                "64.15.184.0/21",
-                "64.211.224.0/25",
-                "206.128.134.0/23",
-                "206.128.136.0/23",
-                "206.128.152.0/21",
-                "206.128.173.0/24",
-                "206.128.176.0/23",
-                "65.151.188.0/22",
-                "64.94.142.8/29",
-                "64.94.114.0/24",
-                "64.94.138.0/24",
-                "66.150.160.0/25",
-                "66.150.174.0/24",
-                "69.25.131.0/24",
-                "70.42.161.0/24",
-                "70.42.168.0/24"
+                "2001:558:6000::/36"
         };
         return getIPs(dns, 50);
     }
@@ -376,18 +312,29 @@ public class ScoreCommand implements Runnable {
     private Set<String> getIPs(String[] dns, int count) {
         Set<String> retVal = new HashSet<>();
 
-        while (retVal.size() < count) {
-            String name = dns[(int) fairRoundedRandom(0L, (long) dns.length - 1L)];
+        int fails = 0;
+        while (retVal.size() < count && fails < 1000) {
+            String name;
+            do {
+                name = dns[(int) fairRoundedRandom(0L, (long) dns.length - 1L)];
+            } while (name == null);
+
             if (ValidationUtil.isValidIp(name)) {
-                retVal.add(name);
+                if (!retVal.add(name)) {
+                    fails++;
+                }
             } else if (ValidationUtil.isValidIPRange(name)) {
-                retVal.addAll(getIPs(name, 1));
+                if (!retVal.addAll(getIPs(name, 1))) {
+                    fails++;
+                }
             } else {
                 List<String> r = new ArrayList<>(records.get(name));
                 if (r.isEmpty()) {
                     continue;
                 }
-                retVal.add(r.get((int) fairRoundedRandom(0L, (long) r.size() - 1L)));
+                if (!retVal.add(r.get((int) fairRoundedRandom(0L, (long) r.size() - 1L)))) {
+                    fails++;
+                }
             }
         }
 
@@ -398,13 +345,21 @@ public class ScoreCommand implements Runnable {
         Set<String> retVal = new HashSet<>();
         IPAddress range = new IPAddressString(mask).getAddress();
 
-        while (retVal.size() < count) {
+        int fails = 0;
+        while (retVal.size() < count && fails < 1000) {
             long getIndex = fairRoundedRandom(0L, range.getCount().longValue());
             long i = 0;
             for (IPAddress ip : range.getIterable()) {
                 if (i == getIndex) {
-                    retVal.add(ip.toCanonicalString());
-                    if (retVal.size() >= count) {
+                    String str = ip.toCanonicalString();
+                    int idx = str.indexOf('/');
+                    if (idx > -1) {
+                        str = str.substring(0, idx);
+                    }
+                    if (!retVal.add(str)) {
+                        fails++;
+                    }
+                    if (retVal.size() >= count || fails >= 1000) {
                         break;
                     }
                     getIndex = fairRoundedRandom(0L, range.getCount().longValue());

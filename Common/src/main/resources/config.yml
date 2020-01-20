@@ -116,75 +116,44 @@ sources:
 
   # The order to try results in
   order:
-  - 'iphub'
   - 'proxycheck'
-  - 'iphunter'
-  - 'getipintel'
+  - 'iptrooper'
   - 'ipqualityscore'
+  - 'getipintel'
+  - 'iphub'
+  - 'iphunter'
   - 'vpnblocker'
   - 'ip2proxy'
-  - 'teoh'
   - 'shodan'
+  - 'teoh'
   - 'ipwarner'
-  - 'iptrooper'
-  - 'neutrino'
-
-  # https://iphub.info/
-  # Results updated Jul 7, 2019
-  # Error rate: 0%
-  # NordVPN detection rate: 85.71%
-  # Cryptostorm detection rate: 100%
-  # False-flagged homes: 0%
-  iphub:
-    enabled: false
-    # API key to use (Required for this service, free one available at https://iphub.info/apiKey/newFree )
-    key: ''
-    # The block type at which an IP is considered "bad"
-    block: 1
 
   # https://proxycheck.io
-  # Results updated Jul 7, 2019
-  # Error rate: 0%
-  # NordVPN detection rate: 80.95%
-  # Cryptostorm detection rate: 100%
-  # False-flagged homes: 0%
+  # Results updated Jan 19, 2020
+  # Error rate:                     0.00%
+  # NordVPN detection rate:       100.00%
+  # Cryptostorm detection rate:   100.00%
+  # False-flagged homes:            0.00%
   proxycheck:
     enabled: true
     # Optional API key to use
     key: ''
 
-  # https://www.iphunter.info/
-  # Results updated Jul 7, 2019
-  # Error rate: 0%
-  # NordVPN detection rate: 95.24%
-  # Cryptostorm detection rate: 90%
-  # False-flagged homes: 40%
-  iphunter:
-    enabled: false
-    # API key to use (Required for this service, free one available at https://www.iphunter.info/user/register )
-    key: ''
-    # The block type at which an IP is considered "bad"
-    block: 1
-
-  # https://www.getipintel.net/
-  # Results updated Sep 6, 2018
-  # Error rate: 5%
-  # NordVPN detection rate: 90.48%
-  # Cryptostorm detection rate: 100%
-  # False-flagged homes: 40%
-  getipintel:
+  # https://iptrooper.net/
+  # Results updated Jan 19, 2020
+  # Error rate:                     0.00%
+  # NordVPN detection rate:        96.00%
+  # Cryptostorm detection rate:   100.00%
+  # False-flagged homes:            0.00%
+  iptrooper:
     enabled: true
-    # Contact e-mail in case things go wrong. Required
-    contact: 'admin@yoursite.com'
-    # Threshold above which an IP is considered "bad"
-    threshold: 0.98
 
   # https://www.ipqualityscore.com/
-  # Results updated Jul 7, 2019
-  # Error rate: 0%
-  # NordVPN detection rate: 90.48%
-  # Cryptostorm detection rate: 90%
-  # False-flagged homes: 40%
+  # Results updated Jan 19, 2020
+  # Error rate:                    0.00%
+  # NordVPN detection rate:       90.00%
+  # Cryptostorm detection rate:   96.43%
+  # False-flagged homes:           0.00%
   ipqualityscore:
     enabled: false
     # API key to use (Required for this service, free one available at https://www.ipqualityscore.com/create-account )
@@ -192,18 +161,58 @@ sources:
     # Threshold above which an IP is considered "bad"
     threshold: 0.65
 
+  # https://www.getipintel.net/
+  # Results updated Jan 19, 2020
+  # Error rate:                     0.00%
+  # NordVPN detection rate:        86.00%
+  # Cryptostorm detection rate:   100.00%
+  # False-flagged homes:            0.00%
+  getipintel:
+    enabled: true
+    # Contact e-mail in case things go wrong. Required
+    contact: 'admin@yoursite.com'
+    # Threshold above which an IP is considered "bad"
+    threshold: 0.98
+
+  # https://iphub.info/
+  # Results updated Jan 19, 2020
+  # Error rate:                    0.00%
+  # NordVPN detection rate:       84.00%
+  # Cryptostorm detection rate:   96.43%
+  # False-flagged homes:           0.00%
+  iphub:
+    enabled: false
+    # API key to use (Required for this service, free one available at https://iphub.info/apiKey/newFree )
+    key: ''
+    # The block type at which an IP is considered "bad"
+    block: 1
+
+  # https://www.iphunter.info/
+  # Results updated Jan 19, 2020
+  # Error rate:                    0.00%
+  # NordVPN detection rate:       60.00%
+  # Cryptostorm detection rate:   92.86%
+  # False-flagged homes:           0.00%
+  iphunter:
+    enabled: false
+    # API key to use (Required for this service, free one available at https://www.iphunter.info/user/register )
+    key: ''
+    # The block type at which an IP is considered "bad"
+    block: 1
+
   # https://vpnblocker.net/usage
-  # Results updated Jul 7, 2019
-  # Error rate: 0%
-  # NordVPN detection rate: 66.67%
-  # Cryptostorm detection rate: 95%
-  # False-flagged homes: 10%
+  # Results updated Jan 19, 2020
+  # Error rate:                    0.00%
+  # NordVPN detection rate:       64.00%
+  # Cryptostorm detection rate:   82.14%
+  # False-flagged homes:           0.00%
   vpnblocker:
     enabled: true
     # Optional API key to use
     key: ''
 
   # https://www.ip2location.com/web-service/ip2proxy
+  # NOTE: This info is old
   # Results updated Jul 18, 2019
   # Error rate: 0%
   # NordVPN detection rate: 100%
@@ -214,7 +223,19 @@ sources:
     # API key to use (Required for this service, free one available using 'demo' or at https://www.ip2location.com/register?id=1006 )
     key: 'demo'
 
+  # https://www.shodan.io/
+  # Results updated Jan 19, 2020
+  # Error rate:                  55.15%
+  # NordVPN detection rate:      90.00%
+  # Cryptostorm detection rate:   0.00%
+  # False-flagged homes:          0.00%
+  shodan:
+    enabled: false
+    # API key to use (Required for this service)
+    key: ''
+
   # https://ip.teoh.io/vpn-detection
+  # NOTE: This info is old
   # Results updated Jul 7, 2019
   # Error rate: 10%
   # NordVPN detection rate: 61.90%
@@ -223,33 +244,10 @@ sources:
   teoh:
     enabled: true
 
-  # https://www.shodan.io/
-  # Results updated Jul 7, 2019
-  # Error rate: 94.52%
-  # NordVPN detection rate: 95.24%
-  # Cryptostorm detection rate: 60%
-  # False-flagged homes: 0%
-  shodan:
-    enabled: false
-    # API key to use (Required for this service)
-    key: ''
-
   # https://ipwarner.com/
   ipwarner:
     enabled: false
     # API key to use (Required for this service, free one available at https://ipwarner.com/register )
-    key: ''
-
-  # https://iptrooper.net/
-  iptrooper:
-    enabled: true
-
-  # https://www.neutrinoapi.com/
-  neutrino:
-    enabled: false
-    # User ID to use (Required for this service, create one at https://www.neutrinoapi.com/signup/ )
-    id: ''
-    # API key to use (Required for this service, free one available at https://www.neutrinoapi.com/signup/ )
     key: ''
 
 mcleaks:
