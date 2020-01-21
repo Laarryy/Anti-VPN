@@ -14,7 +14,6 @@ import java.util.Optional;
 import java.util.UUID;
 import me.egg82.antivpn.APIException;
 import me.egg82.antivpn.enums.VPNAlgorithmMethod;
-import me.egg82.antivpn.events.EventHolder;
 import me.egg82.antivpn.extended.CachedConfigValues;
 import me.egg82.antivpn.services.AnalyticsHelper;
 import me.egg82.antivpn.services.lookup.PlayerInfo;
