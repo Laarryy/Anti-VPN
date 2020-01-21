@@ -1,39 +1,30 @@
 package me.egg82.antivpn.commands.internal;
 
-import com.velocitypowered.api.command.CommandSource;
+import co.aikar.commands.CommandIssuer;
 import com.velocitypowered.api.plugin.PluginDescription;
 import com.velocitypowered.api.proxy.ProxyServer;
+import me.egg82.antivpn.enums.Message;
+import me.egg82.antivpn.services.StorageMessagingHandler;
 import me.egg82.antivpn.utils.ConfigurationFileUtil;
-import me.egg82.antivpn.utils.LogUtil;
-import net.kyori.text.TextComponent;
-import net.kyori.text.format.TextColor;
 
 public class ReloadCommand implements Runnable {
     private final Object plugin;
     private final ProxyServer proxy;
     private final PluginDescription description;
-    private final CommandSource source;
+    private StorageMessagingHandler handler;
+    private final CommandIssuer issuer;
 
-    public ReloadCommand(Object plugin, ProxyServer proxy, PluginDescription description, CommandSource source) {
+    public ReloadCommand(Object plugin, ProxyServer proxy, PluginDescription description, StorageMessagingHandler handler, CommandIssuer issuer) {
         this.plugin = plugin;
         this.proxy = proxy;
         this.description = description;
-        this.source = source;
+        this.handler = handler;
+        this.issuer = issuer;
     }
 
     public void run() {
-        source.sendMessage(LogUtil.getHeading().append(TextComponent.of("Reloading, please wait..").color(TextColor.YELLOW)).build());
-
-        ServiceUtil.unregisterWorkPool();
-        ServiceUtil.unregisterRedis();
-        ServiceUtil.unregisterRabbit();
-        ServiceUtil.unregisterSQL();
-        ConfigurationFileUtil.reloadConfig(plugin, proxy, description);
-        ServiceUtil.registerWorkPool();
-        ServiceUtil.registerRedis();
-        ServiceUtil.registerRabbit();
-        ServiceUtil.registerSQL();
-
-        source.sendMessage(LogUtil.getHeading().append(TextComponent.of("Configuration reloaded!").color(TextColor.GREEN)).build());
+        issuer.sendInfo(Message.RELOAD__BEGIN);
+        ConfigurationFileUtil.reloadConfig(plugin, proxy, description, handler, handler);
+        issuer.sendInfo(Message.RELOAD__END);
     }
 }

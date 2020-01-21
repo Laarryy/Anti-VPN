@@ -205,15 +205,6 @@
         </repository>
 
         <repository>
-            <id>placeholderapi-proxy</id>
-            <url>https://nexus.egg82.me/repository/placeholderapi/</url>
-        </repository>
-        <repository>
-            <id>placeholderapi</id>
-            <url>http://repo.extendedclip.com/content/repositories/placeholderapi/</url>
-        </repository>
-
-        <repository>
             <id>maven-central-proxy</id>
             <url>https://nexus.egg82.me/repository/maven-central/</url>
         </repository>

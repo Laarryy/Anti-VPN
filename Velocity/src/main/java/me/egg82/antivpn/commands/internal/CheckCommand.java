@@ -1,66 +1,96 @@
 package me.egg82.antivpn.commands.internal;
 
-import com.velocitypowered.api.command.CommandSource;
+import co.aikar.commands.CommandIssuer;
+import com.velocitypowered.api.proxy.ProxyServer;
+import java.io.IOException;
 import java.util.Optional;
+import java.util.UUID;
 import me.egg82.antivpn.APIException;
 import me.egg82.antivpn.VPNAPI;
-import me.egg82.antivpn.extended.Configuration;
+import me.egg82.antivpn.enums.Message;
+import me.egg82.antivpn.enums.VPNAlgorithmMethod;
+import me.egg82.antivpn.extended.CachedConfigValues;
+import me.egg82.antivpn.services.lookup.PlayerInfo;
+import me.egg82.antivpn.services.lookup.PlayerLookup;
 import me.egg82.antivpn.utils.ConfigUtil;
-import me.egg82.antivpn.utils.LogUtil;
-import net.kyori.text.TextComponent;
-import net.kyori.text.format.TextColor;
+import me.egg82.antivpn.utils.ValidationUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class CheckCommand implements Runnable {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private final CommandSource source;
-    private final String ip;
+    private final CommandIssuer issuer;
+    private final ProxyServer proxy;
+    private final String type;
 
     private final VPNAPI api = VPNAPI.getInstance();
 
-    public CheckCommand(CommandSource source, String ip) {
-        this.source = source;
-        this.ip = ip;
+    public CheckCommand(CommandIssuer issuer, ProxyServer proxy, String type) {
+        this.issuer = issuer;
+        this.proxy = proxy;
+        this.type = type;
     }
 
     public void run() {
-        source.sendMessage(LogUtil.getHeading().append(TextComponent.of("Checking ").color(TextColor.YELLOW)).append(TextComponent.of(ip).color(TextColor.WHITE)).append(TextComponent.of("..").color(TextColor.YELLOW)).build());
+        issuer.sendInfo(Message.CHECK__BEGIN, "{type}", type);
 
-        Optional<Configuration> config = ConfigUtil.getConfig();
-        if (!config.isPresent()) {
-            source.sendMessage(LogUtil.getHeading().append(TextComponent.of("Internal error").color(TextColor.DARK_RED)).build());
-            return;
-        }
-
-        Optional<Boolean> isVPN = Optional.empty();
-        if (config.get().getNode("action", "algorithm", "method").getString("cascade").equalsIgnoreCase("consensus")) {
-            double consensus = clamp(0.0d, 1.0d, config.get().getNode("action", "algorithm", "min-consensus").getDouble(0.6d));
-            try {
-                isVPN = Optional.of(api.consensus(ip) >= consensus);
-            } catch (APIException ex) {
-                logger.error(ex.getMessage(), ex);
+        if (ValidationUtil.isValidIp(type)) {
+            Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+            if (!cachedConfig.isPresent()) {
+                logger.error("Cached config could not be fetched.");
+                issuer.sendError(Message.ERROR__INTERNAL);
+                return;
             }
-        } else {
-            try {
-                isVPN = Optional.of(api.cascade(ip));
-            } catch (APIException ex) {
-                logger.error(ex.getMessage(), ex);
+
+            if (cachedConfig.get().getVPNAlgorithmMethod() == VPNAlgorithmMethod.CONSESNSUS) {
+                try {
+                    issuer.sendInfo(api.consensus(type) >= cachedConfig.get().getVPNAlgorithmConsensus() ? Message.CHECK__VPN_DETECTED : Message.CHECK__NO_VPN_DETECTED);
+                    return;
+                } catch (APIException ex) {
+                    logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
+                }
+            } else {
+                try {
+                    issuer.sendInfo(api.cascade(type) ? Message.CHECK__VPN_DETECTED : Message.CHECK__NO_VPN_DETECTED);
+                    return;
+                } catch (APIException ex) {
+                    logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
+                }
             }
-        }
-
-        if (!isVPN.isPresent()) {
-            source.sendMessage(LogUtil.getHeading().append(TextComponent.of("Internal error").color(TextColor.DARK_RED)).build());
-            return;
-        }
-
-        if (isVPN.get()) {
-            source.sendMessage(LogUtil.getHeading().append(TextComponent.of("VPN/Proxy detected").color(TextColor.DARK_RED)).build());
+            issuer.sendError(Message.ERROR__INTERNAL);
         } else {
-            source.sendMessage(LogUtil.getHeading().append(TextComponent.of("No VPN/Proxy detected").color(TextColor.GREEN)).build());
+            UUID playerID = getPlayerUUID(type, proxy);
+            if (playerID == null) {
+                issuer.sendError(Message.ERROR__INTERNAL);
+                return;
+            }
+
+            Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+            if (!cachedConfig.isPresent()) {
+                logger.error("Cached config could not be fetched.");
+                issuer.sendError(Message.ERROR__INTERNAL);
+                return;
+            }
+
+            try {
+                issuer.sendInfo(api.isMCLeaks(playerID) ? Message.CHECK__MCLEAKS_DETECTED : Message.CHECK__NO_MCLEAKS_DETECTED);
+                return;
+            } catch (APIException ex) {
+                logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
+            }
+            issuer.sendError(Message.ERROR__INTERNAL);
         }
     }
 
-    private double clamp(double min, double max, double val) { return Math.min(max, Math.max(min, val)); }
+    private UUID getPlayerUUID(String name, ProxyServer proxy) {
+        PlayerInfo info;
+        try {
+            info = PlayerLookup.get(name, proxy);
+        } catch (IOException ex) {
+            logger.warn("Could not fetch player UUID. (rate-limited?)", ex);
+            return null;
+        }
+        return info.getUUID();
+    }
 }

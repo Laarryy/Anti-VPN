@@ -44,7 +44,6 @@
         <module>Common</module>
         <module>Bukkit</module>
         <module>Bungee</module>
-        <!-- TODO: Fix -->
-        <!--<module>Velocity</module>-->
+        <module>Velocity</module>
     </modules>
 </project>

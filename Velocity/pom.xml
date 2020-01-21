@@ -90,9 +90,10 @@
                                         <exclude>com/google/errorprone/annotations/**</exclude> <!-- included with guava -->
                                         <exclude>com/google/j2objc/annotations/**</exclude> <!-- included with guava -->
                                         <exclude>com/google/thirdparty/publicsuffix/**</exclude> <!-- included with guava -->
-                                        <exclude>com/googlecode/concurrentlinkedhashmap/**</exclude>
                                         <exclude>com/rabbitmq/**</exclude>
                                         <exclude>com/zaxxer/hikari/**</exclude> <!-- included with easy-sql -->
+                                        <exclude>me/gong/mcleaks/**</exclude>
+                                        <exclude>inet/ipaddr/**</exclude>
                                         <exclude>javassist/**</exclude>
                                         <exclude>javax/annotation/**</exclude>
                                         <exclude>ninja/egg82/analytics/**</exclude>
@@ -102,18 +103,13 @@
                                         <exclude>ninja/egg82/reflect/**</exclude>
                                         <exclude>ninja/egg82/service/**</exclude>
                                         <exclude>ninja/egg82/sql/**</exclude>
-                                        <exclude>ninja/egg82/tuples/**</exclude>
                                         <exclude>ninja/leaping/configurate/**</exclude>
-                                        <exclude>org/apache/commons/beanutils/**</exclude> <!-- included with validator -->
-                                        <exclude>org/apache/commons/collections/**</exclude> <!-- included with validator -->
-                                        <exclude>org/apache/commons/digester/**</exclude> <!-- included with validator -->
-                                        <exclude>org/apache/commons/lang3/**</exclude> <!-- included with collections -->
-                                        <exclude>org/apache/commons/logging/**</exclude> <!-- included with validator -->
+                                        <exclude>okio/**</exclude> <!-- included with mcleaks-api -->
+                                        <exclude>okhttp3/**</exclude> <!-- included with mcleaks-api -->
                                         <exclude>org/apache/commons/pool2/**</exclude> <!-- included with jedis -->
-                                        <exclude>org/apache/commons/validator/**</exclude>
                                         <exclude>org/checkerframework/**</exclude> <!-- included with configurate-core -->
                                         <exclude>org/codehaus/mojo/animal_sniffer/**</exclude> <!-- included with guava -->
-                                        <exclude>org/json/simple/**</exclude> <!-- included with gameanalytics-api -->
+                                        <exclude>org/json/simple/**</exclude> <!-- included with gameanalytics-api/json-web -->
                                         <exclude>org/reflections/**</exclude> <!-- included with reflection-utils -->
                                         <exclude>redis/clients/jedis/**</exclude>
                                         <exclude>rabbitmq-amqp-client.properties</exclude> <!-- included with rabbitmq -->
@@ -137,16 +133,44 @@
 
     <repositories>
         <repository>
+            <id>egg82-ninja-proxy</id>
+            <url>https://nexus.egg82.me/repository/egg82/</url>
+        </repository>
+        <repository>
             <id>egg82-ninja</id>
             <url>https://www.myget.org/F/egg82-java/maven/</url>
+        </repository>
+
+        <repository>
+            <id>velocity-proxy</id>
+            <url>https://nexus.egg82.me/repository/egg82/velocity</url>
+        </repository>
+        <repository>
+            <id>velocity</id>
+            <url>https://repo.velocitypowered.com/snapshots/</url>
+        </repository>
+
+        <repository>
+            <id>aikar-proxy</id>
+            <url>https://nexus.egg82.me/repository/aikar/</url>
         </repository>
         <repository>
             <id>aikar</id>
             <url>https://repo.aikar.co/content/groups/aikar/</url>
         </repository>
+
+        <repository>
+            <id>sponge-proxy</id>
+            <url>https://nexus.egg82.me/repository/sponge/</url>
+        </repository>
         <repository>
             <id>sponge</id>
             <url>https://repo.spongepowered.org/maven/</url>
+        </repository>
+
+        <repository>
+            <id>github-rjenkinsjr-proxy</id>
+            <url>https://nexus.egg82.me/repository/rjenkinsjr/</url>
         </repository>
         <repository>
             <id>github-rjenkinsjr</id>
@@ -154,17 +178,26 @@
         </repository>
 
         <repository>
-            <id>CodeMC</id>
-            <url>https://repo.codemc.org/repository/maven-public</url>
+            <id>plan-proxy</id>
+            <url>https://nexus.egg82.me/repository/plan/</url>
         </repository>
         <repository>
-            <id>placeholderapi</id>
-            <url>http://repo.extendedclip.com/content/repositories/placeholderapi/</url>
+            <id>plan</id>
+            <url>https://dl.bintray.com/rsl1122/Plan-repository</url>
         </repository>
 
         <repository>
-            <id>velocity</id>
-            <url>https://repo.velocitypowered.com/snapshots/</url>
+            <id>codemc-proxy</id>
+            <url>https://nexus.egg82.me/repository/codemc/</url>
+        </repository>
+        <repository>
+            <id>CodeMC</id>
+            <url>https://repo.codemc.org/repository/maven-public</url>
+        </repository>
+
+        <repository>
+            <id>maven-central-proxy</id>
+            <url>https://nexus.egg82.me/repository/maven-central/</url>
         </repository>
     </repositories>
 
@@ -203,26 +236,18 @@
         <dependency>
             <groupId>ninja.egg82</groupId>
             <artifactId>dep-downloader</artifactId>
-            <version>2.1.9</version>
+            <version>2.2.12</version>
+        </dependency>
+        <dependency>
+            <groupId>ninja.egg82</groupId>
+            <artifactId>reflection-utils</artifactId>
+            <version>1.0.4</version>
         </dependency>
 
         <dependency>
             <groupId>com.djrapitops</groupId>
-            <artifactId>Plan-common</artifactId>
-            <version>4.5.0-SNAPSHOT</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>me.clip</groupId>
-            <artifactId>placeholderapi</artifactId>
-            <version>2.10.3</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>commons-net</groupId>
-            <artifactId>commons-net</artifactId>
-            <version>3.6</version>
+            <artifactId>Plan-api</artifactId>
+            <version>5.0-R0.3</version>
             <scope>provided</scope>
         </dependency>
 
@@ -235,7 +260,7 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
-            <version>5.5.1</version>
+            <version>5.6.0-M1</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

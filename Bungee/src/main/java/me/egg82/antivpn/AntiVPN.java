@@ -33,6 +33,7 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PostLoginEvent;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.api.plugin.PluginManager;
+import net.md_5.bungee.api.scheduler.ScheduledTask;
 import net.md_5.bungee.event.EventPriority;
 import ninja.egg82.events.BungeeEventSubscriber;
 import ninja.egg82.events.BungeeEvents;
@@ -52,7 +53,7 @@ public class AntiVPN {
 
     private List<EventHolder> eventHolders = new ArrayList<>();
     private List<BungeeEventSubscriber<?>> events = new ArrayList<>();
-    private List<Integer> tasks = new ArrayList<>();
+    private List<ScheduledTask> tasks = new ArrayList<>();
 
     private Metrics metrics = null;
 
@@ -115,7 +116,7 @@ public class AntiVPN {
 
         commandManager.unregisterCommands();
 
-        for (int task : tasks) {
+        for (ScheduledTask task : tasks) {
             plugin.getProxy().getScheduler().cancel(task);
         }
         tasks.clear();
