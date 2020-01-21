@@ -24,7 +24,7 @@ CREATE TABLE `{prefix}players` (
 DROP TABLE IF EXISTS `{prefix}vpn_values`;
 CREATE TABLE `{prefix}vpn_values` (
 	"id"	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-	"ip_id"	INTEGER NOT NULL,
+	"ip_id"	INTEGER NOT NULL UNIQUE,
 	"cascade"	BOOLEAN,
 	"consensus"	DOUBLE,
 	"created"	TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -34,7 +34,7 @@ CREATE TABLE `{prefix}vpn_values` (
 DROP TABLE IF EXISTS `{prefix}mcleaks_values`;
 CREATE TABLE `{prefix}mcleaks_values` (
 	"id"	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-	"player_id"	INTEGER NOT NULL,
+	"player_id"	INTEGER NOT NULL UNIQUE,
 	"result"	BOOLEAN NOT NULL,
 	"created"	TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	FOREIGN KEY("player_id") REFERENCES "{prefix}players"("id") ON DELETE RESTRICT ON UPDATE RESTRICT

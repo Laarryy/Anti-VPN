@@ -76,7 +76,7 @@ BEGIN
   SELECT
     `v`.`id`,
     `p`.`uuid` AS `player_id`,
-    `v`.`value`,
+    `v`.`result`,
     `v`.`created`
   FROM `{prefix}mcleaks_values` `v`
   JOIN `{prefix}players` `p` ON `p`.`id` = `v`.`player_id`
@@ -107,7 +107,7 @@ BEGIN
   SELECT
     `v`.`id`,
     `p`.`uuid` AS `player_id`,
-    `v`.`value`,
+    `v`.`result`,
     `v`.`created`
   FROM `{prefix}mcleaks_values` `v`
   JOIN `{prefix}players` `p` ON `p`.`id` = `v`.`player_id`
@@ -138,7 +138,7 @@ BEGIN
   SELECT
     `v`.`id`,
     `p`.`uuid` AS `player_id`,
-    `v`.`value`,
+    `v`.`result`,
     `v`.`created`
   FROM `{prefix}mcleaks_values` `v`
   JOIN `{prefix}players` `p` ON `p`.`id` = `v`.`player_id`

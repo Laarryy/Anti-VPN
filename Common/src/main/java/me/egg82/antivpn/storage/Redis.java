@@ -404,6 +404,9 @@ public class Redis implements Storage {
                 IPResult r = null;
                 try {
                     String json = redis.get(prefix + "ips:" + i);
+                    if (json == null) {
+                        continue;
+                    }
                     JSONObject obj = JSONUtil.parseObject(json);
                     String ip = (String) obj.get("ip");
                     if (!ValidationUtil.isValidIp(ip)) {
@@ -465,6 +468,9 @@ public class Redis implements Storage {
                 PlayerResult r = null;
                 try {
                     String json = redis.get(prefix + "players:" + i);
+                    if (json == null) {
+                        continue;
+                    }
                     JSONObject obj = JSONUtil.parseObject(json);
                     String pid = (String) obj.get("id");
                     if (!ValidationUtil.isValidUuid(pid)) {
@@ -526,11 +532,14 @@ public class Redis implements Storage {
                 RawVPNResult r = null;
                 try {
                     String json = redis.get(prefix + "vpn_values:" + i);
+                    if (json == null) {
+                        continue;
+                    }
                     JSONObject obj = JSONUtil.parseObject(json);
                     r = new RawVPNResult(
                             i,
                             ((Number) obj.get("ipID")).longValue(),
-                            obj.get("cascade") == null ? Optional.empty() : Optional.of((Boolean) obj.get("consensus")),
+                            obj.get("cascade") == null ? Optional.empty() : Optional.of((Boolean) obj.get("cascade")),
                             obj.get("consensus") == null ? Optional.empty() : Optional.of(((Number) obj.get("consensus")).doubleValue()),
                             ((Number) obj.get("created")).longValue()
                     );
@@ -582,6 +591,9 @@ public class Redis implements Storage {
                 RawMCLeaksResult r = null;
                 try {
                     String json = redis.get(prefix + "mcleaks_values:" + i);
+                    if (json == null) {
+                        continue;
+                    }
                     JSONObject obj = JSONUtil.parseObject(json);
                     r = new RawMCLeaksResult(
                             i,
@@ -765,7 +777,10 @@ public class Redis implements Storage {
         ScanResult<String> result;
         do {
             result = redis.scan(String.valueOf(current), params);
-            redis.del(result.getResult().toArray(new String[0]));
+            List<String> r = result.getResult();
+            if (!r.isEmpty()) {
+                redis.del(r.toArray(new String[0]));
+            }
             current = Long.parseLong(result.getCursor());
         } while (!result.isCompleteIteration());
     }
