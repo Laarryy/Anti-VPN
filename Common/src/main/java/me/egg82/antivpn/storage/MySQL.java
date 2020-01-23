@@ -91,7 +91,7 @@ public class MySQL extends AbstractSQL {
         }
 
         public MySQL.Builder options(String options) throws IOException {
-            options = options.charAt(0) == '?' ? options.substring(1) : options;
+            options = !options.isEmpty() && options.charAt(0) == '?' ? options.substring(1) : options;
             Properties p = new Properties();
             p.load(new StringReader(options.replace("&", "\n")));
             config.setDataSourceProperties(p);
