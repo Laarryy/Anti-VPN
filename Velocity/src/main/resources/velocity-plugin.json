@@ -1,7 +1,7 @@
 {
   "id": "antivpn",
   "name": "AntiVPN",
-  "version": "4.9.32",
+  "version": "5.9.32",
   "description ": "Get the best; save money on overpriced plugins and block VPN users!",
   "authors": ["egg82"],
   "dependencies": [
