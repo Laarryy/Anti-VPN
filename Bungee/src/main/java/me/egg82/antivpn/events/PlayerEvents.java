@@ -49,12 +49,12 @@ public class PlayerEvents extends EventHolder {
         for (String testAddress : cachedConfig.get().getIgnoredIps()) {
             if (ValidationUtil.isValidIp(testAddress) && ip.equalsIgnoreCase(testAddress)) {
                 if (ConfigUtil.getDebugOrFalse()) {
-                    logger.info(LogUtil.getHeading() + ChatColor.WHITE + event.getConnection().getUniqueId() + ChatColor.YELLOW + " is using an ignored IP " + ChatColor.WHITE + ip + ChatColor.YELLOW + ". Ignoring.");
+                    logger.info(LogUtil.getHeading() + ChatColor.WHITE + event.getConnection().getName() + ChatColor.YELLOW + " is using an ignored IP " + ChatColor.WHITE + ip + ChatColor.YELLOW + ". Ignoring.");
                 }
                 return;
             } else if (ValidationUtil.isValidIPRange(testAddress) && rangeContains(testAddress, ip)) {
                 if (ConfigUtil.getDebugOrFalse()) {
-                    logger.info(LogUtil.getHeading() + ChatColor.WHITE + event.getConnection().getUniqueId() + ChatColor.YELLOW + " is under an ignored range " + ChatColor.WHITE + testAddress + " (" + ip + ")" + ChatColor.YELLOW + ". Ignoring.");
+                    logger.info(LogUtil.getHeading() + ChatColor.WHITE + event.getConnection().getName() + ChatColor.YELLOW + " is under an ignored range " + ChatColor.WHITE + testAddress + " (" + ip + ")" + ChatColor.YELLOW + ". Ignoring.");
                 }
                 return;
             }
@@ -74,11 +74,7 @@ public class PlayerEvents extends EventHolder {
             }
         }
 
-        try {
-            api.isMCLeaks(event.getConnection().getUniqueId()); // Calling this will cache the result internally, even if the value is unused
-        } catch (APIException ex) {
-            logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
-        }
+        // Can't cache MCleaks - event.getConnection().getUniqueId() is null here
     }
 
     private void checkPlayer(PostLoginEvent event) {
