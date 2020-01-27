@@ -19,8 +19,13 @@ import me.egg82.antivpn.VPNAPI;
 import me.egg82.antivpn.enums.VPNAlgorithmMethod;
 import me.egg82.antivpn.extended.CachedConfigValues;
 import me.egg82.antivpn.utils.ConfigUtil;
+import ninja.egg82.events.BukkitEvents;
+import ninja.egg82.service.ServiceLocator;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.server.PluginEnableEvent;
+import org.bukkit.plugin.Plugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,7 +33,18 @@ public class PlayerAnalyticsHook implements PluginHook {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final CapabilityService capabilities;
 
-    public PlayerAnalyticsHook() {
+    public static void create(Plugin plugin, Plugin plan) {
+        if (!plan.isEnabled()) {
+            BukkitEvents.subscribe(plugin, PluginEnableEvent.class, EventPriority.MONITOR)
+                    .expireIf(e -> e.getPlugin().getName().equals("Plan"))
+                    .filter(e -> e.getPlugin().getName().equals("Plan"))
+                    .handler(e -> ServiceLocator.register(new PlayerAnalyticsHook()));
+            return;
+        }
+        ServiceLocator.register(new PlayerAnalyticsHook());
+    }
+
+    private PlayerAnalyticsHook() {
         capabilities = CapabilityService.getInstance();
 
         if (isCapabilityAvailable("DATA_EXTENSION_VALUES") && isCapabilityAvailable("DATA_EXTENSION_TABLES")) {

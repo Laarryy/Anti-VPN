@@ -279,9 +279,10 @@ public class AntiVPN {
     private void loadHooks() {
         PluginManager manager = plugin.getServer().getPluginManager();
 
-        if (manager.getPlugin("Plan") != null) {
+        Plugin plan;
+        if ((plan = manager.getPlugin("Plan")) != null) {
             consoleCommandIssuer.sendInfo(Message.GENERAL__HOOK_ENABLE, "{plugin}", "Plan");
-            ServiceLocator.register(new PlayerAnalyticsHook());
+            PlayerAnalyticsHook.create(plugin, plan);
         } else {
             consoleCommandIssuer.sendInfo(Message.GENERAL__HOOK_DISABLE, "{plugin}", "Plan");
         }
