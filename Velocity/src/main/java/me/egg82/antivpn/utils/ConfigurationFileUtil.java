@@ -69,6 +69,10 @@ public class ConfigurationFileUtil {
             storage = new ArrayList<>();
         }
 
+        if (storage.isEmpty()) {
+            throw new IllegalStateException("No storage has been defined in the config.yml");
+        }
+
         if (debug) {
             for (Storage s : storage) {
                 proxy.getConsoleCommandSource().sendMessage(LogUtil.getHeading().append(TextComponent.of("Added storage: ").color(TextColor.YELLOW)).append(TextComponent.of(s.getClass().getSimpleName()).color(TextColor.WHITE)).build());
