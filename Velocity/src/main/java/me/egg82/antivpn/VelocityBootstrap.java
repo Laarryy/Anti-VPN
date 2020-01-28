@@ -66,7 +66,7 @@ public class VelocityBootstrap {
             throw new RuntimeException("Could not get plugin name.");
         }
 
-        proxiedClassLoader = new ProxiedURLClassLoader(getClass().getClassLoader());
+        proxiedClassLoader = new ProxiedURLClassLoader(getClass().getClassLoader(), new String[] { "org\\.slf4j\\..*" });
 
         try {
             loadJars(new File(new File(description.getSource().get().getParent().toFile(), description.getName().get()), "external"), proxiedClassLoader);

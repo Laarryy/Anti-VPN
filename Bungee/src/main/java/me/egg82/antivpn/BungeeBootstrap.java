@@ -36,7 +36,7 @@ public class BungeeBootstrap extends Plugin {
 
     @Override
     public void onLoad() {
-        proxiedClassLoader = new ProxiedURLClassLoader(getClass().getClassLoader());
+        proxiedClassLoader = new ProxiedURLClassLoader(getClass().getClassLoader(), new String[] { "org\\.slf4j\\..*" });
 
         try {
             loadJars(new File(getDataFolder(), "external"), proxiedClassLoader);
