@@ -39,9 +39,6 @@ public class PlayerEvents extends EventHolder {
 
     private void cachePlayer(AsyncPlayerPreLoginEvent event) {
         if (Bukkit.hasWhitelist() && !isWhitelisted(event.getUniqueId())) {
-            if (ConfigUtil.getDebugOrFalse()) {
-                logger.info(LogUtil.getHeading() + ChatColor.WHITE + event.getUniqueId() + ChatColor.YELLOW + " is not whitelisted while the server is in whitelist mode. Ignoring.");
-            }
             return;
         }
 
@@ -56,15 +53,10 @@ public class PlayerEvents extends EventHolder {
         }
 
         for (String testAddress : cachedConfig.get().getIgnoredIps()) {
-            if (ValidationUtil.isValidIp(testAddress) && ip.equalsIgnoreCase(testAddress)) {
-                if (ConfigUtil.getDebugOrFalse()) {
-                    logger.info(LogUtil.getHeading() + ChatColor.WHITE + event.getUniqueId() + ChatColor.YELLOW + " is using an ignored IP " + ChatColor.WHITE + ip + ChatColor.YELLOW + ". Ignoring.");
-                }
-                return;
-            } else if (ValidationUtil.isValidIPRange(testAddress) && rangeContains(testAddress, ip)) {
-                if (ConfigUtil.getDebugOrFalse()) {
-                    logger.info(LogUtil.getHeading() + ChatColor.WHITE + event.getUniqueId() + ChatColor.YELLOW + " is under an ignored range " + ChatColor.WHITE + testAddress + " (" + ip + ")" + ChatColor.YELLOW + ". Ignoring.");
-                }
+            if (
+                    ValidationUtil.isValidIp(testAddress) && ip.equalsIgnoreCase(testAddress)
+                    || ValidationUtil.isValidIPRange(testAddress) && rangeContains(testAddress, ip)
+            ) {
                 return;
             }
         }
@@ -121,8 +113,14 @@ public class PlayerEvents extends EventHolder {
 
         for (String testAddress : cachedConfig.get().getIgnoredIps()) {
             if (ValidationUtil.isValidIp(testAddress) && ip.equalsIgnoreCase(testAddress)) {
+                if (ConfigUtil.getDebugOrFalse()) {
+                    logger.info(LogUtil.getHeading() + ChatColor.WHITE + event.getPlayer().getName() + ChatColor.YELLOW + " is using an ignored IP " + ChatColor.WHITE + ip + ChatColor.YELLOW + ". Ignoring.");
+                }
                 return;
             } else if (ValidationUtil.isValidIPRange(testAddress) && rangeContains(testAddress, ip)) {
+                if (ConfigUtil.getDebugOrFalse()) {
+                    logger.info(LogUtil.getHeading() + ChatColor.WHITE + event.getPlayer().getName() + ChatColor.YELLOW + " is under an ignored range " + ChatColor.WHITE + testAddress + " (" + ip + ")" + ChatColor.YELLOW + ". Ignoring.");
+                }
                 return;
             }
         }

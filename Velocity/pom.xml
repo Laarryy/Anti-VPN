@@ -10,7 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>antivpn-velocity</artifactId>
-    <version>5.9.34</version>
+    <version>5.9.35</version>
 
     <build>
         <sourceDirectory>src/main/java</sourceDirectory>
@@ -254,7 +254,7 @@
         <dependency>
             <groupId>me.egg82</groupId>
             <artifactId>antivpn-common</artifactId>
-            <version>5.9.34</version>
+            <version>5.9.35</version>
         </dependency>
 
         <dependency>

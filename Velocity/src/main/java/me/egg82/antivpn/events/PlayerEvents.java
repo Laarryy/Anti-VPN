@@ -60,15 +60,10 @@ public class PlayerEvents extends EventHolder {
         }
 
         for (String testAddress : cachedConfig.get().getIgnoredIps()) {
-            if (ValidationUtil.isValidIp(testAddress) && ip.equalsIgnoreCase(testAddress)) {
-                if (ConfigUtil.getDebugOrFalse()) {
-                    proxy.getConsoleCommandSource().sendMessage(LogUtil.getHeading().append(TextComponent.of(playerID.toString()).color(TextColor.WHITE)).append(TextComponent.of(" is using an ignored IP ").color(TextColor.YELLOW)).append(TextComponent.of(ip).color(TextColor.WHITE)).append(TextComponent.of(". Ignoring.").color(TextColor.YELLOW)).build());
-                }
-                return;
-            } else if (ValidationUtil.isValidIPRange(testAddress) && rangeContains(testAddress, ip)) {
-                if (ConfigUtil.getDebugOrFalse()) {
-                    proxy.getConsoleCommandSource().sendMessage(LogUtil.getHeading().append(TextComponent.of(playerID.toString()).color(TextColor.WHITE)).append(TextComponent.of(" is under an ignored range ").color(TextColor.YELLOW)).append(TextComponent.of(testAddress + " (" + ip + ")").color(TextColor.WHITE)).append(TextComponent.of(". Ignoring.").color(TextColor.YELLOW)).build());
-                }
+            if (
+                    ValidationUtil.isValidIp(testAddress) && ip.equalsIgnoreCase(testAddress)
+                    || ValidationUtil.isValidIPRange(testAddress) && rangeContains(testAddress, ip)
+            ) {
                 return;
             }
         }
@@ -118,8 +113,14 @@ public class PlayerEvents extends EventHolder {
 
         for (String testAddress : cachedConfig.get().getIgnoredIps()) {
             if (ValidationUtil.isValidIp(testAddress) && ip.equalsIgnoreCase(testAddress)) {
+                if (ConfigUtil.getDebugOrFalse()) {
+                    proxy.getConsoleCommandSource().sendMessage(LogUtil.getHeading().append(TextComponent.of(event.getPlayer().getUsername()).color(TextColor.WHITE)).append(TextComponent.of(" is using an ignored IP ").color(TextColor.YELLOW)).append(TextComponent.of(ip).color(TextColor.WHITE)).append(TextComponent.of(". Ignoring.").color(TextColor.YELLOW)).build());
+                }
                 return;
             } else if (ValidationUtil.isValidIPRange(testAddress) && rangeContains(testAddress, ip)) {
+                if (ConfigUtil.getDebugOrFalse()) {
+                    proxy.getConsoleCommandSource().sendMessage(LogUtil.getHeading().append(TextComponent.of(event.getPlayer().getUsername()).color(TextColor.WHITE)).append(TextComponent.of(" is under an ignored range ").color(TextColor.YELLOW)).append(TextComponent.of(testAddress + " (" + ip + ")").color(TextColor.WHITE)).append(TextComponent.of(". Ignoring.").color(TextColor.YELLOW)).build());
+                }
                 return;
             }
         }
