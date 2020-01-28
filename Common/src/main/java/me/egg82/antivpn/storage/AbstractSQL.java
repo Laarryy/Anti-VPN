@@ -44,7 +44,7 @@ public abstract class AbstractSQL implements Storage {
 
         private static void toVersion(AbstractSQL storage, String sqlResourceName, String version, FileImporter importer) throws IOException, SQLException {
             // Update DB
-            InputStream stream = SQLVersionUtil.class.getClassLoader().getResourceAsStream(sqlResourceName + version.replace('.', '_') + ".sql");
+            InputStream stream = SQLVersionUtil.class.getClassLoader().getResourceAsStream(sqlResourceName + "_" + version + ".sql");
             StringBuilder builder = new StringBuilder();
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8.name()))) {
                 String line;

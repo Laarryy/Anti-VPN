@@ -236,7 +236,7 @@ public class MySQL extends AbstractSQL {
 
         long longIPID = longIPIDCache.get(ip);
         try {
-            sql.execute("INSERT INTO `" + prefix + "vpn_values` (`ip_id`, `cascade`, `consensus`) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE `cascade`=?, `consensus`=?;", longIPID, cascade.orElse(null), consensus.orElse(null), cascade.orElse(null), consensus.orElse(null));
+            sql.execute("INSERT INTO `" + prefix + "vpn_values` (`ip_id`, `cascade`, `consensus`) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE `cascade`=?, `consensus`=?, `created`=CURRENT_TIMESTAMP();", longIPID, cascade.orElse(null), consensus.orElse(null), cascade.orElse(null), consensus.orElse(null));
         } catch (SQLException ex) {
             throw new StorageException(isAutomaticallyRecoverable(ex), ex);
         }
@@ -248,7 +248,7 @@ public class MySQL extends AbstractSQL {
             throw new StorageException(isAutomaticallyRecoverable(ex), ex);
         }
         if (query.getData().length != 1) {
-            throw new StorageException(false, "Could not get date from inserted value.");
+            throw new StorageException(false, "Could not get data from inserted value.");
         }
 
         return new PostVPNResult(
@@ -268,7 +268,7 @@ public class MySQL extends AbstractSQL {
 
         long longPlayerID = longPlayerIDCache.get(playerID);
         try {
-            sql.execute("INSERT INTO `" + prefix + "mcleaks_values` (`player_id`, `result`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `result`=?, `created`=CURRENT_TIMESTAMP;", longPlayerID, value, value);
+            sql.execute("INSERT INTO `" + prefix + "mcleaks_values` (`player_id`, `result`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `result`=?, `created`=CURRENT_TIMESTAMP();", longPlayerID, value, value);
         } catch (SQLException ex) {
             throw new StorageException(isAutomaticallyRecoverable(ex), ex);
         }
@@ -280,7 +280,7 @@ public class MySQL extends AbstractSQL {
             throw new StorageException(isAutomaticallyRecoverable(ex), ex);
         }
         if (query.getData().length != 1) {
-            throw new StorageException(false, "Could not get date from inserted value.");
+            throw new StorageException(false, "Could not get data from inserted value.");
         }
 
         return new PostMCLeaksResult(

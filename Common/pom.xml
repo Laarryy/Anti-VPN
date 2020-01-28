@@ -10,7 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>antivpn-common</artifactId>
-    <version>5.9.33</version>
+    <version>5.9.34</version>
 
     <build>
         <sourceDirectory>src/main/java</sourceDirectory>
