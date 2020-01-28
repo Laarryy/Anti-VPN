@@ -319,6 +319,8 @@ connection:
 
 # When true, logs some extra output to the console so you can see if/why things might be failing
 debug: false
+# Default language (affects console output)
+lang: 'en'
 
 stats:
   # Whether or not to send anonymous usage statistics to bStats
@@ -337,4 +339,4 @@ update:
   notify: true
 
 # Config version, no touchy plz
-version: 4.9
+version: 4.11

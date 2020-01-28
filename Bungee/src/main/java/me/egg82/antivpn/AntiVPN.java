@@ -80,8 +80,8 @@ public class AntiVPN {
 
         consoleCommandIssuer = commandManager.getCommandIssuer(plugin.getProxy().getConsole());
 
-        loadLanguages();
         loadServices();
+        loadLanguages();
         loadCommands();
         loadEvents();
         loadTasks();
@@ -139,6 +139,11 @@ public class AntiVPN {
     }
 
     private void loadLanguages() {
+        Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+        if (!cachedConfig.isPresent()) {
+            throw new RuntimeException("Cached config could not be fetched.");
+        }
+
         BungeeLocales locales = commandManager.getLocales();
 
         try {
@@ -154,6 +159,7 @@ public class AntiVPN {
         }
 
         locales.loadLanguages();
+        locales.setDefaultLocale(cachedConfig.get().getLanguage());
         commandManager.usePerIssuerLocale(true);
 
         commandManager.setFormat(MessageType.ERROR, new PluginMessageFormatter(commandManager, Message.GENERAL__HEADER));

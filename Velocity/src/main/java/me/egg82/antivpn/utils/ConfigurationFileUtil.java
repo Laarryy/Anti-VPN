@@ -59,6 +59,15 @@ public class ConfigurationFileUtil {
             proxy.getConsoleCommandSource().sendMessage(LogUtil.getHeading().append(TextComponent.of("Debug ").color(TextColor.YELLOW)).append(TextComponent.of("enabled").color(TextColor.WHITE)).build());
         }
 
+        Locale language = getLanguage(config.getNode("lang").getString("en"));
+        if (language == null) {
+            logger.warn("lang is not a valid language. Using default value.");
+            language = Locale.US;
+        }
+        if (debug) {
+            proxy.getConsoleCommandSource().sendMessage(LogUtil.getHeading().append(TextComponent.of("Default language: ").color(TextColor.YELLOW)).append(TextComponent.of(language.getCountry() == null || language.getCountry().isEmpty() ? language.getLanguage() : language.getLanguage() + "-" + language.getCountry()).color(TextColor.WHITE)).build());
+        }
+
         UUID serverID = ServerIDUtil.getID(new File(new File(description.getSource().get().getParent().toFile(), description.getName().get()), "stats-id.txt"));
 
         List<Storage> storage;
@@ -292,6 +301,20 @@ public class ConfigurationFileUtil {
         ConfigurationVersionUtil.conformVersion(loader, config, fileOnDisk);
 
         return config;
+    }
+
+    private static Locale getLanguage(String lang) {
+        for (Locale locale : Locale.getAvailableLocales()) {
+            if (locale.getLanguage().equalsIgnoreCase(lang)) {
+                return locale;
+            }
+
+            String l = locale.getCountry() == null || locale.getCountry().isEmpty() ? locale.getLanguage() : locale.getLanguage() + "-" + locale.getCountry();
+            if (l.equalsIgnoreCase(lang)) {
+                return locale;
+            }
+        }
+        return null;
     }
 
     private static List<Storage> getStorage(ProxyServer proxy, PluginDescription description, ConfigurationNode enginesNode, PoolSettings settings, boolean debug, List<String> names, StorageHandler handler) {

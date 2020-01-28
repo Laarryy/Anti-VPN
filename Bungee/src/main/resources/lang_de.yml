@@ -1,0 +1,59 @@
+acf-minecraft:
+  multiple_players_match: "de"
+  version: 1.0
+
+description:
+  reload: "Lädt das Plugin neu."
+  import: "Importiert Daten von einer Speicher-Engine in eine andere."
+  check: "Überprüfen Sie eine IP-Adresse oder einen Player mit dem Standardsystem. Dies gibt genau den gleichen Wert wie jeder andere API-Aufruf zurück."
+  score: "Bewertet eine bestimmte Quelle anhand einer vorab erstellten Liste bekannter guter und schlechter IP-Adressen. Beachten Sie, dass dies eine Überprüfung erzwingt, sodass bei jeder Ausführung Credits verwendet werden."
+  test: "Testen Sie eine IP über die verschiedenen (aktivierten) Dienste. Beachten Sie, dass dies eine Überprüfung erzwingt, sodass bei jeder Ausführung Credits verwendet werden."
+
+general:
+  header: "<c2>[</c2><c3>Anti-VPN</c3><c2>]</c2> "
+  enabled: "<c4>Aktiviert</c4>"
+  disabled: "<c5>Deaktiviert</c5>"
+  load: "<c2>[</c2><c3>Ausführung</c3> {version}<c2>] [</c2>{commands} <c6>Befehle</c6><c2>] [</c2>{events} <c7>Veranstaltungen</c7><c2>] [</c2>{tasks} <c8>Aufgaben</c8><c2>]</c2>"
+  hook_enable: "<c4>Unterstützung für</c4> {plugin} <c4>aktivieren</c4>"
+  hook_disable: "{plugin} <c2>wurde nicht gefunden. Die Unterstützung dafür wurde deaktiviert.</c2>"
+  update: "(Bungee) <c3>hat ein</c3> <c4>Update</c4> <c3>verfügbar!</c3> Neue Version: <c2>{version}</c2>"
+
+error:
+  internal: "Interner Fehler"
+
+import:
+  same_storage: "Der angegebene Master und Slave sind gleich!"
+  no_master: "Der angegebene Masterspeicher wurde nicht gefunden."
+  no_slave: "Der angegebene Slave-Speicher wurde nicht gefunden."
+  ips: "<c2>IPs importieren..</c2> <c8>[</c8><c2>ID:</c2> <c3>{id}</c3><c8>]</c8>"
+  players: "<c2>Spieler importieren..</c2> <c8>[</c8><c2>ID:</c2> <c3>{id}</c3><c8>]</c8>"
+  vpns: "<c2>VPN-Daten importieren..</c2> <c8>[</c8><c2>ID:</c2> <c3>{id}</c3><c8>]</c8>"
+  mcleaks: "<c2>MCLeaks-Daten importieren..</c2> <c8>[</c8><c2>ID:</c2> <c3>{id}</c3><c8>]</c8>"
+  begin: "<c2>Daten werden importiert, bitte warten..</c2>"
+  end: "<c4>Daten erfolgreich importiert!</c4>"
+
+check:
+  begin: "{type} <c2>wird überprüft, bitte warten..</c2>"
+  vpn_detected: "<c5>VPN/Proxy erkannt</c5>"
+  no_vpn_detected: "<c4>Kein VPN/Proxy erkannt</c4>"
+  mcleaks_detected: "<c5>MCLeaks-Konto erkannt</c5>"
+  no_mcleaks_detected: "<c4>Es wurde kein MCLeaks-Konto erkannt</c4>"
+
+score:
+  begin: "<c2>Wertung</c2> {source}<c2>, bitte warten..</c2>"
+  type: "<c2>Wertung gegen</c2> {type}<c2>..</c2>"
+  sleep: "<c2>Schlafen für eine Minute..</c2>"
+  error: "[{source}] {type} <c5>error</c5> {percent}%"
+  score: "[{source}] {type} <c2>ergebnis</c2> {percent}%"
+  end: "<c4>Wertung für</c4> {source} <c4>abgeschlossen!</c4>"
+
+test:
+  begin: "<c2>Testen mit</c2> {ip}<c2>, bitte warten..</c2>"
+  error: "[{source}] <c2>ergebnis</c2>"
+  vpn_detected: "[{source}] <c5>VPN/Proxy erkannt</c5>"
+  no_vpn_detected: "[{source}] <c4>Kein VPN/Proxy erkannt</c4>"
+  end: "<c4>Test für</c4> {ip} <c4>abgeschlossen!</c4>"
+
+reload:
+  begin: "<c2>Nachladen, bitte warten..</c2>"
+  end: "<c4>Konfiguration neu geladen!</c4>"

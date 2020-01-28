@@ -58,6 +58,9 @@ public class ConfigurationVersionUtil {
         if (config.getNode("version").getDouble() == 3.9d) {
             to49(config);
         }
+        if (config.getNode("version").getDouble() == 4.9d) {
+            to411(config);
+        }
 
         if (config.getNode("version").getDouble() != oldVersion) {
             File backupFile = new File(fileOnDisk.getParent(), fileOnDisk.getName() + ".bak");
@@ -520,5 +523,13 @@ public class ConfigurationVersionUtil {
 
         // Version
         config.getNode("version").setValue(4.9d);
+    }
+
+    private static void to411(ConfigurationNode config) {
+        // Add lang
+        config.getNode("lang").setValue("en");
+
+        // Version
+        config.getNode("version").setValue(4.11d);
     }
 }

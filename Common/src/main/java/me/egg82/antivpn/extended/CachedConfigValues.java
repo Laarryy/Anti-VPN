@@ -5,6 +5,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import me.egg82.antivpn.apis.SourceAPI;
@@ -40,6 +41,9 @@ public class CachedConfigValues {
     private boolean debug = false;
     public boolean getDebug() { return debug; }
 
+    private Locale language = Locale.US;
+    public Locale getLanguage() { return language; }
+
     private int threads = 4;
     public int getThreads() { return threads; }
 
@@ -73,6 +77,11 @@ public class CachedConfigValues {
 
         public CachedConfigValues.Builder debug(boolean value) {
             values.debug = value;
+            return this;
+        }
+
+        public CachedConfigValues.Builder language(Locale value) {
+            values.language = value;
             return this;
         }
 
