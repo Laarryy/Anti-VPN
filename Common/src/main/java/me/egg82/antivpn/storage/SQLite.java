@@ -251,7 +251,7 @@ public class SQLite extends AbstractSQL {
 
         long longIPID = longIPIDCache.get(ip);
         try {
-            sql.execute("INSERT INTO `" + prefix + "vpn_values` (`ip_id`, `cascade`, `consensus`) VALUES (?, ?, ?) ON CONFLICT(`ip_id`) DO UPDATE SET `cascade`=?, `consensus`=?, `created`=CURRENT_TIMESTAMP();", longIPID, cascade.orElse(null), consensus.orElse(null), cascade.orElse(null), consensus.orElse(null));
+            sql.execute("INSERT INTO `" + prefix + "vpn_values` (`ip_id`, `cascade`, `consensus`) VALUES (?, ?, ?) ON CONFLICT(`ip_id`) DO UPDATE SET `cascade`=?, `consensus`=?, `created`=CURRENT_TIMESTAMP;", longIPID, cascade.orElse(null), consensus.orElse(null), cascade.orElse(null), consensus.orElse(null));
         } catch (SQLException ex) {
             throw new StorageException(isAutomaticallyRecoverable(ex), ex);
         }
@@ -283,7 +283,7 @@ public class SQLite extends AbstractSQL {
 
         long longPlayerID = longPlayerIDCache.get(playerID);
         try {
-            sql.execute("INSERT INTO `" + prefix + "mcleaks_values` (`player_id`, `result`) VALUES (?, ?) ON CONFLICT(`player_id`) DO UPDATE SET `result`=?, `created`=CURRENT_TIMESTAMP();", longPlayerID, value, value);
+            sql.execute("INSERT INTO `" + prefix + "mcleaks_values` (`player_id`, `result`) VALUES (?, ?) ON CONFLICT(`player_id`) DO UPDATE SET `result`=?, `created`=CURRENT_TIMESTAMP;", longPlayerID, value, value);
         } catch (SQLException ex) {
             throw new StorageException(isAutomaticallyRecoverable(ex), ex);
         }
