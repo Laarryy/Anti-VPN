@@ -4,6 +4,7 @@ import inet.ipaddr.IPAddressString;
 import java.net.InetAddress;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import me.egg82.antivpn.APIException;
 import me.egg82.antivpn.enums.VPNAlgorithmMethod;
 import me.egg82.antivpn.extended.CachedConfigValues;
@@ -16,6 +17,7 @@ import ninja.egg82.events.BukkitEvents;
 import ninja.egg82.service.ServiceLocator;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
@@ -36,6 +38,13 @@ public class PlayerEvents extends EventHolder {
     }
 
     private void cachePlayer(AsyncPlayerPreLoginEvent event) {
+        if (Bukkit.hasWhitelist() && !isWhitelisted(event.getUniqueId())) {
+            if (ConfigUtil.getDebugOrFalse()) {
+                logger.info(LogUtil.getHeading() + ChatColor.WHITE + event.getUniqueId() + ChatColor.YELLOW + " is not whitelisted while the server is in whitelist mode. Ignoring.");
+            }
+            return;
+        }
+
         String ip = getIp(event.getAddress());
         if (ip == null || ip.isEmpty()) {
             return;
@@ -60,28 +69,39 @@ public class PlayerEvents extends EventHolder {
             }
         }
 
-        if (cachedConfig.get().getVPNAlgorithmMethod() == VPNAlgorithmMethod.CONSESNSUS) {
-            try {
-                api.consensus(ip); // Calling this will cache the result internally, even if the value is unused
-            } catch (APIException ex) {
-                logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
-            }
-        } else {
-            try {
-                api.cascade(ip); // Calling this will cache the result internally, even if the value is unused
-            } catch (APIException ex) {
-                logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
+        if ((!cachedConfig.get().getVPNKickMessage().isEmpty() || !cachedConfig.get().getVPNActionCommands().isEmpty())) {
+            if (cachedConfig.get().getVPNAlgorithmMethod() == VPNAlgorithmMethod.CONSESNSUS) {
+                try {
+                    api.consensus(ip); // Calling this will cache the result internally, even if the value is unused
+                } catch (APIException ex) {
+                    logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
+                }
+            } else {
+                try {
+                    api.cascade(ip); // Calling this will cache the result internally, even if the value is unused
+                } catch (APIException ex) {
+                    logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
+                }
             }
         }
 
-        try {
-            api.isMCLeaks(event.getUniqueId()); // Calling this will cache the result internally, even if the value is unused
-        } catch (APIException ex) {
-            logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
+        if (!cachedConfig.get().getMCLeaksKickMessage().isEmpty() || !cachedConfig.get().getMCLeaksActionCommands().isEmpty()) {
+            try {
+                api.isMCLeaks(event.getUniqueId()); // Calling this will cache the result internally, even if the value is unused
+            } catch (APIException ex) {
+                logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
+            }
         }
     }
 
     private void checkPlayer(PlayerLoginEvent event) {
+        if (Bukkit.hasWhitelist() && !event.getPlayer().isWhitelisted()) {
+            if (ConfigUtil.getDebugOrFalse()) {
+                logger.info(LogUtil.getHeading() + ChatColor.WHITE + event.getPlayer().getUniqueId() + ChatColor.YELLOW + " is not whitelisted while the server is in whitelist mode. Ignoring.");
+            }
+            return;
+        }
+
         String ip = getIp(event.getAddress());
         if (ip == null || ip.isEmpty()) {
             return;
@@ -222,6 +242,15 @@ public class PlayerEvents extends EventHolder {
         }
 
         return address.getHostAddress();
+    }
+
+    private boolean isWhitelisted(UUID playerID) {
+        for (OfflinePlayer p : Bukkit.getWhitelistedPlayers()) {
+            if (playerID.equals(p.getUniqueId())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private boolean rangeContains(String range, String ip) { return new IPAddressString(range).contains(new IPAddressString(ip)); }

@@ -73,24 +73,28 @@ public class PlayerEvents extends EventHolder {
             }
         }
 
-        if (cachedConfig.get().getVPNAlgorithmMethod() == VPNAlgorithmMethod.CONSESNSUS) {
-            try {
-                api.consensus(ip); // Calling this will cache the result internally, even if the value is unused
-            } catch (APIException ex) {
-                logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
-            }
-        } else {
-            try {
-                api.cascade(ip); // Calling this will cache the result internally, even if the value is unused
-            } catch (APIException ex) {
-                logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
+        if ((!cachedConfig.get().getVPNKickMessage().isEmpty() || !cachedConfig.get().getVPNActionCommands().isEmpty())) {
+            if (cachedConfig.get().getVPNAlgorithmMethod() == VPNAlgorithmMethod.CONSESNSUS) {
+                try {
+                    api.consensus(ip); // Calling this will cache the result internally, even if the value is unused
+                } catch (APIException ex) {
+                    logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
+                }
+            } else {
+                try {
+                    api.cascade(ip); // Calling this will cache the result internally, even if the value is unused
+                } catch (APIException ex) {
+                    logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
+                }
             }
         }
 
-        try {
-            api.isMCLeaks(playerID); // Calling this will cache the result internally, even if the value is unused
-        } catch (APIException ex) {
-            logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
+        if (!cachedConfig.get().getMCLeaksKickMessage().isEmpty() || !cachedConfig.get().getMCLeaksActionCommands().isEmpty()) {
+            try {
+                api.isMCLeaks(playerID); // Calling this will cache the result internally, even if the value is unused
+            } catch (APIException ex) {
+                logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
+            }
         }
     }
 
