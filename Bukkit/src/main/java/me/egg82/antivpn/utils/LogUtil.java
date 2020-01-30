@@ -5,5 +5,5 @@ import org.bukkit.ChatColor;
 public class LogUtil {
     private LogUtil() {}
 
-    public static String getHeading() { return ChatColor.YELLOW + "[" + ChatColor.AQUA + "AntiVPN" + ChatColor.YELLOW + "] " + ChatColor.RESET; }
+    public static String getHeading() { return ChatColor.YELLOW + "[" + ChatColor.AQUA + "Anti-VPN" + ChatColor.YELLOW + "] " + ChatColor.RESET; }
 }

@@ -76,7 +76,7 @@ public class AntiVPN {
     public void onLoad() {
         if (BukkitEnvironmentUtil.getEnvironment() != BukkitEnvironmentUtil.Environment.PAPER) {
             log(Level.INFO, ChatColor.AQUA + "====================================");
-            log(Level.INFO, ChatColor.YELLOW + "AntiVPN runs better on Paper!");
+            log(Level.INFO, ChatColor.YELLOW + "Anti-VPN runs better on Paper!");
             log(Level.INFO, ChatColor.YELLOW + "https://whypaper.emc.gs/");
             log(Level.INFO, ChatColor.AQUA + "====================================");
         }
