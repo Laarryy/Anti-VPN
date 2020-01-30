@@ -302,7 +302,7 @@ public class AntiVPN {
     }
 
     private void loadMetrics() {
-        metrics = new Metrics(plugin);
+        metrics = new Metrics(plugin, 3249); // TODO: Change ID when bStats finally allows multiple plugins of the same name
         metrics.addCustomChart(new Metrics.SingleLineChart("blocked_vpns", () -> {
             Optional<Configuration> config = ConfigUtil.getConfig();
             if (!config.isPresent()) {

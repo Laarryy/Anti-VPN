@@ -272,7 +272,7 @@ public class AntiVPN {
     }
 
     private void loadMetrics() {
-        metrics = new Metrics(plugin);
+        metrics = new Metrics(plugin, 3249);
         metrics.addCustomChart(new Metrics.SingleLineChart("blocked_vpns", () -> {
             Optional<Configuration> config = ConfigUtil.getConfig();
             if (!config.isPresent()) {
