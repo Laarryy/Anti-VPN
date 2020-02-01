@@ -451,7 +451,7 @@ public class VPNAPI {
             throw new APIException(isHard.get(), "Consensus had no valid/usable sources.");
         }
 
-        double value = r.get();
+        double value = r.get() / success.get();
 
         if (cachedConfig.get().getDebug()) {
             logger.info("Got VPN result: " + ip + " = " + value);
