@@ -3,6 +3,8 @@ package me.egg82.antivpn.storage;
 import com.google.common.primitives.Ints;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,14 +19,14 @@ public abstract class AbstractSQL implements Storage {
 
     protected static class SQLVersionUtil {
         public static void conformVersion(AbstractSQL storage, String sqlResourceName) throws IOException, StorageException {
-            FileImporter importer = new FileImporter(storage.sql);
-
             try {
-                if (!storage.sql.tableExists(storage.database, storage.prefix + "data")) {
+                if (!storage.sql.tableExists(sqlResourceName.equalsIgnoreCase("sqlite") ? null : storage.database, storage.prefix + "data")) {
                     boolean legacyMySQL = false;
                     if (sqlResourceName.equalsIgnoreCase("mysql")) {
                         legacyMySQL = isLegacyMySQL(storage);
                     }
+
+                    FileImporter importer = new FileImporter(storage.sql);
 
                     InputStream stream = SQLVersionUtil.class.getClassLoader().getResourceAsStream(sqlResourceName + ".sql");
                     StringBuilder builder = new StringBuilder();
