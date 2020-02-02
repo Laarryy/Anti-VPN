@@ -25,7 +25,7 @@ public class BukkitVersionUtil {
             if (i > v2.length) {
                 // We're looking for a version deeper than what we have
                 // eg. 1.12.2 -> 1.12
-                // We'll assume, at this point, that whatever we have now is correct
+                equalOrGreater = false;
                 break;
             }
 
