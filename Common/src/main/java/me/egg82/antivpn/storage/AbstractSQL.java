@@ -20,12 +20,12 @@ public abstract class AbstractSQL implements Storage {
             FileImporter importer = new FileImporter(storage.sql);
 
             try {
-                boolean legacyMySQL = false;
-                if (sqlResourceName.equalsIgnoreCase("mysql")) {
-                    legacyMySQL = isLegacyMySQL(storage);
-                }
-
                 if (!storage.sql.tableExists(storage.database, storage.prefix + "data")) {
+                    boolean legacyMySQL = false;
+                    if (sqlResourceName.equalsIgnoreCase("mysql")) {
+                        legacyMySQL = isLegacyMySQL(storage);
+                    }
+
                     InputStream stream = SQLVersionUtil.class.getClassLoader().getResourceAsStream(sqlResourceName + ".sql");
                     StringBuilder builder = new StringBuilder();
                     try (BufferedReader reader = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8.name()))) {
