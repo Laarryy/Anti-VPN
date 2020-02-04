@@ -1,0 +1,59 @@
+acf-minecraft:
+  multiple_players_match: "pl"
+  version: 1.0
+
+description:
+  reload: "Przeładowuje plugin."
+  import: "Importuje dane z jednej bazy do drugiej."
+  check: "Sprawdza adres IP lub gracza używając domyślnego systemu. Zwraca dokładnie taką samą wartość jak inne wywołanie API."
+  score: "Zapisuje określone źródło na podstawie wstępnie przygotowanej listy znanych dobrych i złych adresów IP. Pamiętaj, że wymusza to sprawdzenie, więc użyje kredytów przy każdym uruchomieniu."
+  test: "Testuje adres IP za pomocą różnych (włączonych) usług. Pamiętaj, że wymusza to sprawdzenie, więc użyje kredytów przy każdym uruchomieniu."
+
+general:
+  header: "<c2>[</c2><c3>Anti-VPN</c3><c2>]</c2> "
+  enabled: "<c4>Włączone</c4>"
+  disabled: "<c5>Wyłączone</c5>"
+  load: "<c2>[</c2><c3>Wersja</c3> {version}<c2>] [</c2>{commands} <c6>Komendy</c6><c2>] [</c2>{events} <c7>Akcje</c7><c2>] [</c2>{tasks} <c8>Zadania</c8><c2>]</c2>"
+  hook_enable: "<c4>Włączone wsparcie dla</c4> {plugin}"
+  hook_disable: "{plugin} <c2>nie został znaleziony. Wsparcie dla tego pluginu zostało wyłączone.</c2>"
+  update: "(Bungee) <c3>ma</c3> <c3>dostepną</c3> <c4>aktualizację!</c4> Nowa wersja: <c2>{version}</c2>"
+
+error:
+  internal: "Błąd wewnętrzny"
+
+import:
+  same_storage: "Określony master i slave są takie same!"
+  no_master: "Określona pamięć master nie została znaleziona."
+  no_slave: "Określona pamięć slave nie została znaleziona"
+  ips: "<c2>Importowanie IP..</c2> <c8>[</c8><c2>ID:</c2> <c3>{id}</c3><c8>]</c8>"
+  players: "<c2>Importowanie graczy..</c2> <c8>[</c8><c2>ID:</c2> <c3>{id}</c3><c8>]</c8>"
+  vpns: "<c2>Importowanie danych VPN..</c2> <c8>[</c8><c2>ID:</c2> <c3>{id}</c3><c8>]</c8>"
+  mcleaks: "<c2>Importowanie danych MCLeaks..</c2> <c8>[</c8><c2>ID:</c2> <c3>{id}</c3><c8>]</c8>"
+  begin: "<c2>Importowanie danych, proszę czekać..</c2>"
+  end: "<c4>Dane pomyślnie zaimportowane!</c4>"
+
+check:
+  begin: "<c2>Sprawdzanie</c2> {type}<c2>, proszę czekać..</c2>"
+  vpn_detected: "<c5>VPN/proxy wykryto</c5>"
+  no_vpn_detected: "<c4>Nie wykryto VPN/proxy</c4>"
+  mcleaks_detected: "<c5>Wykryto konto McLeaks</c5>"
+  no_mcleaks_detected: "<c4>Nie wykryto konta MCLeaks</c4>"
+
+score:
+  begin: "<c2>Ocena</c2> {source}<c2>, proszę czekać..</c2>"
+  type: "<c2>Ocena przeciw</c2> {type}<c2>..</c2>"
+  sleep: "<c2>Uśpiony przez minutę..</c2>"
+  error: "[{source}] {type} <c5>błędne</c5> {percent}%"
+  score: "[{source}] {type} <c2>rezultat</c2> {percent}%"
+  end: "<c4>Ocena dla</c4> {source} <c4>zakończona!</c4>"
+
+test:
+  begin: "<c2>Testowanie adresu</c2> {ip}<c2>, proszę czekać..</c2>"
+  error: "[{source}] <c2>błąd</c2>"
+  vpn_detected: "[{source}] <c5>VPN/proxy wykryto</c5>"
+  no_vpn_detected: "[{source}] <c4>Nie wykryto VPN/proxy</c4>"
+  end: "<c4>Test adresu</c4> {ip} <c4>zakończony!</c4>"
+
+reload:
+  begin: "<c2>Trwa przeładowanie, proszę czekać..</c2>"
+  end: "<c4>Konfiguracja przeładowana!</c4>"
