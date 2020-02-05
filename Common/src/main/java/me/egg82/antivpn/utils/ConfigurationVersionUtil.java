@@ -61,6 +61,9 @@ public class ConfigurationVersionUtil {
         if (config.getNode("version").getDouble() == 4.9d) {
             to411(config);
         }
+        if (config.getNode("version").getDouble() == 4.11d) {
+            to412(config);
+        }
 
         if (config.getNode("version").getDouble() != oldVersion) {
             File backupFile = new File(fileOnDisk.getParent(), fileOnDisk.getName() + ".bak");
@@ -531,5 +534,15 @@ public class ConfigurationVersionUtil {
 
         // Version
         config.getNode("version").setValue(4.11d);
+    }
+
+    private static void to412(ConfigurationNode config) {
+        // Forcibly change ipqualityscore from (default) 65% to 98% - this will override any previous customizations
+        config.getNode("sources", "ipqualityscore", "threshold").setValue(0.98d);
+        // Add recent-abuse to ipqualityscore
+        config.getNode("sources", "ipqualityscore", "recent-abuse").setValue(Boolean.FALSE);
+
+        // Version
+        config.getNode("version").setValue(4.12d);
     }
 }

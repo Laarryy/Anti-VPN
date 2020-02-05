@@ -35,7 +35,7 @@ public class IPQualityScore extends AbstractSourceAPI {
 
         JSONObject json;
         try {
-            json = JSONWebUtil.getJSONObject(new URL("http://www.ipqualityscore.com/api/json/ip/" + key + "/" + ip), "GET", (int) getCachedConfig().getTimeout(), "egg82/AntiVPN");
+            json = JSONWebUtil.getJSONObject(new URL("http://www.ipqualityscore.com/api/json/ip/" + key + "/" + ip + "?strictness=0&fast=true&allow_public_access_points=true&lighter_penalties=true"), "GET", (int) getCachedConfig().getTimeout(), "egg82/AntiVPN");
         } catch (IOException | ParseException | ClassCastException ex) {
             logger.error(ex.getMessage(), ex);
             throw new APIException(false, "Could not get result from " + getName());
@@ -48,14 +48,26 @@ public class IPQualityScore extends AbstractSourceAPI {
             throw new APIException(false, "Could not get result from " + getName());
         }
 
-        if (json.get("proxy") != null && ((Boolean) json.get("proxy"))) {
+        if (json.get("proxy") != null) {
+            if (((Boolean) json.get("proxy"))) {
+                return true;
+            }
+        } else {
+            // If "proxy" is true, vpn or tor will also be true
+            if (json.get("vpn") != null && ((Boolean) json.get("vpn"))) {
+                return true;
+            }
+            if (json.get("tor") != null && ((Boolean) json.get("tor"))) {
+                return true;
+            }
+        }
+        if (json.get("bot_status") != null && ((Boolean) json.get("bot_status"))) {
             return true;
         }
-        if (json.get("vpn") != null && ((Boolean) json.get("vpn"))) {
-            return true;
-        }
-        if (json.get("tor") != null && ((Boolean) json.get("tor"))) {
-            return true;
+        if (sourceConfigNode.getNode("recent-abuse").getBoolean()) {
+            if (json.get("recent_abuse") != null && ((Boolean) json.get("recent_abuse"))) {
+                return true;
+            }
         }
         if (json.get("is_crawler") != null && ((Boolean) json.get("is_crawler"))) {
             return true;

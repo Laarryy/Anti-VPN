@@ -149,17 +149,20 @@ sources:
     enabled: true
 
   # https://www.ipqualityscore.com/
-  # Results updated Jan 19, 2020
+  # Results updated Feb 5, 2020
   # Error rate:                    0.00%
   # NordVPN detection rate:       90.00%
-  # Cryptostorm detection rate:   96.43%
+  # Cryptostorm detection rate:  100.00%
   # False-flagged homes:           0.00%
   ipqualityscore:
     enabled: false
     # API key to use (Required for this service, free one available at https://www.ipqualityscore.com/create-account )
+    # This plugin would benefit from a premium account/API key, but does not require it
     key: ''
+    # Whether or not to flag IPs with recent abuse (such as malware, compromised devices, etc) as "bad"
+    recent-abuse: false
     # Threshold above which an IP is considered "bad"
-    threshold: 0.65
+    threshold: 0.98
 
   # https://www.getipintel.net/
   # Results updated Jan 19, 2020
@@ -339,4 +342,4 @@ update:
   notify: true
 
 # Config version, no touchy plz
-version: 4.11
+version: 4.12
