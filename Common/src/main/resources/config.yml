@@ -159,6 +159,12 @@ sources:
     # API key to use (Required for this service, free one available at https://www.ipqualityscore.com/create-account )
     # This plugin would benefit from a premium account/API key, but does not require it
     key: ''
+    # Whether or not to detect proxies as VPNs
+    proxy: false
+    # Whether or not to score IPs as a mobile device (less strict)
+    mobile: true
+    # Strictness setting to use (0-3)
+    strictness: 0
     # Whether or not to flag IPs with recent abuse (such as malware, compromised devices, etc) as "bad"
     recent-abuse: false
     # Threshold above which an IP is considered "bad"

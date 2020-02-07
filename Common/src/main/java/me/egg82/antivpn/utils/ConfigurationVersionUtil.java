@@ -537,10 +537,20 @@ public class ConfigurationVersionUtil {
     }
 
     private static void to412(ConfigurationNode config) {
+        // Add proxy to ipqualityscore
+        config.getNode("sources", "ipqualityscore", "proxy").setValue(Boolean.FALSE);
+
+        // Add mobile to ipqualityscore
+        config.getNode("sources", "ipqualityscore", "mobile").setValue(Boolean.TRUE);
+
+        // Add strictness to ipqualityscore
+        config.getNode("sources", "ipqualityscore", "strictness").setValue(0);
+
+        // Add recent-abuse to ipqualityscore
+        config.getNode("sources", "ipqualityscore", "recent-abuse").setValue(Boolean.TRUE);
+
         // Forcibly change ipqualityscore from (default) 65% to 98% - this will override any previous customizations
         config.getNode("sources", "ipqualityscore", "threshold").setValue(0.98d);
-        // Add recent-abuse to ipqualityscore
-        config.getNode("sources", "ipqualityscore", "recent-abuse").setValue(Boolean.FALSE);
 
         // Version
         config.getNode("version").setValue(4.12d);

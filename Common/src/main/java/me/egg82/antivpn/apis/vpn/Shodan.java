@@ -55,7 +55,7 @@ public class Shodan extends AbstractSourceAPI {
         }
         for (Object tag : tags) {
             String t = (String) tag;
-            if (t.equalsIgnoreCase("vpn")) {
+            if (t.equalsIgnoreCase("proxy") || t.equalsIgnoreCase("vpn")) {
                 return true;
             }
         }

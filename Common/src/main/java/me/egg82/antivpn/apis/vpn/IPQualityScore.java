@@ -33,9 +33,19 @@ public class IPQualityScore extends AbstractSourceAPI {
             throw new APIException(true, "Key is not defined for " + getName());
         }
 
+        int strictness = sourceConfigNode.getNode("strictness").getInt();
+        if (strictness < 0) {
+            logger.warn("strictness capped at a min of 0");
+            strictness = 0;
+        }
+        if (strictness > 3) {
+            logger.warn("strictness capped at a max of 3");
+            strictness = 3;
+        }
+
         JSONObject json;
         try {
-            json = JSONWebUtil.getJSONObject(new URL("http://www.ipqualityscore.com/api/json/ip/" + key + "/" + ip + "?strictness=0&fast=true&allow_public_access_points=true&lighter_penalties=true"), "GET", (int) getCachedConfig().getTimeout(), "egg82/AntiVPN");
+            json = JSONWebUtil.getJSONObject(new URL("http://www.ipqualityscore.com/api/json/ip/" + key + "/" + ip + "?strictness=" + strictness + "&mobile=" + (sourceConfigNode.getNode("mobile").getBoolean() ? "true" : "false") + "&fast=true&allow_public_access_points=true&lighter_penalties=true"), "GET", (int) getCachedConfig().getTimeout(), "egg82/AntiVPN");
         } catch (IOException | ParseException | ClassCastException ex) {
             logger.error(ex.getMessage(), ex);
             throw new APIException(false, "Could not get result from " + getName());
@@ -48,7 +58,7 @@ public class IPQualityScore extends AbstractSourceAPI {
             throw new APIException(false, "Could not get result from " + getName());
         }
 
-        if (json.get("proxy") != null) {
+        if (sourceConfigNode.getNode("proxy").getBoolean() && json.get("proxy") != null) {
             if (((Boolean) json.get("proxy"))) {
                 return true;
             }
