@@ -8,12 +8,8 @@ import ninja.egg82.json.JSONWebUtil;
 import ninja.leaping.configurate.ConfigurationNode;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class GetIPIntel extends AbstractSourceAPI {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
-
     public String getName() { return "getipintel"; }
 
     public boolean isKeyRequired() { return false; }
@@ -35,7 +31,6 @@ public class GetIPIntel extends AbstractSourceAPI {
         try {
             json = JSONWebUtil.getJSONObject(new URL("https://check.getipintel.net/check.php?ip=" + ip + "&contact=" + sourceConfigNode.getNode("contact").getString("admin@yoursite.com") + "&format=json&flags=b"), "GET", (int) getCachedConfig().getTimeout(), "egg82/AntiVPN");
         } catch (IOException | ParseException | ClassCastException ex) {
-            logger.error(ex.getMessage(), ex);
             throw new APIException(false, "Could not get result from " + getName() + " (Is your server's IP banned due to an improper contact e-mail in the config? Send an e-mail to contact@getipintel.net for an unban)", ex);
         }
         if (json == null || json.get("result") == null) {

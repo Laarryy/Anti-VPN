@@ -8,12 +8,8 @@ import ninja.egg82.json.JSONWebUtil;
 import ninja.leaping.configurate.ConfigurationNode;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class IP2Proxy extends AbstractSourceAPI {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
-
     public String getName() { return "ip2proxy"; }
 
     public boolean isKeyRequired() { return true; }
@@ -37,7 +33,6 @@ public class IP2Proxy extends AbstractSourceAPI {
         try {
             json = JSONWebUtil.getJSONObject(new URL("https://api.ip2proxy.com/?ip=" + ip + "&key=" + key + "&package=PX1&format=json"), "GET", (int) getCachedConfig().getTimeout(), "egg82/AntiVPN");
         } catch (IOException | ParseException | ClassCastException ex) {
-            logger.error(ex.getMessage(), ex);
             throw new APIException(false, "Could not get result from " + getName());
         }
         if (json == null || json.get("response") == null) {

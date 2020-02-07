@@ -60,13 +60,21 @@ public class PlayerEvents extends EventHolder {
                 try {
                     api.consensus(ip); // Calling this will cache the result internally, even if the value is unused
                 } catch (APIException ex) {
-                    logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
+                    if (cachedConfig.get().getDebug()) {
+                        logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
+                    } else {
+                        logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage());
+                    }
                 }
             } else {
                 try {
                     api.cascade(ip); // Calling this will cache the result internally, even if the value is unused
                 } catch (APIException ex) {
-                    logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
+                    if (cachedConfig.get().getDebug()) {
+                        logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
+                    } else {
+                        logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage());
+                    }
                 }
             }
         }
@@ -113,14 +121,22 @@ public class PlayerEvents extends EventHolder {
                 try {
                     isVPN = api.consensus(ip) >= cachedConfig.get().getVPNAlgorithmConsensus();
                 } catch (APIException ex) {
-                    logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
+                    if (cachedConfig.get().getDebug()) {
+                        logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
+                    } else {
+                        logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage());
+                    }
                     isVPN = false;
                 }
             } else {
                 try {
                     isVPN = api.cascade(ip);
                 } catch (APIException ex) {
-                    logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
+                    if (cachedConfig.get().getDebug()) {
+                        logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
+                    } else {
+                        logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage());
+                    }
                     isVPN = false;
                 }
             }
@@ -150,7 +166,11 @@ public class PlayerEvents extends EventHolder {
             try {
                 isMCLeaks = api.isMCLeaks(event.getPlayer().getUniqueId());
             } catch (APIException ex) {
-                logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
+                if (cachedConfig.get().getDebug()) {
+                    logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
+                } else {
+                    logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage());
+                }
                 isMCLeaks = false;
             }
 

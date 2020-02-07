@@ -51,14 +51,22 @@ public class CheckCommand implements Runnable {
                                 f.accept(Optional.of(api.consensus(type) >= cachedConfig.get().getVPNAlgorithmConsensus()));
                                 return;
                             } catch (APIException ex) {
-                                logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
+                                if (cachedConfig.get().getDebug()) {
+                                    logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
+                                } else {
+                                    logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage());
+                                }
                             }
                         } else {
                             try {
                                 f.accept(Optional.of(api.cascade(type)));
                                 return;
                             } catch (APIException ex) {
-                                logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
+                                if (cachedConfig.get().getDebug()) {
+                                    logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
+                                } else {
+                                    logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage());
+                                }
                             }
                         }
                         f.accept(Optional.empty());
@@ -91,7 +99,11 @@ public class CheckCommand implements Runnable {
                             f.accept(Optional.of(api.isMCLeaks(v)));
                             return;
                         } catch (APIException ex) {
-                            logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
+                            if (cachedConfig.get().getDebug()) {
+                                logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
+                            } else {
+                                logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage());
+                            }
                         }
                         f.accept(Optional.empty());
                     })

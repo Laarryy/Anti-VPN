@@ -12,12 +12,8 @@ import me.egg82.antivpn.utils.ValidationUtil;
 import ninja.egg82.json.JSONWebUtil;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class Teoh extends AbstractSourceAPI {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
-
     public String getName() { return "teoh"; }
 
     public boolean isKeyRequired() { return false; }
@@ -45,7 +41,6 @@ public class Teoh extends AbstractSourceAPI {
         try {
             json = JSONWebUtil.getJSONObject(new URL("https://ip.teoh.io/api/vpn/" + ip), "GET", (int) getCachedConfig().getTimeout(), "egg82/AntiVPN");
         } catch (IOException | ParseException | ClassCastException ex) {
-            logger.error(ex.getMessage(), ex);
             throw new APIException(false, ex);
         }
         if (json == null || json.get("vpn_or_proxy") == null) {

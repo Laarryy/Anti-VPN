@@ -48,14 +48,22 @@ public class CheckCommand implements Runnable {
                     issuer.sendInfo(api.consensus(type) >= cachedConfig.get().getVPNAlgorithmConsensus() ? Message.CHECK__VPN_DETECTED : Message.CHECK__NO_VPN_DETECTED);
                     return;
                 } catch (APIException ex) {
-                    logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
+                    if (cachedConfig.get().getDebug()) {
+                        logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
+                    } else {
+                        logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage());
+                    }
                 }
             } else {
                 try {
                     issuer.sendInfo(api.cascade(type) ? Message.CHECK__VPN_DETECTED : Message.CHECK__NO_VPN_DETECTED);
                     return;
                 } catch (APIException ex) {
-                    logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
+                    if (cachedConfig.get().getDebug()) {
+                        logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
+                    } else {
+                        logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage());
+                    }
                 }
             }
             issuer.sendError(Message.ERROR__INTERNAL);
@@ -77,7 +85,11 @@ public class CheckCommand implements Runnable {
                 issuer.sendInfo(api.isMCLeaks(playerID) ? Message.CHECK__MCLEAKS_DETECTED : Message.CHECK__NO_MCLEAKS_DETECTED);
                 return;
             } catch (APIException ex) {
-                logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
+                if (cachedConfig.get().getDebug()) {
+                    logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
+                } else {
+                    logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage());
+                }
             }
             issuer.sendError(Message.ERROR__INTERNAL);
         }

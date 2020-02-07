@@ -106,7 +106,11 @@ public class VPNAPI {
                 try {
                     results.put(kvp.getKey(), Optional.of(kvp.getValue().getResult(ip)));
                 } catch (APIException ex) {
-                    logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
+                    if (cachedConfig.get().getDebug()) {
+                        logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
+                    } else {
+                        logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage());
+                    }
                     results.put(kvp.getKey(), Optional.empty());
                 }
                 latch.countDown();
@@ -118,7 +122,11 @@ public class VPNAPI {
                 logger.warn("Timeout reached before all sources could be queried.");
             }
         } catch (InterruptedException ex) {
-            logger.error(ex.getMessage(), ex);
+            if (cachedConfig.get().getDebug()) {
+                logger.error(ex.getMessage(), ex);
+            } else {
+                logger.error(ex.getMessage());
+            }
             Thread.currentThread().interrupt();
         }
         threadPool.shutdownNow(); // Kill it with fire
@@ -244,7 +252,11 @@ public class VPNAPI {
                 result = s.getVPNByIP(ip, cachedConfig.get().getSourceCacheTime());
                 break;
             } catch (StorageException ex) {
-                logger.error("[Recoverable: " + ex.isAutomaticallyRecoverable() + "] " + ex.getMessage(), ex);
+                if (cachedConfig.get().getDebug()) {
+                    logger.error("[Recoverable: " + ex.isAutomaticallyRecoverable() + "] " + ex.getMessage(), ex);
+                } else {
+                    logger.error("[Recoverable: " + ex.isAutomaticallyRecoverable() + "] " + ex.getMessage());
+                }
             }
         }
         if (result != null && result.getCascade().isPresent()) {
@@ -273,7 +285,11 @@ public class VPNAPI {
                 }
                 break;
             } catch (APIException ex) {
-                logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
+                if (cachedConfig.get().getDebug()) {
+                    logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
+                } else {
+                    logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage());
+                }
                 if (!ex.isHard()) {
                     isHard = false;
                 }
@@ -311,7 +327,11 @@ public class VPNAPI {
                 postedStorage = s;
                 break;
             } catch (StorageException ex) {
-                logger.error("[Recoverable: " + ex.isAutomaticallyRecoverable() + "] " + ex.getMessage(), ex);
+                if (cachedConfig.get().getDebug()) {
+                    logger.error("[Recoverable: " + ex.isAutomaticallyRecoverable() + "] " + ex.getMessage(), ex);
+                } else {
+                    logger.error("[Recoverable: " + ex.isAutomaticallyRecoverable() + "] " + ex.getMessage());
+                }
                 if (ex.isAutomaticallyRecoverable()) {
                     canRecover = true;
                 }
@@ -335,7 +355,11 @@ public class VPNAPI {
                         postResult.getCreated()
                 );
             } catch (StorageException ex) {
-                logger.error("[Recoverable: " + ex.isAutomaticallyRecoverable() + "] " + ex.getMessage(), ex);
+                if (cachedConfig.get().getDebug()) {
+                    logger.error("[Recoverable: " + ex.isAutomaticallyRecoverable() + "] " + ex.getMessage(), ex);
+                } else {
+                    logger.error("[Recoverable: " + ex.isAutomaticallyRecoverable() + "] " + ex.getMessage());
+                }
             }
         }
 
@@ -357,7 +381,11 @@ public class VPNAPI {
                     );
                     handled = true;
                 } catch (MessagingException ex) {
-                    logger.error("[Recoverable: " + ex.isAutomaticallyRecoverable() + "] " + ex.getMessage(), ex);
+                    if (cachedConfig.get().getDebug()) {
+                        logger.error("[Recoverable: " + ex.isAutomaticallyRecoverable() + "] " + ex.getMessage(), ex);
+                    } else {
+                        logger.error("[Recoverable: " + ex.isAutomaticallyRecoverable() + "] " + ex.getMessage());
+                    }
                     if (ex.isAutomaticallyRecoverable()) {
                         canRecover = true;
                     }
@@ -388,7 +416,11 @@ public class VPNAPI {
                 result = s.getVPNByIP(ip, cachedConfig.get().getSourceCacheTime());
                 break;
             } catch (StorageException ex) {
-                logger.error("[Recoverable: " + ex.isAutomaticallyRecoverable() + "] " + ex.getMessage(), ex);
+                if (cachedConfig.get().getDebug()) {
+                    logger.error("[Recoverable: " + ex.isAutomaticallyRecoverable() + "] " + ex.getMessage(), ex);
+                } else {
+                    logger.error("[Recoverable: " + ex.isAutomaticallyRecoverable() + "] " + ex.getMessage());
+                }
             }
         }
         if (result != null && result.getConsensus().isPresent()) {
@@ -423,7 +455,11 @@ public class VPNAPI {
                         logger.info(kvp.getKey() + " returned " + tmp + " for " + ip);
                     }
                 } catch (APIException ex) {
-                    logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
+                    if (cachedConfig.get().getDebug()) {
+                        logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
+                    } else {
+                        logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage());
+                    }
                     if (!ex.isHard()) {
                         isHard.set(false);
                     }
@@ -442,7 +478,11 @@ public class VPNAPI {
                 logger.warn("Timeout reached before all sources could be queried.");
             }
         } catch (InterruptedException ex) {
-            logger.error(ex.getMessage(), ex);
+            if (cachedConfig.get().getDebug()) {
+                logger.error(ex.getMessage(), ex);
+            } else {
+                logger.error(ex.getMessage());
+            }
             Thread.currentThread().interrupt();
         }
         threadPool.shutdownNow(); // Kill it with fire
@@ -474,7 +514,11 @@ public class VPNAPI {
                 postedStorage = s;
                 break;
             } catch (StorageException ex) {
-                logger.error("[Recoverable: " + ex.isAutomaticallyRecoverable() + "] " + ex.getMessage(), ex);
+                if (cachedConfig.get().getDebug()) {
+                    logger.error("[Recoverable: " + ex.isAutomaticallyRecoverable() + "] " + ex.getMessage(), ex);
+                } else {
+                    logger.error("[Recoverable: " + ex.isAutomaticallyRecoverable() + "] " + ex.getMessage());
+                }
                 if (ex.isAutomaticallyRecoverable()) {
                     canRecover = true;
                 }
@@ -498,7 +542,11 @@ public class VPNAPI {
                         postResult.getCreated()
                 );
             } catch (StorageException ex) {
-                logger.error("[Recoverable: " + ex.isAutomaticallyRecoverable() + "] " + ex.getMessage(), ex);
+                if (cachedConfig.get().getDebug()) {
+                    logger.error("[Recoverable: " + ex.isAutomaticallyRecoverable() + "] " + ex.getMessage(), ex);
+                } else {
+                    logger.error("[Recoverable: " + ex.isAutomaticallyRecoverable() + "] " + ex.getMessage());
+                }
             }
         }
 
@@ -520,7 +568,11 @@ public class VPNAPI {
                     );
                     handled = true;
                 } catch (MessagingException ex) {
-                    logger.error("[Recoverable: " + ex.isAutomaticallyRecoverable() + "] " + ex.getMessage(), ex);
+                    if (cachedConfig.get().getDebug()) {
+                        logger.error("[Recoverable: " + ex.isAutomaticallyRecoverable() + "] " + ex.getMessage(), ex);
+                    } else {
+                        logger.error("[Recoverable: " + ex.isAutomaticallyRecoverable() + "] " + ex.getMessage());
+                    }
                     if (ex.isAutomaticallyRecoverable()) {
                         canRecover = true;
                     }
@@ -551,7 +603,11 @@ public class VPNAPI {
                 result = s.getMCLeaksByPlayer(playerID, cachedConfig.get().getMCLeaksCacheTime());
                 break;
             } catch (StorageException ex) {
-                logger.error("[Recoverable: " + ex.isAutomaticallyRecoverable() + "] " + ex.getMessage(), ex);
+                if (cachedConfig.get().getDebug()) {
+                    logger.error("[Recoverable: " + ex.isAutomaticallyRecoverable() + "] " + ex.getMessage(), ex);
+                } else {
+                    logger.error("[Recoverable: " + ex.isAutomaticallyRecoverable() + "] " + ex.getMessage());
+                }
             }
         }
         if (result != null) {
@@ -593,7 +649,11 @@ public class VPNAPI {
                 postedStorage = s;
                 break;
             } catch (StorageException ex) {
-                logger.error("[Recoverable: " + ex.isAutomaticallyRecoverable() + "] " + ex.getMessage(), ex);
+                if (cachedConfig.get().getDebug()) {
+                    logger.error("[Recoverable: " + ex.isAutomaticallyRecoverable() + "] " + ex.getMessage(), ex);
+                } else {
+                    logger.error("[Recoverable: " + ex.isAutomaticallyRecoverable() + "] " + ex.getMessage());
+                }
                 if (ex.isAutomaticallyRecoverable()) {
                     canRecover = true;
                 }
@@ -616,7 +676,11 @@ public class VPNAPI {
                         postResult.getCreated()
                 );
             } catch (StorageException ex) {
-                logger.error("[Recoverable: " + ex.isAutomaticallyRecoverable() + "] " + ex.getMessage(), ex);
+                if (cachedConfig.get().getDebug()) {
+                    logger.error("[Recoverable: " + ex.isAutomaticallyRecoverable() + "] " + ex.getMessage(), ex);
+                } else {
+                    logger.error("[Recoverable: " + ex.isAutomaticallyRecoverable() + "] " + ex.getMessage());
+                }
             }
         }
 
@@ -637,7 +701,11 @@ public class VPNAPI {
                     );
                     handled = true;
                 } catch (MessagingException ex) {
-                    logger.error("[Recoverable: " + ex.isAutomaticallyRecoverable() + "] " + ex.getMessage(), ex);
+                    if (cachedConfig.get().getDebug()) {
+                        logger.error("[Recoverable: " + ex.isAutomaticallyRecoverable() + "] " + ex.getMessage(), ex);
+                    } else {
+                        logger.error("[Recoverable: " + ex.isAutomaticallyRecoverable() + "] " + ex.getMessage());
+                    }
                     if (ex.isAutomaticallyRecoverable()) {
                         canRecover = true;
                     }

@@ -10,12 +10,8 @@ import ninja.egg82.json.JSONWebUtil;
 import ninja.leaping.configurate.ConfigurationNode;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class IPHunter extends AbstractSourceAPI {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
-
     public String getName() { return "iphunter"; }
 
     public boolean isKeyRequired() { return true; }
@@ -44,7 +40,6 @@ public class IPHunter extends AbstractSourceAPI {
         try {
             json = JSONWebUtil.getJSONObject(new URL("https://www.iphunter.info:8082/v1/ip/" + ip), "GET", (int) getCachedConfig().getTimeout(), "egg82/AntiVPN", headers);
         } catch (IOException | ParseException | ClassCastException ex) {
-            logger.error(ex.getMessage(), ex);
             throw new APIException(false, ex);
         }
         if (json == null || json.get("status") == null) {

@@ -47,7 +47,6 @@ public class IPQualityScore extends AbstractSourceAPI {
         try {
             json = JSONWebUtil.getJSONObject(new URL("http://www.ipqualityscore.com/api/json/ip/" + key + "/" + ip + "?strictness=" + strictness + "&mobile=" + (sourceConfigNode.getNode("mobile").getBoolean() ? "true" : "false") + "&fast=true&allow_public_access_points=true&lighter_penalties=true"), "GET", (int) getCachedConfig().getTimeout(), "egg82/AntiVPN");
         } catch (IOException | ParseException | ClassCastException ex) {
-            logger.error(ex.getMessage(), ex);
             throw new APIException(false, "Could not get result from " + getName());
         }
         if (json == null || json.get("success") == null) {

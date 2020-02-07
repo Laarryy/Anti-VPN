@@ -9,12 +9,8 @@ import ninja.leaping.configurate.ConfigurationNode;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class Shodan extends AbstractSourceAPI {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
-
     public String getName() { return "shodan"; }
 
     public boolean isKeyRequired() { return true; }
@@ -38,7 +34,6 @@ public class Shodan extends AbstractSourceAPI {
         try {
             json = JSONWebUtil.getJSONObject(new URL("https://api.shodan.io/shodan/host/" + ip + "?key=" + key), "GET", (int) getCachedConfig().getTimeout(), "egg82/AntiVPN");
         } catch (IOException | ParseException | ClassCastException ex) {
-            logger.error(ex.getMessage(), ex);
             throw new APIException(false, "Could not get result from " + getName());
         }
         if (json == null) {

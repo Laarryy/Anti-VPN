@@ -7,6 +7,7 @@ import java.util.Optional;
 import me.egg82.antivpn.APIException;
 import me.egg82.antivpn.VPNAPI;
 import me.egg82.antivpn.enums.Message;
+import me.egg82.antivpn.utils.ConfigUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,7 +35,11 @@ public class TestCommand implements Runnable {
                         f.accept(Optional.of(api.testAllSources(ip)));
                         return;
                     } catch (APIException ex) {
-                        logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
+                        if (ConfigUtil.getDebugOrFalse()) {
+                            logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
+                        } else {
+                            logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage());
+                        }
                     }
                     f.accept(Optional.empty());
                 })

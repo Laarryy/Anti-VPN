@@ -102,7 +102,11 @@ public class PlayerAnalyticsHook implements PluginHook {
                             retVal++;
                         }
                     } catch (APIException ex) {
-                        logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
+                        if (cachedConfig.get().getDebug()) {
+                            logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
+                        } else {
+                            logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage());
+                        }
                     }
                 } else {
                     try {
@@ -110,7 +114,11 @@ public class PlayerAnalyticsHook implements PluginHook {
                             retVal++;
                         }
                     } catch (APIException ex) {
-                        logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
+                        if (cachedConfig.get().getDebug()) {
+                            logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
+                        } else {
+                            logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage());
+                        }
                     }
                 }
             }
@@ -140,7 +148,11 @@ public class PlayerAnalyticsHook implements PluginHook {
                         retVal++;
                     }
                 } catch (APIException ex) {
-                    logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
+                    if (cachedConfig.get().getDebug()) {
+                        logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
+                    } else {
+                        logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage());
+                    }
                 }
             }
             return retVal;
@@ -174,13 +186,21 @@ public class PlayerAnalyticsHook implements PluginHook {
                 try {
                     return api.consensus(ip) >= cachedConfig.get().getVPNAlgorithmConsensus();
                 } catch (APIException ex) {
-                    logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
+                    if (cachedConfig.get().getDebug()) {
+                        logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
+                    } else {
+                        logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage());
+                    }
                 }
             } else {
                 try {
                     return api.cascade(ip);
                 } catch (APIException ex) {
-                    logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
+                    if (cachedConfig.get().getDebug()) {
+                        logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
+                    } else {
+                        logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage());
+                    }
                 }
             }
             return false;
@@ -203,7 +223,11 @@ public class PlayerAnalyticsHook implements PluginHook {
             try {
                 return api.isMCLeaks(playerID);
             } catch (APIException ex) {
-                logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
+                if (cachedConfig.get().getDebug()) {
+                    logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
+                } else {
+                    logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage());
+                }
             }
             return false;
         }

@@ -8,12 +8,8 @@ import ninja.egg82.json.JSONWebUtil;
 import ninja.leaping.configurate.ConfigurationNode;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class ProxyCheck extends AbstractSourceAPI {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
-
     public String getName() { return "proxycheck"; }
 
     public boolean isKeyRequired() { return false; }
@@ -34,7 +30,6 @@ public class ProxyCheck extends AbstractSourceAPI {
         try {
             json = JSONWebUtil.getJSONObject(new URL("https://proxycheck.io/v2/" + ip + "?vpn=1" + ((key != null && !key.isEmpty()) ? "&key=" + key : "")), "GET", (int) getCachedConfig().getTimeout(), "egg82/AntiVPN");
         } catch (IOException | ParseException | ClassCastException ex) {
-            logger.error(ex.getMessage(), ex);
             throw new APIException(false, "Could not get result from " + getName());
         }
         if (json == null || json.get("status") == null) {
