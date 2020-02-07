@@ -53,6 +53,7 @@ public class MySQL extends AbstractSQL {
             result.handler = handler;
 
             // Baseline
+            config.setDriverClassName("com.mysql.cj.jdbc.Driver");
             config.setConnectionTestQuery("SELECT 1;");
             config.setAutoCommit(true);
             config.addDataSourceProperty("useLegacyDatetimeCode", "false");

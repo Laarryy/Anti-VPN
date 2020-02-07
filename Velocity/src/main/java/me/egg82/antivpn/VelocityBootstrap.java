@@ -232,7 +232,7 @@ public class VelocityBootstrap {
                 .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
         buildInject(abstractConfiguration, jarsDir, classLoader, "Abstract Configuration");
 
-        Artifact.Builder easySql = Artifact.builder("ninja.egg82", "easy-sql", "1.3.4", cacheDir)
+        Artifact.Builder easySql = Artifact.builder("ninja.egg82", "easy-sql", "1.3.5", cacheDir)
                 .addRepository(Repository.builder("https://www.myget.org/F/egg82-java/maven/").addProxy("https://nexus.egg82.me/repository/egg82/").build())
                 .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
         buildInject(easySql, jarsDir, classLoader, "EasySQL");
