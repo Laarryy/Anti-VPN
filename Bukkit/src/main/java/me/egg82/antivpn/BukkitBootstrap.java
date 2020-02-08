@@ -160,7 +160,7 @@ public class BukkitBootstrap extends JavaPlugin {
                 .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
         buildInject(configurateYaml, jarsDir, classLoader, "Configurate", 2);
 
-        Artifact.Builder spigotUpdater = Artifact.builder("ninja.egg82", "spigot-updater", "1.0.3", cacheDir)
+        Artifact.Builder spigotUpdater = Artifact.builder("ninja.egg82", "spigot-updater", "1.0.4", cacheDir)
                 .addRepository(Repository.builder("https://www.myget.org/F/egg82-java/maven/").addProxy("https://nexus.egg82.me/repository/egg82/").build())
                 .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
         buildInject(spigotUpdater, jarsDir, classLoader, "Spigot Updater");
