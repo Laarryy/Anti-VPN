@@ -206,7 +206,7 @@ public class PlayerEvents extends EventHolder {
     }
 
     private void tryKickPlayer(String message, ProxiedPlayer player, PostLoginEvent event) {
-        player.disconnect(new TextComponent(message));
+        player.disconnect(TextComponent.fromLegacyText(message.replace('&', ChatColor.COLOR_CHAR)));
     }
 
     private String getIp(InetSocketAddress address) {

@@ -23,6 +23,7 @@ import me.egg82.antivpn.utils.LogUtil;
 import me.egg82.antivpn.utils.ValidationUtil;
 import net.kyori.text.TextComponent;
 import net.kyori.text.format.TextColor;
+import net.kyori.text.serializer.legacy.LegacyComponentSerializer;
 import ninja.egg82.events.VelocityEvents;
 
 public class PlayerEvents extends EventHolder {
@@ -216,7 +217,7 @@ public class PlayerEvents extends EventHolder {
     }
 
     private void tryKickPlayer(String message, Player player, PostLoginEvent event) {
-        player.disconnect(TextComponent.of(message));
+        player.disconnect(LegacyComponentSerializer.legacy().deserialize(message, '&'));
     }
 
     private String getIp(InetSocketAddress address) {
