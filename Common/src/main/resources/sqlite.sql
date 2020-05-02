@@ -1,3 +1,5 @@
+PRAGMA foreign_keys = OFF;
+
 DROP TABLE IF EXISTS `{prefix}`;
 DROP TABLE IF EXISTS `{prefix}consensus`;
 DROP TABLE IF EXISTS `{prefix}queue`;
@@ -39,3 +41,5 @@ CREATE TABLE `{prefix}mcleaks_values` (
 	"created"	TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	FOREIGN KEY("player_id") REFERENCES "{prefix}players"("id") ON DELETE RESTRICT ON UPDATE RESTRICT
 );
+
+PRAGMA foreign_keys = ON;

@@ -118,8 +118,8 @@ sources:
   order:
   - 'proxycheck'
   - 'iptrooper'
-  - 'ipqualityscore'
   - 'getipintel'
+  - 'ipqualityscore'
   - 'iphub'
   - 'iphunter'
   - 'vpnblocker'
@@ -148,11 +148,24 @@ sources:
   iptrooper:
     enabled: true
 
+  # https://www.getipintel.net/
+  # Results updated Jan 19, 2020
+  # Error rate:                     0.00%
+  # NordVPN detection rate:        86.00%
+  # Cryptostorm detection rate:   100.00%
+  # False-flagged homes:            0.00%
+  getipintel:
+    enabled: true
+    # Contact e-mail in case things go wrong. Required
+    contact: 'admin@yoursite.com'
+    # Threshold above which an IP is considered "bad"
+    threshold: 0.98
+
   # https://www.ipqualityscore.com/
-  # Results updated Feb 5, 2020
+  # Results updated Feb 9, 2020
   # Error rate:                    0.00%
-  # NordVPN detection rate:       90.00%
-  # Cryptostorm detection rate:  100.00%
+  # NordVPN detection rate:       86.00%
+  # Cryptostorm detection rate:   96.43%
   # False-flagged homes:           0.00%
   ipqualityscore:
     enabled: false
@@ -167,19 +180,6 @@ sources:
     strictness: 0
     # Whether or not to flag IPs with recent abuse (such as malware, compromised devices, etc) as "bad"
     recent-abuse: false
-    # Threshold above which an IP is considered "bad"
-    threshold: 0.98
-
-  # https://www.getipintel.net/
-  # Results updated Jan 19, 2020
-  # Error rate:                     0.00%
-  # NordVPN detection rate:        86.00%
-  # Cryptostorm detection rate:   100.00%
-  # False-flagged homes:            0.00%
-  getipintel:
-    enabled: true
-    # Contact e-mail in case things go wrong. Required
-    contact: 'admin@yoursite.com'
     # Threshold above which an IP is considered "bad"
     threshold: 0.98
 
