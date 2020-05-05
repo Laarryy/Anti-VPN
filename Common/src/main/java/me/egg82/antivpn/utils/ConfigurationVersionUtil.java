@@ -4,10 +4,7 @@ import com.google.common.io.Files;
 import com.google.common.reflect.TypeToken;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
@@ -63,6 +60,9 @@ public class ConfigurationVersionUtil {
         }
         if (config.getNode("version").getDouble() == 4.11d) {
             to412(config);
+        }
+        if (config.getNode("version").getDouble() == 4.12d) {
+            to413(config);
         }
 
         if (config.getNode("version").getDouble() != oldVersion) {
@@ -554,5 +554,37 @@ public class ConfigurationVersionUtil {
 
         // Version
         config.getNode("version").setValue(4.12d);
+    }
+
+    private static void to413(ConfigurationNode config) {
+        // Add private ranges to ignore
+        List<String> ignoredIPs;
+        try {
+            ignoredIPs = new ArrayList<>(config.getNode("action", "ignore").getList(TypeToken.of(String.class)));
+        } catch (ObjectMappingException ex) {
+            logger.error(ex.getMessage(), ex);
+            return;
+        }
+
+        List<String> added = new ArrayList<>();
+        added.add("10.0.0.0/8");
+        added.add("172.16.0.0/12");
+        added.add("192.168.0.0/16");
+        added.add("fd00::/8");
+
+        for (Iterator<String> i = added.iterator(); i.hasNext();) {
+            String ip = i.next();
+            for (String ip2 : ignoredIPs) {
+                if (ip.equalsIgnoreCase(ip2)) { // IPs are case-insensitive when loaded
+                    i.remove();
+                }
+            }
+        }
+
+        ignoredIPs.addAll(added);
+        config.getNode("action", "ignore").setValue(ignoredIPs);
+
+        // Version
+        config.getNode("version").setValue(4.13d);
     }
 }
