@@ -116,6 +116,7 @@ sources:
 
   # The order to try results in
   order:
+  - 'ipinfo'
   - 'proxycheck'
   - 'iptrooper'
   - 'getipintel'
@@ -156,10 +157,13 @@ sources:
   # False-flagged homes:            0.00%
   getipintel:
     enabled: true
+    # Custom subdomain for paid plans
+    subdomain: ''
     # Contact e-mail in case things go wrong. Required
     contact: 'admin@yoursite.com'
     # Threshold above which an IP is considered "bad"
     threshold: 0.98
+
 
   # https://www.ipqualityscore.com/
   # Results updated Feb 9, 2020
@@ -182,6 +186,15 @@ sources:
     recent-abuse: false
     # Threshold above which an IP is considered "bad"
     threshold: 0.98
+
+  # https://ipinfo.io/
+  ipinfo:
+    enabled: false
+    # Requires paid token/key. Available at https://ipinfo.io/signup
+    key: ''
+      # Whether or not to detect proxies as VPNs
+    proxy: false
+
 
   # https://iphub.info/
   # Results updated Jan 19, 2020
@@ -352,4 +365,4 @@ update:
   notify: true
 
 # Config version, no touchy plz
-version: 4.13
+version: 4.14

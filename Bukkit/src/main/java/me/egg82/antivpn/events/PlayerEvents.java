@@ -1,6 +1,7 @@
 package me.egg82.antivpn.events;
 
 import inet.ipaddr.IPAddressString;
+
 import java.net.InetAddress;
 import java.util.List;
 import java.util.Optional;
@@ -9,10 +10,12 @@ import me.egg82.antivpn.APIException;
 import me.egg82.antivpn.enums.VPNAlgorithmMethod;
 import me.egg82.antivpn.extended.CachedConfigValues;
 import me.egg82.antivpn.hooks.PlaceholderAPIHook;
+import me.egg82.antivpn.hooks.VaultHook;
 import me.egg82.antivpn.services.AnalyticsHelper;
 import me.egg82.antivpn.utils.ConfigUtil;
 import me.egg82.antivpn.utils.LogUtil;
 import me.egg82.antivpn.utils.ValidationUtil;
+import net.milkbowl.vault.permission.Permission;
 import ninja.egg82.events.BukkitEvents;
 import ninja.egg82.service.ServiceLocator;
 import org.bukkit.Bukkit;
@@ -23,8 +26,14 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.PluginManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 public class PlayerEvents extends EventHolder {
+    PluginManager manager = Bukkit.getPluginManager();
+
     public PlayerEvents(Plugin plugin) {
         events.add(
                 BukkitEvents.subscribe(plugin, AsyncPlayerPreLoginEvent.class, EventPriority.HIGH)
@@ -41,9 +50,27 @@ public class PlayerEvents extends EventHolder {
         if (Bukkit.hasWhitelist() && !isWhitelisted(event.getUniqueId())) {
             return;
         }
+        if (manager.getPlugin("Vault") != null) {
+            Permission permission = new VaultHook(Bukkit.getPluginManager().getPlugin("Vault"));
+            boolean hasBypass = permission.playerHas(null, Bukkit.getOfflinePlayer(event.getUniqueId()), "avpn.bypass");
+            boolean vaultEnabled = manager.isPluginEnabled("Vault");
+
+            if (hasBypass && vaultEnabled) {
+                if (ConfigUtil.getDebugOrFalse()) {
+                    logger.info(LogUtil.getHeading() + ChatColor.WHITE + event.getName() + ChatColor.YELLOW + " bypasses AsyncPlayerPreLoginEvent check. Ignoring.");
+                return;
+                }
+                return;
+            }
+        } else {
+            logger.info(LogUtil.getHeading() + ChatColor.WHITE + event.getName() + ChatColor.YELLOW +
+                    " was not able to be checked using Vault, please install Vault for optimally efficient bypass permission checks! ");
+        }
+        logger.info("Failed Vault Perms Check");
 
         String ip = getIp(event.getAddress());
         if (ip == null || ip.isEmpty()) {
+
             return;
         }
 
@@ -98,6 +125,7 @@ public class PlayerEvents extends EventHolder {
         }
     }
 
+
     private void checkPlayer(PlayerLoginEvent event) {
         if (Bukkit.hasWhitelist() && !event.getPlayer().isWhitelisted()) {
             if (ConfigUtil.getDebugOrFalse()) {
@@ -115,14 +143,12 @@ public class PlayerEvents extends EventHolder {
         if (!cachedConfig.isPresent()) {
             return;
         }
-
         if (event.getPlayer().hasPermission("avpn.bypass")) {
             if (ConfigUtil.getDebugOrFalse()) {
                 logger.info(LogUtil.getHeading() + ChatColor.WHITE + event.getPlayer().getName() + ChatColor.YELLOW + " bypasses check. Ignoring.");
             }
             return;
         }
-
         for (String testAddress : cachedConfig.get().getIgnoredIps()) {
             if (ValidationUtil.isValidIp(testAddress) && ip.equalsIgnoreCase(testAddress)) {
                 if (ConfigUtil.getDebugOrFalse()) {
@@ -167,19 +193,22 @@ public class PlayerEvents extends EventHolder {
             if (isVPN) {
                 AnalyticsHelper.incrementBlockedVPNs();
                 if (ConfigUtil.getDebugOrFalse()) {
-                    logger.info(LogUtil.getHeading() + ChatColor.WHITE + event.getPlayer().getName() + ChatColor.DARK_RED + " found using a VPN. Running required actions.");
+                    logger.info(LogUtil.getHeading() + net.md_5.bungee.api.ChatColor.WHITE + event.getPlayer().getName() + net.md_5.bungee.api.ChatColor.DARK_RED + " found using a VPN. Running required actions.");
                 }
-
-                tryRunCommands(cachedConfig.get().getVPNActionCommands(), event.getPlayer(), ip);
-                tryKickPlayer(cachedConfig.get().getVPNKickMessage(), event.getPlayer(), event);
+                if (!cachedConfig.get().getVPNActionCommands().isEmpty()) {
+                    tryRunCommands(cachedConfig.get().getVPNActionCommands(), event.getPlayer(), ip);
+                }
+                if (!cachedConfig.get().getVPNKickMessage().isEmpty()) {
+                    tryKickPlayer(cachedConfig.get().getVPNKickMessage(), event.getPlayer(), event);
+                }
             } else {
                 if (ConfigUtil.getDebugOrFalse()) {
-                    logger.info(LogUtil.getHeading() + ChatColor.WHITE + event.getPlayer().getName() + ChatColor.GREEN + " passed VPN check.");
+                    logger.info(LogUtil.getHeading() + net.md_5.bungee.api.ChatColor.WHITE + event.getPlayer().getName() + net.md_5.bungee.api.ChatColor.GREEN + " passed VPN check.");
                 }
             }
         } else {
             if (ConfigUtil.getDebugOrFalse()) {
-                logger.info(LogUtil.getHeading() + ChatColor.YELLOW + "VPN set to API-only. Ignoring VPN check for " + ChatColor.WHITE + event.getPlayer().getName());
+                logger.info(LogUtil.getHeading() + net.md_5.bungee.api.ChatColor.YELLOW + "VPN set to API-only. Ignoring VPN check for " + net.md_5.bungee.api.ChatColor.WHITE + event.getPlayer().getName());
             }
         }
 
@@ -200,19 +229,22 @@ public class PlayerEvents extends EventHolder {
             if (isMCLeaks) {
                 AnalyticsHelper.incrementBlockedMCLeaks();
                 if (ConfigUtil.getDebugOrFalse()) {
-                    logger.info(LogUtil.getHeading() + ChatColor.WHITE + event.getPlayer().getName() + ChatColor.DARK_RED + " found using an MCLeaks account. Running required actions.");
+                    logger.info(LogUtil.getHeading() + net.md_5.bungee.api.ChatColor.WHITE + event.getPlayer().getName() + net.md_5.bungee.api.ChatColor.DARK_RED + " found using an MCLeaks account. Running required actions.");
                 }
-
-                tryRunCommands(cachedConfig.get().getMCLeaksActionCommands(), event.getPlayer(), ip);
-                tryKickPlayer(cachedConfig.get().getMCLeaksKickMessage(), event.getPlayer(), event);
+                if (!cachedConfig.get().getMCLeaksActionCommands().isEmpty()) {
+                    tryRunCommands(cachedConfig.get().getMCLeaksActionCommands(), event.getPlayer(), ip);
+                }
+                if (!cachedConfig.get().getMCLeaksKickMessage().isEmpty()) {
+                    tryKickPlayer(cachedConfig.get().getMCLeaksKickMessage(), event.getPlayer(), event);
+                }
             } else {
                 if (ConfigUtil.getDebugOrFalse()) {
-                    logger.info(LogUtil.getHeading() + ChatColor.WHITE + event.getPlayer().getName() + ChatColor.GREEN + " passed MCLeaks check.");
+                    logger.info(LogUtil.getHeading() + net.md_5.bungee.api.ChatColor.WHITE + event.getPlayer().getName() + net.md_5.bungee.api.ChatColor.GREEN + " passed MCLeaks check.");
                 }
             }
         } else {
             if (ConfigUtil.getDebugOrFalse()) {
-                logger.info(LogUtil.getHeading() + ChatColor.YELLOW + "MCLeaks set to API-only. Ignoring MCLeaks check for " + ChatColor.WHITE + event.getPlayer().getName());
+                logger.info(LogUtil.getHeading() + net.md_5.bungee.api.ChatColor.YELLOW + "MCLeaks set to API-only. Ignoring MCLeaks check for " + net.md_5.bungee.api.ChatColor.WHITE + event.getPlayer().getName());
             }
         }
     }

@@ -22,6 +22,7 @@ import me.egg82.antivpn.extended.Configuration;
 import me.egg82.antivpn.hooks.PlaceholderAPIHook;
 import me.egg82.antivpn.hooks.PlayerAnalyticsHook;
 import me.egg82.antivpn.hooks.PluginHook;
+//import me.egg82.antivpn.hooks.VaultHook;
 import me.egg82.antivpn.messaging.RabbitMQ;
 import me.egg82.antivpn.services.AnalyticsHelper;
 import me.egg82.antivpn.services.GameAnalyticsErrorHandler;
@@ -298,6 +299,12 @@ public class AntiVPN {
             ServiceLocator.register(new PlaceholderAPIHook());
         } else {
             consoleCommandIssuer.sendInfo(Message.GENERAL__HOOK_DISABLE, "{plugin}", "PlaceholderAPI");
+        }
+        if (manager.getPlugin("Vault") != null) {
+            consoleCommandIssuer.sendInfo(Message.GENERAL__HOOK_ENABLE, "{plugin}", "Vault");
+            //ServiceLocator.register(new VaultHook(Bukkit.getPluginManager().getPlugin("Vault")));
+        } else {
+            consoleCommandIssuer.sendInfo(Message.GENERAL__HOOK_DISABLE, "{plugin}", "Vault");
         }
     }
 

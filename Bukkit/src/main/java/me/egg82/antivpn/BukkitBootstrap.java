@@ -21,6 +21,7 @@ import ninja.egg82.maven.Repository;
 import ninja.egg82.maven.Scope;
 import ninja.egg82.services.ProxiedURLClassLoader;
 import ninja.egg82.utils.InjectUtil;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;

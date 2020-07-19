@@ -151,8 +151,12 @@ public class PlayerEvents extends EventHolder {
                     proxy.getConsoleCommandSource().sendMessage(LogUtil.getHeading().append(TextComponent.of(event.getPlayer().getUsername()).color(TextColor.WHITE)).append(TextComponent.of(" found using a VPN. Running required actions.").color(TextColor.DARK_RED)).build());
                 }
 
-                tryRunCommands(cachedConfig.get().getVPNActionCommands(), event.getPlayer(), ip);
-                tryKickPlayer(cachedConfig.get().getVPNKickMessage(), event.getPlayer(), event);
+                if (!cachedConfig.get().getVPNActionCommands().isEmpty()) {
+                    tryRunCommands(cachedConfig.get().getVPNActionCommands(), event.getPlayer(), ip);
+                }
+                if (!cachedConfig.get().getVPNKickMessage().isEmpty()) {
+                    tryKickPlayer(cachedConfig.get().getVPNKickMessage(), event.getPlayer(), event);
+                }
             } else {
                 if (ConfigUtil.getDebugOrFalse()) {
                     proxy.getConsoleCommandSource().sendMessage(LogUtil.getHeading().append(TextComponent.of(event.getPlayer().getUsername()).color(TextColor.WHITE)).append(TextComponent.of(" passed VPN check.").color(TextColor.GREEN)).build());
@@ -180,8 +184,12 @@ public class PlayerEvents extends EventHolder {
                     proxy.getConsoleCommandSource().sendMessage(LogUtil.getHeading().append(TextComponent.of(event.getPlayer().getUsername()).color(TextColor.WHITE)).append(TextComponent.of(" found using an MCLeaks account. Running required actions.").color(TextColor.DARK_RED)).build());
                 }
 
-                tryRunCommands(cachedConfig.get().getMCLeaksActionCommands(), event.getPlayer(), ip);
-                tryKickPlayer(cachedConfig.get().getMCLeaksKickMessage(), event.getPlayer(), event);
+                if (!cachedConfig.get().getMCLeaksActionCommands().isEmpty()) {
+                    tryRunCommands(cachedConfig.get().getMCLeaksActionCommands(), event.getPlayer(), ip);
+                }
+                if (!cachedConfig.get().getMCLeaksKickMessage().isEmpty()) {
+                    tryKickPlayer(cachedConfig.get().getMCLeaksKickMessage(), event.getPlayer(), event);
+                }
             } else {
                 if (ConfigUtil.getDebugOrFalse()) {
                     proxy.getConsoleCommandSource().sendMessage(LogUtil.getHeading().append(TextComponent.of(event.getPlayer().getUsername()).color(TextColor.WHITE)).append(TextComponent.of(" passed MCLeaks check.").color(TextColor.GREEN)).build());

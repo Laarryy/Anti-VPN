@@ -53,6 +53,9 @@ public class CachedConfigValues {
     private String vpnKickMessage = "&cPlease disconnect from your proxy or VPN before re-joining!";
     public String getVPNKickMessage() { return vpnKickMessage; }
 
+    private String ipInfo = " ";
+    public String getIpInfo() { return ipInfo; }
+
     private ImmutableList<String> vpnActionCommands = ImmutableList.of();
     public ImmutableList<String> getVPNActionCommands() { return vpnActionCommands; }
 

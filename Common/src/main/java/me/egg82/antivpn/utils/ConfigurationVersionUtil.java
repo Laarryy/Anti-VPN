@@ -64,6 +64,8 @@ public class ConfigurationVersionUtil {
         if (config.getNode("version").getDouble() == 4.12d) {
             to413(config);
         }
+        if (config.getNode("version").getDouble() == 4.13d)
+            to414(config);
 
         if (config.getNode("version").getDouble() != oldVersion) {
             File backupFile = new File(fileOnDisk.getParent(), fileOnDisk.getName() + ".bak");
@@ -586,5 +588,25 @@ public class ConfigurationVersionUtil {
 
         // Version
         config.getNode("version").setValue(4.13d);
+    }
+    private static void to414(ConfigurationNode config) {
+        // Add ip2proxy
+        config.getNode("sources", "ipinfo", "enabled").setValue(Boolean.TRUE);
+        config.getNode("sources", "ipinfo", "key").setValue(" ");
+        config.getNode("sources", "ipinfo", "proxy").setValue(Boolean.FALSE);
+
+        List<String> sources;
+        try {
+            sources = new ArrayList<>(config.getNode("sources", "order").getList(TypeToken.of(String.class)));
+        } catch (Exception ex) {
+            sources = new ArrayList<>();
+        }
+        if (!sources.contains("ipinfo")) {
+            sources.add("ipinfo");
+        }
+        config.getNode("sources", "order").setValue(sources);
+
+        // Version
+        config.getNode("version").setValue(4.14d);
     }
 }

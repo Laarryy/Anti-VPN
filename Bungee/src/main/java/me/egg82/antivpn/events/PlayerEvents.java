@@ -146,9 +146,12 @@ public class PlayerEvents extends EventHolder {
                 if (ConfigUtil.getDebugOrFalse()) {
                     logger.info(LogUtil.getHeading() + ChatColor.WHITE + event.getPlayer().getName() + ChatColor.DARK_RED + " found using a VPN. Running required actions.");
                 }
-
-                tryRunCommands(cachedConfig.get().getVPNActionCommands(), event.getPlayer(), ip);
-                tryKickPlayer(cachedConfig.get().getVPNKickMessage(), event.getPlayer(), event);
+                if (!cachedConfig.get().getVPNActionCommands().isEmpty()) {
+                    tryRunCommands(cachedConfig.get().getVPNActionCommands(), event.getPlayer(), ip);
+                }
+                if (!cachedConfig.get().getVPNKickMessage().isEmpty()) {
+                    tryKickPlayer(cachedConfig.get().getVPNKickMessage(), event.getPlayer(), event);
+                }
             } else {
                 if (ConfigUtil.getDebugOrFalse()) {
                     logger.info(LogUtil.getHeading() + ChatColor.WHITE + event.getPlayer().getName() + ChatColor.GREEN + " passed VPN check.");
@@ -179,9 +182,12 @@ public class PlayerEvents extends EventHolder {
                 if (ConfigUtil.getDebugOrFalse()) {
                     logger.info(LogUtil.getHeading() + ChatColor.WHITE + event.getPlayer().getName() + ChatColor.DARK_RED + " found using an MCLeaks account. Running required actions.");
                 }
-
-                tryRunCommands(cachedConfig.get().getMCLeaksActionCommands(), event.getPlayer(), ip);
-                tryKickPlayer(cachedConfig.get().getMCLeaksKickMessage(), event.getPlayer(), event);
+                if (!cachedConfig.get().getMCLeaksActionCommands().isEmpty()) {
+                    tryRunCommands(cachedConfig.get().getMCLeaksActionCommands(), event.getPlayer(), ip);
+                }
+                if (!cachedConfig.get().getMCLeaksKickMessage().isEmpty()) {
+                    tryKickPlayer(cachedConfig.get().getMCLeaksKickMessage(), event.getPlayer(), event);
+                }
             } else {
                 if (ConfigUtil.getDebugOrFalse()) {
                     logger.info(LogUtil.getHeading() + ChatColor.WHITE + event.getPlayer().getName() + ChatColor.GREEN + " passed MCLeaks check.");

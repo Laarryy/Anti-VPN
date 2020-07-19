@@ -52,7 +52,6 @@ public class SQLite extends AbstractSQL {
             }
 
             result.handler = handler;
-
             // Baseline
             config.setPoolName("AntiVPN-SQLite");
             config.setDriverClassName("org.sqlite.JDBC");
@@ -60,6 +59,7 @@ public class SQLite extends AbstractSQL {
             config.setAutoCommit(true);
             config.addDataSourceProperty("useLegacyDatetimeCode", "false");
             config.addDataSourceProperty("serverTimezone", "UTC");
+            config.getDriverClassName();
         }
 
         public SQLite.Builder file(File file, String prefix) {
