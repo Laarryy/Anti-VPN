@@ -300,9 +300,10 @@ public class AntiVPN {
         } else {
             consoleCommandIssuer.sendInfo(Message.GENERAL__HOOK_DISABLE, "{plugin}", "PlaceholderAPI");
         }
-        if (manager.getPlugin("Vault") != null) {
+        Plugin vault;
+        if ((vault = manager.getPlugin("Vault")) != null) {
             consoleCommandIssuer.sendInfo(Message.GENERAL__HOOK_ENABLE, "{plugin}", "Vault");
-            ServiceLocator.register(new VaultHook());
+            VaultHook.create(plugin, vault);
         } else if (manager.getPlugin("Vault") == null ){
             consoleCommandIssuer.sendInfo(Message.GENERAL__HOOK_DISABLE, "{plugin}", "Vault");
         }

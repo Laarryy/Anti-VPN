@@ -18,7 +18,7 @@ public class VaultHook implements PluginHook {
     public final Logger logger = LoggerFactory.getLogger(getClass());
     public Permission permission;
 
-    private static void create(Plugin plugin, Plugin vault) {
+    public static void create(Plugin plugin, Plugin vault) {
         if (vault != null && !vault.isEnabled()) {
             BukkitEvents.subscribe(plugin, PluginEnableEvent.class, EventPriority.MONITOR)
                     .expireIf(e -> e.getPlugin().getName().equals("Vault"))
@@ -31,7 +31,7 @@ public class VaultHook implements PluginHook {
 
 
 
-    public VaultHook() {
+    private VaultHook() {
         if (Bukkit.getPluginManager().isPluginEnabled("Vault")) {
             final RegisteredServiceProvider<Permission> permissionProvider =
                     Bukkit.getServicesManager().getRegistration(Permission.class);
@@ -50,6 +50,9 @@ public class VaultHook implements PluginHook {
 
     @Override
     public void cancel() {
+    }
+    public Permission getPermission() {
+        return this.permission;
     }
 }
 

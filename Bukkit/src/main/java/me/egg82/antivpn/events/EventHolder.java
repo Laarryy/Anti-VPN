@@ -5,6 +5,8 @@ import java.util.List;
 import me.egg82.antivpn.VPNAPI;
 import me.egg82.antivpn.hooks.VaultHook;
 import ninja.egg82.events.BukkitEventSubscriber;
+import ninja.egg82.service.ServiceLocator;
+import org.bukkit.Bukkit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,8 +17,6 @@ public abstract class EventHolder {
     protected final List<BukkitEventSubscriber<?>> events = new ArrayList<>();
 
     protected final VPNAPI api = VPNAPI.getInstance();
-
-    public final VaultHook vaultHook = new VaultHook();
 
     public final int numEvents() { return events.size(); }
 

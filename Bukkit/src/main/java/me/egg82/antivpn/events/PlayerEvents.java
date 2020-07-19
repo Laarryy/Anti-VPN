@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+
 import me.egg82.antivpn.APIException;
 import me.egg82.antivpn.enums.VPNAlgorithmMethod;
 import me.egg82.antivpn.extended.CachedConfigValues;
@@ -50,15 +51,18 @@ public class PlayerEvents extends EventHolder {
         if (Bukkit.hasWhitelist() && !isWhitelisted(event.getUniqueId())) {
             return;
         }
-        if (manager.getPlugin("Vault") != null) {
-
-        VaultHook vaultHook = new VaultHook();
-        boolean bypasses = vaultHook.permission.playerHas(null, Bukkit.getOfflinePlayer(event.getUniqueId()), "avpn.bypass");
-
+        Optional<VaultHook> vaultHook;
+        try {
+            vaultHook = ServiceLocator.getOptional(VaultHook.class);
+        } catch (InstantiationException | IllegalAccessException ex) {
+            logger.error(ex.getMessage(), ex);
+            vaultHook = Optional.empty();
+        }
+        if (vaultHook.isPresent()) {
+            boolean bypasses = vaultHook.get().getPermission().playerHas(null, Bukkit.getOfflinePlayer(event.getUniqueId()), "avpn.bypass");
             if (bypasses) {
                 if (ConfigUtil.getDebugOrFalse()) {
                     logger.info(LogUtil.getHeading() + ChatColor.WHITE + event.getName() + ChatColor.YELLOW + " bypasses check. Ignoring.");
-                return;
                 }
                 return;
             }
@@ -82,7 +86,7 @@ public class PlayerEvents extends EventHolder {
         for (String testAddress : cachedConfig.get().getIgnoredIps()) {
             if (
                     ValidationUtil.isValidIp(testAddress) && ip.equalsIgnoreCase(testAddress)
-                    || ValidationUtil.isValidIPRange(testAddress) && rangeContains(testAddress, ip)
+                            || ValidationUtil.isValidIPRange(testAddress) && rangeContains(testAddress, ip)
             ) {
                 return;
             }
@@ -307,5 +311,7 @@ public class PlayerEvents extends EventHolder {
         return false;
     }
 
-    private boolean rangeContains(String range, String ip) { return new IPAddressString(range).contains(new IPAddressString(ip)); }
+    private boolean rangeContains(String range, String ip) {
+        return new IPAddressString(range).contains(new IPAddressString(ip));
+    }
 }
