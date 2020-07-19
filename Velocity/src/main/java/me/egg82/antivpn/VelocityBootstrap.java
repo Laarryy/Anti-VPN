@@ -38,7 +38,7 @@ import java.util.concurrent.TimeUnit;
 @Plugin(
         id = "antivpn",
         name = "AntiVPN",
-        version = "5.11.37",
+        version = "5.12.38",
         authors = "egg82",
         description = "Get the best; save money on overpriced plugins and block VPN users!",
         dependencies = @Dependency(id = "plan", optional = true)

@@ -315,7 +315,7 @@
         <dependency>
             <groupId>me.egg82</groupId>
             <artifactId>antivpn-common</artifactId>
-            <version>5.11.37</version>
+            <version>5.12.38</version>
         </dependency>
 
         <dependency>
