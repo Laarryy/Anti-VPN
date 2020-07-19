@@ -2,14 +2,15 @@ package me.egg82.antivpn.utils;
 
 import com.google.common.io.Files;
 import com.google.common.reflect.TypeToken;
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
 
 public class ConfigurationVersionUtil {
     private static final Logger logger = LoggerFactory.getLogger(ConfigurationVersionUtil.class);

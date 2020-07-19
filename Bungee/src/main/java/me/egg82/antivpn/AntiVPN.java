@@ -4,11 +4,6 @@ import co.aikar.commands.*;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.SetMultimap;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
-import java.util.concurrent.*;
-import java.util.logging.Level;
 import me.egg82.antivpn.apis.SourceAPI;
 import me.egg82.antivpn.commands.AntiVPNCommand;
 import me.egg82.antivpn.enums.Message;
@@ -43,6 +38,12 @@ import ninja.egg82.updater.BungeeUpdater;
 import org.bstats.bungeecord.Metrics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.logging.Level;
 
 public class AntiVPN {
     private final Logger logger = LoggerFactory.getLogger(getClass());

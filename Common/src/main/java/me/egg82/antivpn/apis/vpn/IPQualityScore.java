@@ -1,7 +1,5 @@
 package me.egg82.antivpn.apis.vpn;
 
-import java.io.IOException;
-import java.net.URL;
 import me.egg82.antivpn.APIException;
 import me.egg82.antivpn.utils.ValidationUtil;
 import ninja.egg82.json.JSONWebUtil;
@@ -10,6 +8,9 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.net.URL;
 
 public class IPQualityScore extends AbstractSourceAPI {
     private final Logger logger = LoggerFactory.getLogger(getClass());

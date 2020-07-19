@@ -1,5 +1,20 @@
 package me.egg82.antivpn;
 
+import me.egg82.antivpn.utils.BukkitEnvironmentUtil;
+import me.egg82.antivpn.utils.LogUtil;
+import ninja.egg82.maven.Artifact;
+import ninja.egg82.maven.Repository;
+import ninja.egg82.maven.Scope;
+import ninja.egg82.services.ProxiedURLClassLoader;
+import ninja.egg82.utils.InjectUtil;
+import org.bukkit.ChatColor;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.java.JavaPlugin;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
+
+import javax.xml.xpath.XPathExpressionException;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -13,21 +28,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
-import javax.xml.xpath.XPathExpressionException;
-import me.egg82.antivpn.utils.BukkitEnvironmentUtil;
-import me.egg82.antivpn.utils.LogUtil;
-import ninja.egg82.maven.Artifact;
-import ninja.egg82.maven.Repository;
-import ninja.egg82.maven.Scope;
-import ninja.egg82.services.ProxiedURLClassLoader;
-import ninja.egg82.utils.InjectUtil;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.java.JavaPlugin;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.xml.sax.SAXException;
 
 public class BukkitBootstrap extends JavaPlugin {
     private final Logger logger = LoggerFactory.getLogger(getClass());

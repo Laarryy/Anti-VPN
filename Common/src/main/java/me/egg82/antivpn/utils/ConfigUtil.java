@@ -1,8 +1,9 @@
 package me.egg82.antivpn.utils;
 
-import java.util.Optional;
 import me.egg82.antivpn.extended.CachedConfigValues;
 import me.egg82.antivpn.extended.Configuration;
+
+import java.util.Optional;
 
 public class ConfigUtil {
     private static Configuration config = null;

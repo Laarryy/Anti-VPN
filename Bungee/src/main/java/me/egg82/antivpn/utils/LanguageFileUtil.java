@@ -1,14 +1,15 @@
 package me.egg82.antivpn.utils;
 
-import java.io.*;
-import java.nio.file.Files;
-import java.util.Locale;
-import java.util.Optional;
 import net.md_5.bungee.api.plugin.Plugin;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
 import ninja.leaping.configurate.yaml.YAMLConfigurationLoader;
 import org.yaml.snakeyaml.DumperOptions;
+
+import java.io.*;
+import java.nio.file.Files;
+import java.util.Locale;
+import java.util.Optional;
 
 public class LanguageFileUtil {
     private LanguageFileUtil() {}

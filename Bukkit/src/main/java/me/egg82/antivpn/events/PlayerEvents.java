@@ -1,13 +1,6 @@
 package me.egg82.antivpn.events;
 
 import inet.ipaddr.IPAddressString;
-
-import java.net.InetAddress;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
-
 import me.egg82.antivpn.APIException;
 import me.egg82.antivpn.enums.VPNAlgorithmMethod;
 import me.egg82.antivpn.extended.CachedConfigValues;
@@ -28,9 +21,11 @@ import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import java.net.InetAddress;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 public class PlayerEvents extends EventHolder {
     PluginManager manager = Bukkit.getPluginManager();

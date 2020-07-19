@@ -12,10 +12,6 @@ import com.djrapitops.plan.extension.icon.Color;
 import com.djrapitops.plan.extension.icon.Family;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.util.Optional;
-import java.util.UUID;
 import me.egg82.antivpn.APIException;
 import me.egg82.antivpn.VPNAPI;
 import me.egg82.antivpn.enums.VPNAlgorithmMethod;
@@ -23,6 +19,11 @@ import me.egg82.antivpn.extended.CachedConfigValues;
 import me.egg82.antivpn.utils.ConfigUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.util.Optional;
+import java.util.UUID;
 
 public class PlayerAnalyticsHook implements PluginHook {
     private final Logger logger = LoggerFactory.getLogger(getClass());

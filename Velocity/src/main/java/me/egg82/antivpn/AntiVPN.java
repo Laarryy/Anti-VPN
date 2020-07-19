@@ -9,9 +9,6 @@ import com.velocitypowered.api.plugin.PluginManager;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.scheduler.ScheduledTask;
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
 import me.egg82.antivpn.apis.SourceAPI;
 import me.egg82.antivpn.commands.AntiVPNCommand;
 import me.egg82.antivpn.enums.Message;
@@ -34,6 +31,10 @@ import ninja.leaping.configurate.yaml.YAMLConfigurationLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.DumperOptions;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
 
 public class AntiVPN {
     private final Logger logger = LoggerFactory.getLogger(getClass());

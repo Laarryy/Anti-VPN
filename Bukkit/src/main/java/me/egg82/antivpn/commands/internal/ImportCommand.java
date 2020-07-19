@@ -3,8 +3,6 @@ package me.egg82.antivpn.commands.internal;
 import co.aikar.commands.CommandIssuer;
 import co.aikar.taskchain.TaskChain;
 import co.aikar.taskchain.TaskChainAbortAction;
-import java.util.Optional;
-import java.util.Set;
 import me.egg82.antivpn.core.IPResult;
 import me.egg82.antivpn.core.PlayerResult;
 import me.egg82.antivpn.core.RawMCLeaksResult;
@@ -16,6 +14,9 @@ import me.egg82.antivpn.storage.StorageException;
 import me.egg82.antivpn.utils.ConfigUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Optional;
+import java.util.Set;
 
 public class ImportCommand implements Runnable {
     private final Logger logger = LoggerFactory.getLogger(getClass());

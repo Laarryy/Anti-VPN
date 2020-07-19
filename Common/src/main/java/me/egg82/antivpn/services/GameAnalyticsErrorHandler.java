@@ -1,9 +1,5 @@
 package me.egg82.antivpn.services;
 
-import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.util.UUID;
 import me.egg82.antivpn.extended.ServiceKeys;
 import ninja.egg82.analytics.GameAnalytics;
 import ninja.egg82.analytics.common.Severity;
@@ -12,6 +8,11 @@ import ninja.egg82.analytics.events.GASessionEnd;
 import ninja.egg82.analytics.events.GASessionStart;
 import ninja.egg82.analytics.events.base.GAEventBase;
 import org.json.simple.parser.ParseException;
+
+import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.util.UUID;
 
 public class GameAnalyticsErrorHandler {
     private static GameAnalytics gameAnalytics = null;

@@ -10,10 +10,6 @@ import com.djrapitops.plan.extension.annotation.NumberProvider;
 import com.djrapitops.plan.extension.annotation.PluginInfo;
 import com.djrapitops.plan.extension.icon.Color;
 import com.djrapitops.plan.extension.icon.Family;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.util.Optional;
-import java.util.UUID;
 import me.egg82.antivpn.APIException;
 import me.egg82.antivpn.VPNAPI;
 import me.egg82.antivpn.enums.VPNAlgorithmMethod;
@@ -28,6 +24,11 @@ import org.bukkit.event.server.PluginEnableEvent;
 import org.bukkit.plugin.Plugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.util.Optional;
+import java.util.UUID;
 
 public class PlayerAnalyticsHook implements PluginHook {
     private final Logger logger = LoggerFactory.getLogger(getClass());

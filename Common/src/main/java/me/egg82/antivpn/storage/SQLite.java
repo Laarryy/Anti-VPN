@@ -3,12 +3,6 @@ package me.egg82.antivpn.storage;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.zaxxer.hikari.HikariConfig;
-import java.io.File;
-import java.io.IOException;
-import java.io.StringReader;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.util.*;
 import me.egg82.antivpn.core.*;
 import me.egg82.antivpn.services.StorageHandler;
 import me.egg82.antivpn.utils.ValidationUtil;
@@ -18,6 +12,13 @@ import ninja.egg82.sql.SQL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sqlite.SQLiteErrorCode;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.StringReader;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.util.*;
 
 public class SQLite extends AbstractSQL {
     private final Logger logger = LoggerFactory.getLogger(getClass());

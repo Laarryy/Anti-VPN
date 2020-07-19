@@ -1,10 +1,6 @@
 package me.egg82.antivpn.events;
 
 import inet.ipaddr.IPAddressString;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.util.List;
-import java.util.Optional;
 import me.egg82.antivpn.APIException;
 import me.egg82.antivpn.enums.VPNAlgorithmMethod;
 import me.egg82.antivpn.extended.CachedConfigValues;
@@ -21,6 +17,11 @@ import net.md_5.bungee.api.event.PreLoginEvent;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.event.EventPriority;
 import ninja.egg82.events.BungeeEvents;
+
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.util.List;
+import java.util.Optional;
 
 public class PlayerEvents extends EventHolder {
     public PlayerEvents(Plugin plugin) {

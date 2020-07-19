@@ -2,14 +2,15 @@ package me.egg82.antivpn.commands.internal;
 
 import co.aikar.commands.CommandIssuer;
 import co.aikar.taskchain.TaskChain;
-import java.util.Map;
-import java.util.Optional;
 import me.egg82.antivpn.APIException;
 import me.egg82.antivpn.VPNAPI;
 import me.egg82.antivpn.enums.Message;
 import me.egg82.antivpn.utils.ConfigUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Map;
+import java.util.Optional;
 
 public class TestCommand implements Runnable {
     private final Logger logger = LoggerFactory.getLogger(getClass());

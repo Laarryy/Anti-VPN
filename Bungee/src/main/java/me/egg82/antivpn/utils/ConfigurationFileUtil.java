@@ -1,10 +1,6 @@
 package me.egg82.antivpn.utils;
 
 import com.google.common.reflect.TypeToken;
-import java.io.*;
-import java.nio.file.Files;
-import java.util.*;
-import java.util.concurrent.TimeUnit;
 import me.egg82.antivpn.VPNAPI;
 import me.egg82.antivpn.apis.SourceAPI;
 import me.egg82.antivpn.enums.VPNAlgorithmMethod;
@@ -32,6 +28,11 @@ import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.DumperOptions;
+
+import java.io.*;
+import java.nio.file.Files;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 public class ConfigurationFileUtil {
     private static final Logger logger = LoggerFactory.getLogger(ConfigurationFileUtil.class);
