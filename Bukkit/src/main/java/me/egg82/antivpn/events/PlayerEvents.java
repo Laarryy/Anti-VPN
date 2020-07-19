@@ -4,6 +4,7 @@ import inet.ipaddr.IPAddressString;
 
 import java.net.InetAddress;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import me.egg82.antivpn.APIException;
@@ -15,7 +16,6 @@ import me.egg82.antivpn.services.AnalyticsHelper;
 import me.egg82.antivpn.utils.ConfigUtil;
 import me.egg82.antivpn.utils.LogUtil;
 import me.egg82.antivpn.utils.ValidationUtil;
-import net.milkbowl.vault.permission.Permission;
 import ninja.egg82.events.BukkitEvents;
 import ninja.egg82.service.ServiceLocator;
 import org.bukkit.Bukkit;
@@ -51,11 +51,13 @@ public class PlayerEvents extends EventHolder {
             return;
         }
         if (manager.getPlugin("Vault") != null) {
-            Permission permission = new VaultHook(Bukkit.getPluginManager().getPlugin("Vault"));
-            boolean hasBypass = permission.playerHas(null, Bukkit.getOfflinePlayer(event.getUniqueId()), "avpn.bypass");
-            boolean vaultEnabled = manager.isPluginEnabled("Vault");
 
-            if (hasBypass && vaultEnabled) {
+        VaultHook vaultHook = new VaultHook();
+        boolean bypasses = vaultHook.permission.playerHas(null, Bukkit.getOfflinePlayer(event.getUniqueId()), "avpn.bypass");
+
+
+
+            if (bypasses) {
                 if (ConfigUtil.getDebugOrFalse()) {
                     logger.info(LogUtil.getHeading() + ChatColor.WHITE + event.getName() + ChatColor.YELLOW + " bypasses AsyncPlayerPreLoginEvent check. Ignoring.");
                 return;
