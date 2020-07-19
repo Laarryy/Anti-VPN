@@ -23,6 +23,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 
 import java.net.InetAddress;
+import java.security.Permission;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -45,6 +46,7 @@ public class PlayerEvents extends EventHolder {
         if (Bukkit.hasWhitelist() && !isWhitelisted(event.getUniqueId())) {
             return;
         }
+
         Optional<VaultHook> vaultHook;
         try {
             vaultHook = ServiceLocator.getOptional(VaultHook.class);
@@ -52,19 +54,18 @@ public class PlayerEvents extends EventHolder {
             logger.error(ex.getMessage(), ex);
             vaultHook = Optional.empty();
         }
-        if (vaultHook.isPresent()) {
+
+        if (vaultHook.isPresent() && (vaultHook.get().getPermission() != null)) {
             boolean bypasses = vaultHook.get().getPermission().playerHas(null, Bukkit.getOfflinePlayer(event.getUniqueId()), "avpn.bypass");
             if (bypasses) {
-                if (ConfigUtil.getDebugOrFalse()) {
-                    logger.info(LogUtil.getHeading() + ChatColor.WHITE + event.getName() + ChatColor.YELLOW + " bypasses check. Ignoring.");
-                }
-                return;
+                   if (ConfigUtil.getDebugOrFalse()) {
+                       logger.info(LogUtil.getHeading() + ChatColor.WHITE + event.getName() + ChatColor.YELLOW + " bypasses check. Ignoring.");
+                   }
+                   return;
             }
-        } else {
-            logger.info(LogUtil.getHeading() + ChatColor.WHITE + event.getName() + ChatColor.YELLOW +
-                    " was not able to be checked using Vault, please install Vault for optimally efficient bypass permission checks! ");
+        } else if (ConfigUtil.getDebugOrFalse()) {
+                logger.info("Vault not installed, skipping pre-check.");
         }
-        logger.debug("No bypass permission according to Vault");
 
         String ip = getIp(event.getAddress());
         if (ip == null || ip.isEmpty()) {
@@ -190,7 +191,7 @@ public class PlayerEvents extends EventHolder {
             if (isVPN) {
                 AnalyticsHelper.incrementBlockedVPNs();
                 if (ConfigUtil.getDebugOrFalse()) {
-                    logger.info(LogUtil.getHeading() + net.md_5.bungee.api.ChatColor.WHITE + event.getPlayer().getName() + net.md_5.bungee.api.ChatColor.DARK_RED + " found using a VPN. Running required actions.");
+                    logger.info(LogUtil.getHeading() + ChatColor.WHITE + event.getPlayer().getName() + ChatColor.DARK_RED + " found using a VPN. Running required actions.");
                 }
                 if (!cachedConfig.get().getVPNActionCommands().isEmpty()) {
                     tryRunCommands(cachedConfig.get().getVPNActionCommands(), event.getPlayer(), ip);
@@ -200,7 +201,7 @@ public class PlayerEvents extends EventHolder {
                 }
             } else {
                 if (ConfigUtil.getDebugOrFalse()) {
-                    logger.info(LogUtil.getHeading() + net.md_5.bungee.api.ChatColor.WHITE + event.getPlayer().getName() + net.md_5.bungee.api.ChatColor.GREEN + " passed VPN check.");
+                    logger.info(LogUtil.getHeading() + ChatColor.WHITE + event.getPlayer().getName() + ChatColor.GREEN + " passed VPN check.");
                 }
             }
         } else {
@@ -304,7 +305,5 @@ public class PlayerEvents extends EventHolder {
         return false;
     }
 
-    private boolean rangeContains(String range, String ip) {
-        return new IPAddressString(range).contains(new IPAddressString(ip));
-    }
+    private boolean rangeContains(String range, String ip) { return new IPAddressString(range).contains(new IPAddressString(ip)); }
 }

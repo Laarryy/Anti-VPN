@@ -1,5 +1,7 @@
 package me.egg82.antivpn.hooks;
 
+import me.egg82.antivpn.utils.ConfigUtil;
+import me.egg82.antivpn.utils.LogUtil;
 import net.milkbowl.vault.permission.Permission;
 import ninja.egg82.events.BukkitEvents;
 import ninja.egg82.service.ServiceLocator;
@@ -11,7 +13,7 @@ import org.bukkit.plugin.RegisteredServiceProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
+import java.util.Optional;
 
 public class VaultHook implements PluginHook {
 
@@ -29,21 +31,18 @@ public class VaultHook implements PluginHook {
         ServiceLocator.register(new VaultHook());
     }
 
-
-
     private VaultHook() {
-        if (Bukkit.getPluginManager().isPluginEnabled("Vault")) {
-            final RegisteredServiceProvider<Permission> permissionProvider =
-                    Bukkit.getServicesManager().getRegistration(Permission.class);
-            if (permissionProvider != null) {
-                logger.debug("Found permissions provider");
-                permission = permissionProvider.getProvider();
-            } else {
-                logger.debug("Vault permissions not detected.");
-                permission = null;
+        final RegisteredServiceProvider<Permission> permissionProvider =
+                Bukkit.getServicesManager().getRegistration(Permission.class);
+        if (permissionProvider != null) {
+            if (ConfigUtil.getDebugOrFalse()) {
+                logger.info(LogUtil.getHeading() + " Found permissions provider");
             }
+            permission = permissionProvider.getProvider();
         } else {
-            logger.debug("Vault was not found.");
+            if (ConfigUtil.getDebugOrFalse()) {
+                logger.info(LogUtil.getHeading() + " Vault permissions not detected.");
+            }
             permission = null;
         }
     }
@@ -51,8 +50,14 @@ public class VaultHook implements PluginHook {
     @Override
     public void cancel() {
     }
+
     public Permission getPermission() {
-        return this.permission;
+        if (permission != null) {
+            return this.permission;
+        } else {
+            if (ConfigUtil.getDebugOrFalse())
+            logger.info(LogUtil.getHeading() + " Permission is null");
+        } return null;
     }
 }
 
