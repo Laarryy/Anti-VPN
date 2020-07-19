@@ -28,7 +28,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 public class PlayerEvents extends EventHolder {
-    PluginManager manager = Bukkit.getPluginManager();
 
     public PlayerEvents(Plugin plugin) {
         events.add(
@@ -69,7 +68,6 @@ public class PlayerEvents extends EventHolder {
 
         String ip = getIp(event.getAddress());
         if (ip == null || ip.isEmpty()) {
-
             return;
         }
 
