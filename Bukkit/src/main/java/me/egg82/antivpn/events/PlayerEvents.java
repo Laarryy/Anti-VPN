@@ -68,7 +68,7 @@ public class PlayerEvents extends EventHolder {
             logger.info(LogUtil.getHeading() + ChatColor.WHITE + event.getName() + ChatColor.YELLOW +
                     " was not able to be checked using Vault, please install Vault for optimally efficient bypass permission checks! ");
         }
-        logger.info("Failed Vault Perms Check");
+        logger.debug("No bypass permission according to Vault");
 
         String ip = getIp(event.getAddress());
         if (ip == null || ip.isEmpty()) {
