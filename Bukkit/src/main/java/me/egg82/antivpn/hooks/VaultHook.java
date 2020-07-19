@@ -4,8 +4,6 @@ import net.milkbowl.vault.permission.Permission;
 import ninja.egg82.events.BukkitEvents;
 import ninja.egg82.service.ServiceLocator;
 import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.World;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.server.PluginEnableEvent;
 import org.bukkit.plugin.Plugin;
@@ -20,7 +18,7 @@ public class VaultHook implements PluginHook {
     public final Logger logger = LoggerFactory.getLogger(getClass());
     public Permission permission;
 
-    public static void create(Plugin plugin, Plugin vault) {
+    private static void create(Plugin plugin, Plugin vault) {
         if (vault != null && !vault.isEnabled()) {
             BukkitEvents.subscribe(plugin, PluginEnableEvent.class, EventPriority.MONITOR)
                     .expireIf(e -> e.getPlugin().getName().equals("Vault"))
@@ -34,18 +32,18 @@ public class VaultHook implements PluginHook {
 
 
     public VaultHook() {
-        if (Bukkit.getPluginManager().getPlugin("Vault") != null || Bukkit.getPluginManager().isPluginEnabled("Vault")) {
+        if (Bukkit.getPluginManager().isPluginEnabled("Vault")) {
             final RegisteredServiceProvider<Permission> permissionProvider =
                     Bukkit.getServicesManager().getRegistration(Permission.class);
             if (permissionProvider != null) {
-                logger.info("Found Permissions Provider");
+                logger.debug("Found permissions provider");
                 permission = permissionProvider.getProvider();
             } else {
-                logger.info("Vault permissions not detected.");
+                logger.debug("Vault permissions not detected.");
                 permission = null;
             }
         } else {
-            logger.info("Vault was not found.");
+            logger.debug("Vault was not found.");
             permission = null;
         }
     }

@@ -55,11 +55,9 @@ public class PlayerEvents extends EventHolder {
         VaultHook vaultHook = new VaultHook();
         boolean bypasses = vaultHook.permission.playerHas(null, Bukkit.getOfflinePlayer(event.getUniqueId()), "avpn.bypass");
 
-
-
             if (bypasses) {
                 if (ConfigUtil.getDebugOrFalse()) {
-                    logger.info(LogUtil.getHeading() + ChatColor.WHITE + event.getName() + ChatColor.YELLOW + " bypasses AsyncPlayerPreLoginEvent check. Ignoring.");
+                    logger.info(LogUtil.getHeading() + ChatColor.WHITE + event.getName() + ChatColor.YELLOW + " bypasses check. Ignoring.");
                 return;
                 }
                 return;
@@ -147,7 +145,7 @@ public class PlayerEvents extends EventHolder {
         }
         if (event.getPlayer().hasPermission("avpn.bypass")) {
             if (ConfigUtil.getDebugOrFalse()) {
-                logger.info(LogUtil.getHeading() + ChatColor.WHITE + event.getPlayer().getName() + ChatColor.YELLOW + " bypasses check. Ignoring.");
+                logger.info(LogUtil.getHeading() + ChatColor.WHITE + event.getPlayer().getName() + ChatColor.YELLOW + " bypasses actions. Ignoring.");
             }
             return;
         }
