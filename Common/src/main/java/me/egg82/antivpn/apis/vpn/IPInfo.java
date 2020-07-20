@@ -48,19 +48,12 @@ public class IPInfo extends AbstractSourceAPI {
             throw new APIException(false, "Could not get result from " + getName());
         }
 
-        Boolean vpnStatus = (Boolean) json.get("vpn");
-        Boolean proxyStatus = (Boolean) json.get("proxy");
-
-        String proxy = sourceConfigNode.getNode("proxy").getString();
-        if (proxy == null || proxy.isEmpty()) {
-            throw new APIException(true, "proxy setting is invalid");
-        }
         // if proxy config setting is true and "proxy" is true, tor || vpn will also be true.
         if (sourceConfigNode.getNode("proxy").getBoolean() && json.get("proxy") != null) {
-            if (proxyStatus) {
+            if ((Boolean) json.get("proxy")) {
                 return true;
-            } else return vpnStatus;
+            }
         }
-        return vpnStatus;
+        return json.get("vpn") != null && (Boolean) json.get("vpn");
     }
 }

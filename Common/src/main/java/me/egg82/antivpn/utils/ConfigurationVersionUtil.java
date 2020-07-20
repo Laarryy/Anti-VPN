@@ -592,9 +592,9 @@ public class ConfigurationVersionUtil {
     }
     private static void to414(ConfigurationNode config) {
         // Add ipinfo
-        config.getNode("sources", "ipinfo", "enabled").setValue(Boolean.TRUE);
+        config.getNode("sources", "ipinfo", "enabled").setValue(Boolean.FALSE);
         config.getNode("sources", "ipinfo", "key").setValue("");
-        config.getNode("sources", "ipinfo", "proxy").setValue(Boolean.FALSE);
+        config.getNode("sources", "ipinfo", "proxy").setValue(Boolean.TRUE);
 
         List<String> sources;
         try {

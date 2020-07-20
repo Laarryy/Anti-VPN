@@ -24,6 +24,7 @@ public class GetIPIntel extends AbstractSourceAPI {
         threadPool.scheduleAtFixedRate(() -> hourlyRequests.set(0), 0L, 24L, TimeUnit.HOURS);
         threadPool.scheduleAtFixedRate(() -> minuteRequests.set(0), 0L, 1L, TimeUnit.MINUTES);
     }
+
     public String getName() { return "getipintel"; }
 
     public boolean isKeyRequired() { return false; }

@@ -301,6 +301,7 @@ public class AntiVPN {
         } else {
             consoleCommandIssuer.sendInfo(Message.GENERAL__HOOK_DISABLE, "{plugin}", "PlaceholderAPI");
         }
+        
         Plugin vault;
         if ((vault = manager.getPlugin("Vault")) != null) {
             consoleCommandIssuer.sendInfo(Message.GENERAL__HOOK_ENABLE, "{plugin}", "Vault");

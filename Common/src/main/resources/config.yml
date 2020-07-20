@@ -116,7 +116,6 @@ sources:
 
   # The order to try results in
   order:
-  - 'ipinfo'
   - 'proxycheck'
   - 'iptrooper'
   - 'getipintel'
@@ -128,6 +127,7 @@ sources:
   - 'shodan'
   - 'teoh'
   - 'ipwarner'
+  - 'ipinfo'
 
   # https://proxycheck.io
   # Results updated Jan 19, 2020
@@ -187,10 +187,10 @@ sources:
   # https://ipinfo.io/
   ipinfo:
     enabled: false
-    # Requires paid token/key. Available at https://ipinfo.io/signup
+    # API key to use (Required for this service, free one available at https://ipinfo.io/signup using the "free trial" option under "Privacy Detection API")
     key: ''
-      # Whether or not to detect proxies as VPNs
-    proxy: false
+    # Whether or not to detect proxies as VPNs
+    proxy: true
 
   # https://iphub.info/
   # Results updated Jan 19, 2020

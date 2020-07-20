@@ -55,16 +55,17 @@ public class PlayerEvents extends EventHolder {
 
         if (
                 vaultHook.isPresent()
-                && (vaultHook.get().getPermission() != null)
-                && (vaultHook.get().getPermission().playerHas(null, Bukkit.getOfflinePlayer(event.getUniqueId()), "avpn.bypass"))
+                && vaultHook.get().getPermission() != null
         ) {
-            if (ConfigUtil.getDebugOrFalse()) {
-                logger.info(LogUtil.getHeading() + ChatColor.WHITE + event.getName() + ChatColor.YELLOW + " bypasses check. Ignoring.");
+            if (vaultHook.get().getPermission().playerHas(null, Bukkit.getOfflinePlayer(event.getUniqueId()), "avpn.bypass")) {
+                if (ConfigUtil.getDebugOrFalse()) {
+                    logger.info(LogUtil.getHeading() + ChatColor.WHITE + event.getName() + ChatColor.YELLOW + " bypasses pre-check. Ignoring.");
+                }
+                return;
             }
-            return;
         } else {
             if (ConfigUtil.getDebugOrFalse()) {
-                logger.info("Vault not installed, skipping pre-check.");
+                logger.info(LogUtil.getHeading() + ChatColor.YELLOW + "Vault not installed, skipping pre-check.");
             }
         }
 
@@ -81,7 +82,7 @@ public class PlayerEvents extends EventHolder {
         for (String testAddress : cachedConfig.get().getIgnoredIps()) {
             if (
                     ValidationUtil.isValidIp(testAddress) && ip.equalsIgnoreCase(testAddress)
-                            || ValidationUtil.isValidIPRange(testAddress) && rangeContains(testAddress, ip)
+                    || ValidationUtil.isValidIPRange(testAddress) && rangeContains(testAddress, ip)
             ) {
                 return;
             }
