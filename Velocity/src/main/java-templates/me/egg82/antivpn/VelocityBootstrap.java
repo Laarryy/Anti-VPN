@@ -36,8 +36,7 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-<<<<<<< HEAD:Velocity/src/main/java/me/egg82/antivpn/VelocityBootstrap.java
-=======
+
 import javax.inject.Inject;
 import javax.xml.xpath.XPathExpressionException;
 import me.egg82.antivpn.utils.LogUtil;
@@ -54,7 +53,6 @@ import ninja.egg82.utils.InjectUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
->>>>>>> 327d9a0795bb1a85e832e6362b90899539167888:Velocity/src/main/java-templates/me/egg82/antivpn/VelocityBootstrap.java
 
 @Plugin(
         id = "antivpn",
