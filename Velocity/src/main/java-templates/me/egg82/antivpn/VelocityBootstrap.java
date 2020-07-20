@@ -42,6 +42,7 @@ import javax.xml.xpath.XPathExpressionException;
 import me.egg82.antivpn.utils.LogUtil;
 import me.lucko.jarrelocator.JarRelocator;
 import me.lucko.jarrelocator.Relocation;
+import me.egg82.antivpn.utils.VelocityFakeClassLoader;
 import net.kyori.text.TextComponent;
 import net.kyori.text.format.TextColor;
 import ninja.egg82.maven.Artifact;
@@ -78,7 +79,10 @@ public class VelocityBootstrap {
     public VelocityBootstrap(ProxyServer proxy, PluginDescription description) {
         this.proxy = proxy;
         this.description = description;
+    }
 
+    @Subscribe(order = PostOrder.FIRST)
+    public void onEarlyInit(ProxyInitializeEvent event) {
         if (!description.getSource().isPresent()) {
             throw new RuntimeException("Could not get plugin file path.");
         }
@@ -86,7 +90,7 @@ public class VelocityBootstrap {
             throw new RuntimeException("Could not get plugin name.");
         }
 
-        proxiedClassLoader = new ProxiedURLClassLoader(getClass().getClassLoader(), new String[] { "org\\.slf4j\\..*", "com\\.mysql\\.jdbc\\..*" });
+        proxiedClassLoader = new VelocityFakeClassLoader(proxy, this);
 
         try {
             loadJars(new File(new File(description.getSource().get().getParent().toFile(), description.getName().get()), "external"), proxiedClassLoader, (URLClassLoader) getClass().getClassLoader());
