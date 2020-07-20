@@ -37,7 +37,6 @@ public class IPInfo extends AbstractSourceAPI {
         JSONObject json;
         try {
             json = JSONWebUtil.getJSONObject(new URL("https://ipinfo.io/" + ip + "/privacy?token=" + key), "GET", (int) getCachedConfig().getTimeout());
-            logger.info(String.valueOf(json));
         } catch (IOException | ParseException | ClassCastException ex) {
             throw new APIException(false, "Could not get result from " + getName());
         }

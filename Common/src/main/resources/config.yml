@@ -125,9 +125,9 @@ sources:
   - 'vpnblocker'
   - 'ip2proxy'
   - 'shodan'
+  - 'ipinfo'
   - 'teoh'
   - 'ipwarner'
-  - 'ipinfo'
 
   # https://proxycheck.io
   # Results updated Jan 19, 2020
@@ -183,14 +183,6 @@ sources:
     recent-abuse: false
     # Threshold above which an IP is considered "bad"
     threshold: 0.98
-
-  # https://ipinfo.io/
-  ipinfo:
-    enabled: false
-    # API key to use (Required for this service, free one available at https://ipinfo.io/signup using the "free trial" option under "Privacy Detection API")
-    key: ''
-    # Whether or not to detect proxies as VPNs
-    proxy: true
 
   # https://iphub.info/
   # Results updated Jan 19, 2020
@@ -251,6 +243,19 @@ sources:
     enabled: false
     # API key to use (Required for this service)
     key: ''
+
+  # https://ipinfo.io/
+  # Results updated Jul 20, 2020
+  # Error rate:                    0.00%
+  # NordVPN detection rate:       84.00%
+  # Cryptostorm detection rate:    0.00%
+  # False-flagged homes:           0.00%
+  ipinfo:
+    enabled: false
+    # API key to use (Required for this service, free one available at https://ipinfo.io/signup using the "free trial" option under "Privacy Detection API")
+    key: ''
+    # Whether or not to detect proxies as VPNs
+    proxy: true
 
   # https://ip.teoh.io/vpn-detection
   # NOTE: This info is old
