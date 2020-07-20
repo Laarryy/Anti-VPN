@@ -217,7 +217,7 @@ public class BukkitBootstrap extends JavaPlugin {
 
         Artifact.Builder caffeine = Artifact.builder("com.github.ben-manes.caffeine", "caffeine", "${caffeine.version}", cacheDir)
                 .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
-        buildRelocateInject(caffeine, jarsDir, Collections.singletonList(new Relocation(getCaffeinePackage(), "me.egg82.ae.external." + getCaffeinePackage())), parentLoader, "Caffeine");
+        buildRelocateInject(caffeine, jarsDir, Collections.singletonList(new Relocation(getCaffeinePackage(), "me.egg82.antivpn.external." + getCaffeinePackage())), parentLoader, "Caffeine");
 
         Artifact.Builder amqpClient = Artifact.builder("com.rabbitmq", "amqp-client", "${rabbitmq.version}", cacheDir)
                 .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
