@@ -3,8 +3,10 @@ package me.egg82.antivpn.utils;
 import com.velocitypowered.api.proxy.ProxyServer;
 import me.egg82.antivpn.VelocityBootstrap;
 
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class VelocityFakeClassLoader extends URLClassLoader {
@@ -19,6 +21,12 @@ public class VelocityFakeClassLoader extends URLClassLoader {
 
     @Override
     protected void addURL(URL url) {
-        server.getPluginManager().addToClasspath(plugin, Paths.get(url.getPath()));
+        Path path;
+        try {
+            path = Paths.get(url.toURI());
+        } catch (URISyntaxException e) {
+            throw new RuntimeException("Unable to add URL to plugin classloader", e);
+        }
+        server.getPluginManager().addToClasspath(plugin, path);
     }
 }
