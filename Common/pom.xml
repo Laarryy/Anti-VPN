@@ -10,11 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>antivpn-common</artifactId>
-<<<<<<< HEAD
-    <version>5.12.38</version>
-=======
     <version>${plugin.version}</version>
->>>>>>> 327d9a0795bb1a85e832e6362b90899539167888
 
     <build>
         <resources>

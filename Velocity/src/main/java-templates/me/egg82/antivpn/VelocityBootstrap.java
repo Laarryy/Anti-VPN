@@ -59,11 +59,7 @@ import org.xml.sax.SAXException;
 @Plugin(
         id = "antivpn",
         name = "AntiVPN",
-<<<<<<< HEAD:Velocity/src/main/java/me/egg82/antivpn/VelocityBootstrap.java
-        version = "5.12.38",
-=======
         version = "${plugin.version}",
->>>>>>> 327d9a0795bb1a85e832e6362b90899539167888:Velocity/src/main/java-templates/me/egg82/antivpn/VelocityBootstrap.java
         authors = "egg82",
         description = "Get the best; save money on overpriced plugins and block VPN users!",
         dependencies = @Dependency(id = "plan", optional = true)
