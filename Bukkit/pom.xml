@@ -10,9 +10,16 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>antivpn-bukkit</artifactId>
-    <version>5.11.37</version>
+    <version>${plugin.version}</version>
 
     <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+
         <sourceDirectory>src/main/java</sourceDirectory>
 
         <plugins>
@@ -26,11 +33,36 @@
             </plugin>
 
             <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>templating-maven-plugin</artifactId>
+                <version>1.0.0</version>
+                <executions>
+                    <execution>
+                        <id>filter-src</id>
+                        <goals>
+                            <goal>filter-sources</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <outputDirectory>${project.build.directory}/maven-templates</outputDirectory>
+                </configuration>
+            </plugin>
+
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
                 <version>3.2.1</version>
                 <configuration>
                     <relocations>
+                        <relocation>
+                            <pattern>com.github.benmanes.caffeine</pattern>
+                            <shadedPattern>me.egg82.antivpn.external.com.github.benmanes.caffeine</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>me.lucko.jarrelocator</pattern>
+                            <shadedPattern>me.egg82.antivpn.external.me.lucko.jarrelocator</shadedPattern>
+                        </relocation>
                         <relocation>
                             <pattern>org.bstats</pattern>
                             <shadedPattern>me.egg82.antivpn.external.org.bstats</shadedPattern>
@@ -133,89 +165,29 @@
 
     <repositories>
         <repository>
-            <id>egg82-ninja-proxy</id>
-            <url>https://nexus.egg82.me/repository/egg82/</url>
-        </repository>
-        <repository>
-            <id>egg82-ninja</id>
-            <url>https://www.myget.org/F/egg82-java/maven/</url>
-        </repository>
-
-        <repository>
-            <id>papermc-proxy</id>
-            <url>https://nexus.egg82.me/repository/papermc/</url>
-        </repository>
-        <repository>
             <id>papermc</id>
             <url>https://papermc.io/repo/repository/maven-public/</url>
         </repository>
-
         <!--<repository>
-            <id>spigot-repo-proxy</id>
-            <url>https://nexus.egg82.me/repository/spigot/</url>
-        </repository>
-        <repository>
             <id>spigot-repo</id>
             <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
         </repository>-->
 
         <repository>
-            <id>aikar-proxy</id>
-            <url>https://nexus.egg82.me/repository/aikar/</url>
-        </repository>
-        <repository>
-            <id>aikar</id>
-            <url>https://repo.aikar.co/content/groups/aikar/</url>
-        </repository>
-
-        <repository>
-            <id>sponge-proxy</id>
-            <url>https://nexus.egg82.me/repository/sponge/</url>
-        </repository>
-        <repository>
-            <id>sponge</id>
-            <url>https://repo.spongepowered.org/maven/</url>
-        </repository>
-
-        <repository>
-            <id>github-rjenkinsjr-proxy</id>
-            <url>https://nexus.egg82.me/repository/rjenkinsjr/</url>
-        </repository>
-        <repository>
             <id>github-rjenkinsjr</id>
             <url>https://raw.github.com/rjenkinsjr/maven2/repo</url>
-        </repository>
-
-        <repository>
-            <id>plan-proxy</id>
-            <url>https://nexus.egg82.me/repository/plan/</url>
         </repository>
         <repository>
             <id>plan</id>
             <url>https://dl.bintray.com/rsl1122/Plan-repository</url>
         </repository>
-
-        <repository>
-            <id>codemc-proxy</id>
-            <url>https://nexus.egg82.me/repository/codemc/</url>
-        </repository>
         <repository>
             <id>CodeMC</id>
             <url>https://repo.codemc.org/repository/maven-public</url>
         </repository>
-
-        <repository>
-            <id>placeholderapi-proxy</id>
-            <url>https://nexus.egg82.me/repository/placeholderapi/</url>
-        </repository>
         <repository>
             <id>placeholderapi</id>
             <url>http://repo.extendedclip.com/content/repositories/placeholderapi/</url>
-        </repository>
-
-        <repository>
-            <id>maven-central-proxy</id>
-            <url>https://nexus.egg82.me/repository/maven-central/</url>
         </repository>
     </repositories>
 
@@ -223,97 +195,81 @@
         <!--<dependency>
             <groupId>org.bukkit</groupId>
             <artifactId>bukkit</artifactId>
-            <version>1.8-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>-->
         <dependency>
             <groupId>com.destroystokyo.paper</groupId>
             <artifactId>paper-api</artifactId>
-            <version>1.15.1-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>co.aikar</groupId>
             <artifactId>taskchain-bukkit</artifactId>
-            <version>3.7.2</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>co.aikar</groupId>
             <artifactId>acf-paper</artifactId>
-            <version>0.5.0-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>ninja.egg82</groupId>
             <artifactId>event-chain-bukkit</artifactId>
-            <version>1.0.9</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.spongepowered</groupId>
             <artifactId>configurate-yaml</artifactId>
-            <version>3.6.1</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>ninja.egg82</groupId>
             <artifactId>spigot-updater</artifactId>
-            <version>1.0.4</version>
             <scope>provided</scope>
         </dependency>
+
         <dependency>
             <groupId>ninja.egg82</groupId>
             <artifactId>service-locator</artifactId>
-            <version>1.0.1</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>ninja.egg82</groupId>
             <artifactId>dep-downloader</artifactId>
-            <version>2.2.15</version>
+        </dependency>
+        <dependency>
+            <groupId>me.lucko</groupId>
+            <artifactId>jar-relocator</artifactId>
         </dependency>
         <dependency>
             <groupId>ninja.egg82</groupId>
             <artifactId>reflection-utils</artifactId>
-            <version>1.0.4</version>
-        </dependency>
-
-        <dependency>
-            <groupId>info.ronjenkins</groupId>
-            <artifactId>slf4bukkit</artifactId>
-            <version>1.0.0</version>
         </dependency>
 
         <dependency>
             <groupId>org.bstats</groupId>
             <artifactId>bstats-bukkit</artifactId>
-            <version>1.7</version>
         </dependency>
         <dependency>
             <groupId>com.djrapitops</groupId>
             <artifactId>Plan-api</artifactId>
-            <version>5.0-R0.3</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>me.clip</groupId>
             <artifactId>placeholderapi</artifactId>
-            <version>2.10.4</version>
             <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>me.egg82</groupId>
             <artifactId>antivpn-common</artifactId>
-            <version>5.11.37</version>
         </dependency>
 
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
-            <version>5.6.0-M1</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
