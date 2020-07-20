@@ -53,14 +53,15 @@ public class PlayerEvents extends EventHolder {
             vaultHook = Optional.empty();
         }
 
-        if (vaultHook.isPresent() && (vaultHook.get().getPermission() != null)) {
-            boolean bypasses = vaultHook.get().getPermission().playerHas(null, Bukkit.getOfflinePlayer(event.getUniqueId()), "avpn.bypass");
-            if (bypasses) {
-                   if (ConfigUtil.getDebugOrFalse()) {
-                       logger.info(LogUtil.getHeading() + ChatColor.WHITE + event.getName() + ChatColor.YELLOW + " bypasses check. Ignoring.");
-                   }
-                   return;
+        if (
+                vaultHook.isPresent()
+                && (vaultHook.get().getPermission() != null)
+                && (vaultHook.get().getPermission().playerHas(null, Bukkit.getOfflinePlayer(event.getUniqueId()), "avpn.bypass"))
+        ) {
+            if (ConfigUtil.getDebugOrFalse()) {
+                logger.info(LogUtil.getHeading() + ChatColor.WHITE + event.getName() + ChatColor.YELLOW + " bypasses check. Ignoring.");
             }
+            return;
         } else {
             if (ConfigUtil.getDebugOrFalse()) {
                 logger.info("Vault not installed, skipping pre-check.");
