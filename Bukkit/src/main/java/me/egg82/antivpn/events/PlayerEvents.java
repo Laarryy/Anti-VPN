@@ -20,10 +20,8 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.PluginManager;
 
 import java.net.InetAddress;
-import java.security.Permission;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -63,8 +61,10 @@ public class PlayerEvents extends EventHolder {
                    }
                    return;
             }
-        } else if (ConfigUtil.getDebugOrFalse()) {
+        } else {
+            if (ConfigUtil.getDebugOrFalse()) {
                 logger.info("Vault not installed, skipping pre-check.");
+            }
         }
 
         String ip = getIp(event.getAddress());
@@ -123,7 +123,6 @@ public class PlayerEvents extends EventHolder {
         }
     }
 
-
     private void checkPlayer(PlayerLoginEvent event) {
         if (Bukkit.hasWhitelist() && !event.getPlayer().isWhitelisted()) {
             if (ConfigUtil.getDebugOrFalse()) {
@@ -141,12 +140,14 @@ public class PlayerEvents extends EventHolder {
         if (!cachedConfig.isPresent()) {
             return;
         }
+
         if (event.getPlayer().hasPermission("avpn.bypass")) {
             if (ConfigUtil.getDebugOrFalse()) {
                 logger.info(LogUtil.getHeading() + ChatColor.WHITE + event.getPlayer().getName() + ChatColor.YELLOW + " bypasses actions. Ignoring.");
             }
             return;
         }
+
         for (String testAddress : cachedConfig.get().getIgnoredIps()) {
             if (ValidationUtil.isValidIp(testAddress) && ip.equalsIgnoreCase(testAddress)) {
                 if (ConfigUtil.getDebugOrFalse()) {
@@ -206,7 +207,7 @@ public class PlayerEvents extends EventHolder {
             }
         } else {
             if (ConfigUtil.getDebugOrFalse()) {
-                logger.info(LogUtil.getHeading() + net.md_5.bungee.api.ChatColor.YELLOW + "VPN set to API-only. Ignoring VPN check for " + net.md_5.bungee.api.ChatColor.WHITE + event.getPlayer().getName());
+                logger.info(LogUtil.getHeading() + ChatColor.YELLOW + "VPN set to API-only. Ignoring VPN check for " + ChatColor.WHITE + event.getPlayer().getName());
             }
         }
 
@@ -227,7 +228,7 @@ public class PlayerEvents extends EventHolder {
             if (isMCLeaks) {
                 AnalyticsHelper.incrementBlockedMCLeaks();
                 if (ConfigUtil.getDebugOrFalse()) {
-                    logger.info(LogUtil.getHeading() + net.md_5.bungee.api.ChatColor.WHITE + event.getPlayer().getName() + net.md_5.bungee.api.ChatColor.DARK_RED + " found using an MCLeaks account. Running required actions.");
+                    logger.info(LogUtil.getHeading() + ChatColor.WHITE + event.getPlayer().getName() + ChatColor.DARK_RED + " found using an MCLeaks account. Running required actions.");
                 }
                 if (!cachedConfig.get().getMCLeaksActionCommands().isEmpty()) {
                     tryRunCommands(cachedConfig.get().getMCLeaksActionCommands(), event.getPlayer(), ip);
@@ -237,12 +238,12 @@ public class PlayerEvents extends EventHolder {
                 }
             } else {
                 if (ConfigUtil.getDebugOrFalse()) {
-                    logger.info(LogUtil.getHeading() + net.md_5.bungee.api.ChatColor.WHITE + event.getPlayer().getName() + net.md_5.bungee.api.ChatColor.GREEN + " passed MCLeaks check.");
+                    logger.info(LogUtil.getHeading() + ChatColor.WHITE + event.getPlayer().getName() + ChatColor.GREEN + " passed MCLeaks check.");
                 }
             }
         } else {
             if (ConfigUtil.getDebugOrFalse()) {
-                logger.info(LogUtil.getHeading() + net.md_5.bungee.api.ChatColor.YELLOW + "MCLeaks set to API-only. Ignoring MCLeaks check for " + net.md_5.bungee.api.ChatColor.WHITE + event.getPlayer().getName());
+                logger.info(LogUtil.getHeading() + ChatColor.YELLOW + "MCLeaks set to API-only. Ignoring MCLeaks check for " + ChatColor.WHITE + event.getPlayer().getName());
             }
         }
     }

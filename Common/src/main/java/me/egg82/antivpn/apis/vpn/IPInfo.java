@@ -15,13 +15,9 @@ import java.net.URL;
 public class IPInfo extends AbstractSourceAPI {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    public String getName() {
-        return "ipinfo";
-    }
+    public String getName() { return "ipinfo"; }
 
-    public boolean isKeyRequired() {
-        return true;
-    }
+    public boolean isKeyRequired() { return true; }
 
     public boolean getResult(String ip) throws APIException {
         if (ip == null) {
@@ -53,11 +49,10 @@ public class IPInfo extends AbstractSourceAPI {
 
         Boolean vpnStatus = (Boolean) json.get("vpn");
         Boolean proxyStatus = (Boolean) json.get("proxy");
-        Boolean torStatus = (Boolean) json.get("tor");
 
         String proxy = sourceConfigNode.getNode("proxy").getString();
         if (proxy == null || proxy.isEmpty()) {
-            throw new IllegalArgumentException("proxy setting is invalid");
+            throw new APIException(true, "proxy setting is invalid");
         }
         // if proxy config setting is true and "proxy" is true, tor || vpn will also be true.
         if (sourceConfigNode.getNode("proxy").getBoolean() && json.get("proxy") != null) {

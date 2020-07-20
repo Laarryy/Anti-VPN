@@ -157,13 +157,10 @@ sources:
   # False-flagged homes:            0.00%
   getipintel:
     enabled: true
-    # Custom subdomain for paid plans
-    subdomain: ''
     # Contact e-mail in case things go wrong. Required
     contact: 'admin@yoursite.com'
     # Threshold above which an IP is considered "bad"
     threshold: 0.98
-
 
   # https://www.ipqualityscore.com/
   # Results updated Feb 9, 2020
@@ -194,7 +191,6 @@ sources:
     key: ''
       # Whether or not to detect proxies as VPNs
     proxy: false
-
 
   # https://iphub.info/
   # Results updated Jan 19, 2020

@@ -41,8 +41,6 @@
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
                             </transformers>
-                            <relocations>
-                            </relocations>
                         </configuration>
                     </execution>
                 </executions>
@@ -180,12 +178,6 @@
             <artifactId>junit-jupiter-api</artifactId>
             <version>5.6.0-M1</version>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.ipinfo</groupId>
-            <artifactId>ipinfo-api</artifactId>
-            <version>1.0</version>
-            <scope>compile</scope>
         </dependency>
     </dependencies>
 </project>

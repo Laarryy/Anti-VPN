@@ -15,8 +15,8 @@ import org.slf4j.LoggerFactory;
 
 public class VaultHook implements PluginHook {
 
-    public final Logger logger = LoggerFactory.getLogger(getClass());
-    public Permission permission;
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private Permission permission;
 
     public static void create(Plugin plugin, Plugin vault) {
         if (vault != null && !vault.isEnabled()) {
@@ -48,16 +48,12 @@ public class VaultHook implements PluginHook {
     @Override
     public void cancel() {
     }
-
+    /* can return null */
     public Permission getPermission() {
-        if (permission != null) {
+            if (permission == null && ConfigUtil.getDebugOrFalse()) {
+                logger.info(LogUtil.getHeading() + " Permission is null");
+            }
             return this.permission;
-        } else {
-            if (ConfigUtil.getDebugOrFalse())
-            logger.info(LogUtil.getHeading() + " Permission is null");
-        } return null;
+        }
     }
-}
-
-
 
