@@ -21,8 +21,8 @@
         <servicelocator.version>1.0.2</servicelocator.version>
         <configurate.version>3.6.1</configurate.version>
         <abstractconfiguration.version>1.0.3</abstractconfiguration.version>
-        <easysql.version>1.3.5</easysql.version>
-        <jsonweb.version>2.1.6</jsonweb.version>
+        <easysql.version>1.3.6</easysql.version>
+        <jsonweb.version>2.1.7</jsonweb.version>
         <sqlite.version>LATEST</sqlite.version>
         <mysql.version>LATEST</mysql.version>
         <jedis.version>3.2.0</jedis.version>
