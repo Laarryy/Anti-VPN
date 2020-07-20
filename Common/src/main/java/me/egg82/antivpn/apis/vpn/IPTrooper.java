@@ -1,12 +1,13 @@
 package me.egg82.antivpn.apis.vpn;
 
-import java.io.IOException;
-import java.net.URL;
 import me.egg82.antivpn.APIException;
 import me.egg82.antivpn.utils.ValidationUtil;
 import ninja.egg82.json.JSONWebUtil;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
+
+import java.io.IOException;
+import java.net.URL;
 
 public class IPTrooper extends AbstractSourceAPI {
     public String getName() { return "iptrooper"; }

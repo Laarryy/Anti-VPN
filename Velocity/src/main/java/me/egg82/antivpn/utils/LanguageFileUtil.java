@@ -1,14 +1,15 @@
 package me.egg82.antivpn.utils;
 
 import com.velocitypowered.api.plugin.PluginDescription;
-import java.io.*;
-import java.nio.file.Files;
-import java.util.Locale;
-import java.util.Optional;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
 import ninja.leaping.configurate.yaml.YAMLConfigurationLoader;
 import org.yaml.snakeyaml.DumperOptions;
+
+import java.io.*;
+import java.nio.file.Files;
+import java.util.Locale;
+import java.util.Optional;
 
 public class LanguageFileUtil {
     private LanguageFileUtil() {}

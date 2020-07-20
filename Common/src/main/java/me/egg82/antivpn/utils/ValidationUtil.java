@@ -2,6 +2,7 @@ package me.egg82.antivpn.utils;
 
 import inet.ipaddr.AddressStringException;
 import inet.ipaddr.IPAddressString;
+
 import java.util.regex.Pattern;
 
 public class ValidationUtil {

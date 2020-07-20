@@ -1,11 +1,6 @@
 package me.egg82.antivpn.messaging;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 import me.egg82.antivpn.services.MessagingHandler;
 import me.egg82.antivpn.utils.ValidationUtil;
 import ninja.egg82.analytics.utils.JSONUtil;
@@ -18,6 +13,12 @@ import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 import redis.clients.jedis.JedisPubSub;
 import redis.clients.jedis.exceptions.JedisException;
+
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class Redis extends JedisPubSub implements Messaging {
     private final Logger logger = LoggerFactory.getLogger(getClass());

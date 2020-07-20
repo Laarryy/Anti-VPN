@@ -1,14 +1,11 @@
 package me.egg82.antivpn.events;
 
 import inet.ipaddr.IPAddressString;
-import java.net.InetAddress;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 import me.egg82.antivpn.APIException;
 import me.egg82.antivpn.enums.VPNAlgorithmMethod;
 import me.egg82.antivpn.extended.CachedConfigValues;
 import me.egg82.antivpn.hooks.PlaceholderAPIHook;
+import me.egg82.antivpn.hooks.VaultHook;
 import me.egg82.antivpn.services.AnalyticsHelper;
 import me.egg82.antivpn.utils.ConfigUtil;
 import me.egg82.antivpn.utils.LogUtil;
@@ -24,7 +21,13 @@ import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.plugin.Plugin;
 
+import java.net.InetAddress;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
 public class PlayerEvents extends EventHolder {
+
     public PlayerEvents(Plugin plugin) {
         events.add(
                 BukkitEvents.subscribe(plugin, AsyncPlayerPreLoginEvent.class, EventPriority.HIGH)
@@ -40,6 +43,30 @@ public class PlayerEvents extends EventHolder {
     private void cachePlayer(AsyncPlayerPreLoginEvent event) {
         if (Bukkit.hasWhitelist() && !isWhitelisted(event.getUniqueId())) {
             return;
+        }
+
+        Optional<VaultHook> vaultHook;
+        try {
+            vaultHook = ServiceLocator.getOptional(VaultHook.class);
+        } catch (InstantiationException | IllegalAccessException ex) {
+            logger.error(ex.getMessage(), ex);
+            vaultHook = Optional.empty();
+        }
+
+        if (
+                vaultHook.isPresent()
+                && vaultHook.get().getPermission() != null
+        ) {
+            if (vaultHook.get().getPermission().playerHas(null, Bukkit.getOfflinePlayer(event.getUniqueId()), "avpn.bypass")) {
+                if (ConfigUtil.getDebugOrFalse()) {
+                    logger.info(LogUtil.getHeading() + ChatColor.WHITE + event.getName() + ChatColor.YELLOW + " bypasses pre-check. Ignoring.");
+                }
+                return;
+            }
+        } else {
+            if (ConfigUtil.getDebugOrFalse()) {
+                logger.info(LogUtil.getHeading() + ChatColor.YELLOW + "Vault not installed, skipping pre-check.");
+            }
         }
 
         String ip = getIp(event.getAddress());
@@ -118,7 +145,7 @@ public class PlayerEvents extends EventHolder {
 
         if (event.getPlayer().hasPermission("avpn.bypass")) {
             if (ConfigUtil.getDebugOrFalse()) {
-                logger.info(LogUtil.getHeading() + ChatColor.WHITE + event.getPlayer().getName() + ChatColor.YELLOW + " bypasses check. Ignoring.");
+                logger.info(LogUtil.getHeading() + ChatColor.WHITE + event.getPlayer().getName() + ChatColor.YELLOW + " bypasses actions. Ignoring.");
             }
             return;
         }
@@ -169,9 +196,12 @@ public class PlayerEvents extends EventHolder {
                 if (ConfigUtil.getDebugOrFalse()) {
                     logger.info(LogUtil.getHeading() + ChatColor.WHITE + event.getPlayer().getName() + ChatColor.DARK_RED + " found using a VPN. Running required actions.");
                 }
-
-                tryRunCommands(cachedConfig.get().getVPNActionCommands(), event.getPlayer(), ip);
-                tryKickPlayer(cachedConfig.get().getVPNKickMessage(), event.getPlayer(), event);
+                if (!cachedConfig.get().getVPNActionCommands().isEmpty()) {
+                    tryRunCommands(cachedConfig.get().getVPNActionCommands(), event.getPlayer(), ip);
+                }
+                if (!cachedConfig.get().getVPNKickMessage().isEmpty()) {
+                    tryKickPlayer(cachedConfig.get().getVPNKickMessage(), event.getPlayer(), event);
+                }
             } else {
                 if (ConfigUtil.getDebugOrFalse()) {
                     logger.info(LogUtil.getHeading() + ChatColor.WHITE + event.getPlayer().getName() + ChatColor.GREEN + " passed VPN check.");
@@ -202,9 +232,12 @@ public class PlayerEvents extends EventHolder {
                 if (ConfigUtil.getDebugOrFalse()) {
                     logger.info(LogUtil.getHeading() + ChatColor.WHITE + event.getPlayer().getName() + ChatColor.DARK_RED + " found using an MCLeaks account. Running required actions.");
                 }
-
-                tryRunCommands(cachedConfig.get().getMCLeaksActionCommands(), event.getPlayer(), ip);
-                tryKickPlayer(cachedConfig.get().getMCLeaksKickMessage(), event.getPlayer(), event);
+                if (!cachedConfig.get().getMCLeaksActionCommands().isEmpty()) {
+                    tryRunCommands(cachedConfig.get().getMCLeaksActionCommands(), event.getPlayer(), ip);
+                }
+                if (!cachedConfig.get().getMCLeaksKickMessage().isEmpty()) {
+                    tryKickPlayer(cachedConfig.get().getMCLeaksKickMessage(), event.getPlayer(), event);
+                }
             } else {
                 if (ConfigUtil.getDebugOrFalse()) {
                     logger.info(LogUtil.getHeading() + ChatColor.WHITE + event.getPlayer().getName() + ChatColor.GREEN + " passed MCLeaks check.");

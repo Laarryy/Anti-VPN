@@ -2,8 +2,6 @@ package me.egg82.antivpn.storage;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicLong;
 import me.egg82.antivpn.core.*;
 import me.egg82.antivpn.services.StorageHandler;
 import me.egg82.antivpn.utils.ValidationUtil;
@@ -14,6 +12,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.clients.jedis.*;
 import redis.clients.jedis.exceptions.JedisException;
+
+import java.util.*;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class Redis implements Storage {
     private final Logger logger = LoggerFactory.getLogger(getClass());

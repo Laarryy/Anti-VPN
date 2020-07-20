@@ -125,6 +125,7 @@ sources:
   - 'vpnblocker'
   - 'ip2proxy'
   - 'shodan'
+  - 'ipinfo'
   - 'teoh'
   - 'ipwarner'
 
@@ -243,6 +244,19 @@ sources:
     # API key to use (Required for this service)
     key: ''
 
+  # https://ipinfo.io/
+  # Results updated Jul 20, 2020
+  # Error rate:                    0.00%
+  # NordVPN detection rate:       84.00%
+  # Cryptostorm detection rate:    0.00%
+  # False-flagged homes:           0.00%
+  ipinfo:
+    enabled: false
+    # API key to use (Required for this service, free one available at https://ipinfo.io/signup using the "free trial" option under "Privacy Detection API")
+    key: ''
+    # Whether or not to detect proxies as VPNs
+    proxy: true
+
   # https://ip.teoh.io/vpn-detection
   # NOTE: This info is old
   # Results updated Jul 7, 2019
@@ -352,4 +366,4 @@ update:
   notify: true
 
 # Config version, no touchy plz
-version: 4.13
+version: 4.14

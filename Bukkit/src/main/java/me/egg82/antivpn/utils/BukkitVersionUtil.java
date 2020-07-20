@@ -1,10 +1,11 @@
 package me.egg82.antivpn.utils;
 
 import com.google.common.primitives.Ints;
-import java.util.ArrayList;
-import java.util.List;
 import ninja.egg82.reflect.PackageFilter;
 import org.bukkit.Bukkit;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class BukkitVersionUtil {
     private static final Object versionLock = new Object();

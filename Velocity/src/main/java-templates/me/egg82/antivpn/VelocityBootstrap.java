@@ -8,6 +8,20 @@ import com.velocitypowered.api.plugin.Dependency;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.PluginDescription;
 import com.velocitypowered.api.proxy.ProxyServer;
+import me.egg82.antivpn.utils.LogUtil;
+import net.kyori.text.TextComponent;
+import net.kyori.text.format.TextColor;
+import ninja.egg82.maven.Artifact;
+import ninja.egg82.maven.Repository;
+import ninja.egg82.maven.Scope;
+import ninja.egg82.services.ProxiedURLClassLoader;
+import ninja.egg82.utils.InjectUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
+
+import javax.inject.Inject;
+import javax.xml.xpath.XPathExpressionException;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -22,6 +36,7 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+
 import javax.inject.Inject;
 import javax.xml.xpath.XPathExpressionException;
 import me.egg82.antivpn.utils.LogUtil;

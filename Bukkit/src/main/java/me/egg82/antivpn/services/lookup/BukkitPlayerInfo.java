@@ -2,6 +2,14 @@ package me.egg82.antivpn.services.lookup;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import ninja.egg82.json.JSONUtil;
+import ninja.egg82.json.JSONWebUtil;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.ParseException;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,13 +21,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-import ninja.egg82.json.JSONUtil;
-import ninja.egg82.json.JSONWebUtil;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.ParseException;
 
 public class BukkitPlayerInfo implements PlayerInfo {
     private UUID uuid;

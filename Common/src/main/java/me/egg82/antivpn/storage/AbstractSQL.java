@@ -1,16 +1,15 @@
 package me.egg82.antivpn.storage;
 
 import com.google.common.primitives.Ints;
-import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 import ninja.egg82.core.SQLQueryResult;
 import ninja.egg82.sql.FileImporter;
 import ninja.egg82.sql.SQL;
+
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public abstract class AbstractSQL implements Storage {
     protected SQL sql;

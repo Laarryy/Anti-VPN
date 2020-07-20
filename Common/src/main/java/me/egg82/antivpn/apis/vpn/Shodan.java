@@ -1,7 +1,5 @@
 package me.egg82.antivpn.apis.vpn;
 
-import java.io.IOException;
-import java.net.URL;
 import me.egg82.antivpn.APIException;
 import me.egg82.antivpn.utils.ValidationUtil;
 import ninja.egg82.json.JSONWebUtil;
@@ -9,6 +7,9 @@ import ninja.leaping.configurate.ConfigurationNode;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
+
+import java.io.IOException;
+import java.net.URL;
 
 public class Shodan extends AbstractSourceAPI {
     public String getName() { return "shodan"; }

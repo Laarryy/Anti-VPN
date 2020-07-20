@@ -1,9 +1,10 @@
 package me.egg82.antivpn.storage;
 
+import me.egg82.antivpn.core.*;
+
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import me.egg82.antivpn.core.*;
 
 public interface Storage {
     void close();

@@ -3,13 +3,6 @@ package me.egg82.antivpn;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.google.common.util.concurrent.AtomicDouble;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicLong;
 import me.egg82.antivpn.apis.SourceAPI;
 import me.egg82.antivpn.core.MCLeaksResult;
 import me.egg82.antivpn.core.PostMCLeaksResult;
@@ -29,6 +22,14 @@ import ninja.egg82.service.ServiceLocator;
 import ninja.egg82.service.ServiceNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class VPNAPI {
     private static final Logger logger = LoggerFactory.getLogger(VPNAPI.class);

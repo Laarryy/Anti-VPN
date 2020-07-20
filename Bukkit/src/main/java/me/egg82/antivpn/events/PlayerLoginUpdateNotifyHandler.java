@@ -1,9 +1,6 @@
 package me.egg82.antivpn.events;
 
 import co.aikar.commands.CommandManager;
-import java.util.Optional;
-import java.util.concurrent.ExecutionException;
-import java.util.function.Consumer;
 import me.egg82.antivpn.enums.Message;
 import me.egg82.antivpn.extended.Configuration;
 import me.egg82.antivpn.utils.ConfigUtil;
@@ -15,6 +12,10 @@ import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.plugin.Plugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Optional;
+import java.util.concurrent.ExecutionException;
+import java.util.function.Consumer;
 
 public class PlayerLoginUpdateNotifyHandler implements Consumer<PlayerLoginEvent> {
     private final Logger logger = LoggerFactory.getLogger(getClass());

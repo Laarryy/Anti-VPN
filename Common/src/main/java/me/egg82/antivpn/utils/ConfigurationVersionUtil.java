@@ -2,14 +2,15 @@ package me.egg82.antivpn.utils;
 
 import com.google.common.io.Files;
 import com.google.common.reflect.TypeToken;
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
 
 public class ConfigurationVersionUtil {
     private static final Logger logger = LoggerFactory.getLogger(ConfigurationVersionUtil.class);
@@ -64,6 +65,8 @@ public class ConfigurationVersionUtil {
         if (config.getNode("version").getDouble() == 4.12d) {
             to413(config);
         }
+        if (config.getNode("version").getDouble() == 4.13d)
+            to414(config);
 
         if (config.getNode("version").getDouble() != oldVersion) {
             File backupFile = new File(fileOnDisk.getParent(), fileOnDisk.getName() + ".bak");
@@ -586,5 +589,25 @@ public class ConfigurationVersionUtil {
 
         // Version
         config.getNode("version").setValue(4.13d);
+    }
+    private static void to414(ConfigurationNode config) {
+        // Add ipinfo
+        config.getNode("sources", "ipinfo", "enabled").setValue(Boolean.FALSE);
+        config.getNode("sources", "ipinfo", "key").setValue("");
+        config.getNode("sources", "ipinfo", "proxy").setValue(Boolean.TRUE);
+
+        List<String> sources;
+        try {
+            sources = new ArrayList<>(config.getNode("sources", "order").getList(TypeToken.of(String.class)));
+        } catch (Exception ex) {
+            sources = new ArrayList<>();
+        }
+        if (!sources.contains("ipinfo")) {
+            sources.add("ipinfo");
+        }
+        config.getNode("sources", "order").setValue(sources);
+
+        // Version
+        config.getNode("version").setValue(4.14d);
     }
 }

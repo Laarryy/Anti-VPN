@@ -3,12 +3,13 @@ package me.egg82.antivpn.services.lookup;
 import com.destroystokyo.paper.profile.PlayerProfile;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+
 import java.io.IOException;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 
 public class PaperPlayerInfo implements PlayerInfo {
     private UUID uuid;

@@ -1,12 +1,13 @@
 package me.egg82.antivpn.apis.vpn;
 
-import java.util.Optional;
 import me.egg82.antivpn.APIException;
 import me.egg82.antivpn.apis.SourceAPI;
 import me.egg82.antivpn.extended.CachedConfigValues;
 import me.egg82.antivpn.extended.Configuration;
 import me.egg82.antivpn.utils.ConfigUtil;
 import ninja.leaping.configurate.ConfigurationNode;
+
+import java.util.Optional;
 
 public abstract class AbstractSourceAPI implements SourceAPI {
     protected final ConfigurationNode getSourceConfigNode() throws APIException {

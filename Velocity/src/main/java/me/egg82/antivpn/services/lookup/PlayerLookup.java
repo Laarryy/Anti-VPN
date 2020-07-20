@@ -1,6 +1,7 @@
 package me.egg82.antivpn.services.lookup;
 
 import com.velocitypowered.api.proxy.ProxyServer;
+
 import java.io.IOException;
 import java.util.UUID;
 

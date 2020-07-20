@@ -6,11 +6,6 @@ import co.aikar.taskchain.TaskChainFactory;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.SetMultimap;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
-import java.util.concurrent.*;
-import java.util.logging.Level;
 import me.egg82.antivpn.apis.SourceAPI;
 import me.egg82.antivpn.commands.AntiVPNCommand;
 import me.egg82.antivpn.enums.Message;
@@ -22,6 +17,7 @@ import me.egg82.antivpn.extended.Configuration;
 import me.egg82.antivpn.hooks.PlaceholderAPIHook;
 import me.egg82.antivpn.hooks.PlayerAnalyticsHook;
 import me.egg82.antivpn.hooks.PluginHook;
+import me.egg82.antivpn.hooks.VaultHook;
 import me.egg82.antivpn.messaging.RabbitMQ;
 import me.egg82.antivpn.services.AnalyticsHelper;
 import me.egg82.antivpn.services.GameAnalyticsErrorHandler;
@@ -48,6 +44,12 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.logging.Level;
 
 public class AntiVPN {
     private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -298,6 +300,14 @@ public class AntiVPN {
             ServiceLocator.register(new PlaceholderAPIHook());
         } else {
             consoleCommandIssuer.sendInfo(Message.GENERAL__HOOK_DISABLE, "{plugin}", "PlaceholderAPI");
+        }
+        
+        Plugin vault;
+        if ((vault = manager.getPlugin("Vault")) != null) {
+            consoleCommandIssuer.sendInfo(Message.GENERAL__HOOK_ENABLE, "{plugin}", "Vault");
+            VaultHook.create(plugin, vault);
+        } else {
+            consoleCommandIssuer.sendInfo(Message.GENERAL__HOOK_DISABLE, "{plugin}", "Vault");
         }
     }
 

@@ -3,12 +3,6 @@ package me.egg82.antivpn.services;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicLong;
 import me.egg82.antivpn.core.MCLeaksResult;
 import me.egg82.antivpn.core.VPNResult;
 import me.egg82.antivpn.extended.CachedConfigValues;
@@ -19,6 +13,13 @@ import me.egg82.antivpn.storage.StorageException;
 import me.egg82.antivpn.utils.ConfigUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class StorageMessagingHandler implements StorageHandler, MessagingHandler {
     private final Logger logger = LoggerFactory.getLogger(getClass());

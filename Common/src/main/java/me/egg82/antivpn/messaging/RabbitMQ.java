@@ -1,6 +1,14 @@
 package me.egg82.antivpn.messaging;
 
 import com.rabbitmq.client.*;
+import me.egg82.antivpn.services.MessagingHandler;
+import me.egg82.antivpn.utils.ValidationUtil;
+import ninja.egg82.analytics.utils.JSONUtil;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.ParseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
@@ -9,13 +17,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeoutException;
-import me.egg82.antivpn.services.MessagingHandler;
-import me.egg82.antivpn.utils.ValidationUtil;
-import ninja.egg82.analytics.utils.JSONUtil;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.ParseException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class RabbitMQ implements Messaging {
     private final Logger logger = LoggerFactory.getLogger(getClass());

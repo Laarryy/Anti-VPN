@@ -6,12 +6,16 @@ import ninja.egg82.json.JSONWebUtil;
 import ninja.leaping.configurate.ConfigurationNode;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URL;
 
-public class IP2Proxy extends AbstractSourceAPI {
-    public String getName() { return "ip2proxy"; }
+public class IPInfo extends AbstractSourceAPI {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+
+    public String getName() { return "ipinfo"; }
 
     public boolean isKeyRequired() { return true; }
 
@@ -32,24 +36,23 @@ public class IP2Proxy extends AbstractSourceAPI {
 
         JSONObject json;
         try {
-            json = JSONWebUtil.getJSONObject(new URL("https://api.ip2proxy.com/?ip=" + ip + "&key=" + key + "&package=PX1&format=json"), "GET", (int) getCachedConfig().getTimeout(), "egg82/AntiVPN");
+            json = JSONWebUtil.getJSONObject(new URL("https://ipinfo.io/" + ip + "/privacy?token=" + key), "GET", (int) getCachedConfig().getTimeout());
         } catch (IOException | ParseException | ClassCastException ex) {
             throw new APIException(false, "Could not get result from " + getName());
         }
-        if (json == null || json.get("response") == null) {
+        if (json == null) {
+            throw new APIException(false, "Could not get result from " + getName());
+        }
+        if (json.isEmpty()) {
             throw new APIException(false, "Could not get result from " + getName());
         }
 
-        String status = (String) json.get("response");
-        if (!status.equalsIgnoreCase("OK")) {
-            throw new APIException(false, "Could not get result from " + getName());
+        // if proxy config setting is true and "proxy" is true, tor || vpn will also be true.
+        if (sourceConfigNode.getNode("proxy").getBoolean() && json.get("proxy") != null) {
+            if ((Boolean) json.get("proxy")) {
+                return true;
+            }
         }
-
-        if (json.get("isProxy") == null) {
-            throw new APIException(false, "Could not get result from " + getName());
-        }
-        String proxy = (String) json.get("isProxy");
-
-        return proxy.equalsIgnoreCase("YES");
+        return json.get("vpn") != null && (Boolean) json.get("vpn");
     }
 }

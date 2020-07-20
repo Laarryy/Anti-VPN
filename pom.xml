@@ -12,7 +12,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <plugin.version>5.11.37</plugin.version>
+        <plugin.version>5.12.38</plugin.version>
         <paper.version>1.16.1-R0.1-SNAPSHOT</paper.version>
         <waterfall.version>1.15-SNAPSHOT</waterfall.version>
         <velocity.version>1.0.0-SNAPSHOT</velocity.version>
@@ -48,6 +48,7 @@
 
         <plan.version>5.1-R0.2</plan.version>
         <placeholderapi.version>2.10.6</placeholderapi.version>
+        <vault.version>1.7</vault.version>
 
         <javassist.version>3.26.0-GA</javassist.version>
         <javaxannotation.version>1.3.2</javaxannotation.version>
@@ -79,6 +80,9 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>3.2.0</version>
+                <configuration>
+                    <source>8</source>
+                </configuration>
                 <executions>
                     <execution>
                         <id>attach-javadocs</id>
@@ -317,6 +321,11 @@
                 <groupId>me.clip</groupId>
                 <artifactId>placeholderapi</artifactId>
                 <version>${placeholderapi.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.MilkBowl</groupId>
+                <artifactId>VaultAPI</artifactId>
+                <version>${vault.version}</version>
             </dependency>
 
             <!-- Bungee -->

@@ -1,8 +1,9 @@
 package me.egg82.antivpn.services;
 
+import me.egg82.antivpn.messaging.Messaging;
+
 import java.util.Optional;
 import java.util.UUID;
-import me.egg82.antivpn.messaging.Messaging;
 
 public interface MessagingHandler {
     void ipCallback(UUID messageID, String ip, long longIPID, Messaging callingMessaging);
