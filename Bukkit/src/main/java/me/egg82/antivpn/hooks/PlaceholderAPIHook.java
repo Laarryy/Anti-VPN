@@ -4,6 +4,8 @@ import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
+import java.security.PublicKey;
+
 public class PlaceholderAPIHook implements PluginHook {
     public PlaceholderAPIHook() {}
 
