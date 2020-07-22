@@ -301,13 +301,19 @@ public class AntiVPN {
         } else {
             consoleCommandIssuer.sendInfo(Message.GENERAL__HOOK_DISABLE, "{plugin}", "PlaceholderAPI");
         }
-        
+
         Plugin vault;
         if ((vault = manager.getPlugin("Vault")) != null) {
             consoleCommandIssuer.sendInfo(Message.GENERAL__HOOK_ENABLE, "{plugin}", "Vault");
+            if (ConfigUtil.getDebugOrFalse()) {
+                logger.info(LogUtil.getHeading() + ChatColor.YELLOW + "Running actions on async pre-login.");
+            }
             VaultHook.create(plugin, vault);
         } else {
             consoleCommandIssuer.sendInfo(Message.GENERAL__HOOK_DISABLE, "{plugin}", "Vault");
+            if (ConfigUtil.getDebugOrFalse()) {
+                logger.info(LogUtil.getHeading() + ChatColor.YELLOW + "Running actions on sync login.");
+            }
         }
     }
 
