@@ -49,6 +49,7 @@
         <plan.version>5.1-R0.2</plan.version>
         <placeholderapi.version>2.10.6</placeholderapi.version>
         <vault.version>1.7</vault.version>
+        <luckperms.version>5.1</luckperms.version>
 
         <javassist.version>3.26.0-GA</javassist.version>
         <javaxannotation.version>1.3.2</javaxannotation.version>
@@ -249,6 +250,11 @@
                 <groupId>me.egg82</groupId>
                 <artifactId>antivpn-common</artifactId>
                 <version>${plugin.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.luckperms</groupId>
+                <artifactId>api</artifactId>
+                <version>${luckperms.version}</version>
             </dependency>
 
             <!-- Bukkit -->

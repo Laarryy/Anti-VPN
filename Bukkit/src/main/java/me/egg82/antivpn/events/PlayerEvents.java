@@ -4,6 +4,7 @@ import inet.ipaddr.IPAddressString;
 import me.egg82.antivpn.APIException;
 import me.egg82.antivpn.enums.VPNAlgorithmMethod;
 import me.egg82.antivpn.extended.CachedConfigValues;
+import me.egg82.antivpn.hooks.LuckPermsHook;
 import me.egg82.antivpn.hooks.PlaceholderAPIHook;
 import me.egg82.antivpn.hooks.VaultHook;
 import me.egg82.antivpn.services.AnalyticsHelper;
@@ -48,20 +49,34 @@ public class PlayerEvents extends EventHolder {
             return;
         }
 
-        Optional<VaultHook> vaultHook;
+        Optional<LuckPermsHook> luckPermsHook;
         try {
-            vaultHook = ServiceLocator.getOptional(VaultHook.class);
+            luckPermsHook = ServiceLocator.getOptional(LuckPermsHook.class);
         } catch (InstantiationException | IllegalAccessException ex) {
             logger.error(ex.getMessage(), ex);
-            vaultHook = Optional.empty();
+            luckPermsHook = Optional.empty();
         }
 
-        if (vaultHook.isPresent() && vaultHook.get().getPermission() != null) {
-            // Vault is available, run through entire check gambit
-            checkPermsPlayer(event, vaultHook.get().getPermission().playerHas(null, Bukkit.getOfflinePlayer(event.getUniqueId()), "avpn.bypass"));
+        if (luckPermsHook.isPresent()) {
+            // LuckPerms is available, run through entire check gambit
+            checkPermsPlayer(event, luckPermsHook.get().hasPermission(event.getUniqueId(), "avpn.bypass"));
         } else {
-            // Vault is not available, only cache data
-            cachePlayer(event);
+            // LuckPerms is not available, check for Vault
+            Optional<VaultHook> vaultHook;
+            try {
+                vaultHook = ServiceLocator.getOptional(VaultHook.class);
+            } catch (InstantiationException | IllegalAccessException ex) {
+                logger.error(ex.getMessage(), ex);
+                vaultHook = Optional.empty();
+            }
+
+            if (vaultHook.isPresent() && vaultHook.get().getPermission() != null) {
+                // Vault is available, run through entire check gambit
+                checkPermsPlayer(event, vaultHook.get().getPermission().playerHas(null, Bukkit.getOfflinePlayer(event.getUniqueId()), "avpn.bypass"));
+            } else {
+                // Vault is not available, only cache data
+                cachePlayer(event);
+            }
         }
     }
 
@@ -138,7 +153,7 @@ public class PlayerEvents extends EventHolder {
         for (String testAddress : cachedConfig.get().getIgnoredIps()) {
             if (
                     ValidationUtil.isValidIp(testAddress) && ip.equalsIgnoreCase(testAddress)
-                            || ValidationUtil.isValidIPRange(testAddress) && rangeContains(testAddress, ip)
+                    || ValidationUtil.isValidIPRange(testAddress) && rangeContains(testAddress, ip)
             ) {
                 return;
             }
@@ -188,6 +203,18 @@ public class PlayerEvents extends EventHolder {
     }
 
     private void checkPlayer(PlayerLoginEvent event) {
+        Optional<LuckPermsHook> luckPermsHook;
+        try {
+            luckPermsHook = ServiceLocator.getOptional(LuckPermsHook.class);
+        } catch (InstantiationException | IllegalAccessException ex) {
+            logger.error(ex.getMessage(), ex);
+            luckPermsHook = Optional.empty();
+        }
+
+        if (luckPermsHook.isPresent()) {
+            return;
+        }
+
         Optional<VaultHook> vaultHook;
         try {
             vaultHook = ServiceLocator.getOptional(VaultHook.class);
