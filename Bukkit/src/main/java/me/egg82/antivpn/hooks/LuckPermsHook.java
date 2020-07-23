@@ -53,9 +53,6 @@ public class LuckPermsHook implements PluginHook {
     public boolean hasPermission(UUID uuid, String permission) {
         User user = null;
         if (userManager.isLoaded(uuid)) {
-            if (ConfigUtil.getDebugOrFalse()) {
-                logger.info(LogUtil.getHeading() + ChatColor.YELLOW + "UUID " + ChatColor.WHITE + uuid.toString() + ChatColor.YELLOW + " is previously loaded, fetching cached data..");
-            }
             user = userManager.getUser(uuid);
         }
         if (user == null) {
@@ -64,6 +61,10 @@ public class LuckPermsHook implements PluginHook {
             }
             CompletableFuture<User> future = userManager.loadUser(uuid);
             user = future.join(); // Expensive
+        } else {
+            if (ConfigUtil.getDebugOrFalse()) {
+                logger.info(LogUtil.getHeading() + ChatColor.YELLOW + "UUID " + ChatColor.WHITE + uuid.toString() + ChatColor.YELLOW + " is previously loaded, using cached data..");
+            }
         }
 
         ImmutableContextSet contexts = contextManager.getContext(user).orElseGet(contextManager::getStaticContext);
