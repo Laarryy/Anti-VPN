@@ -297,7 +297,7 @@ public class MySQL extends AbstractSQL {
 
     public void setIPRaw(long longIPID, String ip) throws StorageException {
         try {
-            sql.execute("INSERT INTO `" + prefix + "ips` (`id`, `ip`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `ip`=?, `uuid`=?;", longIPID, ip, longIPID, ip);
+            sql.execute("INSERT INTO `" + prefix + "ips` (`id`, `ip`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `id`=?, `ip`=?;", longIPID, ip, longIPID, ip);
         } catch (SQLException ex) {
             throw new StorageException(isAutomaticallyRecoverable(ex), ex);
         }
