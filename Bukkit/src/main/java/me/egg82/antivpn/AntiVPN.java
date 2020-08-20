@@ -14,10 +14,7 @@ import me.egg82.antivpn.events.PlayerEvents;
 import me.egg82.antivpn.events.PlayerLoginUpdateNotifyHandler;
 import me.egg82.antivpn.extended.CachedConfigValues;
 import me.egg82.antivpn.extended.Configuration;
-import me.egg82.antivpn.hooks.PlaceholderAPIHook;
-import me.egg82.antivpn.hooks.PlayerAnalyticsHook;
-import me.egg82.antivpn.hooks.PluginHook;
-import me.egg82.antivpn.hooks.VaultHook;
+import me.egg82.antivpn.hooks.*;
 import me.egg82.antivpn.messaging.RabbitMQ;
 import me.egg82.antivpn.services.AnalyticsHelper;
 import me.egg82.antivpn.services.GameAnalyticsErrorHandler;
@@ -301,18 +298,28 @@ public class AntiVPN {
         } else {
             consoleCommandIssuer.sendInfo(Message.GENERAL__HOOK_DISABLE, "{plugin}", "PlaceholderAPI");
         }
-
-        Plugin vault;
-        if ((vault = manager.getPlugin("Vault")) != null) {
-            consoleCommandIssuer.sendInfo(Message.GENERAL__HOOK_ENABLE, "{plugin}", "Vault");
+      
+        Plugin luckperms;
+        if ((luckperms = manager.getPlugin("LuckPerms")) != null) {
+            consoleCommandIssuer.sendInfo(Message.GENERAL__HOOK_ENABLE, "{plugin}", "LuckPerms");
             if (ConfigUtil.getDebugOrFalse()) {
                 logger.info(LogUtil.getHeading() + ChatColor.YELLOW + "Running actions on async pre-login.");
             }
-            VaultHook.create(plugin, vault);
+            LuckPermsHook.create(plugin, luckperms);
         } else {
-            consoleCommandIssuer.sendInfo(Message.GENERAL__HOOK_DISABLE, "{plugin}", "Vault");
-            if (ConfigUtil.getDebugOrFalse()) {
-                logger.info(LogUtil.getHeading() + ChatColor.YELLOW + "Running actions on sync login.");
+            consoleCommandIssuer.sendInfo(Message.GENERAL__HOOK_DISABLE, "{plugin}", "LuckPerms");
+            Plugin vault;
+            if ((vault = manager.getPlugin("Vault")) != null) {
+                consoleCommandIssuer.sendInfo(Message.GENERAL__HOOK_ENABLE, "{plugin}", "Vault");
+                if (ConfigUtil.getDebugOrFalse()) {
+                    logger.info(LogUtil.getHeading() + ChatColor.YELLOW + "Running actions on async pre-login.");
+                }
+                VaultHook.create(plugin, vault);
+            } else {
+                consoleCommandIssuer.sendInfo(Message.GENERAL__HOOK_DISABLE, "{plugin}", "Vault");
+                if (ConfigUtil.getDebugOrFalse()) {
+                    logger.info(LogUtil.getHeading() + ChatColor.YELLOW + "Running actions on sync login.");
+                }
             }
         }
     }
