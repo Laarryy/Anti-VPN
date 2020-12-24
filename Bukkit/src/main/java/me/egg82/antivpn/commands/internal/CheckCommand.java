@@ -3,21 +3,20 @@ package me.egg82.antivpn.commands.internal;
 import co.aikar.commands.CommandIssuer;
 import co.aikar.taskchain.TaskChain;
 import co.aikar.taskchain.TaskChainAbortAction;
-import me.egg82.antivpn.APIException;
-import me.egg82.antivpn.VPNAPI;
-import me.egg82.antivpn.enums.Message;
-import me.egg82.antivpn.enums.VPNAlgorithmMethod;
-import me.egg82.antivpn.extended.CachedConfigValues;
-import me.egg82.antivpn.services.lookup.PlayerInfo;
-import me.egg82.antivpn.services.lookup.PlayerLookup;
-import me.egg82.antivpn.utils.ConfigUtil;
-import me.egg82.antivpn.utils.ValidationUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.util.Optional;
 import java.util.UUID;
+import me.egg82.antivpn.APIException;
+import me.egg82.antivpn.VPNAPI;
+import me.egg82.antivpn.config.CachedConfig;
+import me.egg82.antivpn.config.ConfigUtil;
+import me.egg82.antivpn.config.enums.VPNAlgorithmMethod;
+import me.egg82.antivpn.lang.Message;
+import me.egg82.antivpn.services.lookup.PlayerInfo;
+import me.egg82.antivpn.services.lookup.PlayerLookup;
+import me.egg82.antivpn.utils.ValidationUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class CheckCommand implements Runnable {
     private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -40,7 +39,7 @@ public class CheckCommand implements Runnable {
         if (ValidationUtil.isValidIp(type)) {
             chain
                     .<Optional<Boolean>>asyncCallback((v, f) -> {
-                        Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+                        Optional<CachedConfig> cachedConfig = ConfigUtil.getCachedConfig();
                         if (!cachedConfig.isPresent()) {
                             logger.error("Cached config could not be fetched.");
                             f.accept(Optional.empty());
@@ -89,7 +88,7 @@ public class CheckCommand implements Runnable {
                         }
                     })
                     .<Optional<Boolean>>asyncCallback((v, f) -> {
-                        Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+                        Optional<CachedConfig> cachedConfig = ConfigUtil.getCachedConfig();
                         if (!cachedConfig.isPresent()) {
                             logger.error("Cached config could not be fetched.");
                             f.accept(Optional.empty());

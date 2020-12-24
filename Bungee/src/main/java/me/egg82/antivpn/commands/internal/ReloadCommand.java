@@ -1,9 +1,9 @@
 package me.egg82.antivpn.commands.internal;
 
 import co.aikar.commands.CommandIssuer;
-import me.egg82.antivpn.enums.Message;
+import me.egg82.antivpn.config.ConfigurationFileUtil;
+import me.egg82.antivpn.lang.Message;
 import me.egg82.antivpn.services.StorageMessagingHandler;
-import me.egg82.antivpn.utils.ConfigurationFileUtil;
 import net.md_5.bungee.api.plugin.Plugin;
 
 public class ReloadCommand implements Runnable {

@@ -1,19 +1,18 @@
 package me.egg82.antivpn.apis.vpn;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import me.egg82.antivpn.APIException;
-import me.egg82.antivpn.utils.ValidationUtil;
-import ninja.egg82.json.JSONWebUtil;
-import ninja.leaping.configurate.ConfigurationNode;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.ParseException;
-
 import java.io.IOException;
 import java.net.URL;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import me.egg82.antivpn.APIException;
+import me.egg82.antivpn.utils.ValidationUtil;
+import ninja.egg82.json.JSONWebUtil;
+import ninja.leaping.configurate.ConfigurationNode;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.ParseException;
 
 public class GetIPIntel extends AbstractSourceAPI {
     private static final AtomicInteger hourlyRequests = new AtomicInteger(0);

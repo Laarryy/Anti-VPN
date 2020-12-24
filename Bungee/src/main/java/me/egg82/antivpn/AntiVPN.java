@@ -4,25 +4,35 @@ import co.aikar.commands.*;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.SetMultimap;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.logging.Level;
 import me.egg82.antivpn.apis.SourceAPI;
 import me.egg82.antivpn.commands.AntiVPNCommand;
-import me.egg82.antivpn.enums.Message;
+import me.egg82.antivpn.config.CachedConfig;
+import me.egg82.antivpn.config.ConfigUtil;
+import me.egg82.antivpn.config.ConfigurationFileUtil;
 import me.egg82.antivpn.events.EventHolder;
 import me.egg82.antivpn.events.PlayerEvents;
 import me.egg82.antivpn.events.PostLoginUpdateNotifyHandler;
-import me.egg82.antivpn.extended.CachedConfigValues;
 import me.egg82.antivpn.extended.Configuration;
 import me.egg82.antivpn.hooks.PlayerAnalyticsHook;
 import me.egg82.antivpn.hooks.PluginHook;
+import me.egg82.antivpn.lang.LanguageFileUtil;
+import me.egg82.antivpn.lang.Message;
+import me.egg82.antivpn.lang.PluginMessageFormatter;
 import me.egg82.antivpn.messaging.RabbitMQ;
+import me.egg82.antivpn.messaging.ServerIDUtil;
 import me.egg82.antivpn.services.AnalyticsHelper;
 import me.egg82.antivpn.services.GameAnalyticsErrorHandler;
-import me.egg82.antivpn.services.PluginMessageFormatter;
 import me.egg82.antivpn.services.StorageMessagingHandler;
 import me.egg82.antivpn.storage.MySQL;
 import me.egg82.antivpn.storage.SQLite;
 import me.egg82.antivpn.storage.Storage;
-import me.egg82.antivpn.utils.*;
+import me.egg82.antivpn.utils.BungeeEnvironmentUtil;
+import me.egg82.antivpn.utils.ValidationUtil;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PostLoginEvent;
@@ -38,12 +48,6 @@ import ninja.egg82.updater.BungeeUpdater;
 import org.bstats.bungeecord.Metrics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
-import java.util.concurrent.*;
-import java.util.logging.Level;
 
 public class AntiVPN {
     private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -140,7 +144,7 @@ public class AntiVPN {
     }
 
     private void loadLanguages() {
-        Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+        Optional<CachedConfig> cachedConfig = ConfigUtil.getCachedConfig();
         if (!cachedConfig.isPresent()) {
             throw new RuntimeException("Cached config could not be fetched.");
         }
@@ -166,7 +170,7 @@ public class AntiVPN {
         commandManager.setFormat(MessageType.ERROR, new PluginMessageFormatter(commandManager, Message.GENERAL__HEADER));
         commandManager.setFormat(MessageType.INFO, new PluginMessageFormatter(commandManager, Message.GENERAL__HEADER));
         commandManager.setFormat(MessageType.ERROR, ChatColor.DARK_RED, ChatColor.YELLOW, ChatColor.AQUA, ChatColor.WHITE);
-        commandManager.setFormat(MessageType.INFO, ChatColor.WHITE, ChatColor.YELLOW, ChatColor.AQUA, ChatColor.GREEN, ChatColor.RED, ChatColor.GOLD, ChatColor.BLUE, ChatColor.GRAY);
+        commandManager.setFormat(MessageType.INFO, ChatColor.WHITE, ChatColor.YELLOW, ChatColor.AQUA, ChatColor.GREEN, ChatColor.RED, ChatColor.GOLD, ChatColor.BLUE, ChatColor.GRAY, ChatColor.DARK_RED);
     }
 
     private void loadServices() {
@@ -185,7 +189,7 @@ public class AntiVPN {
         });
 
         commandManager.getCommandConditions().addCondition(String.class, "source", (c, exec, value) -> {
-            Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+            Optional<CachedConfig> cachedConfig = ConfigUtil.getCachedConfig();
             if (!cachedConfig.isPresent()) {
                 return;
             }
@@ -199,7 +203,7 @@ public class AntiVPN {
 
         commandManager.getCommandConditions().addCondition(String.class, "storage", (c, exec, value) -> {
             String v = value.replace(" ", "_");
-            Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+            Optional<CachedConfig> cachedConfig = ConfigUtil.getCachedConfig();
             if (!cachedConfig.isPresent()) {
                 return;
             }
@@ -214,7 +218,7 @@ public class AntiVPN {
         commandManager.getCommandCompletions().registerCompletion("storage", c -> {
             String lower = c.getInput().toLowerCase().replace(" ", "_");
             Set<String> storage = new LinkedHashSet<>();
-            Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+            Optional<CachedConfig> cachedConfig = ConfigUtil.getCachedConfig();
             if (!cachedConfig.isPresent()) {
                 logger.error("Cached config could not be fetched.");
                 return ImmutableList.copyOf(storage);
@@ -300,7 +304,7 @@ public class AntiVPN {
         }));
         metrics.addCustomChart(new Metrics.SimplePie("mysql", () -> {
             Optional<Configuration> config = ConfigUtil.getConfig();
-            Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+            Optional<CachedConfig> cachedConfig = ConfigUtil.getCachedConfig();
             if (!config.isPresent() || !cachedConfig.isPresent()) {
                 return null;
             }
@@ -319,7 +323,7 @@ public class AntiVPN {
         }));
         metrics.addCustomChart(new Metrics.SimplePie("redis_storage", () -> {
             Optional<Configuration> config = ConfigUtil.getConfig();
-            Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+            Optional<CachedConfig> cachedConfig = ConfigUtil.getCachedConfig();
             if (!config.isPresent() || !cachedConfig.isPresent()) {
                 return null;
             }
@@ -338,7 +342,7 @@ public class AntiVPN {
         }));
         metrics.addCustomChart(new Metrics.SimplePie("sqlite", () -> {
             Optional<Configuration> config = ConfigUtil.getConfig();
-            Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+            Optional<CachedConfig> cachedConfig = ConfigUtil.getCachedConfig();
             if (!config.isPresent() || !cachedConfig.isPresent()) {
                 return null;
             }
@@ -357,7 +361,7 @@ public class AntiVPN {
         }));
         metrics.addCustomChart(new Metrics.SimplePie("redis_messaging", () -> {
             Optional<Configuration> config = ConfigUtil.getConfig();
-            Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+            Optional<CachedConfig> cachedConfig = ConfigUtil.getCachedConfig();
             if (!config.isPresent() || !cachedConfig.isPresent()) {
                 return null;
             }
@@ -376,7 +380,7 @@ public class AntiVPN {
         }));
         metrics.addCustomChart(new Metrics.SimplePie("rabbitmq", () -> {
             Optional<Configuration> config = ConfigUtil.getConfig();
-            Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+            Optional<CachedConfig> cachedConfig = ConfigUtil.getCachedConfig();
             if (!config.isPresent() || !cachedConfig.isPresent()) {
                 return null;
             }
@@ -395,7 +399,7 @@ public class AntiVPN {
         }));
         metrics.addCustomChart(new Metrics.AdvancedPie("sources", () -> {
             Optional<Configuration> config = ConfigUtil.getConfig();
-            Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+            Optional<CachedConfig> cachedConfig = ConfigUtil.getCachedConfig();
             if (!config.isPresent() || !cachedConfig.isPresent()) {
                 return null;
             }
@@ -412,7 +416,7 @@ public class AntiVPN {
         }));
         metrics.addCustomChart(new Metrics.SimplePie("algorithm", () -> {
             Optional<Configuration> config = ConfigUtil.getConfig();
-            Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+            Optional<CachedConfig> cachedConfig = ConfigUtil.getCachedConfig();
             if (!config.isPresent() || !cachedConfig.isPresent()) {
                 return null;
             }
@@ -425,7 +429,7 @@ public class AntiVPN {
         }));
         metrics.addCustomChart(new Metrics.SimplePie("vpn_action", () -> {
             Optional<Configuration> config = ConfigUtil.getConfig();
-            Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+            Optional<CachedConfig> cachedConfig = ConfigUtil.getCachedConfig();
             if (!config.isPresent() || !cachedConfig.isPresent()) {
                 return null;
             }
@@ -446,7 +450,7 @@ public class AntiVPN {
         }));
         metrics.addCustomChart(new Metrics.SimplePie("mcleaks_action", () -> {
             Optional<Configuration> config = ConfigUtil.getConfig();
-            Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+            Optional<CachedConfig> cachedConfig = ConfigUtil.getCachedConfig();
             if (!config.isPresent() || !cachedConfig.isPresent()) {
                 return null;
             }

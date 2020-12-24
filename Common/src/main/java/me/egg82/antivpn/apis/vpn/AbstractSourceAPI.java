@@ -2,9 +2,9 @@ package me.egg82.antivpn.apis.vpn;
 
 import me.egg82.antivpn.APIException;
 import me.egg82.antivpn.apis.SourceAPI;
-import me.egg82.antivpn.extended.CachedConfigValues;
+import me.egg82.antivpn.config.CachedConfig;
 import me.egg82.antivpn.extended.Configuration;
-import me.egg82.antivpn.utils.ConfigUtil;
+import me.egg82.antivpn.config.ConfigUtil;
 import ninja.leaping.configurate.ConfigurationNode;
 
 import java.util.Optional;
@@ -19,8 +19,8 @@ public abstract class AbstractSourceAPI implements SourceAPI {
         return config.get().getNode("sources", getName());
     }
 
-    protected final CachedConfigValues getCachedConfig() throws APIException {
-        Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+    protected final CachedConfig getCachedConfig() throws APIException {
+        Optional<CachedConfig> cachedConfig = ConfigUtil.getCachedConfig();
         if (!cachedConfig.isPresent()) {
             throw new APIException(true, "Cached config could not be fetched.");
         }

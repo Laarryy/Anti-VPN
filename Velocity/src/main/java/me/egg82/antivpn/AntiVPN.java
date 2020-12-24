@@ -9,19 +9,26 @@ import com.velocitypowered.api.plugin.PluginManager;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.scheduler.ScheduledTask;
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
 import me.egg82.antivpn.apis.SourceAPI;
 import me.egg82.antivpn.commands.AntiVPNCommand;
-import me.egg82.antivpn.enums.Message;
+import me.egg82.antivpn.config.CachedConfig;
+import me.egg82.antivpn.config.ConfigUtil;
+import me.egg82.antivpn.config.ConfigurationFileUtil;
 import me.egg82.antivpn.events.EventHolder;
 import me.egg82.antivpn.events.PlayerEvents;
-import me.egg82.antivpn.extended.CachedConfigValues;
 import me.egg82.antivpn.hooks.PlayerAnalyticsHook;
 import me.egg82.antivpn.hooks.PluginHook;
+import me.egg82.antivpn.lang.LanguageFileUtil;
+import me.egg82.antivpn.lang.Message;
+import me.egg82.antivpn.lang.PluginMessageFormatter;
+import me.egg82.antivpn.messaging.ServerIDUtil;
 import me.egg82.antivpn.services.GameAnalyticsErrorHandler;
-import me.egg82.antivpn.services.PluginMessageFormatter;
 import me.egg82.antivpn.services.StorageMessagingHandler;
 import me.egg82.antivpn.storage.Storage;
-import me.egg82.antivpn.utils.*;
+import me.egg82.antivpn.utils.ValidationUtil;
 import net.kyori.text.format.TextColor;
 import ninja.egg82.events.VelocityEventSubscriber;
 import ninja.egg82.service.ServiceLocator;
@@ -31,10 +38,6 @@ import ninja.leaping.configurate.yaml.YAMLConfigurationLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.DumperOptions;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
 
 public class AntiVPN {
     private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -124,7 +127,7 @@ public class AntiVPN {
     }
 
     private void loadLanguages() {
-        Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+        Optional<CachedConfig> cachedConfig = ConfigUtil.getCachedConfig();
         if (!cachedConfig.isPresent()) {
             throw new RuntimeException("Cached config could not be fetched.");
         }
@@ -150,7 +153,7 @@ public class AntiVPN {
         commandManager.setFormat(MessageType.ERROR, new PluginMessageFormatter(commandManager, Message.GENERAL__HEADER));
         commandManager.setFormat(MessageType.INFO, new PluginMessageFormatter(commandManager, Message.GENERAL__HEADER));
         commandManager.setFormat(MessageType.ERROR, TextColor.DARK_RED, TextColor.YELLOW, TextColor.AQUA, TextColor.WHITE);
-        commandManager.setFormat(MessageType.INFO, TextColor.WHITE, TextColor.YELLOW, TextColor.AQUA, TextColor.GREEN, TextColor.RED, TextColor.GOLD, TextColor.BLUE, TextColor.GRAY);
+        commandManager.setFormat(MessageType.INFO, TextColor.WHITE, TextColor.YELLOW, TextColor.AQUA, TextColor.GREEN, TextColor.RED, TextColor.GOLD, TextColor.BLUE, TextColor.GRAY, TextColor.DARK_RED);
     }
 
     private void loadServices() {
@@ -167,7 +170,7 @@ public class AntiVPN {
         });
 
         commandManager.getCommandConditions().addCondition(String.class, "source", (c, exec, value) -> {
-            Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+            Optional<CachedConfig> cachedConfig = ConfigUtil.getCachedConfig();
             if (!cachedConfig.isPresent()) {
                 return;
             }
@@ -181,7 +184,7 @@ public class AntiVPN {
 
         commandManager.getCommandConditions().addCondition(String.class, "storage", (c, exec, value) -> {
             String v = value.replace(" ", "_");
-            Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+            Optional<CachedConfig> cachedConfig = ConfigUtil.getCachedConfig();
             if (!cachedConfig.isPresent()) {
                 return;
             }
@@ -196,7 +199,7 @@ public class AntiVPN {
         commandManager.getCommandCompletions().registerCompletion("storage", c -> {
             String lower = c.getInput().toLowerCase().replace(" ", "_");
             Set<String> storage = new LinkedHashSet<>();
-            Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+            Optional<CachedConfig> cachedConfig = ConfigUtil.getCachedConfig();
             if (!cachedConfig.isPresent()) {
                 logger.error("Cached config could not be fetched.");
                 return ImmutableList.copyOf(storage);

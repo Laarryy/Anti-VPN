@@ -3,14 +3,14 @@ package me.egg82.antivpn.services;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import me.egg82.antivpn.core.MCLeaksResult;
-import me.egg82.antivpn.core.VPNResult;
-import me.egg82.antivpn.extended.CachedConfigValues;
+import me.egg82.antivpn.storage.results.MCLeaksResult;
+import me.egg82.antivpn.storage.results.VPNResult;
+import me.egg82.antivpn.config.CachedConfig;
 import me.egg82.antivpn.messaging.Messaging;
 import me.egg82.antivpn.messaging.MessagingException;
 import me.egg82.antivpn.storage.Storage;
 import me.egg82.antivpn.storage.StorageException;
-import me.egg82.antivpn.utils.ConfigUtil;
+import me.egg82.antivpn.config.ConfigUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,7 +56,7 @@ public class StorageMessagingHandler implements StorageHandler, MessagingHandler
     }
 
     private void getQueues() {
-        Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+        Optional<CachedConfig> cachedConfig = ConfigUtil.getCachedConfig();
         if (!cachedConfig.isPresent()) {
             try {
                 Thread.sleep(10L * 1000L);
@@ -127,7 +127,7 @@ public class StorageMessagingHandler implements StorageHandler, MessagingHandler
             logger.info("Propagating to storage & messaging");
         }
 
-        Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+        Optional<CachedConfig> cachedConfig = ConfigUtil.getCachedConfig();
         if (!cachedConfig.isPresent()) {
             logger.error("Cached config could not be fetched.");
             return;
@@ -161,7 +161,7 @@ public class StorageMessagingHandler implements StorageHandler, MessagingHandler
             logger.info("Propagating to storage & messaging");
         }
 
-        Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+        Optional<CachedConfig> cachedConfig = ConfigUtil.getCachedConfig();
         if (!cachedConfig.isPresent()) {
             logger.error("Cached config could not be fetched.");
             return;
@@ -200,7 +200,7 @@ public class StorageMessagingHandler implements StorageHandler, MessagingHandler
             logger.info("Propagating to storage & messaging");
         }
 
-        Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+        Optional<CachedConfig> cachedConfig = ConfigUtil.getCachedConfig();
         if (!cachedConfig.isPresent()) {
             logger.error("Cached config could not be fetched.");
             return;
@@ -236,7 +236,7 @@ public class StorageMessagingHandler implements StorageHandler, MessagingHandler
             logger.info("Propagating to storage & messaging");
         }
 
-        Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+        Optional<CachedConfig> cachedConfig = ConfigUtil.getCachedConfig();
         if (!cachedConfig.isPresent()) {
             logger.error("Cached config could not be fetched.");
             return;
@@ -272,7 +272,7 @@ public class StorageMessagingHandler implements StorageHandler, MessagingHandler
             logger.info("Propagating to storage & messaging");
         }
 
-        Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+        Optional<CachedConfig> cachedConfig = ConfigUtil.getCachedConfig();
         if (!cachedConfig.isPresent()) {
             logger.error("Cached config could not be fetched.");
             return;
@@ -308,7 +308,7 @@ public class StorageMessagingHandler implements StorageHandler, MessagingHandler
             logger.info("Propagating to storage & messaging");
         }
 
-        Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+        Optional<CachedConfig> cachedConfig = ConfigUtil.getCachedConfig();
         if (!cachedConfig.isPresent()) {
             logger.error("Cached config could not be fetched.");
             return;

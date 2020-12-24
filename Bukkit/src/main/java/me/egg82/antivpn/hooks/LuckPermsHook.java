@@ -2,7 +2,7 @@ package me.egg82.antivpn.hooks;
 
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import me.egg82.antivpn.utils.ConfigUtil;
+import me.egg82.antivpn.config.ConfigUtil;
 import me.egg82.antivpn.utils.LogUtil;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;

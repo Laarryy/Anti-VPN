@@ -170,6 +170,19 @@
         </repository>
 
         <repository>
+            <id>egg82-nexus</id>
+            <url>https://nexus.egg82.me/repository/maven-releases/</url>
+        </repository>
+        <repository>
+            <id>sponge</id>
+            <url>https://repo.spongepowered.org/maven/</url>
+        </repository>
+        <repository>
+            <id>aikar</id>
+            <url>https://repo.aikar.co/content/groups/aikar/</url>
+        </repository>
+
+        <repository>
             <id>github-rjenkinsjr</id>
             <url>https://raw.github.com/rjenkinsjr/maven2/repo</url>
         </repository>
@@ -187,45 +200,48 @@
         <dependency>
             <groupId>com.velocitypowered</groupId>
             <artifactId>velocity-api</artifactId>
+            <version>${velocity.version}</version>
             <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>co.aikar</groupId>
             <artifactId>acf-velocity</artifactId>
+            <version>${acf.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>ninja.egg82</groupId>
             <artifactId>event-chain-velocity</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.spongepowered</groupId>
-            <artifactId>configurate-yaml</artifactId>
+            <version>${eventchain.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>ninja.egg82</groupId>
             <artifactId>service-locator</artifactId>
+            <version>${servicelocator.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>ninja.egg82</groupId>
             <artifactId>dep-downloader</artifactId>
+            <version>${depdownloader.version}</version>
         </dependency>
         <dependency>
             <groupId>me.lucko</groupId>
             <artifactId>jar-relocator</artifactId>
+            <version>${relocator.version}</version>
         </dependency>
         <dependency>
             <groupId>ninja.egg82</groupId>
             <artifactId>reflection-utils</artifactId>
+            <version>${reflectionutils.version}</version>
         </dependency>
 
         <dependency>
             <groupId>com.djrapitops</groupId>
             <artifactId>Plan-api</artifactId>
+            <version>${plan.version}</version>
             <scope>provided</scope>
         </dependency>
 
@@ -237,6 +253,7 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
+            <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

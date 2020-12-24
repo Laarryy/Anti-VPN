@@ -1,6 +1,6 @@
 package me.egg82.antivpn.hooks;
 
-import me.egg82.antivpn.utils.ConfigUtil;
+import me.egg82.antivpn.config.ConfigUtil;
 import me.egg82.antivpn.utils.LogUtil;
 import net.milkbowl.vault.permission.Permission;
 import ninja.egg82.events.BukkitEvents;

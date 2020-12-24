@@ -1,6 +1,6 @@
 package me.egg82.antivpn.services;
 
-import me.egg82.antivpn.extended.ServiceKeys;
+import me.egg82.antivpn.config.ServiceKeys;
 import ninja.egg82.analytics.GameAnalytics;
 import ninja.egg82.analytics.common.Severity;
 import ninja.egg82.analytics.events.GAError;

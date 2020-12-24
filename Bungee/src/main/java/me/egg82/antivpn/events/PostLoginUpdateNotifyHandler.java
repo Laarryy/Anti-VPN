@@ -1,9 +1,12 @@
 package me.egg82.antivpn.events;
 
 import co.aikar.commands.CommandManager;
-import me.egg82.antivpn.enums.Message;
+import java.util.Optional;
+import java.util.concurrent.ExecutionException;
+import java.util.function.Consumer;
+import me.egg82.antivpn.config.ConfigUtil;
 import me.egg82.antivpn.extended.Configuration;
-import me.egg82.antivpn.utils.ConfigUtil;
+import me.egg82.antivpn.lang.Message;
 import net.md_5.bungee.api.event.PostLoginEvent;
 import net.md_5.bungee.api.plugin.Plugin;
 import ninja.egg82.service.ServiceLocator;
@@ -11,10 +14,6 @@ import ninja.egg82.service.ServiceNotFoundException;
 import ninja.egg82.updater.BungeeUpdater;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Optional;
-import java.util.concurrent.ExecutionException;
-import java.util.function.Consumer;
 
 public class PostLoginUpdateNotifyHandler implements Consumer<PostLoginEvent> {
     private final Logger logger = LoggerFactory.getLogger(getClass());

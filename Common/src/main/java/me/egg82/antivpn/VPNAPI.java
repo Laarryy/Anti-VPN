@@ -3,26 +3,6 @@ package me.egg82.antivpn;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.google.common.util.concurrent.AtomicDouble;
-import me.egg82.antivpn.apis.SourceAPI;
-import me.egg82.antivpn.core.MCLeaksResult;
-import me.egg82.antivpn.core.PostMCLeaksResult;
-import me.egg82.antivpn.core.PostVPNResult;
-import me.egg82.antivpn.core.VPNResult;
-import me.egg82.antivpn.extended.CachedConfigValues;
-import me.egg82.antivpn.extended.Configuration;
-import me.egg82.antivpn.messaging.Messaging;
-import me.egg82.antivpn.messaging.MessagingException;
-import me.egg82.antivpn.services.StorageMessagingHandler;
-import me.egg82.antivpn.storage.Storage;
-import me.egg82.antivpn.storage.StorageException;
-import me.egg82.antivpn.utils.ConfigUtil;
-import me.egg82.antivpn.utils.ValidationUtil;
-import me.gong.mcleaks.MCLeaksAPI;
-import ninja.egg82.service.ServiceLocator;
-import ninja.egg82.service.ServiceNotFoundException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -30,6 +10,25 @@ import java.util.UUID;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
+import me.egg82.antivpn.apis.SourceAPI;
+import me.egg82.antivpn.config.CachedConfig;
+import me.egg82.antivpn.config.ConfigUtil;
+import me.egg82.antivpn.extended.Configuration;
+import me.egg82.antivpn.messaging.Messaging;
+import me.egg82.antivpn.messaging.MessagingException;
+import me.egg82.antivpn.services.StorageMessagingHandler;
+import me.egg82.antivpn.storage.Storage;
+import me.egg82.antivpn.storage.StorageException;
+import me.egg82.antivpn.storage.results.MCLeaksResult;
+import me.egg82.antivpn.storage.results.PostMCLeaksResult;
+import me.egg82.antivpn.storage.results.PostVPNResult;
+import me.egg82.antivpn.storage.results.VPNResult;
+import me.egg82.antivpn.utils.ValidationUtil;
+import me.gong.mcleaks.MCLeaksAPI;
+import ninja.egg82.service.ServiceLocator;
+import ninja.egg82.service.ServiceNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class VPNAPI {
     private static final Logger logger = LoggerFactory.getLogger(VPNAPI.class);
@@ -54,7 +53,7 @@ public class VPNAPI {
             logger.error("Could not get configuration.");
             return;
         }
-        Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+        Optional<CachedConfig> cachedConfig = ConfigUtil.getCachedConfig();
         if (!cachedConfig.isPresent()) {
             logger.error("Cached config could not be fetched.");
             return;
@@ -90,7 +89,7 @@ public class VPNAPI {
             throw new APIException(false, "ip is invalid.");
         }
 
-        Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+        Optional<CachedConfig> cachedConfig = ConfigUtil.getCachedConfig();
         if (!cachedConfig.isPresent()) {
             throw new APIException(false, "Could not get cached config.");
         }
@@ -152,7 +151,7 @@ public class VPNAPI {
             throw new APIException(false, "sourceName cannot be null.");
         }
 
-        Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+        Optional<CachedConfig> cachedConfig = ConfigUtil.getCachedConfig();
         if (!cachedConfig.isPresent()) {
             throw new APIException(false, "Could not get cached config.");
         }
@@ -239,7 +238,7 @@ public class VPNAPI {
     }
 
     private static boolean cascadeExpensive(String ip) throws APIException {
-        Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+        Optional<CachedConfig> cachedConfig = ConfigUtil.getCachedConfig();
         if (!cachedConfig.isPresent()) {
             throw new APIException(false, "Could not get cached config.");
         }
@@ -403,7 +402,7 @@ public class VPNAPI {
     }
 
     private static double consensusExpensive(String ip) throws APIException {
-        Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+        Optional<CachedConfig> cachedConfig = ConfigUtil.getCachedConfig();
         if (!cachedConfig.isPresent()) {
             throw new APIException(false, "Could not get cached config.");
         }
@@ -590,7 +589,7 @@ public class VPNAPI {
     }
 
     private static boolean mcleaksExpensive(UUID playerID) throws APIException {
-        Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+        Optional<CachedConfig> cachedConfig = ConfigUtil.getCachedConfig();
         if (!cachedConfig.isPresent()) {
             throw new APIException(false, "Could not get cached config.");
         }

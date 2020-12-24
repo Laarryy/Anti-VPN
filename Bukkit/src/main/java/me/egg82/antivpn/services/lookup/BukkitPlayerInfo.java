@@ -2,35 +2,32 @@ package me.egg82.antivpn.services.lookup;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
-import ninja.egg82.json.JSONUtil;
-import ninja.egg82.json.JSONWebUtil;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.ParseException;
-
-import java.io.BufferedReader;
+import com.google.common.collect.ImmutableList;
+import flexjson.JSONDeserializer;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
+import me.egg82.antivpn.services.lookup.models.PlayerNameModel;
+import me.egg82.antivpn.services.lookup.models.PlayerUUIDModel;
+import me.egg82.antivpn.services.lookup.models.ProfileModel;
+import me.egg82.antivpn.utils.WebUtil;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 
 public class BukkitPlayerInfo implements PlayerInfo {
     private UUID uuid;
     private String name;
+    private List<ProfileModel.ProfilePropertyModel> properties;
 
     private static Cache<UUID, String> uuidCache = Caffeine.newBuilder().expireAfterWrite(1L, TimeUnit.HOURS).build();
     private static Cache<String, UUID> nameCache = Caffeine.newBuilder().expireAfterWrite(1L, TimeUnit.HOURS).build();
+    private static Cache<UUID, List<ProfileModel.ProfilePropertyModel>> propertiesCache = Caffeine.newBuilder().expireAfterWrite(1L, TimeUnit.DAYS).build();
 
     private static final Object uuidCacheLock = new Object();
     private static final Object nameCacheLock = new Object();
+    private static final Object propertiesCacheLock = new Object();
 
     private static final Map<String, String> headers = new HashMap<>();
 
@@ -55,6 +52,20 @@ public class BukkitPlayerInfo implements PlayerInfo {
         }
 
         this.name = name.orElse(null);
+
+        if (this.name != null) {
+            Optional<List<ProfileModel.ProfilePropertyModel>> properties = Optional.ofNullable(propertiesCache.getIfPresent(uuid));
+            if (!properties.isPresent()) {
+                synchronized (propertiesCacheLock) {
+                    properties = Optional.ofNullable(propertiesCache.getIfPresent(uuid));
+                    if (!properties.isPresent()) {
+                        properties = Optional.ofNullable(propertiesExpensive(uuid));
+                        properties.ifPresent(v -> propertiesCache.put(uuid, v));
+                    }
+                }
+            }
+            this.properties = properties.orElse(null);
+        }
     }
 
     BukkitPlayerInfo(String name) throws IOException {
@@ -72,37 +83,55 @@ public class BukkitPlayerInfo implements PlayerInfo {
         }
 
         this.uuid = uuid.orElse(null);
+
+        if (this.uuid != null) {
+            Optional<List<ProfileModel.ProfilePropertyModel>> properties = Optional.ofNullable(propertiesCache.getIfPresent(this.uuid));
+            if (!properties.isPresent()) {
+                synchronized (propertiesCacheLock) {
+                    properties = Optional.ofNullable(propertiesCache.getIfPresent(this.uuid));
+                    if (!properties.isPresent()) {
+                        properties = Optional.ofNullable(propertiesExpensive(this.uuid));
+                        properties.ifPresent(v -> propertiesCache.put(this.uuid, v));
+                    }
+                }
+            }
+            this.properties = properties.orElse(null);
+        }
     }
 
     public UUID getUUID() { return uuid; }
 
     public String getName() { return name; }
 
+    public ImmutableList<ProfileModel.ProfilePropertyModel> getProperties() { return ImmutableList.copyOf(properties); }
+
     private static String nameExpensive(UUID uuid) throws IOException {
         // Currently-online lookup
         Player player = Bukkit.getPlayer(uuid);
         if (player != null) {
-            nameCache.put(player.getName(), uuid);
+            synchronized (nameCacheLock) {
+                nameCache.put(player.getName(), uuid);
+            }
             return player.getName();
         }
 
         // Network lookup
-        HttpURLConnection conn = JSONWebUtil.getConnection(new URL("https://api.mojang.com/user/profiles/" + uuid.toString().replace("-", "") + "/names"), "GET", 5000, "egg82/PlayerInfo", headers);;
+        HttpURLConnection conn = WebUtil.getConnection(new URL("https://api.mojang.com/user/profiles/" + uuid.toString().replace("-", "") + "/names"), "GET", 5000, "egg82/PlayerInfo", headers);
         int status = conn.getResponseCode();
 
         if (status == 204) {
             // No data exists
             return null;
         } else if (status == 200) {
-            try {
-                JSONArray json = getJSONArray(conn, status);
-                JSONObject last = (JSONObject) json.get(json.size() - 1);
-                String name = (String) last.get("name");
+            JSONDeserializer<List<PlayerNameModel>> modelDeserializer = new JSONDeserializer<>();
+            modelDeserializer.use("values", PlayerNameModel.class);
+            List<PlayerNameModel> model = modelDeserializer.deserialize(WebUtil.getString(conn));
+
+            String name = model.get(model.size() - 1).getName();
+            synchronized (nameCacheLock) {
                 nameCache.put(name, uuid);
-                return name;
-            } catch (ParseException | ClassCastException ex) {
-                throw new IOException(ex.getMessage(), ex);
             }
+            return name;
         }
 
         throw new IOException("Could not load player data from Mojang (rate-limited?)");
@@ -112,57 +141,46 @@ public class BukkitPlayerInfo implements PlayerInfo {
         // Currently-online lookup
         Player player = Bukkit.getPlayer(name);
         if (player != null) {
-            uuidCache.put(player.getUniqueId(), name);
+            synchronized (uuidCacheLock) {
+                uuidCache.put(player.getUniqueId(), name);
+            }
             return player.getUniqueId();
         }
 
         // Network lookup
-        HttpURLConnection conn = JSONWebUtil.getConnection(new URL("https://api.mojang.com/users/profiles/minecraft/" + name), "GET", 5000, "egg82/PlayerInfo", headers);
+        HttpURLConnection conn = WebUtil.getConnection(new URL("https://api.mojang.com/users/profiles/minecraft/" + WebUtil.urlEncode(name)), "GET", 5000, "egg82/PlayerInfo", headers);
         int status = conn.getResponseCode();
 
         if (status == 204) {
             // No data exists
             return null;
         } else if (status == 200) {
-            try {
-                JSONObject json = getJSONObject(conn, status);
-                UUID uuid = UUID.fromString(((String) json.get("id")).replaceFirst("(\\p{XDigit}{8})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}+)", "$1-$2-$3-$4-$5"));
-                name = (String) json.get("name");
+            JSONDeserializer<PlayerUUIDModel> modelDeserializer = new JSONDeserializer<>();
+            PlayerUUIDModel model = modelDeserializer.deserialize(WebUtil.getString(conn), PlayerUUIDModel.class);
+
+            UUID uuid = UUID.fromString(model.getId().replaceFirst("(\\p{XDigit}{8})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}+)", "$1-$2-$3-$4-$5"));
+            synchronized (uuidCacheLock) {
                 uuidCache.put(uuid, name);
-                return uuid;
-            } catch (ParseException | ClassCastException ex) {
-                throw new IOException(ex.getMessage(), ex);
             }
+            return uuid;
         }
 
         throw new IOException("Could not load player data from Mojang (rate-limited?)");
     }
 
-    public static JSONArray getJSONArray(HttpURLConnection conn, int status) throws IOException, ParseException, ClassCastException {
-        return JSONUtil.parseArray(getString(conn, status));
-    }
+    private static List<ProfileModel.ProfilePropertyModel> propertiesExpensive(UUID uuid) throws IOException {
+        // Network lookup
+        HttpURLConnection conn = WebUtil.getConnection(new URL("https://sessionserver.mojang.com/session/minecraft/profile/" + uuid.toString().replace("-", "") + "?unsigned=false"), "GET", 5000, "egg82/PlayerInfo", headers);
+        int status = conn.getResponseCode();
 
-    private static JSONObject getJSONObject(HttpURLConnection conn, int status) throws IOException, ParseException, ClassCastException {
-        return JSONUtil.parseObject(getString(conn, status));
-    }
-
-    private static String getString(HttpURLConnection conn, int status) throws IOException {
-        try (InputStream in = getInputStream(conn, status); InputStreamReader reader = new InputStreamReader(in); BufferedReader buffer = new BufferedReader(reader)) {
-            StringBuilder builder = new StringBuilder();
-            String line;
-            while ((line = buffer.readLine()) != null) {
-                builder.append(line);
-            }
-            return builder.toString();
-        }
-    }
-
-    private static InputStream getInputStream(HttpURLConnection conn, int status) throws IOException {
-        if (status >= 400 && status < 600) {
-            // 400-500 errors
-            throw new IOException("Server returned status code " + status);
+        if (status == 204) {
+            // No data exists
+            return null;
+        } else if (status == 200) {
+            JSONDeserializer<ProfileModel> modelDeserializer = new JSONDeserializer<>();
+            return modelDeserializer.deserialize(WebUtil.getString(conn), ProfileModel.class).getProperties();
         }
 
-        return conn.getInputStream();
+        throw new IOException("Could not load skin data from Mojang (rate-limited?)");
     }
 }

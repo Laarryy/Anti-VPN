@@ -1,14 +1,18 @@
 package me.egg82.antivpn.events;
 
 import inet.ipaddr.IPAddressString;
+import java.net.InetAddress;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import me.egg82.antivpn.APIException;
-import me.egg82.antivpn.enums.VPNAlgorithmMethod;
-import me.egg82.antivpn.extended.CachedConfigValues;
+import me.egg82.antivpn.config.CachedConfig;
+import me.egg82.antivpn.config.ConfigUtil;
+import me.egg82.antivpn.config.enums.VPNAlgorithmMethod;
 import me.egg82.antivpn.hooks.LuckPermsHook;
 import me.egg82.antivpn.hooks.PlaceholderAPIHook;
 import me.egg82.antivpn.hooks.VaultHook;
-import me.egg82.antivpn.services.AnalyticsHelper;
-import me.egg82.antivpn.utils.ConfigUtil;
+import me.egg82.antivpn.hooks.plan.AnalyticsUtil;
 import me.egg82.antivpn.utils.LogUtil;
 import me.egg82.antivpn.utils.ValidationUtil;
 import ninja.egg82.events.BukkitEvents;
@@ -20,11 +24,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.plugin.Plugin;
-
-import java.net.InetAddress;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 
 public class PlayerEvents extends EventHolder {
 
@@ -93,7 +92,7 @@ public class PlayerEvents extends EventHolder {
             return;
         }
 
-        Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+        Optional<CachedConfig> cachedConfig = ConfigUtil.getCachedConfig();
         if (!cachedConfig.isPresent()) {
             return;
         }
@@ -116,7 +115,7 @@ public class PlayerEvents extends EventHolder {
         cacheData(ip, event.getUniqueId(), cachedConfig.get());
 
         if (isVPN(ip, event.getName(), cachedConfig.get())) {
-            AnalyticsHelper.incrementBlockedVPNs();
+            AnalyticsUtil.incrementBlockedVPNs();
             if (!cachedConfig.get().getVPNActionCommands().isEmpty()) {
                 tryRunCommands(cachedConfig.get().getVPNActionCommands(), event.getName(), event.getUniqueId(), ip);
             }
@@ -127,7 +126,7 @@ public class PlayerEvents extends EventHolder {
         }
 
         if (isMCLeaks(event.getName(), event.getUniqueId(), cachedConfig.get())) {
-            AnalyticsHelper.incrementBlockedMCLeaks();
+            AnalyticsUtil.incrementBlockedMCLeaks();
             if (!cachedConfig.get().getMCLeaksActionCommands().isEmpty()) {
                 tryRunCommands(cachedConfig.get().getMCLeaksActionCommands(), event.getName(), event.getUniqueId(), ip);
             }
@@ -144,7 +143,7 @@ public class PlayerEvents extends EventHolder {
             return;
         }
 
-        Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+        Optional<CachedConfig> cachedConfig = ConfigUtil.getCachedConfig();
         if (!cachedConfig.isPresent()) {
             return;
         }
@@ -162,7 +161,7 @@ public class PlayerEvents extends EventHolder {
         cacheData(ip, event.getUniqueId(), cachedConfig.get());
     }
 
-    private void cacheData(String ip, UUID uuid, CachedConfigValues cachedConfig) {
+    private void cacheData(String ip, UUID uuid, CachedConfig cachedConfig) {
         // Cache IP data
         if ((!cachedConfig.getVPNKickMessage().isEmpty() || !cachedConfig.getVPNActionCommands().isEmpty())) {
             if (cachedConfig.getVPNAlgorithmMethod() == VPNAlgorithmMethod.CONSESNSUS) {
@@ -232,7 +231,7 @@ public class PlayerEvents extends EventHolder {
             return;
         }
 
-        Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+        Optional<CachedConfig> cachedConfig = ConfigUtil.getCachedConfig();
         if (!cachedConfig.isPresent()) {
             return;
         }
@@ -259,7 +258,7 @@ public class PlayerEvents extends EventHolder {
         }
 
         if (isVPN(ip, event.getPlayer().getName(), cachedConfig.get())) {
-            AnalyticsHelper.incrementBlockedVPNs();
+            AnalyticsUtil.incrementBlockedVPNs();
             if (!cachedConfig.get().getVPNActionCommands().isEmpty()) {
                 tryRunCommands(cachedConfig.get().getVPNActionCommands(), event.getPlayer().getName(), event.getPlayer().getUniqueId(), ip);
             }
@@ -270,7 +269,7 @@ public class PlayerEvents extends EventHolder {
         }
 
         if (isMCLeaks(event.getPlayer().getName(), event.getPlayer().getUniqueId(), cachedConfig.get())) {
-            AnalyticsHelper.incrementBlockedMCLeaks();
+            AnalyticsUtil.incrementBlockedMCLeaks();
             if (!cachedConfig.get().getMCLeaksActionCommands().isEmpty()) {
                 tryRunCommands(cachedConfig.get().getMCLeaksActionCommands(), event.getPlayer().getName(), event.getPlayer().getUniqueId(), ip);
             }
@@ -281,7 +280,7 @@ public class PlayerEvents extends EventHolder {
         }
     }
 
-    private boolean isVPN(String ip, String name, CachedConfigValues cachedConfig) {
+    private boolean isVPN(String ip, String name, CachedConfig cachedConfig) {
         if (!cachedConfig.getVPNKickMessage().isEmpty() || !cachedConfig.getVPNActionCommands().isEmpty()) {
             boolean isVPN;
 
@@ -328,7 +327,7 @@ public class PlayerEvents extends EventHolder {
         return false;
     }
 
-    private boolean isMCLeaks(String name, UUID uuid, CachedConfigValues cachedConfig) {
+    private boolean isMCLeaks(String name, UUID uuid, CachedConfig cachedConfig) {
         if (!cachedConfig.getMCLeaksKickMessage().isEmpty() || !cachedConfig.getMCLeaksActionCommands().isEmpty()) {
             boolean isMCLeaks;
 

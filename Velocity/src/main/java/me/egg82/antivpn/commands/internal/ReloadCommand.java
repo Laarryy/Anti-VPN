@@ -3,9 +3,9 @@ package me.egg82.antivpn.commands.internal;
 import co.aikar.commands.CommandIssuer;
 import com.velocitypowered.api.plugin.PluginDescription;
 import com.velocitypowered.api.proxy.ProxyServer;
-import me.egg82.antivpn.enums.Message;
+import me.egg82.antivpn.config.ConfigurationFileUtil;
+import me.egg82.antivpn.lang.Message;
 import me.egg82.antivpn.services.StorageMessagingHandler;
-import me.egg82.antivpn.utils.ConfigurationFileUtil;
 
 public class ReloadCommand implements Runnable {
     private final Object plugin;

@@ -2,45 +2,38 @@
 # "external" data sources will also be used as messaging
 storage:
   engines:
-    mysql:
-      # Whether or not to use MySQL/MariaDB
+    # Engine name. Can be anything
+    engine1:
+      # Engine type. Can be "mysql" or "sqlite"
       # https://mariadb.org/
+      # https://www.sqlite.org/index.html
+      type: 'mysql'
+      # Whether or not to use this engine
       enabled: false
       connection:
-        # Address and port of the database instance
+        # Address and port (MySQL only)
         address: '127.0.0.1:3306'
-        # The name of the database the plugin will store data in
+        # The name of the database the plugin will store data in (MySQL only)
         # This must be created beforehand
         database: 'anti_vpn'
-        # Table prefix for all plugin tables, indexes, keys, and procedures
-        prefix: 'avpn_'
-        # Database credentials
+        # Credentials
         username: ''
         password: ''
-        # Extra options to use with the database server
+        # Extra options to use with this storage engine
         # These values will override any others
         options: 'useSSL=false&useUnicode=true&characterEncoding=utf8'
-    redis:
-      # Whether or not to use Redis for storage
-      # https://redis.io/
-      enabled: false
-      connection:
-        # Address and port of the Redis instance
-        address: '127.0.0.1:6379'
-        # Redis credentials
-        password: ''
-        # Storage prefix for all plugin data
-        prefix: 'avpn:'
-    sqlite:
-      # Whether or not to use SQLite
+    # Engine name. Can be anything
+    engine2:
+      # Engine type. Can be "mysql" or "sqlite"
+      # https://mariadb.org/
       # https://www.sqlite.org/index.html
+      type: 'sqlite'
+      # Whether or not to use this engine
       enabled: true
       connection:
-        # File name for the database
+        # File name (SQLite only)
         file: 'anti_vpn.db'
-        # Table prefix for all plugin tables, indexes, keys, and procedures
-        prefix: 'avpn_'
-        # Extra options to use with the database server
+        # Extra options to use with this storage engine
         # These values will override any others
         options: 'useUnicode=true&characterEncoding=utf8'
   settings:
@@ -52,42 +45,47 @@ storage:
     min-idle: 4
     # The maximum lifetime of a connection in the pool
     # Should be at least 30 seconds less than any storage engine or infrastructure-imposed connection time limit
-    max-lifetime: 1800000 # 30 minutes
-    # The maximum number of milliseconds that the plugin will wait for a new connection from the pool before timing out
-    timeout: 5000 # 5 seconds
+    max-lifetime: '30minutes'
+    # The maximum amount of time that the plugin will wait for a new connection from the pool before timing out
+    timeout: '5seconds'
   # The order in which the storage engines will be used
   # The first available engine will be considered the "master" and will be the authoritative data source
   # Keep in mind that, for redundancy, ALL defined and enabled storage engines will be used
   order:
-    - 'mysql'
-    - 'redis'
-    - 'sqlite'
+    - 'engine1'
+    - 'engine2'
 
 # How the plugin rapidly shares information with other servers along the network
-# Note that cross-server chat toggling only works if a messaging engine is provided
-# Else any toggled chat will be erased when the player leaves the server
 messaging:
   engines:
-    rabbitmq:
-      # Whether or not to use RabbitMQ for messaging
+    # Engine name. Can be anything
+    engine1:
+      # Engine type. Can be "rabbitmq" or "redis"
       # https://www.rabbitmq.com/
+      # https://redis.io/
+      type: 'rabbitmq'
+      # Whether or not to use this engine
       enabled: false
       connection:
-        # Address and port of the RabbitMQ instance
+        # Address and port
         address: '127.0.0.1:5672'
-        # RabbitMQ virtual host
+        # Virtual host (RabbitMQ only)
         v-host: '/'
-        # RabbitMQ credentials
+        # Credentials
         username: 'guest'
         password: 'guest'
-    redis:
-      # Whether or not to use Redis for messaging
+    # Engine name. Can be anything
+    engine2:
+      # Engine type. Can be "rabbitmq" or "redis"
+      # https://www.rabbitmq.com/
       # https://redis.io/
+      type: 'redis'
+      # Whether or not to use this engine
       enabled: false
       connection:
-        # Address and port of the Redis instance
+        # Address and port
         address: '127.0.0.1:6379'
-        # Redis credentials
+        # Credentials
         password: ''
   settings:
     # The maximum size of the messaging engine connection pool
@@ -98,14 +96,9 @@ messaging:
     min-idle: 5 # + 1 for the receiver
     # The maximum lifetime of a connection in the pool
     # Should be at least 30 seconds less than any messaging engine or infrastructure-imposed connection time limit
-    max-lifetime: 1800000 # 30 minutes
-    # The maximum number of milliseconds that the plugin will wait for a new connection from the pool before timing out
-    timeout: 5000 # 5 seconds
-  # The order in which the messaging engines will be used
-  # Keep in mind that, for redundancy, ALL defined and enabled messaging engines will be used
-  order:
-    - 'rabbitmq'
-    - 'redis'
+    max-lifetime: '30minutes'
+    # The maximum amount of time that the plugin will wait for a new connection from the pool before timing out
+    timeout: '5seconds'
 
 # Where VPN-checking sources are defined
 # Beware the more sources that are included (and fail) the worse the performance and the more the lag
@@ -335,14 +328,14 @@ action:
 
 connection:
   # The amount of time to cache lookups in-memory
-  # Higher values require more memory
+  # Higher values require slightly more memory
   # Lower values will hit Storage/APIs more frequently
   # Generally the default is good enough to prevent many sequential lookups from choking resources, but still keep memory usage low
   cache-time: '1minute'
   # The number of threads to use for web operations
   threads: 4
-  # The maximum number of milliseconds that the plugin will wait for an API to respond before timing out
-  timeout: 5000 # 5 seconds
+  # The maximum amount of time that the plugin will wait for an API to respond before timing out
+  timeout: '5seconds'
 
 # When true, logs some extra output to the console so you can see if/why things might be failing
 debug: false
@@ -366,4 +359,4 @@ update:
   notify: true
 
 # Config version, no touchy plz
-version: 4.14
+version: 5.0

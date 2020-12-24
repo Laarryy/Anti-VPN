@@ -6,26 +6,25 @@ import com.velocitypowered.api.event.connection.PreLoginEvent;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import inet.ipaddr.IPAddressString;
-import me.egg82.antivpn.APIException;
-import me.egg82.antivpn.enums.VPNAlgorithmMethod;
-import me.egg82.antivpn.extended.CachedConfigValues;
-import me.egg82.antivpn.services.AnalyticsHelper;
-import me.egg82.antivpn.services.lookup.PlayerInfo;
-import me.egg82.antivpn.services.lookup.PlayerLookup;
-import me.egg82.antivpn.utils.ConfigUtil;
-import me.egg82.antivpn.utils.LogUtil;
-import me.egg82.antivpn.utils.ValidationUtil;
-import net.kyori.text.TextComponent;
-import net.kyori.text.format.TextColor;
-import net.kyori.text.serializer.legacy.LegacyComponentSerializer;
-import ninja.egg82.events.VelocityEvents;
-
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import me.egg82.antivpn.APIException;
+import me.egg82.antivpn.config.CachedConfig;
+import me.egg82.antivpn.config.ConfigUtil;
+import me.egg82.antivpn.config.enums.VPNAlgorithmMethod;
+import me.egg82.antivpn.services.AnalyticsHelper;
+import me.egg82.antivpn.services.lookup.PlayerInfo;
+import me.egg82.antivpn.services.lookup.PlayerLookup;
+import me.egg82.antivpn.utils.LogUtil;
+import me.egg82.antivpn.utils.ValidationUtil;
+import net.kyori.text.TextComponent;
+import net.kyori.text.format.TextColor;
+import net.kyori.text.serializer.legacy.LegacyComponentSerializer;
+import ninja.egg82.events.VelocityEvents;
 
 public class PlayerEvents extends EventHolder {
     private final ProxyServer proxy;
@@ -50,7 +49,7 @@ public class PlayerEvents extends EventHolder {
             return;
         }
 
-        Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+        Optional<CachedConfig> cachedConfig = ConfigUtil.getCachedConfig();
         if (!cachedConfig.isPresent()) {
             return;
         }
@@ -101,7 +100,7 @@ public class PlayerEvents extends EventHolder {
             return;
         }
 
-        Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+        Optional<CachedConfig> cachedConfig = ConfigUtil.getCachedConfig();
         if (!cachedConfig.isPresent()) {
             return;
         }

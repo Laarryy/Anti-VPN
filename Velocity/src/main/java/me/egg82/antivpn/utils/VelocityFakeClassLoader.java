@@ -1,13 +1,12 @@
 package me.egg82.antivpn.utils;
 
 import com.velocitypowered.api.proxy.ProxyServer;
-import me.egg82.antivpn.VelocityBootstrap;
-
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import me.egg82.antivpn.VelocityBootstrap;
 
 public class VelocityFakeClassLoader extends URLClassLoader {
     private final ProxyServer server;

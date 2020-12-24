@@ -1,0 +1,2 @@
+entity-packages: me.egg82.antivpn.storage.models
+transactional-packages: me.egg82.antivpn.storage

@@ -10,20 +10,19 @@ import com.djrapitops.plan.extension.annotation.NumberProvider;
 import com.djrapitops.plan.extension.annotation.PluginInfo;
 import com.djrapitops.plan.extension.icon.Color;
 import com.djrapitops.plan.extension.icon.Family;
-import me.egg82.antivpn.APIException;
-import me.egg82.antivpn.VPNAPI;
-import me.egg82.antivpn.enums.VPNAlgorithmMethod;
-import me.egg82.antivpn.extended.CachedConfigValues;
-import me.egg82.antivpn.utils.ConfigUtil;
-import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.Optional;
 import java.util.UUID;
+import me.egg82.antivpn.APIException;
+import me.egg82.antivpn.VPNAPI;
+import me.egg82.antivpn.config.CachedConfig;
+import me.egg82.antivpn.config.ConfigUtil;
+import me.egg82.antivpn.config.enums.VPNAlgorithmMethod;
+import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PlayerAnalyticsHook implements PluginHook {
     private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -80,7 +79,7 @@ public class PlayerAnalyticsHook implements PluginHook {
                 format = FormatType.NONE
         )
         public long getVPNs() {
-            Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+            Optional<CachedConfig> cachedConfig = ConfigUtil.getCachedConfig();
             if (!cachedConfig.isPresent()) {
                 logger.error("Cached config could not be fetched.");
                 return 0L;
@@ -124,7 +123,7 @@ public class PlayerAnalyticsHook implements PluginHook {
                 format = FormatType.NONE
         )
         public long getMCLeaks() {
-            Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+            Optional<CachedConfig> cachedConfig = ConfigUtil.getCachedConfig();
             if (!cachedConfig.isPresent()) {
                 logger.error("Cached config could not be fetched.");
                 return 0L;
@@ -161,7 +160,7 @@ public class PlayerAnalyticsHook implements PluginHook {
                 return false;
             }
 
-            Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+            Optional<CachedConfig> cachedConfig = ConfigUtil.getCachedConfig();
             if (!cachedConfig.isPresent()) {
                 logger.error("Cached config could not be fetched.");
                 return false;
@@ -191,7 +190,7 @@ public class PlayerAnalyticsHook implements PluginHook {
                 iconColor = Color.NONE
         )
         public boolean getMCLeaks(UUID playerID) {
-            Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+            Optional<CachedConfig> cachedConfig = ConfigUtil.getCachedConfig();
             if (!cachedConfig.isPresent()) {
                 logger.error("Cached config could not be fetched.");
                 return false;

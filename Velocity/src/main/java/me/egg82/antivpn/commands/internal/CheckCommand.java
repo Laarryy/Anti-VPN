@@ -2,21 +2,20 @@ package me.egg82.antivpn.commands.internal;
 
 import co.aikar.commands.CommandIssuer;
 import com.velocitypowered.api.proxy.ProxyServer;
-import me.egg82.antivpn.APIException;
-import me.egg82.antivpn.VPNAPI;
-import me.egg82.antivpn.enums.Message;
-import me.egg82.antivpn.enums.VPNAlgorithmMethod;
-import me.egg82.antivpn.extended.CachedConfigValues;
-import me.egg82.antivpn.services.lookup.PlayerInfo;
-import me.egg82.antivpn.services.lookup.PlayerLookup;
-import me.egg82.antivpn.utils.ConfigUtil;
-import me.egg82.antivpn.utils.ValidationUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.util.Optional;
 import java.util.UUID;
+import me.egg82.antivpn.APIException;
+import me.egg82.antivpn.VPNAPI;
+import me.egg82.antivpn.config.CachedConfig;
+import me.egg82.antivpn.config.ConfigUtil;
+import me.egg82.antivpn.config.enums.VPNAlgorithmMethod;
+import me.egg82.antivpn.lang.Message;
+import me.egg82.antivpn.services.lookup.PlayerInfo;
+import me.egg82.antivpn.services.lookup.PlayerLookup;
+import me.egg82.antivpn.utils.ValidationUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class CheckCommand implements Runnable {
     private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -37,7 +36,7 @@ public class CheckCommand implements Runnable {
         issuer.sendInfo(Message.CHECK__BEGIN, "{type}", type);
 
         if (ValidationUtil.isValidIp(type)) {
-            Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+            Optional<CachedConfig> cachedConfig = ConfigUtil.getCachedConfig();
             if (!cachedConfig.isPresent()) {
                 logger.error("Cached config could not be fetched.");
                 issuer.sendError(Message.ERROR__INTERNAL);
@@ -75,7 +74,7 @@ public class CheckCommand implements Runnable {
                 return;
             }
 
-            Optional<CachedConfigValues> cachedConfig = ConfigUtil.getCachedConfig();
+            Optional<CachedConfig> cachedConfig = ConfigUtil.getCachedConfig();
             if (!cachedConfig.isPresent()) {
                 logger.error("Cached config could not be fetched.");
                 issuer.sendError(Message.ERROR__INTERNAL);

@@ -5,18 +5,6 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import inet.ipaddr.IPAddress;
 import inet.ipaddr.IPAddressString;
-import me.egg82.antivpn.APIException;
-import me.egg82.antivpn.VPNAPI;
-import me.egg82.antivpn.enums.Message;
-import me.egg82.antivpn.utils.ConfigUtil;
-import me.egg82.antivpn.utils.ValidationUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.naming.NamingEnumeration;
-import javax.naming.NamingException;
-import javax.naming.directory.Attributes;
-import javax.naming.directory.InitialDirContext;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.text.DecimalFormat;
@@ -24,6 +12,17 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import javax.naming.NamingEnumeration;
+import javax.naming.NamingException;
+import javax.naming.directory.Attributes;
+import javax.naming.directory.InitialDirContext;
+import me.egg82.antivpn.APIException;
+import me.egg82.antivpn.VPNAPI;
+import me.egg82.antivpn.config.ConfigUtil;
+import me.egg82.antivpn.lang.Message;
+import me.egg82.antivpn.utils.ValidationUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ScoreCommand implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(ScoreCommand.class);

@@ -2,9 +2,9 @@ package me.egg82.antivpn.commands.internal;
 
 import co.aikar.commands.CommandIssuer;
 import co.aikar.taskchain.TaskChain;
-import me.egg82.antivpn.enums.Message;
+import me.egg82.antivpn.config.ConfigurationFileUtil;
+import me.egg82.antivpn.lang.Message;
 import me.egg82.antivpn.services.StorageMessagingHandler;
-import me.egg82.antivpn.utils.ConfigurationFileUtil;
 import org.bukkit.plugin.Plugin;
 
 public class ReloadCommand implements Runnable {
