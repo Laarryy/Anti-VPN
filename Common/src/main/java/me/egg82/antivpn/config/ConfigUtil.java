@@ -1,7 +1,6 @@
 package me.egg82.antivpn.config;
 
 import javax.annotation.Nullable;
-
 import org.spongepowered.configurate.ConfigurationNode;
 
 public class ConfigUtil {

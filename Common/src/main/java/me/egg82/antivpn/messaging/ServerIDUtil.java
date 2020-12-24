@@ -1,12 +1,11 @@
 package me.egg82.antivpn.messaging;
 
-import me.egg82.antivpn.utils.ValidationUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.*;
 import java.nio.file.Files;
 import java.util.UUID;
+import me.egg82.antivpn.utils.ValidationUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ServerIDUtil {
     private static final Logger logger = LoggerFactory.getLogger(ServerIDUtil.class);

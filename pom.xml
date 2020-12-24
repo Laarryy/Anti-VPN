@@ -15,8 +15,8 @@
         <plugin.version>6.0.0</plugin.version>
         <paper.version>1.16.1-R0.1-SNAPSHOT</paper.version>
         <waterfall.version>1.15-SNAPSHOT</waterfall.version>
-        <velocity.version>1.0.0-SNAPSHOT</velocity.version>
-        <bstats.version>1.7</bstats.version>
+        <velocity.version>1.1.2</velocity.version>
+        <bstats.version>1.8</bstats.version>
         <mockbukkit.version>1.14-0.2.2</mockbukkit.version>
 
         <servicelocator.version>1.0.2</servicelocator.version>
@@ -25,12 +25,13 @@
         <jsonweb.version>2.1.7</jsonweb.version>
         <sqlite.version>LATEST</sqlite.version>
         <mysql.version>LATEST</mysql.version>
-        <flyway.version>7.3.1</flyway.version>
-        <ebean.version>12.6.2</ebean.version>
+        <flyway.version>7.3.2</flyway.version>
+        <ebean.version>12.6.4</ebean.version>
         <flexjson.version>3.3</flexjson.version>
         <jedis.version>3.4.0</jedis.version>
         <rabbitmq.version>5.10.0</rabbitmq.version>
-        <guava.version>30.0-jre</guava.version>
+        <zstd.version>1.4.5-12</zstd.version>
+        <guava.version>30.1-jre</guava.version>
         <fastutil.version>8.4.4</fastutil.version>
         <caffeine.version>2.8.8</caffeine.version>
         <ipaddress.version>5.3.3</ipaddress.version>
@@ -128,20 +129,20 @@
         </repository>
     </distributionManagement>
 
-    <repositories>
-        <repository>
-            <id>egg82-nexus</id>
-            <url>https://nexus.egg82.me/repository/maven-releases/</url>
-        </repository>
-        <repository>
-            <id>sponge</id>
-            <url>https://repo.spongepowered.org/maven/</url>
-        </repository>
-        <repository>
-            <id>aikar</id>
-            <url>https://repo.aikar.co/content/groups/aikar/</url>
-        </repository>
-    </repositories>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>me.egg82</groupId>
+                <artifactId>antivpn-api</artifactId>
+                <version>${plugin.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>me.egg82</groupId>
+                <artifactId>antivpn-common</artifactId>
+                <version>${plugin.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <modules>
         <module>API</module>

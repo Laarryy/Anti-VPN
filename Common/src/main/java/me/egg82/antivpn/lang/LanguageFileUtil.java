@@ -1,14 +1,13 @@
 package me.egg82.antivpn.lang;
 
-import org.spongepowered.configurate.CommentedConfigurationNode;
-import org.spongepowered.configurate.loader.ConfigurationLoader;
-import org.spongepowered.configurate.yaml.NodeStyle;
-import org.spongepowered.configurate.yaml.YamlConfigurationLoader;
-
 import java.io.*;
 import java.nio.file.Files;
 import java.util.Locale;
 import java.util.Optional;
+import org.spongepowered.configurate.CommentedConfigurationNode;
+import org.spongepowered.configurate.loader.ConfigurationLoader;
+import org.spongepowered.configurate.yaml.NodeStyle;
+import org.spongepowered.configurate.yaml.YamlConfigurationLoader;
 
 public class LanguageFileUtil {
     private LanguageFileUtil() {}
@@ -39,7 +38,7 @@ public class LanguageFileUtil {
 
         // Check language version
         if (fileOnDisk.exists()) {
-            try (InputStream inStream = LanguageFileUtil.class.getResourceAsStream("/" + resourcePath)) {
+            try (InputStream inStream = LanguageFileUtil.class.getResourceAsStream("/lang/" + resourcePath)) {
                 if (inStream != null) {
                     ConfigurationLoader<CommentedConfigurationNode> fileLoader = YamlConfigurationLoader.builder().nodeStyle(NodeStyle.BLOCK).indent(2).file(fileOnDisk).build();
                     CommentedConfigurationNode fileRoot = fileLoader.load();
@@ -67,7 +66,7 @@ public class LanguageFileUtil {
 
         // Write language file to disk if not exists
         if (!fileOnDisk.exists()) {
-            try (InputStream inStream = LanguageFileUtil.class.getResourceAsStream("/" + resourcePath)) {
+            try (InputStream inStream = LanguageFileUtil.class.getResourceAsStream("/lang/" + resourcePath)) {
                 if (inStream != null) {
                     try (InputStreamReader reader = new InputStreamReader(inStream);
                          BufferedReader in = new BufferedReader(reader);

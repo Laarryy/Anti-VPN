@@ -1,7 +1,6 @@
 package me.egg82.antivpn.utils;
 
 import java.util.Objects;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -12,15 +11,15 @@ public class TimeUtil {
     private static final Pattern timePattern = Pattern.compile("^(\\d+)\\s*(?:seconds?|s|minutes?|m|hours?|h|days?|d)$");
     private static final Pattern unitPattern = Pattern.compile("^(?:\\d+)\\s*(seconds?|s|minutes?|m|hours?|h|days?|d)$");
 
-    public static Optional<Time> getTime(String input) {
+    public static Time getTime(String input) {
         Matcher timeMatcher = timePattern.matcher(input);
         if (!timeMatcher.matches()) {
-            return Optional.empty();
+            return null;
         }
 
         Matcher unitMatcher = unitPattern.matcher(input);
         if (!unitMatcher.matches()) {
-            return Optional.empty();
+            return null;
         }
 
         long time = Long.parseLong(timeMatcher.group(1));
@@ -28,16 +27,29 @@ public class TimeUtil {
         char unit = unitMatcher.group(1).charAt(0);
         switch (unit) {
             case 's':
-                return Optional.of(new Time(time, TimeUnit.SECONDS));
+                return new Time(time, TimeUnit.SECONDS);
             case 'm':
-                return Optional.of(new Time(time, TimeUnit.MINUTES));
+                return new Time(time, TimeUnit.MINUTES);
             case 'h':
-                return Optional.of(new Time(time, TimeUnit.HOURS));
+                return new Time(time, TimeUnit.HOURS);
             case 'd':
-                return Optional.of(new Time(time, TimeUnit.DAYS));
+                return new Time(time, TimeUnit.DAYS);
             default:
-                return Optional.empty();
+                return null;
         }
+    }
+
+    public static String getTimeString(Time time) {
+        if (time.unit == TimeUnit.DAYS) {
+            return time.time + (time.time == 1 ? "day" : "days");
+        } else if (time.unit == TimeUnit.HOURS) {
+            return time.time + (time.time == 1 ? "hour" : "hours");
+        } else if (time.unit == TimeUnit.MINUTES) {
+            return time.time + (time.time == 1 ? "minute" : "minutes");
+        } else if (time.unit == TimeUnit.SECONDS) {
+            return time.time + (time.time == 1 ? "second" : "seconds");
+        }
+        return null;
     }
 
     public static class Time {

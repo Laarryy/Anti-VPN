@@ -2,7 +2,6 @@ package me.egg82.antivpn.messaging;
 
 import com.rabbitmq.client.*;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
@@ -23,7 +22,7 @@ public class RabbitMQMessagingService extends AbstractMessagingService {
     private RecoverableConnection connection;
 
     private volatile boolean closed = false;
-    private ReadWriteLock queueLock = new ReentrantReadWriteLock();
+    private final ReadWriteLock queueLock = new ReentrantReadWriteLock();
 
     private static final String EXCHANGE_NAME = "avpn-data";
 
@@ -67,11 +66,6 @@ public class RabbitMQMessagingService extends AbstractMessagingService {
             buffer.putLong(serverId.getLeastSignificantBits());
 
             service.handler = handler;
-            try {
-                service.handlePacketMethod = handler.getClass().getMethod("handlePacket", UUID.class, Packet.class);
-            } catch (NoSuchMethodException | SecurityException ex) {
-                service.logger.error("Could not get packet handler method.", ex);
-            }
 
             config.setAutomaticRecoveryEnabled(true);
             config.setTopologyRecoveryEnabled(true);
@@ -137,11 +131,7 @@ public class RabbitMQMessagingService extends AbstractMessagingService {
                 }
                 packet.read(data);
 
-                try {
-                    handlePacketMethod.invoke(handler, UUID.fromString(properties.getMessageId()), packet);
-                } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-                    logger.error("Could not invoke handler.", ex);
-                }
+                handler.handlePacket(UUID.fromString(properties.getMessageId()), packet);
             }
         };
         channel.addShutdownListener(cause -> {

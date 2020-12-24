@@ -1,4 +1,4 @@
-package me.egg82.pemu.services.lookup.models;
+package me.egg82.antivpn.services.lookup.models;
 
 import java.io.Serializable;
 import java.util.ArrayList;

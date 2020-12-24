@@ -1,10 +1,10 @@
-package me.egg82.pemu.messaging.packets;
+package me.egg82.antivpn.messaging.packets;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import me.egg82.pemu.utils.PacketUtil;
+import me.egg82.antivpn.utils.PacketUtil;
 
 public class MultiPacket extends AbstractPacket {
     private List<Packet> packets;
@@ -18,6 +18,10 @@ public class MultiPacket extends AbstractPacket {
     }
 
     public void read(ByteBuffer buffer) {
+        if (!checkVersion(buffer)) {
+            return;
+        }
+
         if (this.packets == null) {
             this.packets = new ArrayList<>();
         } else {
@@ -51,6 +55,8 @@ public class MultiPacket extends AbstractPacket {
     }
 
     public void write(ByteBuffer buffer) {
+        buffer.put(VERSION);
+
         if (packets == null || packets.isEmpty()) {
             buffer.put((byte) 0x00); // End of multi-packet
             return;

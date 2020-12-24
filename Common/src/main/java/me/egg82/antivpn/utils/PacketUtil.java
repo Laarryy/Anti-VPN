@@ -34,7 +34,7 @@ public class PacketUtil {
             try {
                 packet = clazz.newInstance();
             } catch (IllegalAccessException | InstantiationException | ExceptionInInitializerError | SecurityException ex) {
-                LoggerFactory.getLogger(AbstractMessagingService.class).error("Could not instantiate packet " + clazz.getSimpleName() + ".", ex);
+                logger.error("Could not instantiate packet " + clazz.getSimpleName() + ".", ex);
                 continue;
             }
             packetCache.put(packet.getPacketId(), clazz);

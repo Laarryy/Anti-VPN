@@ -2,20 +2,20 @@ package me.egg82.antivpn.config;
 
 import co.aikar.commands.CommandIssuer;
 import com.google.common.reflect.TypeToken;
+import java.io.*;
+import java.nio.file.Files;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import me.egg82.antivpn.VPNAPI;
 import me.egg82.antivpn.apis.SourceAPI;
 import me.egg82.antivpn.config.enums.VPNAlgorithmMethod;
-import me.egg82.antivpn.messaging.MessagingService;
-import me.egg82.antivpn.messaging.RabbitMQMessagingService;
-import me.egg82.antivpn.messaging.RedisMessagingService;
-import me.egg82.antivpn.services.MessagingHandler;
-import me.egg82.antivpn.services.StorageHandler;
-import me.egg82.antivpn.storage.MySQL;
-import me.egg82.antivpn.storage.SQLite;
-import me.egg82.antivpn.storage.Storage;
-import me.egg82.antivpn.storage.StorageException;
-import me.egg82.antivpn.utils.*;
+import me.egg82.antivpn.messaging.*;
+import me.egg82.antivpn.storage.*;
+import me.egg82.antivpn.utils.LogUtil;
+import me.egg82.antivpn.utils.PacketUtil;
+import me.egg82.antivpn.utils.TimeUtil;
+import me.egg82.antivpn.utils.ValidationUtil;
 import ninja.egg82.reflect.PackageFilter;
 import ninja.egg82.service.ServiceLocator;
 import org.reflections.Reflections;
@@ -27,11 +27,6 @@ import org.spongepowered.configurate.ConfigurationOptions;
 import org.spongepowered.configurate.loader.ConfigurationLoader;
 import org.spongepowered.configurate.yaml.NodeStyle;
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader;
-
-import java.io.*;
-import java.nio.file.Files;
-import java.util.*;
-import java.util.concurrent.TimeUnit;
 import redis.clients.jedis.exceptions.JedisException;
 
 public class ConfigurationFileUtil {
@@ -39,7 +34,7 @@ public class ConfigurationFileUtil {
 
     private ConfigurationFileUtil() {}
 
-    public static void reloadConfig(File dataDirectory, CommandIssuer console, StorageHandler storageHandler, MessagingHandler messagingHandler) {
+    public static void reloadConfig(File dataDirectory, CommandIssuer console, MessagingHandler messagingHandler) {
         ConfigurationNode config;
         try {
             config = getConfig("config.yml", new File(dataDirectory, "config.yml"));
@@ -59,38 +54,6 @@ public class ConfigurationFileUtil {
         UUID serverId = ServerIDUtil.getId(new File(dataDirectory, "server-id.txt"));
         if (debug) {
             console.sendMessage(LogUtil.HEADING + "<c2>Server ID:</c2> <c1>" + serverId.toString() + "</c1>");
-        }
-
-        List<Storage> storage;
-        try {
-            storage = getStorage(plugin, config.getNode("storage", "engines"), new PoolSettings(config.getNode("storage", "settings")), debug, config.getNode("storage", "order").getList(TypeToken.of(String.class)), storageHandler);
-        } catch (ObjectMappingException ex) {
-            logger.error(ex.getMessage(), ex);
-            storage = new ArrayList<>();
-        }
-
-        if (storage.isEmpty()) {
-            throw new IllegalStateException("No storage has been defined in the config.yml");
-        }
-
-        if (debug) {
-            for (Storage s : storage) {
-                logger.info(LogUtil.getHeading() + ChatColor.YELLOW + "Added storage: " + ChatColor.WHITE + s.getClass().getSimpleName());
-            }
-        }
-
-        List<Messaging> messaging;
-        try {
-            messaging = getMessaging(config.getNode("messaging", "engines"), new PoolSettings(config.getNode("messaging", "settings")), debug, serverID, config.getNode("messaging", "order").getList(TypeToken.of(String.class)), messagingHandler);
-        } catch (ObjectMappingException ex) {
-            logger.error(ex.getMessage(), ex);
-            messaging = new ArrayList<>();
-        }
-
-        if (debug) {
-            for (Messaging m : messaging) {
-                logger.info(LogUtil.getHeading() + ChatColor.YELLOW + "Added messaging: " + ChatColor.WHITE + m.getClass().getSimpleName());
-            }
         }
 
         Map<String, SourceAPI> sources = getAllSources(debug);
@@ -231,7 +194,7 @@ public class ConfigurationFileUtil {
         CachedConfig cachedConfig = CachedConfig.builder()
                 .debug(debug)
                 .language(getLanguage(config, debug, console))
-                .storage(getStorage(config, serverId, messagingHandler, debug, console))
+                .storage(getStorage(config, dataDirectory, debug, console))
                 .messaging(getMessaging(config, serverId, messagingHandler, debug, console))
                 .sources(getSources(config, debug, console))
                 .sourceCacheTime(getSourceCacheTime(config, debug, console))
@@ -360,162 +323,94 @@ public class ConfigurationFileUtil {
         return null;
     }
 
-    private static List<Storage> getStorage(Plugin plugin, ConfigurationNode enginesNode, PoolSettings settings, boolean debug, List<String> names, StorageHandler handler) {
-        List<Storage> retVal = new ArrayList<>();
+    private static List<StorageService> getStorage(ConfigurationNode config, File dataDirectory, boolean debug, CommandIssuer console) {
+        List<StorageService> retVal = new ArrayList<>();
 
-        for (String name : names) {
-            name = name.toLowerCase();
-            switch (name) {
-                case "mysql": {
-                    if (!enginesNode.getNode(name, "enabled").getBoolean()) {
-                        if (debug) {
-                            logger.info(LogUtil.getHeading() + ChatColor.DARK_RED + name + " is disabled. Removing.");
-                        }
-                        continue;
-                    }
-                    ConfigurationNode connectionNode = enginesNode.getNode(name, "connection");
-                    String options = connectionNode.getNode("options").getString("useSSL=false&useUnicode=true&characterEncoding=utf8");
-                    if (options.length() > 0 && options.charAt(0) == '?') {
-                        options = options.substring(1);
-                    }
-                    AddressPort url = new AddressPort("storage.engines." + name + ".connection.address", connectionNode.getNode("address").getString("127.0.0.1:3306"), 3306);
-                    try {
-                        retVal.add(
-                                MySQL.builder(handler)
-                                        .url(url.address, url.port, connectionNode.getNode("database").getString("anti_vpn"), connectionNode.getNode("prefix").getString("avpn_"))
-                                        .credentials(connectionNode.getNode("username").getString(""), connectionNode.getNode("password").getString(""))
-                                        .options(options)
-                                        .poolSize(settings.minPoolSize, settings.maxPoolSize)
-                                        .life(settings.maxLifetime, settings.timeout)
-                                        .build()
-                        );
-                    } catch (IOException | StorageException ex) {
-                        logger.error("Could not create MySQL instance.", ex);
-                    }
-                    break;
-                }
-                case "redis": {
-                    if (!enginesNode.getNode(name, "enabled").getBoolean()) {
-                        if (debug) {
-                            logger.info(LogUtil.getHeading() + ChatColor.DARK_RED + name + " is disabled. Removing.");
-                        }
-                        continue;
-                    }
-                    ConfigurationNode connectionNode = enginesNode.getNode(name, "connection");
-                    AddressPort url = new AddressPort("storage.engines." + name + ".connection.address", connectionNode.getNode("address").getString("127.0.0.1:6379"), 6379);
-                    try {
-                        retVal.add(
-                                me.egg82.antivpn.storage.Redis.builder(handler)
-                                        .url(url.address, url.port, connectionNode.getNode("prefix").getString("avpn_"))
-                                        .credentials(connectionNode.getNode("password").getString(""))
-                                        .poolSize(settings.minPoolSize, settings.maxPoolSize)
-                                        .life(settings.maxLifetime, (int) settings.timeout)
-                                        .build()
-                        );
-                    } catch (StorageException ex) {
-                        logger.error("Could not create Redis instance.", ex);
-                    }
-                    break;
-                }
-                case "sqlite": {
-                    if (!enginesNode.getNode(name, "enabled").getBoolean()) {
-                        if (debug) {
-                            logger.info(LogUtil.getHeading() + ChatColor.DARK_RED + name + " is disabled. Removing.");
-                        }
-                        continue;
-                    }
-                    ConfigurationNode connectionNode = enginesNode.getNode(name, "connection");
-                    String options = connectionNode.getNode("options").getString("useUnicode=true&characterEncoding=utf8");
-                    if (options.length() > 0 && options.charAt(0) == '?') {
-                        options = options.substring(1);
-                    }
-                    String file = connectionNode.getNode("file").getString("anti_vpn.db");
-                    try {
-                        retVal.add(
-                                SQLite.builder(handler)
-                                        .file(new File(plugin.getDataFolder(), file), connectionNode.getNode("prefix").getString("avpn_"))
-                                        .options(options)
-                                        .poolSize(settings.minPoolSize, settings.maxPoolSize)
-                                        .life(settings.maxLifetime, settings.timeout)
-                                        .build()
-                        );
-                    } catch (IOException | StorageException ex) {
-                        logger.error("Could not create SQLite instance.", ex);
-                    }
-                    break;
-                }
-                default: {
-                    logger.warn("Unknown storage type: \"" + name + "\"");
-                    break;
-                }
+        PoolSettings poolSettings = new PoolSettings(config.node("storage", "settings"));
+        for (Map.Entry<Object, ? extends ConfigurationNode> kvp : config.node("storage", "engines").childrenMap().entrySet()) {
+            StorageService service = getStorageOf((String) kvp.getKey(), kvp.getValue(), dataDirectory, poolSettings, debug, console);
+            if (service == null) {
+                continue;
             }
+
+            if (debug) {
+                console.sendMessage(LogUtil.HEADING + "<c2>Added storage:</c2> <c1>" + service.getName() + " (" + service.getClass().getSimpleName() + ")</c1>");
+            }
+            retVal.add(service);
         }
 
         return retVal;
     }
 
-    private static List<Messaging> getMessaging(ConfigurationNode enginesNode, PoolSettings settings, boolean debug, UUID serverID, List<String> names, MessagingHandler handler) {
-        List<Messaging> retVal = new ArrayList<>();
-
-        for (String name : names) {
-            name = name.toLowerCase();
-            switch (name) {
-                case "rabbitmq": {
-                    if (!enginesNode.getNode(name, "enabled").getBoolean()) {
-                        if (debug) {
-                            logger.info(LogUtil.getHeading() + ChatColor.DARK_RED + name + " is disabled. Removing.");
-                        }
-                        continue;
-                    }
-                    ConfigurationNode connectionNode = enginesNode.getNode(name, "connection");
-                    AddressPort url = new AddressPort("messaging.engines." + name + ".connection.address", connectionNode.getNode("address").getString("127.0.0.1:5672"), 5672);
-                    try {
-                        retVal.add(
-                                RabbitMQ.builder(serverID, handler)
-                                        .url(url.address, url.port, connectionNode.getNode("v-host").getString("/"))
-                                        .credentials(connectionNode.getNode("username").getString("guest"), connectionNode.getNode("password").getString("guest"))
-                                        .timeout((int) settings.timeout)
-                                        .build()
-                        );
-                    } catch (MessagingException ex) {
-                        logger.error("Could not create RabbitMQ instance.", ex);
-                    }
-                    break;
-                }
-                case "redis": {
-                    if (!enginesNode.getNode(name, "enabled").getBoolean()) {
-                        if (debug) {
-                            logger.info(LogUtil.getHeading() + ChatColor.DARK_RED + name + " is disabled. Removing.");
-                        }
-                        continue;
-                    }
-                    ConfigurationNode connectionNode = enginesNode.getNode(name, "connection");
-                    AddressPort url = new AddressPort("messaging.engines." + name + ".connection.address", connectionNode.getNode("address").getString("127.0.0.1:6379"), 6379);
-                    try {
-                        retVal.add(
-                                me.egg82.antivpn.messaging.Redis.builder(serverID, handler)
-                                        .url(url.address, url.port)
-                                        .credentials(connectionNode.getNode("password").getString(""))
-                                        .poolSize(settings.minPoolSize, settings.maxPoolSize)
-                                        .life(settings.maxLifetime, (int) settings.timeout)
-                                        .build()
-                        );
-                    } catch (MessagingException ex) {
-                        logger.error("Could not create Redis instance.", ex);
-                    }
-                    break;
-                }
-                default: {
-                    logger.warn("Unknown messaging type: \"" + name + "\"");
-                    break;
-                }
+    private static StorageService getStorageOf(String name, ConfigurationNode engineNode, File dataDirectory, PoolSettings poolSettings, boolean debug, CommandIssuer console) {
+        if (!engineNode.node("enabled").getBoolean()) {
+            if (debug) {
+                console.sendMessage(LogUtil.HEADING + "<c9>Engine</c9> <c1>" + name + "</c1> <c9>is disabled. Removing.</c9>");
             }
+            return null;
         }
 
-        return retVal;
+        String type = engineNode.node("type").getString("").toLowerCase();
+        ConfigurationNode connectionNode = engineNode.node("connection");
+        switch (type) {
+            case "mysql": {
+                AddressPort url = new AddressPort(connectionNode.key() + ".address", connectionNode.node("address").getString("127.0.0.1:3306"), 3306);
+                if (debug) {
+                    console.sendMessage(LogUtil.HEADING + "<c2>Creating engine</c2> <c1>" + name + "</c1> <c2>of type mysql with address</c2> <c1>" + url.getAddress() + ":" + url.getPort() + "/" + connectionNode.node("database").getString("anti_vpn") + "</c1>");
+                }
+                String options = connectionNode.node("options").getString("useSSL=false&useUnicode=true&characterEncoding=utf8");
+                if (options.length() > 0 && options.charAt(0) == '?') {
+                    options = options.substring(1);
+                }
+                if (debug) {
+                    console.sendMessage(LogUtil.HEADING + "<c2>Setting options for engine</c2> <c1>" + name + "</c1> <c2>to</c2> <c1>" + options + "</c1>");
+                }
+                try {
+                    return MySQLStorageService.builder(name)
+                            .url(url.address, url.port, connectionNode.node("database").getString("anti_vpn"))
+                            .credentials(connectionNode.node("username").getString(""), connectionNode.node("password").getString(""))
+                            .options(options)
+                            .poolSize(poolSettings.minPoolSize, poolSettings.maxPoolSize)
+                            .life(poolSettings.maxLifetime, poolSettings.timeout)
+                            .build();
+                } catch (IOException ex) {
+                    logger.error("Could not create engine \"" + name + "\".", ex);
+                }
+                break;
+            }
+            case "sqlite": {
+                AddressPort url = new AddressPort(connectionNode.key() + ".address", connectionNode.node("address").getString("127.0.0.1:6379"), 6379);
+                if (debug) {
+                    console.sendMessage(LogUtil.HEADING + "<c2>Creating engine</c2> <c1>" + name + "</c1> <c2>of type redis with address</c2> <c1>" + url.getAddress() + ":" + url.getPort() + "</c1>");
+                }
+                String options = connectionNode.node("options").getString("useUnicode=true&characterEncoding=utf8");
+                if (options.length() > 0 && options.charAt(0) == '?') {
+                    options = options.substring(1);
+                }
+                if (debug) {
+                    console.sendMessage(LogUtil.HEADING + "<c2>Setting options for engine</c2> <c1>" + name + "</c1> <c2>to</c2> <c1>" + options + "</c1>");
+                }
+                try {
+                    return SQLiteStorageService.builder(name)
+                            .file(new File(dataDirectory, connectionNode.node("file").getString("anti_vpn.db")))
+                            .options(options)
+                            .poolSize(poolSettings.minPoolSize, poolSettings.maxPoolSize)
+                            .life(poolSettings.maxLifetime, poolSettings.timeout)
+                            .build();
+                } catch (IOException ex) {
+                    logger.error("Could not create engine \"" + name + "\".", ex);
+                }
+                break;
+            }
+            default: {
+                console.sendMessage(LogUtil.HEADING + "<c9>Unknown storage type</c9> <c1>" + type + "</c1> <c9>in engine</c9> <c1>" + name + "</c1>");
+                break;
+            }
+        }
+        return null;
     }
 
-    private static Optional<SourceAPI> getAPI(String name, Map<String, SourceAPI> sources) { return Optional.ofNullable(sources.getOrDefault(name, null)); }
+    private static SourceAPI getAPI(String name, Map<String, SourceAPI> sources) { return sources.getOrDefault(name, null); }
 
     private static Map<String, SourceAPI> getAllSources(boolean debug) {
         List<Class<SourceAPI>> sourceClasses = PackageFilter.getClasses(SourceAPI.class, "me.egg82.antivpn.apis.vpn", false, false, false);
@@ -569,23 +464,23 @@ public class ConfigurationFileUtil {
     }
 
     private static class AddressPort {
-        private String address;
-        private int port;
+        private final String address;
+        private final int port;
 
         public AddressPort(String node, String raw, int defaultPort) {
-            String address = raw;
-            int portIndex = address.indexOf(':');
-            int port;
+            String a = raw;
+            int portIndex = a.indexOf(':');
+            int p;
             if (portIndex > -1) {
-                port = Integer.parseInt(address.substring(portIndex + 1));
-                address = address.substring(0, portIndex);
+                p = Integer.parseInt(a.substring(portIndex + 1));
+                a = a.substring(0, portIndex);
             } else {
                 logger.warn(node + " port is an unknown value. Using default value.");
-                port = defaultPort;
+                p = defaultPort;
             }
 
-            this.address = address;
-            this.port = port;
+            this.address = a;
+            this.port = p;
         }
 
         public String getAddress() { return address; }
@@ -594,16 +489,16 @@ public class ConfigurationFileUtil {
     }
 
     private static class PoolSettings {
-        private int minPoolSize;
-        private int maxPoolSize;
-        private long maxLifetime;
-        private long timeout;
+        private final int minPoolSize;
+        private final int maxPoolSize;
+        private final long maxLifetime;
+        private final long timeout;
 
         public PoolSettings(ConfigurationNode settingsNode) {
-            minPoolSize = settingsNode.getNode("min-idle").getInt();
-            maxPoolSize = settingsNode.getNode("max-pool-size").getInt();
-            maxLifetime = settingsNode.getNode("max-lifetime").getLong();
-            timeout = settingsNode.getNode("timeout").getLong();
+            minPoolSize = settingsNode.node("min-idle").getInt();
+            maxPoolSize = settingsNode.node("max-pool-size").getInt();
+            maxLifetime = settingsNode.node("max-lifetime").getLong();
+            timeout = settingsNode.node("timeout").getLong();
         }
 
         public int getMinPoolSize() { return minPoolSize; }

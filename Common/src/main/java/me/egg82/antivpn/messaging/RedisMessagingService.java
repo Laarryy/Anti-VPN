@@ -2,7 +2,6 @@ package me.egg82.antivpn.messaging;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
@@ -83,11 +82,6 @@ public class RedisMessagingService extends AbstractMessagingService {
             buffer.putLong(serverId.getLeastSignificantBits());
 
             service.handler = handler;
-            try {
-                service.handlePacketMethod = handler.getClass().getMethod("handlePacket", UUID.class, Packet.class);
-            } catch (NoSuchMethodException | SecurityException ex) {
-                service.logger.error("Could not get packet handler method.", ex);
-            }
         }
 
         public Builder url(String address, int port) {
@@ -210,11 +204,7 @@ public class RedisMessagingService extends AbstractMessagingService {
             }
             packet.read(data);
 
-            try {
-                service.handlePacketMethod.invoke(service.handler, messageId, packet);
-            } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-                service.logger.error("Could not invoke handler.", ex);
-            }
+            service.handler.handlePacket(messageId, packet);
         }
     }
 

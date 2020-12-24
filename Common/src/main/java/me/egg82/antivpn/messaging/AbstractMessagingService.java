@@ -3,7 +3,6 @@ package me.egg82.antivpn.messaging;
 import com.github.luben.zstd.Zstd;
 import com.github.luben.zstd.ZstdException;
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 import java.text.DecimalFormat;
 import java.util.UUID;
@@ -22,8 +21,6 @@ public abstract class AbstractMessagingService implements MessagingService {
     protected byte[] serverIdBytes;
 
     protected MessagingHandler handler;
-
-    protected Method handlePacketMethod;
 
     public String getName() { return name; }
 

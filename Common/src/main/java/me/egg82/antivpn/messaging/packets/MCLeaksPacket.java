@@ -3,36 +3,38 @@ package me.egg82.antivpn.messaging.packets;
 import java.nio.ByteBuffer;
 import java.util.Objects;
 
-public class VPNPacket extends AbstractPacket {
+public class MCLeaksPacket extends AbstractPacket {
     private long id;
-    private boolean cascade;
-    private double consensus;
+    private boolean value;
     private long created;
 
-    public byte getPacketId() { return 0x03; }
+    public byte getPacketId() { return 0x04; }
 
-    public VPNPacket(ByteBuffer data) { read(data); }
+    public MCLeaksPacket(ByteBuffer data) { read(data); }
 
-    public VPNPacket() {
+    public MCLeaksPacket() {
         this.id = -1L;
-        this.cascade = false;
-        this.consensus = -1.0d;
+        this.value = false;
         this.created = -1L;
     }
 
     public void read(ByteBuffer buffer) {
+        if (!checkVersion(buffer)) {
+            return;
+        }
+
         this.id = buffer.getLong();
-        this.cascade = getBoolean(buffer);
-        this.consensus = buffer.getDouble();
+        this.value = getBoolean(buffer);
         this.created = buffer.getLong();
 
         checkReadPacket(buffer);
     }
 
     public void write(ByteBuffer buffer) {
+        buffer.put(VERSION);
+
         buffer.putLong(this.id);
-        putBoolean(this.cascade, buffer);
-        buffer.putDouble(consensus);
+        putBoolean(this.value, buffer);
         buffer.putLong(created);
     }
 
@@ -40,13 +42,9 @@ public class VPNPacket extends AbstractPacket {
 
     public void setId(long id) { this.id = id; }
 
-    public boolean getCascade() { return cascade; }
+    public boolean getValue() { return value; }
 
-    public void setCascade(boolean cascade) { this.cascade = cascade; }
-
-    public double getConsensus() { return consensus; }
-
-    public void setConsensus(double consensus) { this.consensus = consensus; }
+    public void setValue(boolean value) { this.value = value; }
 
     public long getCreated() { return created; }
 
@@ -54,18 +52,17 @@ public class VPNPacket extends AbstractPacket {
 
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof VPNPacket)) return false;
-        VPNPacket vpnPacket = (VPNPacket) o;
-        return id == vpnPacket.id && cascade == vpnPacket.cascade && Double.compare(vpnPacket.consensus, consensus) == 0 && created == vpnPacket.created;
+        if (!(o instanceof MCLeaksPacket)) return false;
+        MCLeaksPacket that = (MCLeaksPacket) o;
+        return id == that.id && value == that.value && created == that.created;
     }
 
-    public int hashCode() { return Objects.hash(id, cascade, consensus, created); }
+    public int hashCode() { return Objects.hash(id, value, created); }
 
     public String toString() {
-        return "VPNPacket{" +
+        return "MCLeaksPacket{" +
                 "id=" + id +
-                ", cascade=" + cascade +
-                ", consensus=" + consensus +
+                ", value=" + value +
                 ", created=" + created +
                 '}';
     }

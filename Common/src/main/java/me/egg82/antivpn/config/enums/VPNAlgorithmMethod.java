@@ -1,4 +1,4 @@
-package me.egg82.antivpn.enums;
+package me.egg82.antivpn.config.enums;
 
 public enum VPNAlgorithmMethod {
     CASCADE("cascade"),

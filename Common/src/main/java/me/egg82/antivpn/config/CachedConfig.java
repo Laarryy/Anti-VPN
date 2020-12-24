@@ -3,23 +3,22 @@ package me.egg82.antivpn.config;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import me.egg82.antivpn.apis.SourceAPI;
-import me.egg82.antivpn.config.enums.VPNAlgorithmMethod;
-import me.egg82.antivpn.messaging.MessagingService;
-import me.egg82.antivpn.storage.Storage;
-import me.egg82.antivpn.utils.TimeUtil;
-
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import me.egg82.antivpn.apis.SourceAPI;
+import me.egg82.antivpn.config.enums.VPNAlgorithmMethod;
+import me.egg82.antivpn.messaging.MessagingService;
+import me.egg82.antivpn.storage.StorageService;
+import me.egg82.antivpn.utils.TimeUtil;
 
 public class CachedConfig {
     private CachedConfig() {}
 
-    private ImmutableList<Storage> storage = ImmutableList.of();
-    public ImmutableList<Storage> getStorage() { return storage; }
+    private ImmutableList<StorageService> storage = ImmutableList.of();
+    public ImmutableList<StorageService> getStorage() { return storage; }
 
     private ImmutableList<MessagingService> messaging = ImmutableList.of();
     public ImmutableList<MessagingService> getMessaging() { return messaging; }
@@ -86,7 +85,7 @@ public class CachedConfig {
             return this;
         }
 
-        public CachedConfig.Builder storage(List<Storage> value) {
+        public CachedConfig.Builder storage(List<StorageService> value) {
             values.storage = ImmutableList.copyOf(value);
             return this;
         }

@@ -1,9 +1,9 @@
-package me.egg82.pemu.messaging.packets;
+package me.egg82.antivpn.messaging.packets;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
-import me.egg82.pemu.config.ConfigUtil;
+import me.egg82.antivpn.config.ConfigUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -107,6 +107,15 @@ public abstract class AbstractPacket implements Packet {
                 printBytes(buffer);
             }
         }
+    }
+
+    protected final boolean checkVersion(ByteBuffer buffer) {
+        byte packetVersion = buffer.get();
+        if (packetVersion != VERSION) {
+            logger.warn("Received packet version " + String.format("0x%02X ", packetVersion) + " does not match current packet version " + String.format("0x%02X ", VERSION) + ". Skipping packet.");
+            return false;
+        }
+        return true;
     }
 
     protected final void printBytes(ByteBuffer buffer) {

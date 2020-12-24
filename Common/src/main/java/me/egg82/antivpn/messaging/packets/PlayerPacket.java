@@ -2,53 +2,60 @@ package me.egg82.antivpn.messaging.packets;
 
 import java.nio.ByteBuffer;
 import java.util.Objects;
+import java.util.UUID;
 
-public class IPPacket extends AbstractPacket {
+public class PlayerPacket extends AbstractPacket {
     private long id;
-    private String ip;
+    private UUID uuid;
 
-    public byte getPacketId() { return 0x01; }
+    public byte getPacketId() { return 0x02; }
 
-    public IPPacket(ByteBuffer data) { read(data); }
+    public PlayerPacket(ByteBuffer data) { read(data); }
 
-    public IPPacket() {
+    public PlayerPacket() {
         this.id = -1L;
-        this.ip = null;
+        this.uuid = null;
     }
 
     public void read(ByteBuffer buffer) {
+        if (!checkVersion(buffer)) {
+            return;
+        }
+
         this.id = buffer.getLong();
-        this.ip = getString(buffer);
+        this.uuid = getUUID(buffer);
 
         checkReadPacket(buffer);
     }
 
     public void write(ByteBuffer buffer) {
+        buffer.put(VERSION);
+
         buffer.putLong(this.id);
-        putString(this.ip, buffer);
+        putUUID(this.uuid, buffer);
     }
 
     public long getId() { return id; }
 
     public void setId(long id) { this.id = id; }
 
-    public String getIp() { return ip; }
+    public UUID getUuid() { return uuid; }
 
-    public void setIp(String ip) { this.ip = ip; }
+    public void setUuid(UUID uuid) { this.uuid = uuid; }
 
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof IPPacket)) return false;
-        IPPacket ipPacket = (IPPacket) o;
-        return id == ipPacket.id && Objects.equals(ip, ipPacket.ip);
+        if (!(o instanceof PlayerPacket)) return false;
+        PlayerPacket that = (PlayerPacket) o;
+        return id == that.id && Objects.equals(uuid, that.uuid);
     }
 
-    public int hashCode() { return Objects.hash(id, ip); }
+    public int hashCode() { return Objects.hash(id, uuid); }
 
     public String toString() {
-        return "IPPacket{" +
+        return "PlayerPacket{" +
                 "id=" + id +
-                ", ip='" + ip + '\'' +
+                ", uuid=" + uuid +
                 '}';
     }
 }
