@@ -232,11 +232,6 @@
             <artifactId>jar-relocator</artifactId>
             <version>${relocator.version}</version>
         </dependency>
-        <dependency>
-            <groupId>ninja.egg82</groupId>
-            <artifactId>reflection-utils</artifactId>
-            <version>${reflectionutils.version}</version>
-        </dependency>
 
         <dependency>
             <groupId>com.djrapitops</groupId>
