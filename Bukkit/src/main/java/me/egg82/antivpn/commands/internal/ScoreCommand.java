@@ -18,8 +18,8 @@ import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.directory.Attributes;
 import javax.naming.directory.InitialDirContext;
-import me.egg82.antivpn.VPNAPI;
 import me.egg82.antivpn.api.APIException;
+import me.egg82.antivpn.api.VPNAPIProvider;
 import me.egg82.antivpn.config.ConfigUtil;
 import me.egg82.antivpn.lang.Message;
 import me.egg82.antivpn.utils.ValidationUtil;
@@ -33,7 +33,7 @@ public class ScoreCommand implements Runnable {
     private final String source;
     private final TaskChain<?> chain;
 
-    private final VPNAPI api = VPNAPI.getInstance();
+    private final VPNAPI api = VPNAPIProvider.getInstance();
 
     private static final DecimalFormat format = new DecimalFormat("##0.00");
 

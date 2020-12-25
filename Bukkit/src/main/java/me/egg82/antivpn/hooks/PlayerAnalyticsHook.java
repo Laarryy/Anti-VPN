@@ -14,8 +14,8 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.Optional;
 import java.util.UUID;
-import me.egg82.antivpn.VPNAPI;
 import me.egg82.antivpn.api.APIException;
+import me.egg82.antivpn.api.VPNAPIProvider;
 import me.egg82.antivpn.api.model.ip.AlgorithmMethod;
 import me.egg82.antivpn.config.CachedConfig;
 import me.egg82.antivpn.config.ConfigUtil;
@@ -80,7 +80,7 @@ public class PlayerAnalyticsHook implements PluginHook {
             color = Color.BLUE
     )
     class Data implements DataExtension {
-        private final VPNAPI api = VPNAPI.getInstance();
+        private final VPNAPI api = VPNAPIProvider.getInstance();
         private final CallEvents[] events = new CallEvents[] { CallEvents.SERVER_PERIODICAL, CallEvents.SERVER_EXTENSION_REGISTER, CallEvents.PLAYER_JOIN };
 
         private Data() { }

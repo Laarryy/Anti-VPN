@@ -4,8 +4,8 @@ import co.aikar.commands.CommandIssuer;
 import co.aikar.taskchain.TaskChain;
 import java.util.Map;
 import java.util.Optional;
-import me.egg82.antivpn.VPNAPI;
 import me.egg82.antivpn.api.APIException;
+import me.egg82.antivpn.api.VPNAPIProvider;
 import me.egg82.antivpn.config.ConfigUtil;
 import me.egg82.antivpn.lang.Message;
 import org.slf4j.Logger;
@@ -18,7 +18,7 @@ public class TestCommand implements Runnable {
     private final String ip;
     private final TaskChain<?> chain;
 
-    private final VPNAPI api = VPNAPI.getInstance();
+    private final VPNAPI api = VPNAPIProvider.getInstance();
 
     public TestCommand(CommandIssuer issuer, String ip, TaskChain<?> chain) {
         this.issuer = issuer;

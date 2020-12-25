@@ -4,6 +4,7 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.function.Consumer;
+import me.egg82.antivpn.api.APIException;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -76,4 +77,12 @@ public interface IPManager {
      * @return the algorithm method
      */
     @NonNull AlgorithmMethod getCurrentAlgorithmMethod();
+
+    default boolean cascade(@NonNull IP ip, boolean useCache) throws APIException { return cascade(ip.getIp(), useCache); }
+
+    boolean cascade(@NonNull String ip, boolean useCache) throws APIException;
+
+    default double consensus(@NonNull IP ip, boolean useCache) throws APIException { return consensus(ip.getIp(), useCache); }
+
+    double consensus(@NonNull String ip, boolean useCache) throws APIException;
 }

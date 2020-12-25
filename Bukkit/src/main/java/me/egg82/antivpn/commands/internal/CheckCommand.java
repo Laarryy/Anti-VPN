@@ -6,8 +6,9 @@ import co.aikar.taskchain.TaskChainAbortAction;
 import java.io.IOException;
 import java.util.Optional;
 import java.util.UUID;
-import me.egg82.antivpn.VPNAPI;
 import me.egg82.antivpn.api.APIException;
+import me.egg82.antivpn.api.VPNAPI;
+import me.egg82.antivpn.api.VPNAPIProvider;
 import me.egg82.antivpn.api.model.ip.AlgorithmMethod;
 import me.egg82.antivpn.config.CachedConfig;
 import me.egg82.antivpn.config.ConfigUtil;
@@ -25,7 +26,7 @@ public class CheckCommand implements Runnable {
     private final String type;
     private final TaskChain<?> chain;
 
-    private final VPNAPI api = VPNAPI.getInstance();
+    private final VPNAPI api = VPNAPIProvider.getInstance();
 
     public CheckCommand(CommandIssuer issuer, String type, TaskChain<?> chain) {
         this.issuer = issuer;
@@ -39,19 +40,19 @@ public class CheckCommand implements Runnable {
         if (ValidationUtil.isValidIp(type)) {
             chain
                     .<Optional<Boolean>>asyncCallback((v, f) -> {
-                        Optional<CachedConfig> cachedConfig = ConfigUtil.getCachedConfig();
-                        if (!cachedConfig.isPresent()) {
+                        CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
+                        if (cachedConfig == null) {
                             logger.error("Cached config could not be fetched.");
                             f.accept(Optional.empty());
                             return;
                         }
 
-                        if (cachedConfig.get().getVPNAlgorithmMethod() == AlgorithmMethod.CONSESNSUS) {
+                        if (api.getIpManager().getCurrentAlgorithmMethod() == AlgorithmMethod.CONSESNSUS) {
                             try {
-                                f.accept(Optional.of(api.consensus(type) >= cachedConfig.get().getVPNAlgorithmConsensus()));
+                                f.accept(Optional.of(api.getIpManager().consensus(type, true) >= cachedConfig.getVPNAlgorithmConsensus()));
                                 return;
                             } catch (APIException ex) {
-                                if (cachedConfig.get().getDebug()) {
+                                if (cachedConfig.getDebug()) {
                                     logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
                                 } else {
                                     logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage());
@@ -59,10 +60,10 @@ public class CheckCommand implements Runnable {
                             }
                         } else {
                             try {
-                                f.accept(Optional.of(api.cascade(type)));
+                                f.accept(Optional.of(api.getIpManager().cascade(type, true)));
                                 return;
                             } catch (APIException ex) {
-                                if (cachedConfig.get().getDebug()) {
+                                if (cachedConfig.getDebug()) {
                                     logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
                                 } else {
                                     logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage());
@@ -88,18 +89,11 @@ public class CheckCommand implements Runnable {
                         }
                     })
                     .<Optional<Boolean>>asyncCallback((v, f) -> {
-                        Optional<CachedConfig> cachedConfig = ConfigUtil.getCachedConfig();
-                        if (!cachedConfig.isPresent()) {
-                            logger.error("Cached config could not be fetched.");
-                            f.accept(Optional.empty());
-                            return;
-                        }
-
                         try {
-                            f.accept(Optional.of(api.isMCLeaks(v)));
+                            f.accept(Optional.of(api.getPlayerManager().checkMcLeaks(v, true)));
                             return;
                         } catch (APIException ex) {
-                            if (cachedConfig.get().getDebug()) {
+                            if (ConfigUtil.getDebugOrFalse()) {
                                 logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
                             } else {
                                 logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage());

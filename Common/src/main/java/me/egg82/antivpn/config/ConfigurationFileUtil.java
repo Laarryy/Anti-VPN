@@ -7,7 +7,6 @@ import java.nio.file.Files;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import me.egg82.antivpn.VPNAPI;
 import me.egg82.antivpn.api.model.ip.AlgorithmMethod;
 import me.egg82.antivpn.api.model.source.Source;
 import me.egg82.antivpn.apis.SourceAPI;

@@ -5,6 +5,7 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.function.Consumer;
+import me.egg82.antivpn.api.APIException;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -76,4 +77,8 @@ public interface PlayerManager {
      * @return a set of UUIDs
      */
     @NonNull CompletableFuture<Set<UUID>> getPlayers();
+
+    default boolean checkMcLeaks(@NonNull Player player, boolean useCache) throws APIException { return checkMcLeaks(player.getUuid(), useCache); }
+
+    boolean checkMcLeaks(@NonNull UUID uniqueID, boolean useCache) throws APIException;
 }

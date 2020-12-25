@@ -4,8 +4,8 @@ import co.aikar.commands.CommandIssuer;
 import java.io.IOException;
 import java.util.Optional;
 import java.util.UUID;
-import me.egg82.antivpn.VPNAPI;
 import me.egg82.antivpn.api.APIException;
+import me.egg82.antivpn.api.VPNAPIProvider;
 import me.egg82.antivpn.api.model.ip.AlgorithmMethod;
 import me.egg82.antivpn.config.CachedConfig;
 import me.egg82.antivpn.config.ConfigUtil;
@@ -22,7 +22,7 @@ public class CheckCommand implements Runnable {
     private final CommandIssuer issuer;
     private final String type;
 
-    private final VPNAPI api = VPNAPI.getInstance();
+    private final VPNAPI api = VPNAPIProvider.getInstance();
 
     public CheckCommand(CommandIssuer issuer, String type) {
         this.issuer = issuer;
