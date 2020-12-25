@@ -33,7 +33,7 @@ public class GetIPIntel extends AbstractSource {
         }
 
         ConfigurationNode sourceConfigNode = getSourceConfigNode();
-        if (sourceConfigNode.node("contact").getString("admin@yoursite.com").equalsIgnoreCase("admin@yoursite.com")) {
+        if ("admin@yoursite.com".equalsIgnoreCase(sourceConfigNode.node("contact").getString("admin@yoursite.com"))) {
             throw new APIException(true, "Contact is not defined for " + getName() + " (WARNING: USING AN INVALID E-MAIL FOR THE CONTACT WILL GET YOUR IP BANNED FROM THE SERVICE)");
         }
 
@@ -44,7 +44,7 @@ public class GetIPIntel extends AbstractSource {
             throw new APIException(false, "API calls to this source have been limited to 15/minute as per request.");
         }
 
-        HttpURLConnection conn = getConnection("https://check.getipintel.net/check.php?ip=" + ip + "&contact=" + sourceConfigNode.node("contact").getString("admin@yoursite.com") + "&format=json&flags=b", "GET", 5000, "egg82/PlayerInfo", headers);
+        HttpURLConnection conn = getConnection("https://check.getipintel.net/check.php?ip=" + ip + "&contact=" + sourceConfigNode.node("contact").getString("admin@yoursite.com") + "&format=json&flags=b", "GET", (int) getCachedConfig().getTimeout(), "egg82/AntiVPN", headers);
         JSONDeserializer<GetIPIntelModel> modelDeserializer = new JSONDeserializer<>();
         GetIPIntelModel model = modelDeserializer.deserialize(getString(conn), GetIPIntelModel.class);
         if (!"success".equalsIgnoreCase(model.getStatus())) {
