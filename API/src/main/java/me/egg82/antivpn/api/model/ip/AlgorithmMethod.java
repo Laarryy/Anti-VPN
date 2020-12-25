@@ -1,18 +1,18 @@
-package me.egg82.antivpn.config.enums;
+package me.egg82.antivpn.api.model.ip;
 
-public enum VPNAlgorithmMethod {
+public enum AlgorithmMethod {
     CASCADE("cascade"),
     CONSESNSUS("consensus");
 
     private final String name;
-    VPNAlgorithmMethod(String name) {
+    AlgorithmMethod(String name) {
         this.name = name;
     }
 
     public String getName() { return name; }
 
-    public static VPNAlgorithmMethod getByName(String name) {
-        for (VPNAlgorithmMethod value : values()) {
+    public static AlgorithmMethod getByName(String name) {
+        for (AlgorithmMethod value : values()) {
             if (value.name.equalsIgnoreCase(name)) {
                 return value;
             }
