@@ -8,12 +8,12 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import me.egg82.antivpn.api.APIException;
-import me.egg82.antivpn.apis.vpn.models.GetIPIntelModel;
+import me.egg82.antivpn.api.model.source.models.GetIPIntelModel;
 import me.egg82.antivpn.utils.ValidationUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.spongepowered.configurate.ConfigurationNode;
 
-public class GetIPIntel extends AbstractSource {
+public class GetIPIntel extends AbstractSource<GetIPIntelModel> {
     private static final AtomicInteger hourlyRequests = new AtomicInteger(0);
     private static final AtomicInteger minuteRequests = new AtomicInteger(0);
     private static final ScheduledExecutorService threadPool = Executors.newSingleThreadScheduledExecutor(new ThreadFactoryBuilder().setNameFormat("AntiVPN-GetIPIntel-%d").build());
@@ -28,6 +28,19 @@ public class GetIPIntel extends AbstractSource {
     public boolean isKeyRequired() { return false; }
 
     public boolean getResult(@NonNull String ip) throws APIException {
+        GetIPIntelModel model = getRawResponse(ip);
+        if (!"success".equalsIgnoreCase(model.getStatus())) {
+            boolean isHard = "-5".equals(model.getResult()) || "-6".equals(model.getResult());
+            throw new APIException(isHard, "Could not get result from " + getName() + " (" + model.getResult() + ": " + model.getMessage() + ")" + (isHard ? " (Is your server's IP banned due to an improper contact e-mail in the config? Send an e-mail to contact@getipintel.net for an unban)" : ""));
+        }
+
+        ConfigurationNode sourceConfigNode = getSourceConfigNode();
+
+        double retVal = Double.parseDouble(model.getResult());
+        return retVal >= sourceConfigNode.node("threshold").getDouble(0.98);
+    }
+
+    public GetIPIntelModel getRawResponse(@NonNull String ip) throws APIException {
         if (!ValidationUtil.isValidIp(ip)) {
             throw new IllegalArgumentException("ip is invalid.");
         }
@@ -46,13 +59,6 @@ public class GetIPIntel extends AbstractSource {
 
         HttpURLConnection conn = getConnection("https://check.getipintel.net/check.php?ip=" + ip + "&contact=" + sourceConfigNode.node("contact").getString("admin@yoursite.com") + "&format=json&flags=b", "GET", (int) getCachedConfig().getTimeout(), "egg82/AntiVPN", headers);
         JSONDeserializer<GetIPIntelModel> modelDeserializer = new JSONDeserializer<>();
-        GetIPIntelModel model = modelDeserializer.deserialize(getString(conn), GetIPIntelModel.class);
-        if (!"success".equalsIgnoreCase(model.getStatus())) {
-            boolean isHard = "-5".equals(model.getResult()) || "-6".equals(model.getResult());
-            throw new APIException(isHard, "Could not get result from " + getName() + " (" + model.getResult() + ": " + model.getMessage() + ")" + (isHard ? " (Is your server's IP banned due to an improper contact e-mail in the config? Send an e-mail to contact@getipintel.net for an unban)" : ""));
-        }
-
-        double retVal = Double.parseDouble(model.getResult());
-        return retVal >= sourceConfigNode.node("threshold").getDouble(0.98);
+        return modelDeserializer.deserialize(getString(conn), GetIPIntelModel.class);
     }
 }

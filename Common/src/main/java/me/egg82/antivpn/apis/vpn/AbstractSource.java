@@ -7,13 +7,14 @@ import java.util.HashMap;
 import java.util.Map;
 import me.egg82.antivpn.api.APIException;
 import me.egg82.antivpn.api.model.source.Source;
+import me.egg82.antivpn.api.model.source.models.SourceModel;
 import me.egg82.antivpn.config.CachedConfig;
 import me.egg82.antivpn.config.ConfigUtil;
 import me.egg82.antivpn.utils.WebUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.spongepowered.configurate.ConfigurationNode;
 
-public abstract class AbstractSource implements Source {
+public abstract class AbstractSource<T extends SourceModel> implements Source<T> {
     protected static final Map<String, String> headers = new HashMap<>();
     static {
         headers.put("Accept", "application/json");

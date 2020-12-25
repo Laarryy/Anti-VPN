@@ -1,10 +1,9 @@
-package me.egg82.antivpn.apis.vpn.models;
+package me.egg82.antivpn.api.model.source.models;
 
 import flexjson.JSON;
-import java.io.Serializable;
 import java.util.Objects;
 
-public class GetIPIntelModel implements Serializable {
+public class GetIPIntelModel implements SourceModel {
     private String status;
     private String result;
     private String message;

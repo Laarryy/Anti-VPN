@@ -1,10 +1,9 @@
-package me.egg82.antivpn.apis.vpn.models;
+package me.egg82.antivpn.api.model.source.models;
 
 import flexjson.JSON;
-import java.io.Serializable;
 import java.util.Objects;
 
-public class IP2ProxyModel implements Serializable {
+public class IP2ProxyModel implements SourceModel {
     private String response;
     private String countryCode;
     @JSON(name = "countryName")

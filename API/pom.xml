@@ -82,6 +82,11 @@
             <artifactId>checker</artifactId>
             <version>${checkerframework.version}</version>
         </dependency>
+        <dependency>
+            <groupId>net.sf.flexjson</groupId>
+            <artifactId>flexjson</artifactId>
+            <version>${flexjson.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>org.junit.jupiter</groupId>

@@ -3,17 +3,26 @@ package me.egg82.antivpn.apis.vpn;
 import flexjson.JSONDeserializer;
 import java.net.HttpURLConnection;
 import me.egg82.antivpn.api.APIException;
-import me.egg82.antivpn.apis.vpn.models.IP2ProxyModel;
+import me.egg82.antivpn.api.model.source.models.IP2ProxyModel;
 import me.egg82.antivpn.utils.ValidationUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.spongepowered.configurate.ConfigurationNode;
 
-public class IP2Proxy extends AbstractSource {
+public class IP2Proxy extends AbstractSource<IP2ProxyModel> {
     public @NonNull String getName() { return "ip2proxy"; }
 
     public boolean isKeyRequired() { return true; }
 
     public boolean getResult(@NonNull String ip) throws APIException {
+        IP2ProxyModel model = getRawResponse(ip);
+        if (!"OK".equalsIgnoreCase(model.getResponse())) {
+            throw new APIException(false, "Could not get result from " + getName() + " (" + model.getResponse() + ")");
+        }
+
+        return "YES".equalsIgnoreCase(model.getProxy());
+    }
+
+    public IP2ProxyModel getRawResponse(@NonNull String ip) throws APIException {
         if (!ValidationUtil.isValidIp(ip)) {
             throw new IllegalArgumentException("ip is invalid.");
         }
@@ -27,11 +36,6 @@ public class IP2Proxy extends AbstractSource {
 
         HttpURLConnection conn = getConnection("https://api.ip2proxy.com/?ip=" + ip + "&key=" + key + "&package=PX1&format=json", "GET", (int) getCachedConfig().getTimeout(), "egg82/AntiVPN", headers);
         JSONDeserializer<IP2ProxyModel> modelDeserializer = new JSONDeserializer<>();
-        IP2ProxyModel model = modelDeserializer.deserialize(getString(conn), IP2ProxyModel.class);
-
-        if (!"OK".equalsIgnoreCase(model.getResponse())) {
-            throw new APIException(false, "Could not get result from " + getName() + " (" + model.getResponse() + ")");
-        }
-        return "YES".equalsIgnoreCase(model.getProxy());
+        return modelDeserializer.deserialize(getString(conn), IP2ProxyModel.class);
     }
 }

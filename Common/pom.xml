@@ -171,11 +171,6 @@
             <version>${ebean.version}</version>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>net.sf.flexjson</groupId>
-            <artifactId>flexjson</artifactId>
-            <version>${flexjson.version}</version>
-        </dependency>
 
         <dependency>
             <groupId>redis.clients</groupId>

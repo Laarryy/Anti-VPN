@@ -2,12 +2,13 @@ package me.egg82.antivpn.api.model.source;
 
 import me.egg82.antivpn.api.APIException;
 import me.egg82.antivpn.api.model.ip.IP;
+import me.egg82.antivpn.api.model.source.models.SourceModel;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * An API source which contains information about various statuses it holds and methods for interfacing with the API.
  */
-public interface Source {
+public interface Source<T extends SourceModel> {
     /**
      * Gets the source's name.
      *
@@ -42,4 +43,15 @@ public interface Source {
      * @throws IllegalArgumentException if the IP provided is invalid
      */
     boolean getResult(@NonNull String ip) throws APIException;
+
+    /**
+     * Returns the raw response from the source given its configuration.
+     *
+     * @param ip the IP to test
+     * @return the raw response model from the source
+     * @throws NullPointerException if the IP is null
+     * @throws APIException if the source returned an error
+     * @throws IllegalArgumentException if the IP provided is invalid
+     */
+    T getRawResponse(@NonNull String ip) throws APIException;
 }

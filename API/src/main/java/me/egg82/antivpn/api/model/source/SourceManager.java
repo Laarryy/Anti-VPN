@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.function.Consumer;
+import me.egg82.antivpn.api.model.source.models.SourceModel;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -28,7 +29,17 @@ public interface SourceManager {
      * @return a {@link Source} object, if one matching the name is available, or null if not
      * @throws NullPointerException if the name is null
      */
-    @Nullable Source getSource(@NonNull String name);
+    @Nullable Source<? extends SourceModel> getSource(@NonNull String name);
+
+    /**
+     * Gets a source with a model type.
+     *
+     * @param name the name of the source to get
+     * @param modelClass the class of the model to return
+     * @return a {@link Source} object, if one matching the name is available, or null if not
+     * @throws NullPointerException if the name or model is null
+     */
+    @Nullable <T extends SourceModel> Source<T> getSource(@NonNull String name, @NonNull Class<T> modelClass);
 
     /**
      * Gets a list of all enabled {@link Source}s, in the order
@@ -36,5 +47,5 @@ public interface SourceManager {
      *
      * @return a list of sources
      */
-    @NonNull CompletableFuture<List<Source>> getSources();
+    @NonNull CompletableFuture<List<Source<? extends SourceModel>>> getSources();
 }
