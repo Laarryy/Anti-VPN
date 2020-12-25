@@ -6,6 +6,8 @@ import me.egg82.antivpn.api.model.ip.IP;
 import me.egg82.antivpn.api.model.ip.IPManager;
 import me.egg82.antivpn.api.model.player.Player;
 import me.egg82.antivpn.api.model.player.PlayerManager;
+import me.egg82.antivpn.api.model.source.Source;
+import me.egg82.antivpn.api.model.source.SourceManager;
 import me.egg82.antivpn.api.platform.Platform;
 import me.egg82.antivpn.api.platform.PluginMetadata;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -60,6 +62,17 @@ public interface VPNAPI {
      * @return the player manager
      */
     @NonNull PlayerManager getPlayerManager();
+
+    /**
+     * Gets the {@link SourceManager}, responsible for managing
+     * {@link Source} instances.
+     *
+     * <p>This manager can be used to retrieve instances of {@link Source} by name
+     * or query all loaded sources.</p>
+     *
+     * @return the source manager
+     */
+    @NonNull SourceManager getSourceManager();
 
     /**
      * Gets the {@link Platform}, which represents the server platform the

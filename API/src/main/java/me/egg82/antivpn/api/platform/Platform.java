@@ -1,10 +1,9 @@
 package me.egg82.antivpn.api.platform;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import java.time.Instant;
 import java.util.Set;
 import java.util.UUID;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * Provides information about the platform AntiVPN is running on.

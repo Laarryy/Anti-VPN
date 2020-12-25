@@ -18,9 +18,9 @@ import java.util.Optional;
 import java.util.UUID;
 import me.egg82.antivpn.APIException;
 import me.egg82.antivpn.VPNAPI;
+import me.egg82.antivpn.api.model.ip.AlgorithmMethod;
 import me.egg82.antivpn.config.CachedConfig;
 import me.egg82.antivpn.config.ConfigUtil;
-import me.egg82.antivpn.api.model.ip.AlgorithmMethod;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

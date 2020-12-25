@@ -2,6 +2,9 @@ package me.egg82.antivpn.api.model.ip;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+/**
+ * An IP which contains information about various statuses it holds.
+ */
 public interface IP {
     /**
      * Gets the IP.
