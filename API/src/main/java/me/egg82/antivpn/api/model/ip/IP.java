@@ -1,11 +1,12 @@
 package me.egg82.antivpn.api.model.ip;
 
+import java.io.Serializable;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
  * An IP which contains information about various statuses it holds.
  */
-public interface IP {
+public interface IP extends Serializable {
     /**
      * Gets the IP.
      *
@@ -40,4 +41,18 @@ public interface IP {
      * @param status a number between 0 and 1 determining the likelihood that an IP is a VPN/proxy
      */
     void setConsensus(double status);
+
+    /**
+     * {@inheritDoc}
+     */
+    boolean equals(Object o);
+    /**
+     * {@inheritDoc}
+     */
+    int hashCode();
+
+    /**
+     * {@inheritDoc}
+     */
+    String toString();
 }

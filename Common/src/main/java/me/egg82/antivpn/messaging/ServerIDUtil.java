@@ -4,6 +4,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.util.UUID;
 import me.egg82.antivpn.utils.ValidationUtil;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,11 +13,7 @@ public class ServerIDUtil {
 
     private ServerIDUtil() { }
 
-    public static UUID getId(File idFile) {
-        if (idFile == null) {
-            throw new IllegalArgumentException("idFile cannot be null.");
-        }
-
+    public static UUID getId(@NonNull File idFile) {
         UUID retVal;
 
         try {

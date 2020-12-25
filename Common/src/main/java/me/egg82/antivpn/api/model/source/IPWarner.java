@@ -1,4 +1,4 @@
-package me.egg82.antivpn.apis.vpn;
+package me.egg82.antivpn.api.model.source;
 
 import java.io.IOException;
 import java.net.URL;
@@ -7,12 +7,11 @@ import me.egg82.antivpn.utils.ValidationUtil;
 import ninja.egg82.json.JSONWebUtil;
 import ninja.leaping.configurate.ConfigurationNode;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 
-public class Shodan extends AbstractSource {
-    public @NonNull String getName() { return "shodan"; }
+public class IPWarner extends AbstractSource {
+    public @NonNull String getName() { return "ipwarner"; }
 
     public boolean isKeyRequired() { return true; }
 
@@ -30,29 +29,23 @@ public class Shodan extends AbstractSource {
 
         JSONObject json;
         try {
-            json = JSONWebUtil.getJSONObject(new URL("https://api.shodan.io/shodan/host/" + ip + "?key=" + key), "GET", (int) getCachedConfig().getTimeout(), "egg82/AntiVPN");
-        } catch (IOException | ParseException | ClassCastException ex) {
-            throw new APIException(false, "Could not get result from " + getName());
-        }
-        if (json == null) {
-            throw new APIException(false, "Could not get result from " + getName());
-        }
-
-        JSONArray tags = (JSONArray) json.get("tags");
-        if (tags == null) {
-            throw new APIException(false, "Could not get result from " + getName());
-        }
-
-        if (tags.isEmpty()) {
-            return false;
-        }
-        for (Object tag : tags) {
-            String t = (String) tag;
-            if (t.equalsIgnoreCase("proxy") || t.equalsIgnoreCase("vpn")) {
-                return true;
+            json = JSONWebUtil.getJSONObject(new URL("https://api.ipwarner.com/" + key + "/" + ip), "GET", (int) getCachedConfig().getTimeout(), "egg82/AntiVPN");
+        } catch (IOException | ParseException | ClassCastException ignored) {
+            try {
+                json = JSONWebUtil.getJSONObject(new URL("http://api.ipwarner.com/" + key + "/" + ip), "GET", (int) getCachedConfig().getTimeout(), "egg82/AntiVPN"); // Temporary (hopefully) hack
+            } catch (IOException | ParseException | ClassCastException ex) {
+                throw new APIException(false, ex);
             }
         }
+        if (json == null || json.get("goodIp") == null) {
+            throw new APIException(false, "Could not get result from " + getName());
+        }
 
-        return false;
+        short retVal = ((Number) json.get("goodIp")).shortValue();
+        if (retVal < 0) {
+            throw new APIException(false, "Could not get result from " + getName());
+        }
+
+        return retVal == 1;
     }
 }

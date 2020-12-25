@@ -1,4 +1,4 @@
-package me.egg82.antivpn.apis.vpn;
+package me.egg82.antivpn.api.model.source;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -6,7 +6,6 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import me.egg82.antivpn.api.APIException;
-import me.egg82.antivpn.api.model.source.Source;
 import me.egg82.antivpn.api.model.source.models.SourceModel;
 import me.egg82.antivpn.config.CachedConfig;
 import me.egg82.antivpn.config.ConfigUtil;

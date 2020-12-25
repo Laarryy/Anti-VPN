@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 public class PacketUtil {
     private static final Logger logger = LoggerFactory.getLogger(PacketUtil.class);
 
-    private static ExecutorService workPool = Executors.newFixedThreadPool(1, new ThreadFactoryBuilder().setNameFormat("AntiVPN-Messaging-%d").build());
+    private static ExecutorService workPool = Executors.newFixedThreadPool(4, new ThreadFactoryBuilder().setNameFormat("AntiVPN-Messaging-%d").build());
 
     private PacketUtil() { }
 

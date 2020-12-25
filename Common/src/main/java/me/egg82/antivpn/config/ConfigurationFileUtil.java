@@ -9,6 +9,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import me.egg82.antivpn.VPNAPI;
 import me.egg82.antivpn.api.model.ip.AlgorithmMethod;
+import me.egg82.antivpn.api.model.source.Source;
 import me.egg82.antivpn.apis.SourceAPI;
 import me.egg82.antivpn.messaging.*;
 import me.egg82.antivpn.storage.MySQLStorageService;
@@ -414,16 +415,16 @@ public class ConfigurationFileUtil {
 
     private static SourceAPI getAPI(String name, Map<String, SourceAPI> sources) { return sources.getOrDefault(name, null); }
 
-    private static Map<String, SourceAPI> getAllSources(boolean debug) {
-        List<Class<SourceAPI>> sourceClasses = PackageFilter.getClasses(SourceAPI.class, "me.egg82.antivpn.apis.vpn", false, false, false);
-        Map<String, SourceAPI> retVal = new HashMap<>();
-        for (Class<SourceAPI> clazz : sourceClasses) {
+    private static Map<String, Source> getAllSources(boolean debug) {
+        List<Class<Source>> sourceClasses = PackageFilter.getClasses(Source.class, "me.egg82.antivpn.api.model.source", false, false, false);
+        Map<String, Source> retVal = new HashMap<>();
+        for (Class<Source> clazz : sourceClasses) {
             if (debug) {
                 logger.info("Initializing VPN API " + clazz.getName());
             }
 
             try {
-                SourceAPI api = clazz.newInstance();
+                Source api = clazz.newInstance();
                 retVal.put(api.getName(), api);
             } catch (InstantiationException | IllegalAccessException ex) {
                 logger.error(ex.getMessage(), ex);

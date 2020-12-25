@@ -1,5 +1,6 @@
 package me.egg82.antivpn.api.model.player;
 
+import java.io.Serializable;
 import java.util.UUID;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -7,7 +8,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 /**
  * A player which contains information about various statuses they hold.
  */
-public interface Player {
+public interface Player extends Serializable {
     /**
      * Gets the player's {@link UUID}.
      *
@@ -37,4 +38,18 @@ public interface Player {
      * @param status true if the player is an MCLeaks account, false if not
      */
     void setMcLeaks(boolean status);
+
+    /**
+     * {@inheritDoc}
+     */
+    boolean equals(Object o);
+    /**
+     * {@inheritDoc}
+     */
+    int hashCode();
+
+    /**
+     * {@inheritDoc}
+     */
+    String toString();
 }

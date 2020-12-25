@@ -15,6 +15,7 @@ import me.egg82.antivpn.services.lookup.models.ProfileModel;
 import me.egg82.antivpn.utils.WebUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 public class BukkitPlayerInfo implements PlayerInfo {
     private final UUID uuid;
@@ -98,11 +99,11 @@ public class BukkitPlayerInfo implements PlayerInfo {
         }
     }
 
-    public UUID getUUID() { return uuid; }
+    public @NonNull UUID getUUID() { return uuid; }
 
-    public String getName() { return name; }
+    public @NonNull String getName() { return name; }
 
-    public ImmutableList<ProfileModel.ProfilePropertyModel> getProperties() { return ImmutableList.copyOf(properties); }
+    public @NonNull ImmutableList<ProfileModel.ProfilePropertyModel> getProperties() { return ImmutableList.copyOf(properties); }
 
     private static String nameExpensive(UUID uuid) throws IOException {
         // Currently-online lookup

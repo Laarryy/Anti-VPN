@@ -1,4 +1,4 @@
-package me.egg82.antivpn.apis.vpn;
+package me.egg82.antivpn.api.model.source;
 
 import java.io.IOException;
 import java.net.URL;
@@ -9,9 +9,13 @@ import ninja.leaping.configurate.ConfigurationNode;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class IPWarner extends AbstractSource {
-    public @NonNull String getName() { return "ipwarner"; }
+public class IPInfo extends AbstractSource {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+
+    public @NonNull String getName() { return "ipinfo"; }
 
     public boolean isKeyRequired() { return true; }
 
@@ -29,23 +33,23 @@ public class IPWarner extends AbstractSource {
 
         JSONObject json;
         try {
-            json = JSONWebUtil.getJSONObject(new URL("https://api.ipwarner.com/" + key + "/" + ip), "GET", (int) getCachedConfig().getTimeout(), "egg82/AntiVPN");
-        } catch (IOException | ParseException | ClassCastException ignored) {
-            try {
-                json = JSONWebUtil.getJSONObject(new URL("http://api.ipwarner.com/" + key + "/" + ip), "GET", (int) getCachedConfig().getTimeout(), "egg82/AntiVPN"); // Temporary (hopefully) hack
-            } catch (IOException | ParseException | ClassCastException ex) {
-                throw new APIException(false, ex);
+            json = JSONWebUtil.getJSONObject(new URL("https://ipinfo.io/" + ip + "/privacy?token=" + key), "GET", (int) getCachedConfig().getTimeout());
+        } catch (IOException | ParseException | ClassCastException ex) {
+            throw new APIException(false, "Could not get result from " + getName());
+        }
+        if (json == null) {
+            throw new APIException(false, "Could not get result from " + getName());
+        }
+        if (json.isEmpty()) {
+            throw new APIException(false, "Could not get result from " + getName());
+        }
+
+        // if proxy config setting is true and "proxy" is true, tor || vpn will also be true.
+        if (sourceConfigNode.getNode("proxy").getBoolean() && json.get("proxy") != null) {
+            if ((Boolean) json.get("proxy")) {
+                return true;
             }
         }
-        if (json == null || json.get("goodIp") == null) {
-            throw new APIException(false, "Could not get result from " + getName());
-        }
-
-        short retVal = ((Number) json.get("goodIp")).shortValue();
-        if (retVal < 0) {
-            throw new APIException(false, "Could not get result from " + getName());
-        }
-
-        return retVal == 1;
+        return json.get("vpn") != null && (Boolean) json.get("vpn");
     }
 }

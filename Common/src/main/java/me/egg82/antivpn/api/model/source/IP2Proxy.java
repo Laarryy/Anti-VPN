@@ -1,4 +1,4 @@
-package me.egg82.antivpn.apis.vpn;
+package me.egg82.antivpn.api.model.source;
 
 import flexjson.JSONDeserializer;
 import java.net.HttpURLConnection;

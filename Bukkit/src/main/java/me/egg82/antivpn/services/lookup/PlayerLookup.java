@@ -2,6 +2,7 @@ package me.egg82.antivpn.services.lookup;
 
 import java.io.IOException;
 import java.util.UUID;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 public class PlayerLookup {
     private PlayerLookup() { }
@@ -18,7 +19,7 @@ public class PlayerLookup {
         IS_PAPER = paper;
     }
 
-    public static PlayerInfo get(UUID uuid) throws IOException {
+    public static @NonNull PlayerInfo get(UUID uuid) throws IOException {
         if (uuid == null) {
             throw new IllegalArgumentException("uuid cannot be null.");
         }
@@ -26,7 +27,7 @@ public class PlayerLookup {
         return (IS_PAPER) ? new PaperPlayerInfo(uuid) : new BukkitPlayerInfo(uuid);
     }
 
-    public static PlayerInfo get(String name) throws IOException {
+    public static @NonNull PlayerInfo get(String name) throws IOException {
         if (name == null) {
             throw new IllegalArgumentException("name cannot be null.");
         }
