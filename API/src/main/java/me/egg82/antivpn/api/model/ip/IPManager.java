@@ -71,18 +71,70 @@ public interface IPManager {
     @NonNull CompletableFuture<Set<String>> getIps();
 
     /**
-     * Gets the {@link AlgorithmMethod}, which represents the algorithm method the
-     * plugin is using to determine IP statuses.
+     * Gets the {@link AlgorithmMethod}, which represents the algorithm method
+     * AntiVPN is currently using to determine IP statuses.
      *
      * @return the algorithm method
      */
     @NonNull AlgorithmMethod getCurrentAlgorithmMethod();
 
+    /**
+     * Gets the cascade result from AntiVPN using the configuration
+     * provided to the plugin.
+     *
+     * <p>You may choose to use AntiVPN's internal cache
+     * for the result, or skip the cache and get an answer
+     * directly from the sources.</p>
+     *
+     * @param ip The IP to test
+     * @param useCache true if you would like to use AntiVPN's internal cache, false if not
+     * @return true if the cascade algorithm thinks the provided IP is a VPN/proxy, false if not
+     * @throws APIException if a result could not be obtained
+     */
     default boolean cascade(@NonNull IP ip, boolean useCache) throws APIException { return cascade(ip.getIp(), useCache); }
 
+    /**
+     * Gets the cascade result from AntiVPN using the configuration
+     * provided to the plugin.
+     *
+     * <p>You may choose to use AntiVPN's internal cache
+     * for the result, or skip the cache and get an answer
+     * directly from the sources.</p>
+     *
+     * @param ip The IP to test
+     * @param useCache true if you would like to use AntiVPN's internal cache, false if not
+     * @return true if the cascade algorithm thinks the provided IP is a VPN/proxy, false if not
+     * @throws APIException if a result could not be obtained
+     */
     boolean cascade(@NonNull String ip, boolean useCache) throws APIException;
 
+    /**
+     * Gets the consensus result from AntiVPN using the configuration
+     * provided to the plugin.
+     *
+     * <p>You may choose to use AntiVPN's internal cache
+     * for the result, or skip the cache and get an answer
+     * directly from the sources.</p>
+     *
+     * @param ip The IP to test
+     * @param useCache true if you would like to use AntiVPN's internal cache, false if not
+     * @return a number between 0 and 1 determining the likelihood that an IP is a VPN/proxy
+     * @throws APIException if a result could not be obtained
+     */
     default double consensus(@NonNull IP ip, boolean useCache) throws APIException { return consensus(ip.getIp(), useCache); }
 
+    /**
+     * Gets the consensus result from AntiVPN using the configuration
+     * provided to the plugin.
+     *
+     * <p>You may choose to use AntiVPN's internal cache
+     * for the result, or skip the cache and get an answer
+     * directly from the sources.</p>
+     *
+     * @param ip The IP to test
+     * @param useCache true if you would like to use AntiVPN's internal cache, false if not
+     * @return a number between 0 and 1 determining the likelihood that an IP is a VPN/proxy
+     * @throws APIException if a result could not be obtained
+     */
     double consensus(@NonNull String ip, boolean useCache) throws APIException;
 }

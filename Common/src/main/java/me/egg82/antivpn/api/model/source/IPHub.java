@@ -1,50 +1,46 @@
 package me.egg82.antivpn.api.model.source;
 
-import java.io.IOException;
-import java.net.URL;
+import flexjson.JSONDeserializer;
+import java.net.HttpURLConnection;
 import java.util.HashMap;
 import java.util.Map;
 import me.egg82.antivpn.api.APIException;
+import me.egg82.antivpn.api.model.source.models.IPHubModel;
 import me.egg82.antivpn.utils.ValidationUtil;
-import ninja.egg82.json.JSONWebUtil;
-import ninja.leaping.configurate.ConfigurationNode;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.ParseException;
+import org.spongepowered.configurate.ConfigurationNode;
 
-public class IPHub extends AbstractSource {
+public class IPHub extends AbstractSource<IPHubModel> {
     public @NonNull String getName() { return "iphub"; }
 
     public boolean isKeyRequired() { return true; }
 
     public boolean getResult(@NonNull String ip) throws APIException {
+        IPHubModel model = getRawResponse(ip);
+        if (model.getError() != null) {
+            throw new APIException(model.getError().contains("key"), "Could not get result from " + getName() + " (" + model.getError() + ")");
+        }
+
+        return model.getBlock() == getSourceConfigNode().node("block").getInt(1);
+    }
+
+    public IPHubModel getRawResponse(@NonNull String ip) throws APIException {
         if (!ValidationUtil.isValidIp(ip)) {
             throw new IllegalArgumentException("ip is invalid.");
         }
 
         ConfigurationNode sourceConfigNode = getSourceConfigNode();
 
-        String key = sourceConfigNode.getNode("key").getString();
+        String key = sourceConfigNode.node("key").getString();
         if (key == null || key.isEmpty()) {
             throw new APIException(true, "Key is not defined for " + getName());
         }
 
-        int blockType = sourceConfigNode.getNode("block").getInt(1);
+        Map<String, String> newHeaders = new HashMap<>(headers);
+        newHeaders.put("X-Key", key);
 
-        Map<String, String> headers = new HashMap<>();
-        headers.put("X-Key", key);
-
-        JSONObject json;
-        try {
-            json = JSONWebUtil.getJSONObject(new URL("https://v2.api.iphub.info/ip/" + ip), "GET", (int) getCachedConfig().getTimeout(), "egg82/AntiVPN", headers);
-        } catch (IOException | ParseException | ClassCastException ex) {
-            throw new APIException(false, "Could not get result from " + getName());
-        }
-        if (json == null || json.get("block") == null) {
-            throw new APIException(false, "Could not get result from " + getName());
-        }
-
-        int block = ((Number) json.get("block")).intValue();
-        return block == blockType;
+        HttpURLConnection conn = getConnection("https://v2.api.iphub.info/ip/" + ip, "GET", (int) getCachedConfig().getTimeout(), "egg82/AntiVPN", newHeaders);
+        JSONDeserializer<IPHubModel> modelDeserializer = new JSONDeserializer<>();
+        return modelDeserializer.deserialize(getString(conn), IPHubModel.class);
     }
 }

@@ -76,6 +76,7 @@ public class WebUtil {
 
     public static HttpURLConnection getConnection(URL url, String method, int timeout, String userAgent, Map<String, String> headers) throws IOException { return getConnection(url, method, timeout, userAgent, headers, null); }
 
+    // TODO: Re-use connections? https://docs.oracle.com/javase/7/docs/technotes/guides/net/http-keepalive.html or https://stackoverflow.com/questions/34748479/reusing-tcp-connections-with-httpsurlconnection
     public static HttpURLConnection getConnection(URL url, String method, int timeout, String userAgent, Map<String, String> headers, Map<String, String> postData) throws IOException {
         if (url == null) {
             throw new IllegalArgumentException("url cannot be null.");

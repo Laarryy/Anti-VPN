@@ -78,7 +78,33 @@ public interface PlayerManager {
      */
     @NonNull CompletableFuture<Set<UUID>> getPlayers();
 
+    /**
+     * Gets the MCLeaks result from AntiVPN using the configuration
+     * provided to the plugin.
+     *
+     * <p>You may choose to use AntiVPN's internal cache
+     * for the result, or skip the cache and get an answer
+     * directly from the API.</p>
+     *
+     * @param player The player to test
+     * @param useCache true if you would like to use AntiVPN's internal cache, false if not
+     * @return true if the API thinks the provided player is an MCLeaks account, false if not
+     * @throws APIException if a result could not be obtained
+     */
     default boolean checkMcLeaks(@NonNull Player player, boolean useCache) throws APIException { return checkMcLeaks(player.getUuid(), useCache); }
 
-    boolean checkMcLeaks(@NonNull UUID uniqueID, boolean useCache) throws APIException;
+    /**
+     * Gets the MCLeaks result from AntiVPN using the configuration
+     * provided to the plugin.
+     *
+     * <p>You may choose to use AntiVPN's internal cache
+     * for the result, or skip the cache and get an answer
+     * directly from the API.</p>
+     *
+     * @param uniqueId The player {@link UUID} to test
+     * @param useCache true if you would like to use AntiVPN's internal cache, false if not
+     * @return true if the API thinks the provided player is an MCLeaks account, false if not
+     * @throws APIException if a result could not be obtained
+     */
+    boolean checkMcLeaks(@NonNull UUID uniqueId, boolean useCache) throws APIException;
 }
