@@ -30,6 +30,7 @@ public interface IPManager {
      * @param ip the IP of the IP object to get
      * @return an {@link IP} object, if one matching the IP is available, or null if not
      * @throws NullPointerException if ip is null
+     * @throws IllegalArgumentException if the IP provided is invalid
      */
     @Nullable IP getIp(@NonNull String ip);
 
@@ -57,6 +58,7 @@ public interface IPManager {
      *
      * @param ip the IP
      * @return a future encapsulating the result of the operation
+     * @throws IllegalArgumentException if the IP provided is invalid
      */
     @NonNull CompletableFuture<Void> deleteIp(@NonNull String ip);
 

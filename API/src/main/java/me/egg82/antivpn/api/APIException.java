@@ -1,5 +1,8 @@
-package me.egg82.antivpn;
+package me.egg82.antivpn.api;
 
+/**
+ * An exception thrown from the AntiVPN API.
+ */
 public class APIException extends Exception {
     private final boolean hard;
 
@@ -19,10 +22,12 @@ public class APIException extends Exception {
     }
 
     /**
-     * A boolean representing whether or not the exception is "hard"
-     * A "hard" exception means an internal failure or exception in the API, and is usually logged
-     * A "soft" (not hard) exception means a user error or otherwise easily-correctable error
-     * @return A boolean representing whether or not the exception is "hard"
+     * A boolean representing whether or not the exception is "hard".
+     *
+     * <p>A "hard" exception means an internal failure or exception in the API or its configuration, and is usually logged.</p>
+     * <p>A "soft" (not hard) exception means a user error, temporary API malfunction, or otherwise easily-correctable issue.</p>
+     *
+     * @return true if the exception is "hard", false if not
      */
     public boolean isHard() { return hard; }
 }

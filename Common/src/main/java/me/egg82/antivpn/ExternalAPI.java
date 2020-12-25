@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import me.egg82.antivpn.api.APIException;
 
 public class ExternalAPI {
     private static ExternalAPI api = null;
@@ -30,7 +31,7 @@ public class ExternalAPI {
             Constructor<?> constructor = concreteClass.getDeclaredConstructor();
             constructor.setAccessible(true);
             concrete = constructor.newInstance();
-            exceptionClass = classLoader.loadClass("me.egg82.antivpn.APIException");
+            exceptionClass = classLoader.loadClass("me.egg82.antivpn.api.APIException");
         } catch (ClassNotFoundException | NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException ex) {
             throw new RuntimeException("Could not get VPNAPI from classLoader.", ex);
         }

@@ -10,6 +10,7 @@ import java.util.UUID;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
+import me.egg82.antivpn.api.APIException;
 import me.egg82.antivpn.apis.SourceAPI;
 import me.egg82.antivpn.config.CachedConfig;
 import me.egg82.antivpn.config.ConfigUtil;

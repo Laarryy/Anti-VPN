@@ -1,5 +1,6 @@
 package me.egg82.antivpn.api.model.source;
 
+import me.egg82.antivpn.api.APIException;
 import me.egg82.antivpn.api.model.ip.IP;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -27,8 +28,9 @@ public interface Source {
      * @param ip the {@link IP} object to test
      * @return true if the source thinks the IP is a VPN/proxy, false if not
      * @throws NullPointerException if the IP is null
+     * @throws APIException if the source returned an error
      */
-    default boolean getResult(@NonNull IP ip) { return getResult(ip.getIp()); }
+    default boolean getResult(@NonNull IP ip) throws APIException { return getResult(ip.getIp()); }
 
     /**
      * Returns the result from the source given its configuration.
@@ -36,6 +38,8 @@ public interface Source {
      * @param ip the IP to test
      * @return true if the source thinks the IP is a VPN/proxy, false if not
      * @throws NullPointerException if the IP is null
+     * @throws APIException if the source returned an error
+     * @throws IllegalArgumentException if the IP provided is invalid
      */
-    boolean getResult(@NonNull String ip);
+    boolean getResult(@NonNull String ip) throws APIException;
 }

@@ -13,13 +13,13 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 public class PaperPlayerInfo implements PlayerInfo {
-    private UUID uuid;
-    private String name;
+    private final UUID uuid;
+    private final String name;
     private List<ProfileModel.ProfilePropertyModel> properties;
 
-    private static Cache<UUID, String> uuidCache = Caffeine.newBuilder().expireAfterAccess(1L, TimeUnit.MINUTES).expireAfterWrite(1L, TimeUnit.HOURS).build();
-    private static Cache<String, UUID> nameCache = Caffeine.newBuilder().expireAfterAccess(1L, TimeUnit.MINUTES).expireAfterWrite(1L, TimeUnit.HOURS).build();
-    private static Cache<UUID, List<ProfileModel.ProfilePropertyModel>> propertiesCache = Caffeine.newBuilder().expireAfterAccess(1L, TimeUnit.MINUTES).expireAfterWrite(1L, TimeUnit.DAYS).build();
+    private static final Cache<UUID, String> uuidCache = Caffeine.newBuilder().expireAfterAccess(1L, TimeUnit.MINUTES).expireAfterWrite(1L, TimeUnit.HOURS).build();
+    private static final Cache<String, UUID> nameCache = Caffeine.newBuilder().expireAfterAccess(1L, TimeUnit.MINUTES).expireAfterWrite(1L, TimeUnit.HOURS).build();
+    private static final Cache<UUID, List<ProfileModel.ProfilePropertyModel>> propertiesCache = Caffeine.newBuilder().expireAfterAccess(1L, TimeUnit.MINUTES).expireAfterWrite(1L, TimeUnit.DAYS).build();
 
     private static final Object uuidCacheLock = new Object();
     private static final Object nameCacheLock = new Object();

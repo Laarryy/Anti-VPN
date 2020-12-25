@@ -12,7 +12,7 @@ import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import me.egg82.antivpn.APIException;
+import me.egg82.antivpn.api.APIException;
 import me.egg82.antivpn.api.model.ip.AlgorithmMethod;
 import me.egg82.antivpn.config.CachedConfig;
 import me.egg82.antivpn.config.ConfigUtil;

@@ -4,7 +4,7 @@ import co.aikar.commands.CommandIssuer;
 import co.aikar.taskchain.TaskChain;
 import java.util.Map;
 import java.util.Optional;
-import me.egg82.antivpn.APIException;
+import me.egg82.antivpn.api.APIException;
 import me.egg82.antivpn.VPNAPI;
 import me.egg82.antivpn.config.ConfigUtil;
 import me.egg82.antivpn.lang.Message;

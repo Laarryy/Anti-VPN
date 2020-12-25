@@ -7,14 +7,15 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-import me.egg82.antivpn.APIException;
+import me.egg82.antivpn.api.APIException;
 import me.egg82.antivpn.utils.ValidationUtil;
 import ninja.egg82.json.JSONWebUtil;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 
-public class Teoh extends AbstractSourceAPI {
-    public String getName() { return "teoh"; }
+public class Teoh extends AbstractSource {
+    public @NonNull String getName() { return "teoh"; }
 
     public boolean isKeyRequired() { return false; }
 
@@ -25,10 +26,7 @@ public class Teoh extends AbstractSourceAPI {
         threadPool.scheduleAtFixedRate(() -> requests.set(0), 0L, 24L, TimeUnit.HOURS);
     }
 
-    public boolean getResult(String ip) throws APIException {
-        if (ip == null) {
-            throw new IllegalArgumentException("ip cannot be null.");
-        }
+    public boolean getResult(@NonNull String ip) throws APIException {
         if (!ValidationUtil.isValidIp(ip)) {
             throw new IllegalArgumentException("ip is invalid.");
         }
