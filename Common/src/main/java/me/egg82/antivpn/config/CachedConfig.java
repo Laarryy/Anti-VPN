@@ -9,7 +9,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import me.egg82.antivpn.apis.SourceAPI;
-import me.egg82.antivpn.config.enums.VPNAlgorithmMethod;
+import me.egg82.antivpn.api.model.ip.AlgorithmMethod;
 import me.egg82.antivpn.messaging.MessagingService;
 import me.egg82.antivpn.storage.StorageService;
 import me.egg82.antivpn.utils.TimeUtil;
@@ -62,8 +62,8 @@ public class CachedConfig {
     private ImmutableList<String> mcleaksActionCommands = ImmutableList.of();
     public ImmutableList<String> getMCLeaksActionCommands() { return mcleaksActionCommands; }
 
-    private VPNAlgorithmMethod vpnAlgorithmMethod = VPNAlgorithmMethod.CASCADE;
-    public VPNAlgorithmMethod getVPNAlgorithmMethod() { return vpnAlgorithmMethod; }
+    private AlgorithmMethod algorithmMethod = AlgorithmMethod.CASCADE;
+    public AlgorithmMethod getVPNAlgorithmMethod() { return algorithmMethod; }
 
     private double vpnAlgorithmConsensus = 0.6d;
     public double getVPNAlgorithmConsensus() { return vpnAlgorithmConsensus; }
@@ -197,11 +197,11 @@ public class CachedConfig {
             return this;
         }
 
-        public CachedConfig.Builder vpnAlgorithmMethod(VPNAlgorithmMethod value) {
+        public CachedConfig.Builder vpnAlgorithmMethod(AlgorithmMethod value) {
             if (value == null) {
                 throw new IllegalArgumentException("value cannot be null.");
             }
-            values.vpnAlgorithmMethod = value;
+            values.algorithmMethod = value;
             return this;
         }
 

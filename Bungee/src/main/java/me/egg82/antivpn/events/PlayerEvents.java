@@ -8,7 +8,7 @@ import java.util.Optional;
 import me.egg82.antivpn.APIException;
 import me.egg82.antivpn.config.CachedConfig;
 import me.egg82.antivpn.config.ConfigUtil;
-import me.egg82.antivpn.config.enums.VPNAlgorithmMethod;
+import me.egg82.antivpn.api.model.ip.AlgorithmMethod;
 import me.egg82.antivpn.services.AnalyticsHelper;
 import me.egg82.antivpn.utils.LogUtil;
 import me.egg82.antivpn.utils.ValidationUtil;
@@ -56,7 +56,7 @@ public class PlayerEvents extends EventHolder {
         }
 
         if ((!cachedConfig.get().getVPNKickMessage().isEmpty() || !cachedConfig.get().getVPNActionCommands().isEmpty())) {
-            if (cachedConfig.get().getVPNAlgorithmMethod() == VPNAlgorithmMethod.CONSESNSUS) {
+            if (cachedConfig.get().getVPNAlgorithmMethod() == AlgorithmMethod.CONSESNSUS) {
                 try {
                     api.consensus(ip); // Calling this will cache the result internally, even if the value is unused
                 } catch (APIException ex) {
@@ -117,7 +117,7 @@ public class PlayerEvents extends EventHolder {
         if (!cachedConfig.get().getVPNKickMessage().isEmpty() || !cachedConfig.get().getVPNActionCommands().isEmpty()) {
             boolean isVPN;
 
-            if (cachedConfig.get().getVPNAlgorithmMethod() == VPNAlgorithmMethod.CONSESNSUS) {
+            if (cachedConfig.get().getVPNAlgorithmMethod() == AlgorithmMethod.CONSESNSUS) {
                 try {
                     isVPN = api.consensus(ip) >= cachedConfig.get().getVPNAlgorithmConsensus();
                 } catch (APIException ex) {

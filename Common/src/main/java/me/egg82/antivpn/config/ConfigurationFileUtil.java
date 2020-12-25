@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import me.egg82.antivpn.VPNAPI;
 import me.egg82.antivpn.apis.SourceAPI;
-import me.egg82.antivpn.config.enums.VPNAlgorithmMethod;
+import me.egg82.antivpn.api.model.ip.AlgorithmMethod;
 import me.egg82.antivpn.messaging.*;
 import me.egg82.antivpn.storage.MySQLStorageService;
 import me.egg82.antivpn.storage.SQLiteStorageService;
@@ -184,10 +184,10 @@ public class ConfigurationFileUtil {
             }
         }
 
-        VPNAlgorithmMethod vpnAlgorithmMethod = VPNAlgorithmMethod.getByName(config.getNode("action", "vpn", "algorithm", "method").getString("cascade"));
-        if (vpnAlgorithmMethod == null) {
+        AlgorithmMethod algorithmMethod = AlgorithmMethod.getByName(config.getNode("action", "vpn", "algorithm", "method").getString("cascade"));
+        if (algorithmMethod == null) {
             logger.warn("action.vpn.algorithm.method is not a valid type. Using default value.");
-            vpnAlgorithmMethod = VPNAlgorithmMethod.CASCADE;
+            algorithmMethod = AlgorithmMethod.CASCADE;
         }
 
         double vpnAlgorithmConsensus = config.getNode("action", "vpn", "algorithm", "min-consensus").getDouble(0.6d);

@@ -18,7 +18,7 @@ import me.egg82.antivpn.APIException;
 import me.egg82.antivpn.VPNAPI;
 import me.egg82.antivpn.config.CachedConfig;
 import me.egg82.antivpn.config.ConfigUtil;
-import me.egg82.antivpn.config.enums.VPNAlgorithmMethod;
+import me.egg82.antivpn.api.model.ip.AlgorithmMethod;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import org.slf4j.Logger;
@@ -92,7 +92,7 @@ public class PlayerAnalyticsHook implements PluginHook {
                     continue;
                 }
 
-                if (cachedConfig.get().getVPNAlgorithmMethod() == VPNAlgorithmMethod.CONSESNSUS) {
+                if (cachedConfig.get().getVPNAlgorithmMethod() == AlgorithmMethod.CONSESNSUS) {
                     try {
                         if (api.consensus(ip) >= cachedConfig.get().getVPNAlgorithmConsensus()) {
                             retVal++;
@@ -166,7 +166,7 @@ public class PlayerAnalyticsHook implements PluginHook {
                 return false;
             }
 
-            if (cachedConfig.get().getVPNAlgorithmMethod() == VPNAlgorithmMethod.CONSESNSUS) {
+            if (cachedConfig.get().getVPNAlgorithmMethod() == AlgorithmMethod.CONSESNSUS) {
                 try {
                     return api.consensus(ip) >= cachedConfig.get().getVPNAlgorithmConsensus();
                 } catch (APIException ex) {

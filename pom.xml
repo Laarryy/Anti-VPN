@@ -19,6 +19,7 @@
         <bstats.version>1.8</bstats.version>
         <mockbukkit.version>1.14-0.2.2</mockbukkit.version>
 
+        <checkerframework.version>3.8.0</checkerframework.version>
         <servicelocator.version>1.0.2</servicelocator.version>
         <configurate.version>4.0.0</configurate.version>
         <flyway.version>7.3.2</flyway.version>
