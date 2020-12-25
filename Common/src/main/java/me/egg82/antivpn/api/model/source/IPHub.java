@@ -16,7 +16,7 @@ public class IPHub extends AbstractSource<IPHubModel> {
 
     public boolean isKeyRequired() { return true; }
 
-    public CompletableFuture<Boolean> getResult(@NonNull String ip) throws APIException {
+    public CompletableFuture<Boolean> getResult(@NonNull String ip) {
         return getRawResponse(ip).thenApply(model -> {
             if (model.getError() != null) {
                 throw new APIException(model.getError().contains("key"), "Could not get result from " + getName() + " (" + model.getError() + ")");
@@ -26,7 +26,7 @@ public class IPHub extends AbstractSource<IPHubModel> {
         });
     }
 
-    public CompletableFuture<IPHubModel> getRawResponse(@NonNull String ip) throws APIException {
+    public CompletableFuture<IPHubModel> getRawResponse(@NonNull String ip) {
         return CompletableFuture.supplyAsync(() -> {
             if (!ValidationUtil.isValidIp(ip)) {
                 throw new IllegalArgumentException("ip is invalid.");
