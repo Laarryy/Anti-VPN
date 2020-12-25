@@ -114,6 +114,7 @@
                                         <exclude>org/intellij/**</exclude>
                                         <exclude>org/junit/**</exclude>
                                         <exclude>org/hamcrest/**</exclude>
+                                        <exclude>ebean.mf</exclude>
 
                                         <!-- dep-injected -->
                                         <!-- mvn dependency:tree -->
