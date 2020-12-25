@@ -1,7 +1,7 @@
 package me.egg82.antivpn.commands.internal;
 
 import co.aikar.commands.CommandIssuer;
-import co.aikar.taskchain.TaskChain;
+import co.aikar.taskchain.TaskChainFactory;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import inet.ipaddr.IPAddress;
@@ -31,22 +31,22 @@ public class ScoreCommand implements Runnable {
 
     private final CommandIssuer issuer;
     private final String source;
-    private final TaskChain<?> chain;
+    private final TaskChainFactory taskFactory;
 
     private final VPNAPI api = VPNAPIProvider.getInstance();
 
     private static final DecimalFormat format = new DecimalFormat("##0.00");
 
-    public ScoreCommand(CommandIssuer issuer, String source, TaskChain<?> chain) {
+    public ScoreCommand(CommandIssuer issuer, String source, TaskChainFactory taskFactory) {
         this.issuer = issuer;
         this.source = source;
-        this.chain = chain;
+        this.taskFactory = taskFactory;
     }
 
     public void run() {
         issuer.sendInfo(Message.SCORE__BEGIN, "{source}", source);
 
-        chain
+        taskFactory.<Void>newChain()
                 .sync(() -> issuer.sendInfo(Message.SCORE__TYPE, "{type}", "NordVPN"))
                 .async(() -> test(issuer, source, "NordVPN", getNordVPNIPs()))
                 .sync(() -> issuer.sendInfo(Message.SCORE__SLEEP))

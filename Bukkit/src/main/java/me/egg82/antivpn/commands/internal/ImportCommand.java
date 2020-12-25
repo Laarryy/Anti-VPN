@@ -3,6 +3,7 @@ package me.egg82.antivpn.commands.internal;
 import co.aikar.commands.CommandIssuer;
 import co.aikar.taskchain.TaskChain;
 import co.aikar.taskchain.TaskChainAbortAction;
+import co.aikar.taskchain.TaskChainFactory;
 import java.util.Optional;
 import java.util.Set;
 import me.egg82.antivpn.config.CachedConfig;
@@ -24,14 +25,14 @@ public class ImportCommand implements Runnable {
     private final String masterName;
     private final String slaveName;
     private final String batchMax;
-    private final TaskChain<?> chain;
+    private final TaskChainFactory taskFactory;
 
-    public ImportCommand(CommandIssuer issuer, String masterName, String slaveName, String batchMax, TaskChain<?> chain) {
+    public ImportCommand(CommandIssuer issuer, String masterName, String slaveName, String batchMax, TaskChainFactory taskFactory) {
         this.issuer = issuer;
         this.masterName = masterName;
         this.slaveName = slaveName;
         this.batchMax = batchMax;
-        this.chain = chain;
+        this.taskFactory = taskFactory;
     }
 
     public void run() {

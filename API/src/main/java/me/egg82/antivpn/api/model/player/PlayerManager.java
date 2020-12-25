@@ -30,19 +30,19 @@ public interface PlayerManager {
      * Gets a player.
      *
      * @param uniqueId the {@link UUID} of the player to get
-     * @return a {@link Player} object, if one matching the uuid is available, or null if not
+     * @return a {@link CompletableFuture} - a {@link Player} object, if one matching the uuid is available, or null if not
      * @throws NullPointerException if the uuid is null
      */
-    @Nullable Player getPlayer(@NonNull UUID uniqueId);
+    @Nullable CompletableFuture<Player> getPlayer(@NonNull UUID uniqueId);
 
     /**
      * Gets a player.
      *
      * @param username the username of the player to get
-     * @return a {@link Player} object, if one matching the name is available, or null if not
+     * @return a {@link CompletableFuture} - a {@link Player} object, if one matching the name is available, or null if not
      * @throws NullPointerException if the name is null
      */
-    @Nullable Player getPlayer(@NonNull String username);
+    @Nullable CompletableFuture<Player> getPlayer(@NonNull String username);
 
     /**
      * Saves a player back to the plugin's storage provider.
@@ -60,6 +60,7 @@ public interface PlayerManager {
      *
      * @param player the {@link Player} object to delete
      * @return a future encapsulating the result of the operation
+     * @throws NullPointerException if player is null
      */
     default @NonNull CompletableFuture<Void> deletePlayer(@NonNull Player player) { return deletePlayer(player.getUuid()); }
 
@@ -68,6 +69,7 @@ public interface PlayerManager {
      *
      * @param uniqueId the player's {@link UUID}
      * @return a future encapsulating the result of the operation
+     * @throws NullPointerException if the uuid is null
      */
     @NonNull CompletableFuture<Void> deletePlayer(@NonNull UUID uniqueId);
 
@@ -88,10 +90,11 @@ public interface PlayerManager {
      *
      * @param player The player to test
      * @param useCache true if you would like to use AntiVPN's internal cache, false if not
-     * @return true if the API thinks the provided player is an MCLeaks account, false if not
-     * @throws APIException if a result could not be obtained
+     * @return a {@link CompletableFuture} - true if the API thinks the provided player is an MCLeaks account, false if not
+     * @throws NullPointerException if player is null
+     * @throws APIException in the result if a result could not be obtained
      */
-    default boolean checkMcLeaks(@NonNull Player player, boolean useCache) throws APIException { return checkMcLeaks(player.getUuid(), useCache); }
+    default @NonNull CompletableFuture<Boolean> checkMcLeaks(@NonNull Player player, boolean useCache) { return checkMcLeaks(player.getUuid(), useCache); }
 
     /**
      * Gets the MCLeaks result from AntiVPN using the configuration
@@ -103,8 +106,9 @@ public interface PlayerManager {
      *
      * @param uniqueId The player {@link UUID} to test
      * @param useCache true if you would like to use AntiVPN's internal cache, false if not
-     * @return true if the API thinks the provided player is an MCLeaks account, false if not
-     * @throws APIException if a result could not be obtained
+     * @return a {@link CompletableFuture} - true if the API thinks the provided player is an MCLeaks account, false if not
+     * @throws NullPointerException if the uuid is null
+     * @throws APIException in the result if a result could not be obtained
      */
-    boolean checkMcLeaks(@NonNull UUID uniqueId, boolean useCache) throws APIException;
+    @NonNull CompletableFuture<Boolean> checkMcLeaks(@NonNull UUID uniqueId, boolean useCache);
 }

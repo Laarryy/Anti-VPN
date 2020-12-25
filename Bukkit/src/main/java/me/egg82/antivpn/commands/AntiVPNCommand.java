@@ -38,7 +38,7 @@ public class AntiVPNCommand extends BaseCommand {
             logger.error(ex.getMessage(), ex);
             return;
         }
-        new ReloadCommand(plugin, taskFactory.newChain(), handler, issuer).run();
+        new ReloadCommand(plugin, taskFactory, handler, issuer).run();
     }
 
     @Subcommand("import")
@@ -47,7 +47,7 @@ public class AntiVPNCommand extends BaseCommand {
     @Syntax("<master> <slave> [batchSize]")
     @CommandCompletion("@storage @storage @nothing")
     public void onImport(CommandIssuer issuer, @Conditions("storage") String master, @Conditions("storage") String slave, @Default("50") String batchSize) {
-        new ImportCommand(issuer, master, slave, batchSize, taskFactory.newChain()).run();
+        new ImportCommand(issuer, master, slave, batchSize, taskFactory).run();
     }
 
     @Subcommand("test")
@@ -56,7 +56,7 @@ public class AntiVPNCommand extends BaseCommand {
     @Syntax("<ip>")
     @CommandCompletion("@nothing")
     public void onTest(CommandIssuer issuer, @Conditions("ip") String ip) {
-        new TestCommand(issuer, ip, taskFactory.newChain()).run();
+        new TestCommand(issuer, ip, taskFactory).run();
     }
 
     @Subcommand("score")
@@ -65,7 +65,7 @@ public class AntiVPNCommand extends BaseCommand {
     @Syntax("<source>")
     @CommandCompletion("@source @nothing")
     public void onScore(CommandIssuer issuer, @Conditions("source") String source) {
-        new ScoreCommand(issuer, source, taskFactory.newChain()).run();
+        new ScoreCommand(issuer, source, taskFactory).run();
     }
 
     @Subcommand("check")
@@ -74,7 +74,7 @@ public class AntiVPNCommand extends BaseCommand {
     @Syntax("<ip|player>")
     @CommandCompletion("@player @nothing")
     public void onCheck(CommandIssuer issuer, String type) {
-        new CheckCommand(issuer, type, taskFactory.newChain()).run();
+        new CheckCommand(issuer, taskFactory, type).run();
     }
 
     @CatchUnknown @Default

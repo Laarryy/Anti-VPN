@@ -3,7 +3,7 @@ package me.egg82.antivpn.api;
 /**
  * An exception thrown from the AntiVPN API.
  */
-public class APIException extends Exception {
+public class APIException extends RuntimeException {
     private final boolean hard;
 
     public APIException(boolean hard, String message) {

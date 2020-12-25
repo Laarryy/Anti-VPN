@@ -1,5 +1,6 @@
 package me.egg82.antivpn.api.model.source;
 
+import java.util.concurrent.CompletableFuture;
 import me.egg82.antivpn.api.APIException;
 import me.egg82.antivpn.api.model.ip.IP;
 import me.egg82.antivpn.api.model.source.models.SourceModel;
@@ -27,31 +28,31 @@ public interface Source<T extends SourceModel> {
      * Returns the result from the source given its configuration.
      *
      * @param ip the {@link IP} object to test
-     * @return true if the source thinks the IP is a VPN/proxy, false if not
+     * @return a {@link CompletableFuture} - true if the source thinks the IP is a VPN/proxy, false if not
      * @throws NullPointerException if the IP is null
-     * @throws APIException if the source returned an error
+     * @throws APIException in the result if the source returned an error
      */
-    default boolean getResult(@NonNull IP ip) throws APIException { return getResult(ip.getIp()); }
+    default CompletableFuture<Boolean> getResult(@NonNull IP ip) { return getResult(ip.getIp()); }
 
     /**
      * Returns the result from the source given its configuration.
      *
      * @param ip the IP to test
-     * @return true if the source thinks the IP is a VPN/proxy, false if not
+     * @return a {@link CompletableFuture} - true if the source thinks the IP is a VPN/proxy, false if not
      * @throws NullPointerException if the IP is null
-     * @throws APIException if the source returned an error
      * @throws IllegalArgumentException if the IP provided is invalid
+     * @throws APIException in the result if the source returned an error
      */
-    boolean getResult(@NonNull String ip) throws APIException;
+    CompletableFuture<Boolean> getResult(@NonNull String ip);
 
     /**
      * Returns the raw response from the source given its configuration.
      *
      * @param ip the IP to test
-     * @return the raw response model from the source
+     * @return a {@link CompletableFuture} - the raw response model from the source
      * @throws NullPointerException if the IP is null
-     * @throws APIException if the source returned an error
      * @throws IllegalArgumentException if the IP provided is invalid
+     * @throws APIException in the result if the source returned an error
      */
-    T getRawResponse(@NonNull String ip) throws APIException;
+    CompletableFuture<T> getRawResponse(@NonNull String ip);
 }
