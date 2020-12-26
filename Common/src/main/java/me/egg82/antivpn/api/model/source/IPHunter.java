@@ -1,64 +1,50 @@
 package me.egg82.antivpn.api.model.source;
 
-import java.io.IOException;
-import java.net.URL;
+import flexjson.JSONDeserializer;
+import java.net.HttpURLConnection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import me.egg82.antivpn.api.APIException;
+import me.egg82.antivpn.api.model.source.models.IPHunterModel;
 import me.egg82.antivpn.utils.ValidationUtil;
-import ninja.egg82.json.JSONWebUtil;
-import ninja.leaping.configurate.ConfigurationNode;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.ParseException;
+import org.spongepowered.configurate.ConfigurationNode;
 
-public class IPHunter extends AbstractSource {
+public class IPHunter extends AbstractSource<IPHunterModel> {
     public @NonNull String getName() { return "iphunter"; }
 
     public boolean isKeyRequired() { return true; }
 
-    public boolean getResult(@NonNull String ip) throws APIException {
-        if (!ValidationUtil.isValidIp(ip)) {
-            throw new IllegalArgumentException("ip is invalid.");
-        }
+    public CompletableFuture<Boolean> getResult(@NonNull String ip) {
+        return getRawResponse(ip).thenApply(model -> {
+            if (!"success".equalsIgnoreCase(model.getStatus())) {
+                throw new APIException(model.getCode().contains("X-Key"), "Could not get result from " + getName() + " (" + model.getCode() + ")");
+            }
 
-        ConfigurationNode sourceConfigNode = getSourceConfigNode();
+            return model.getData().getBlock() == getSourceConfigNode().node("block").getInt(1);
+        });
+    }
 
-        String key = sourceConfigNode.getNode("key").getString();
-        if (key == null || key.isEmpty()) {
-            throw new APIException(true, "Key is not defined for " + getName());
-        }
+    public CompletableFuture<IPHunterModel> getRawResponse(@NonNull String ip) {
+        return CompletableFuture.supplyAsync(() -> {
+            if (!ValidationUtil.isValidIp(ip)) {
+                throw new IllegalArgumentException("ip is invalid.");
+            }
 
-        int blockType = sourceConfigNode.getNode("block").getInt(1);
+            ConfigurationNode sourceConfigNode = getSourceConfigNode();
 
-        Map<String, String> headers = new HashMap<>();
-        headers.put("X-Key", key);
+            String key = sourceConfigNode.node("key").getString();
+            if (key == null || key.isEmpty()) {
+                throw new APIException(true, "Key is not defined for " + getName());
+            }
 
-        JSONObject json;
-        try {
-            json = JSONWebUtil.getJSONObject(new URL("https://www.iphunter.info:8082/v1/ip/" + ip), "GET", (int) getCachedConfig().getTimeout(), "egg82/AntiVPN", headers);
-        } catch (IOException | ParseException | ClassCastException ex) {
-            throw new APIException(false, ex);
-        }
-        if (json == null || json.get("status") == null) {
-            throw new APIException(false, "Could not get result from " + getName());
-        }
+            Map<String, String> newHeaders = new HashMap<>(headers);
+            newHeaders.put("X-Key", key);
 
-        String status = (String) json.get("status");
-        if (!status.equalsIgnoreCase("success")) {
-            throw new APIException(false, "Could not get result from " + getName());
-        }
-
-        JSONObject data = (JSONObject) json.get("data");
-        if (data == null) {
-            throw new APIException(false, "Could not get result from " + getName());
-        }
-
-        if (data.get("block") == null) {
-            throw new APIException(false, "Could not get result from " + getName());
-        }
-
-        int block = ((Number) data.get("block")).intValue();
-        return block == blockType;
+            HttpURLConnection conn = getConnection("https://www.iphunter.info:8082/v1/ip/" + ip, "GET", (int) getCachedConfig().getTimeout(), "egg82/AntiVPN", newHeaders);
+            JSONDeserializer<IPHunterModel> modelDeserializer = new JSONDeserializer<>();
+            return modelDeserializer.deserialize(getString(conn), IPHunterModel.class);
+        });
     }
 }

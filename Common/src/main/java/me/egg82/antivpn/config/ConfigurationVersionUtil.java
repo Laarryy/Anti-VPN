@@ -631,6 +631,9 @@ public class ConfigurationVersionUtil {
         }
         config.node("sources", "order").setList(String.class, sources);
 
+        // Add "subdomain" to sources->getipintel
+        config.node("sources", "getipintel", "subdomain").set("check");
+
         // Version
         config.node("version").set(5.0d);
     }

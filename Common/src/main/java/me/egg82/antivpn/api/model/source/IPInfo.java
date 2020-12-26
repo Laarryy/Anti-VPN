@@ -1,55 +1,51 @@
 package me.egg82.antivpn.api.model.source;
 
-import java.io.IOException;
-import java.net.URL;
+import flexjson.JSONDeserializer;
+import java.net.HttpURLConnection;
+import java.util.concurrent.CompletableFuture;
 import me.egg82.antivpn.api.APIException;
+import me.egg82.antivpn.api.model.source.models.IPInfoModel;
 import me.egg82.antivpn.utils.ValidationUtil;
-import ninja.egg82.json.JSONWebUtil;
-import ninja.leaping.configurate.ConfigurationNode;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.ParseException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.spongepowered.configurate.ConfigurationNode;
 
-public class IPInfo extends AbstractSource {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
-
+public class IPInfo extends AbstractSource<IPInfoModel> {
     public @NonNull String getName() { return "ipinfo"; }
 
     public boolean isKeyRequired() { return true; }
 
-    public boolean getResult(@NonNull String ip) throws APIException {
-        if (!ValidationUtil.isValidIp(ip)) {
-            throw new IllegalArgumentException("ip is invalid.");
-        }
+    public CompletableFuture<Boolean> getResult(@NonNull String ip) throws APIException {
+        return getRawResponse(ip).thenApply(model -> {
+            if (model.getError() != null) {
+                throw new APIException(model.getError().getMessage().contains("token"), "Could not get result from " + getName() + " (" + model.getError().getMessage() + ")");
+            }
 
-        ConfigurationNode sourceConfigNode = getSourceConfigNode();
+            ConfigurationNode sourceConfigNode = getSourceConfigNode();
 
-        String key = sourceConfigNode.getNode("key").getString();
-        if (key == null || key.isEmpty()) {
-            throw new APIException(true, "Key is not defined for " + getName());
-        }
-
-        JSONObject json;
-        try {
-            json = JSONWebUtil.getJSONObject(new URL("https://ipinfo.io/" + ip + "/privacy?token=" + key), "GET", (int) getCachedConfig().getTimeout());
-        } catch (IOException | ParseException | ClassCastException ex) {
-            throw new APIException(false, "Could not get result from " + getName());
-        }
-        if (json == null) {
-            throw new APIException(false, "Could not get result from " + getName());
-        }
-        if (json.isEmpty()) {
-            throw new APIException(false, "Could not get result from " + getName());
-        }
-
-        // if proxy config setting is true and "proxy" is true, tor || vpn will also be true.
-        if (sourceConfigNode.getNode("proxy").getBoolean() && json.get("proxy") != null) {
-            if ((Boolean) json.get("proxy")) {
+            // if proxy config setting is true and "proxy" is true, tor || vpn will also be true.
+            if (sourceConfigNode.node("proxy").getBoolean(true) && model.isProxy()) {
                 return true;
             }
-        }
-        return json.get("vpn") != null && (Boolean) json.get("vpn");
+            return model.isTor() || model.isVpn();
+        });
+    }
+
+    public CompletableFuture<IPInfoModel> getRawResponse(@NonNull String ip) {
+        return CompletableFuture.supplyAsync(() -> {
+            if (!ValidationUtil.isValidIp(ip)) {
+                throw new IllegalArgumentException("ip is invalid.");
+            }
+
+            ConfigurationNode sourceConfigNode = getSourceConfigNode();
+
+            String key = sourceConfigNode.node("key").getString();
+            if (key == null || key.isEmpty()) {
+                throw new APIException(true, "Key is not defined for " + getName());
+            }
+
+            HttpURLConnection conn = getConnection("https://ipinfo.io/" + ip + "/privacy?token=" + key, "GET", (int) getCachedConfig().getTimeout(), "egg82/AntiVPN", headers);
+            JSONDeserializer<IPInfoModel> modelDeserializer = new JSONDeserializer<>();
+            return modelDeserializer.deserialize(getString(conn), IPInfoModel.class);
+        });
     }
 }

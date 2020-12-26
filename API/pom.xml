@@ -81,11 +81,13 @@
             <groupId>org.checkerframework</groupId>
             <artifactId>checker</artifactId>
             <version>${checkerframework.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>net.sf.flexjson</groupId>
             <artifactId>flexjson</artifactId>
             <version>${flexjson.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>

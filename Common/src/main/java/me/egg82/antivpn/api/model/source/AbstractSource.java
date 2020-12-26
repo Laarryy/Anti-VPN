@@ -48,13 +48,16 @@ public abstract class AbstractSource<T extends SourceModel> implements Source<T>
 
             if (status >= 200 && status < 300) {
                 if (status == 204 || status == 205) { // Empty response, reset
-                    throw new APIException(false, "Could not get result from " + getName() + " (HTTP status " + status + ")");
+                    throw new APIException(false, "Could not get result from " + getName() + " (HTTP status " + status + " - empty response/reset connection)");
                 }
 
                 return conn;
             } else if (status >= 400 && status < 500) {
+                if (status == 403) { // Forbidden
+                    throw new APIException(true, "Could not get result from " + getName() + " (HTTP status " + status + " - access denied, key/token issue)");
+                }
                 if (status == 429) { // Too many queries
-                    throw new APIException(false, "Could not get result from " + getName() + " (HTTP status " + status + ")");
+                    throw new APIException(false, "Could not get result from " + getName() + " (HTTP status " + status + " - too many queries, temporary issue)");
                 }
                 throw new APIException(true, "Could not get result from " + getName() + " (HTTP status " + status + ")");
             } else if (status >= 500 && status < 600) { // Server errors (usually temporary)

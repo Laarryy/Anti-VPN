@@ -60,7 +60,7 @@ public class GetIPIntel extends AbstractSource<GetIPIntelModel> {
                 throw new APIException(false, "API calls to this source have been limited to 15/minute as per request.");
             }
 
-            HttpURLConnection conn = getConnection("https://check.getipintel.net/check.php?ip=" + ip + "&contact=" + sourceConfigNode.node("contact").getString("admin@yoursite.com") + "&format=json&flags=b", "GET", (int) getCachedConfig().getTimeout(), "egg82/AntiVPN", headers);
+            HttpURLConnection conn = getConnection("https://" + sourceConfigNode.node("subdomain").getString("check") + ".getipintel.net/check.php?ip=" + ip + "&contact=" + sourceConfigNode.node("contact").getString("admin@yoursite.com") + "&format=json&flags=b", "GET", (int) getCachedConfig().getTimeout(), "egg82/AntiVPN", headers);
             JSONDeserializer<GetIPIntelModel> modelDeserializer = new JSONDeserializer<>();
             return modelDeserializer.deserialize(getString(conn), GetIPIntelModel.class);
         });

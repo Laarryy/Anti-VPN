@@ -154,6 +154,8 @@ sources:
     contact: 'admin@yoursite.com'
     # Threshold above which an IP is considered "bad"
     threshold: 0.98
+    # Subdomains for business customers. Contact getipintel@gmail.com if you'd like one
+    subdomain: 'check'
 
   # https://www.ipqualityscore.com/
   # Results updated Feb 9, 2020
