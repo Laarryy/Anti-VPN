@@ -1,51 +1,50 @@
 package me.egg82.antivpn.api.model.source;
 
-import java.io.IOException;
-import java.net.URL;
+import flexjson.JSONDeserializer;
+import java.net.HttpURLConnection;
 import java.util.concurrent.CompletableFuture;
 import me.egg82.antivpn.api.APIException;
+import me.egg82.antivpn.api.model.source.models.ProxyCheckModel;
 import me.egg82.antivpn.utils.ValidationUtil;
-import ninja.egg82.json.JSONWebUtil;
-import ninja.leaping.configurate.ConfigurationNode;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.ParseException;
+import org.spongepowered.configurate.ConfigurationNode;
 
-public class ProxyCheck extends AbstractSource {
+public class ProxyCheck extends AbstractSource<ProxyCheckModel> {
     public @NonNull String getName() { return "proxycheck"; }
 
     public boolean isKeyRequired() { return false; }
 
     public @NonNull CompletableFuture<Boolean> getResult(@NonNull String ip) {
-        if (!ValidationUtil.isValidIp(ip)) {
-            throw new IllegalArgumentException("ip is invalid.");
-        }
+        return getRawResponse(ip).thenApply(model -> {
+            if (!"ok".equalsIgnoreCase(model.getStatus())) {
+                throw new APIException(model.getMessage().contains("Key"), "Could not get result from " + getName() + " (" + model.getMessage() + ")");
+            }
 
-        ConfigurationNode sourceConfigNode = getSourceConfigNode();
+            ProxyCheckModel.IP ipModel;
+            try {
+                ipModel = (ProxyCheckModel.IP) model.getClass().getField(ip).get(model);
+            } catch (NoSuchFieldException | IllegalAccessException ex) {
+                throw new APIException(true, "Could not get field " + ip + " from " + model);
+            }
 
-        String key = sourceConfigNode.getNode("key").getString();
+            return "yes".equalsIgnoreCase(ipModel.getProxy());
+        });
+    }
 
-        JSONObject json;
-        try {
-            json = JSONWebUtil.getJSONObject(new URL("https://proxycheck.io/v2/" + ip + "?vpn=1" + ((key != null && !key.isEmpty()) ? "&key=" + key : "")), "GET", (int) getCachedConfig().getTimeout(), "egg82/AntiVPN");
-        } catch (IOException | ParseException | ClassCastException ex) {
-            throw new APIException(false, "Could not get result from " + getName());
-        }
-        if (json == null || json.get("status") == null) {
-            throw new APIException(false, "Could not get result from " + getName());
-        }
+    public @NonNull CompletableFuture<ProxyCheckModel> getRawResponse(@NonNull String ip) {
+        return CompletableFuture.supplyAsync(() -> {
+            if (!ValidationUtil.isValidIp(ip)) {
+                throw new IllegalArgumentException("ip is invalid.");
+            }
 
-        String status = (String) json.get("status");
-        if (!status.equalsIgnoreCase("ok")) {
-            throw new APIException(false, "Could not get result from " + getName());
-        }
+            ConfigurationNode sourceConfigNode = getSourceConfigNode();
 
-        JSONObject result = (JSONObject) json.get(ip);
-        if (result == null || result.get("proxy") == null) {
-            throw new APIException(false, "Could not get result from " + getName());
-        }
-        String proxy = (String) result.get("proxy");
+            String key = sourceConfigNode.node("key").getString();
 
-        return proxy.equalsIgnoreCase("yes");
+            HttpURLConnection conn = getConnection("https://proxycheck.io/v2/" + ip + "?vpn=1" + ((key != null && !key.isEmpty()) ? "&key=" + key : ""), "GET", (int) getCachedConfig().getTimeout(), "egg82/AntiVPN", headers);
+            JSONDeserializer<ProxyCheckModel> modelDeserializer = new JSONDeserializer<>();
+            modelDeserializer.use(ip, ProxyCheckModel.IP.class);
+            return modelDeserializer.deserialize(getString(conn), ProxyCheckModel.class);
+        });
     }
 }

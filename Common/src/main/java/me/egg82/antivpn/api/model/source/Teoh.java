@@ -1,52 +1,53 @@
 package me.egg82.antivpn.api.model.source;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import java.io.IOException;
-import java.net.URL;
+import flexjson.JSONDeserializer;
+import java.net.HttpURLConnection;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import me.egg82.antivpn.api.APIException;
+import me.egg82.antivpn.api.model.source.models.TeohModel;
 import me.egg82.antivpn.utils.ValidationUtil;
-import ninja.egg82.json.JSONWebUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.ParseException;
 
-public class Teoh extends AbstractSource {
+public class Teoh extends AbstractSource<TeohModel> {
     public @NonNull String getName() { return "teoh"; }
 
     public boolean isKeyRequired() { return false; }
 
-    private static AtomicInteger requests = new AtomicInteger(0);
-    private static ScheduledExecutorService threadPool = Executors.newSingleThreadScheduledExecutor(new ThreadFactoryBuilder().setNameFormat("AntiVPN-TeohAPI-%d").build());
+    private static final AtomicInteger requests = new AtomicInteger(0);
+    private static final ScheduledExecutorService threadPool = Executors.newSingleThreadScheduledExecutor(new ThreadFactoryBuilder().setNameFormat("AntiVPN-TeohAPI-%d").build());
 
     static {
         threadPool.scheduleAtFixedRate(() -> requests.set(0), 0L, 24L, TimeUnit.HOURS);
     }
 
     public @NonNull CompletableFuture<Boolean> getResult(@NonNull String ip) {
-        if (!ValidationUtil.isValidIp(ip)) {
-            throw new IllegalArgumentException("ip is invalid.");
-        }
+        return getRawResponse(ip).thenApply(model -> {
+            if (model.getMessage() != null) {
+                throw new APIException(false, "Could not get result from " + getName() + " (" + model.getMessage() + ")");
+            }
 
-        if (requests.getAndIncrement() >= 1000) {
-            throw new APIException(true, "API calls to this source have been limited to 1,000/day as per request.");
-        }
+            return model.isHosting() || "yes".equalsIgnoreCase(model.getVpnOrProxy());
+        });
+    }
 
-        JSONObject json;
-        try {
-            json = JSONWebUtil.getJSONObject(new URL("https://ip.teoh.io/api/vpn/" + ip), "GET", (int) getCachedConfig().getTimeout(), "egg82/AntiVPN");
-        } catch (IOException | ParseException | ClassCastException ex) {
-            throw new APIException(false, ex);
-        }
-        if (json == null || json.get("vpn_or_proxy") == null) {
-            throw new APIException(false, "Could not get result from " + getName());
-        }
+    public @NonNull CompletableFuture<TeohModel> getRawResponse(@NonNull String ip) {
+        return CompletableFuture.supplyAsync(() -> {
+            if (!ValidationUtil.isValidIp(ip)) {
+                throw new IllegalArgumentException("ip is invalid.");
+            }
 
-        String proxy = (String) json.get("vpn_or_proxy");
-        return proxy.equalsIgnoreCase("yes");
+            if (requests.getAndIncrement() >= 1000) {
+                throw new APIException(false, "API calls to " + getName() + " have been limited to 1,000/day as per request.");
+            }
+
+            HttpURLConnection conn = getConnection("https://ip.teoh.io/api/vpn/" + ip, "GET", (int) getCachedConfig().getTimeout(), "egg82/AntiVPN", headers);
+            JSONDeserializer<TeohModel> modelDeserializer = new JSONDeserializer<>();
+            return modelDeserializer.deserialize(getString(conn), TeohModel.class);
+        });
     }
 }

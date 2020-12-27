@@ -13,6 +13,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <plugin.version>6.0.0</plugin.version>
+        <api.version>2.0.0</api.version>
+
         <paper.version>1.16.1-R0.1-SNAPSHOT</paper.version>
         <waterfall.version>1.15-SNAPSHOT</waterfall.version>
         <velocity.version>1.1.2</velocity.version>
@@ -131,7 +133,7 @@
             <dependency>
                 <groupId>me.egg82</groupId>
                 <artifactId>antivpn-api</artifactId>
-                <version>${plugin.version}</version>
+                <version>${api.version}</version>
             </dependency>
             <dependency>
                 <groupId>me.egg82</groupId>

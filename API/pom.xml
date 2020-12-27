@@ -10,7 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>antivpn-api</artifactId>
-    <version>${plugin.version}</version>
+    <version>${api.version}</version>
 
     <build>
         <resources>

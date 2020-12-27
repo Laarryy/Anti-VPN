@@ -53,7 +53,7 @@ public abstract class AbstractSource<T extends SourceModel> implements Source<T>
 
                 return conn;
             } else if (status >= 400 && status < 500) {
-                if (status == 403) { // Forbidden
+                if (status == 401 || status == 403) { // Unauthorized, forbidden
                     throw new APIException(true, "Could not get result from " + getName() + " (HTTP status " + status + " - access denied, key/token issue)");
                 }
                 if (status == 429) { // Too many queries

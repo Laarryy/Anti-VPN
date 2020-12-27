@@ -32,7 +32,7 @@ public class IPQualityScore extends AbstractSource<IPQualityScoreModel> {
                 return true;
             }
 
-            return model.getFraudScore() >= sourceConfigNode.node("threshold").getDouble(0.98d);
+            return model.getFraudScore() >= sourceConfigNode.node("threshold").getDouble(0.98d) * 100.0d;
         });
     }
 
