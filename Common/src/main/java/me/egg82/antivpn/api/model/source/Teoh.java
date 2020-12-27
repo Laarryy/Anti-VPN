@@ -3,6 +3,7 @@ package me.egg82.antivpn.api.model.source;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import java.io.IOException;
 import java.net.URL;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -26,7 +27,7 @@ public class Teoh extends AbstractSource {
         threadPool.scheduleAtFixedRate(() -> requests.set(0), 0L, 24L, TimeUnit.HOURS);
     }
 
-    public boolean getResult(@NonNull String ip) throws APIException {
+    public @NonNull CompletableFuture<Boolean> getResult(@NonNull String ip) {
         if (!ValidationUtil.isValidIp(ip)) {
             throw new IllegalArgumentException("ip is invalid.");
         }

@@ -16,7 +16,7 @@ public class IPHunter extends AbstractSource<IPHunterModel> {
 
     public boolean isKeyRequired() { return true; }
 
-    public CompletableFuture<Boolean> getResult(@NonNull String ip) {
+    public @NonNull CompletableFuture<Boolean> getResult(@NonNull String ip) {
         return getRawResponse(ip).thenApply(model -> {
             if (!"success".equalsIgnoreCase(model.getStatus())) {
                 throw new APIException(model.getCode().contains("X-Key"), "Could not get result from " + getName() + " (" + model.getCode() + ")");
@@ -26,7 +26,7 @@ public class IPHunter extends AbstractSource<IPHunterModel> {
         });
     }
 
-    public CompletableFuture<IPHunterModel> getRawResponse(@NonNull String ip) {
+    public @NonNull CompletableFuture<IPHunterModel> getRawResponse(@NonNull String ip) {
         return CompletableFuture.supplyAsync(() -> {
             if (!ValidationUtil.isValidIp(ip)) {
                 throw new IllegalArgumentException("ip is invalid.");

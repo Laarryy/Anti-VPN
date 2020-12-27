@@ -32,7 +32,7 @@ public interface Source<T extends SourceModel> {
      * @throws NullPointerException if the IP is null
      * @throws APIException in the result if the source returned an error
      */
-    default CompletableFuture<Boolean> getResult(@NonNull IP ip) { return getResult(ip.getIp()); }
+    default @NonNull CompletableFuture<Boolean> getResult(@NonNull IP ip) { return getResult(ip.getIp()); }
 
     /**
      * Returns the result from the source given its configuration.
@@ -43,7 +43,7 @@ public interface Source<T extends SourceModel> {
      * @throws IllegalArgumentException if the IP provided is invalid
      * @throws APIException in the result if the source returned an error
      */
-    CompletableFuture<Boolean> getResult(@NonNull String ip);
+    @NonNull CompletableFuture<Boolean> getResult(@NonNull String ip);
 
     /**
      * Returns the raw response from the source given its configuration.
@@ -54,5 +54,5 @@ public interface Source<T extends SourceModel> {
      * @throws IllegalArgumentException if the IP provided is invalid
      * @throws APIException in the result if the source returned an error
      */
-    CompletableFuture<T> getRawResponse(@NonNull String ip);
+    @NonNull CompletableFuture<T> getRawResponse(@NonNull String ip);
 }

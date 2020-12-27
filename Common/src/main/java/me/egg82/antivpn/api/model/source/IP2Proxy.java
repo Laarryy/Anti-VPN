@@ -14,7 +14,7 @@ public class IP2Proxy extends AbstractSource<IP2ProxyModel> {
 
     public boolean isKeyRequired() { return true; }
 
-    public CompletableFuture<Boolean> getResult(@NonNull String ip) {
+    public @NonNull CompletableFuture<Boolean> getResult(@NonNull String ip) {
         return getRawResponse(ip).thenApply(model -> {
             if (!"OK".equalsIgnoreCase(model.getResponse())) {
                 throw new APIException(false, "Could not get result from " + getName() + " (" + model.getResponse() + ")");
@@ -24,7 +24,7 @@ public class IP2Proxy extends AbstractSource<IP2ProxyModel> {
         });
     }
 
-    public CompletableFuture<IP2ProxyModel> getRawResponse(@NonNull String ip) {
+    public @NonNull CompletableFuture<IP2ProxyModel> getRawResponse(@NonNull String ip) {
         return CompletableFuture.supplyAsync(() -> {
             if (!ValidationUtil.isValidIp(ip)) {
                 throw new IllegalArgumentException("ip is invalid.");

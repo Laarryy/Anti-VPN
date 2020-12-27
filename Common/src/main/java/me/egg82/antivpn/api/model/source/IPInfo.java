@@ -14,7 +14,7 @@ public class IPInfo extends AbstractSource<IPInfoModel> {
 
     public boolean isKeyRequired() { return true; }
 
-    public CompletableFuture<Boolean> getResult(@NonNull String ip) throws APIException {
+    public @NonNull CompletableFuture<Boolean> getResult(@NonNull String ip) {
         return getRawResponse(ip).thenApply(model -> {
             if (model.getError() != null) {
                 throw new APIException(model.getError().getMessage().contains("token"), "Could not get result from " + getName() + " (" + model.getError().getMessage() + ")");
@@ -30,7 +30,7 @@ public class IPInfo extends AbstractSource<IPInfoModel> {
         });
     }
 
-    public CompletableFuture<IPInfoModel> getRawResponse(@NonNull String ip) {
+    public @NonNull CompletableFuture<IPInfoModel> getRawResponse(@NonNull String ip) {
         return CompletableFuture.supplyAsync(() -> {
             if (!ValidationUtil.isValidIp(ip)) {
                 throw new IllegalArgumentException("ip is invalid.");

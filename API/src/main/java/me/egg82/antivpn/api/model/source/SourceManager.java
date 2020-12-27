@@ -42,10 +42,92 @@ public interface SourceManager {
     @Nullable <T extends SourceModel> Source<T> getSource(@NonNull String name, @NonNull Class<T> modelClass);
 
     /**
+     * Registers and enables a new, unique {@link Source}, replacing
+     * an existing source with the same name in the sources list
+     * (the order in which they will be used).
+     *
+     * <p>Note that this method will return false if a source with
+     * the same name was not registered.</p>
+     *
+     * @param newSource The new source to replace an existing source with
+     * @return true if the replacement was successful, false if not
+     * @throws NullPointerException if the new source is null
+     */
+    default boolean replaceSource(@NonNull Source<? extends SourceModel> newSource) {
+        List<Source<? extends SourceModel>> sources = getSources();
+        int index = -1;
+        for (int i = 0; i < sources.size(); i++) {
+            if (sources.get(i).getName().equals(newSource.getName())) {
+                index = i;
+                deregisterSource(sources.get(i).getName());
+                break;
+            }
+        }
+        if (index == -1) {
+            return false;
+        }
+        return registerSource(newSource, index);
+    }
+
+    /**
+     * Registers and enables a new, unique {@link Source}, appending
+     * the source to the end of the sources list (the order in which
+     * they will be used).
+     *
+     * <p>Note that this method will return false if a source with
+     * the same name as an existing source is being added.</p>
+     *
+     * @param source The new, unique source to add
+     * @return true if the addition was successful, false if not
+     * @throws NullPointerException if the source is null
+     */
+    default boolean registerSource(@NonNull Source<? extends SourceModel> source) { return registerSource(source, getSources().size()); }
+
+    /**
+     * Registers and enables a new, unique {@link Source}, inserting
+     * the source at the specified location in the sources list (the
+     * order in which they will be used).
+     *
+     * <p>Note that this method will return false if a source with
+     * the same name as an existing source is being added.</p>
+     *
+     * @param source The new, unique source to add
+     * @return true if the addition was successful, false if not
+     * @throws NullPointerException if the source is null
+     */
+    boolean registerSource(@NonNull Source<? extends SourceModel> source, int index);
+
+    /**
+     * Deregisters, disables, and removes an existing source from
+     * the sources list.
+     *
+     * <p>Note that this method will return false if the source
+     * was not registered.</p>
+     *
+     * @param source The source to remove
+     * @return true if the removal was successful, false if not
+     * @throws NullPointerException if the source is null
+     */
+    default boolean deregisterSource(@NonNull Source<? extends SourceModel> source) { return deregisterSource(source.getName()); }
+
+    /**
+     * Deregisters, disables, and removes an existing source from
+     * the sources list.
+     *
+     * <p>Note that this method will return false if the source
+     * was not registered.</p>
+     *
+     * @param sourceName The source to remove
+     * @return true if the removal was successful, false if not
+     * @throws NullPointerException if the source name is null
+     */
+    boolean deregisterSource(@NonNull String sourceName);
+
+    /**
      * Gets a list of all enabled {@link Source}s, in the order
-     * they are provided in the AntiVPN plugin configuration.
+     * they are used in the AntiVPN plugin.
      *
      * @return a list of sources
      */
-    @NonNull CompletableFuture<List<Source<? extends SourceModel>>> getSources();
+    @NonNull List<Source<? extends SourceModel>> getSources();
 }

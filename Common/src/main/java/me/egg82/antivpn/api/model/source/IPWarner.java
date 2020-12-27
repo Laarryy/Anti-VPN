@@ -2,6 +2,7 @@ package me.egg82.antivpn.api.model.source;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.concurrent.CompletableFuture;
 import me.egg82.antivpn.api.APIException;
 import me.egg82.antivpn.utils.ValidationUtil;
 import ninja.egg82.json.JSONWebUtil;
@@ -15,7 +16,7 @@ public class IPWarner extends AbstractSource {
 
     public boolean isKeyRequired() { return true; }
 
-    public boolean getResult(@NonNull String ip) throws APIException {
+    public @NonNull CompletableFuture<Boolean> getResult(@NonNull String ip) {
         if (!ValidationUtil.isValidIp(ip)) {
             throw new IllegalArgumentException("ip is invalid.");
         }

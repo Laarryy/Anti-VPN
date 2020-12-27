@@ -28,7 +28,7 @@ public class GetIPIntel extends AbstractSource<GetIPIntelModel> {
 
     public boolean isKeyRequired() { return false; }
 
-    public CompletableFuture<Boolean> getResult(@NonNull String ip) {
+    public @NonNull CompletableFuture<Boolean> getResult(@NonNull String ip) {
         return getRawResponse(ip).thenApply(model -> {
             if (!"success".equalsIgnoreCase(model.getStatus())) {
                 boolean isHard = "-5".equals(model.getResult()) || "-6".equals(model.getResult());
@@ -42,7 +42,7 @@ public class GetIPIntel extends AbstractSource<GetIPIntelModel> {
         });
     }
 
-    public CompletableFuture<GetIPIntelModel> getRawResponse(@NonNull String ip) {
+    public @NonNull CompletableFuture<GetIPIntelModel> getRawResponse(@NonNull String ip) {
         return CompletableFuture.supplyAsync(() -> {
             if (!ValidationUtil.isValidIp(ip)) {
                 throw new IllegalArgumentException("ip is invalid.");

@@ -1,7 +1,6 @@
 package me.egg82.antivpn.api.model.source;
 
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 import me.egg82.antivpn.api.model.source.models.SourceModel;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -15,7 +14,15 @@ public class GenericSourceManager implements SourceManager {
 
     }
 
-    public @NonNull CompletableFuture<List<Source<? extends SourceModel>>> getSources() {
+    public boolean registerSource(@NonNull Source<? extends SourceModel> source, int index) {
+
+    }
+
+    public boolean deregisterSource(@NonNull String sourceName) {
+
+    }
+
+    public @NonNull List<Source<? extends SourceModel>> getSources() {
 
     }
 }

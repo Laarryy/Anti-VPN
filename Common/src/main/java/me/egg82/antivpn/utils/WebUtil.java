@@ -8,6 +8,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import me.egg82.antivpn.config.ConfigUtil;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,7 +17,7 @@ public class WebUtil {
 
     private WebUtil() { }
 
-    public static String urlEncode(String part) {
+    public static @NonNull String urlEncode(String part) {
         try {
             return URLEncoder.encode(part, StandardCharsets.UTF_8.toString());
         } catch (UnsupportedEncodingException ignored) {
@@ -28,17 +29,17 @@ public class WebUtil {
         }
     }
 
-    public static String getString(URL url) throws IOException { return getString(url, null, 5000, null, null, null); }
+    public static @NonNull String getString(URL url) throws IOException { return getString(url, null, 5000, null, null, null); }
 
-    public static String getString(URL url, String method) throws IOException { return getString(url, method, 5000, null, null, null); }
+    public static @NonNull String getString(URL url, String method) throws IOException { return getString(url, method, 5000, null, null, null); }
 
-    public static String getString(URL url, String method, int timeout) throws IOException { return getString(url, method, timeout, null, null, null); }
+    public static @NonNull String getString(URL url, String method, int timeout) throws IOException { return getString(url, method, timeout, null, null, null); }
 
-    public static String getString(URL url, String method, int timeout, String userAgent) throws IOException { return getString(url, method, timeout, userAgent, null, null); }
+    public static @NonNull String getString(URL url, String method, int timeout, String userAgent) throws IOException { return getString(url, method, timeout, userAgent, null, null); }
 
-    public static String getString(URL url, String method, int timeout, String userAgent, Map<String, String> headers) throws IOException { return getString(url, method, timeout, userAgent, headers, null); }
+    public static @NonNull String getString(URL url, String method, int timeout, String userAgent, Map<String, String> headers) throws IOException { return getString(url, method, timeout, userAgent, headers, null); }
 
-    public static String getString(URL url, String method, int timeout, String userAgent, Map<String, String> headers, Map<String, String> postData) throws IOException {
+    public static @NonNull String getString(URL url, String method, int timeout, String userAgent, Map<String, String> headers, Map<String, String> postData) throws IOException {
         if (headers == null) {
             headers = new HashMap<>();
         }
@@ -55,7 +56,7 @@ public class WebUtil {
         }
     }
 
-    public static String getString(HttpURLConnection conn) throws IOException {
+    public static @NonNull String getString(HttpURLConnection conn) throws IOException {
         try (InputStream in = getInputStream(conn); InputStreamReader reader = new InputStreamReader(in); BufferedReader buffer = new BufferedReader(reader)) {
             StringBuilder builder = new StringBuilder();
             String line;
@@ -66,18 +67,18 @@ public class WebUtil {
         }
     }
 
-    public static HttpURLConnection getConnection(URL url) throws IOException { return getConnection(url, null, 5000, null, null, null); }
+    public static @NonNull HttpURLConnection getConnection(URL url) throws IOException { return getConnection(url, null, 5000, null, null, null); }
 
-    public static HttpURLConnection getConnection(URL url, String method) throws IOException { return getConnection(url, method, 5000, null, null, null); }
+    public static @NonNull HttpURLConnection getConnection(URL url, String method) throws IOException { return getConnection(url, method, 5000, null, null, null); }
 
-    public static HttpURLConnection getConnection(URL url, String method, int timeout) throws IOException { return getConnection(url, method, timeout, null, null, null); }
+    public static @NonNull HttpURLConnection getConnection(URL url, String method, int timeout) throws IOException { return getConnection(url, method, timeout, null, null, null); }
 
-    public static HttpURLConnection getConnection(URL url, String method, int timeout, String userAgent) throws IOException { return getConnection(url, method, timeout, userAgent, null, null); }
+    public static @NonNull HttpURLConnection getConnection(URL url, String method, int timeout, String userAgent) throws IOException { return getConnection(url, method, timeout, userAgent, null, null); }
 
-    public static HttpURLConnection getConnection(URL url, String method, int timeout, String userAgent, Map<String, String> headers) throws IOException { return getConnection(url, method, timeout, userAgent, headers, null); }
+    public static @NonNull HttpURLConnection getConnection(URL url, String method, int timeout, String userAgent, Map<String, String> headers) throws IOException { return getConnection(url, method, timeout, userAgent, headers, null); }
 
     // TODO: Re-use connections? https://docs.oracle.com/javase/7/docs/technotes/guides/net/http-keepalive.html or https://stackoverflow.com/questions/34748479/reusing-tcp-connections-with-httpsurlconnection
-    public static HttpURLConnection getConnection(URL url, String method, int timeout, String userAgent, Map<String, String> headers, Map<String, String> postData) throws IOException {
+    public static @NonNull HttpURLConnection getConnection(URL url, String method, int timeout, String userAgent, Map<String, String> headers, Map<String, String> postData) throws IOException {
         if (url == null) {
             throw new IllegalArgumentException("url cannot be null.");
         }
@@ -148,9 +149,9 @@ public class WebUtil {
         }
     }
 
-    public static InputStream getInputStream(URL url, String method, int timeout, String userAgent, Map<String, String> headers) throws IOException { return getInputStream(url, method, timeout, userAgent, headers, null); }
+    public static @NonNull InputStream getInputStream(URL url, String method, int timeout, String userAgent, Map<String, String> headers) throws IOException { return getInputStream(url, method, timeout, userAgent, headers, null); }
 
-    public static InputStream getInputStream(URL url, String method, int timeout, String userAgent, Map<String, String> headers, Map<String, String> postData) throws IOException {
+    public static @NonNull InputStream getInputStream(URL url, String method, int timeout, String userAgent, Map<String, String> headers, Map<String, String> postData) throws IOException {
         HttpURLConnection conn = getConnection(url, method, timeout, userAgent, headers, postData);
         int status = conn.getResponseCode();
 
@@ -162,7 +163,7 @@ public class WebUtil {
         return conn.getInputStream();
     }
 
-    public static InputStream getInputStream(HttpURLConnection conn) throws IOException {
+    public static @NonNull InputStream getInputStream(HttpURLConnection conn) throws IOException {
         int status = conn.getResponseCode();
 
         if (status >= 400 && status < 600) {

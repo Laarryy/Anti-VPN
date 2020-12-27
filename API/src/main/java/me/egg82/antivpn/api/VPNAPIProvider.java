@@ -26,5 +26,5 @@ public final class VPNAPIProvider {
 
     private static void register(@NonNull VPNAPI instance) { VPNAPIProvider.instance = instance; }
 
-    private static void remove() { VPNAPIProvider.instance = null; }
+    private static void deregister() { VPNAPIProvider.instance = null; }
 }

@@ -39,9 +39,9 @@ public abstract class AbstractSource<T extends SourceModel> implements Source<T>
         return cachedConfig;
     }
 
-    protected final HttpURLConnection getConnection(String url, String method, int timeout, String userAgent, Map<String, String> headers) throws APIException { return getConnection(url, method, timeout, userAgent, headers, null); }
+    protected final @NonNull HttpURLConnection getConnection(String url, String method, int timeout, String userAgent, Map<String, String> headers) throws APIException { return getConnection(url, method, timeout, userAgent, headers, null); }
 
-    protected final HttpURLConnection getConnection(String url, String method, int timeout, String userAgent, Map<String, String> headers, Map<String, String> postData) throws APIException {
+    protected final @NonNull HttpURLConnection getConnection(String url, String method, int timeout, String userAgent, Map<String, String> headers, Map<String, String> postData) throws APIException {
         try {
             HttpURLConnection conn = WebUtil.getConnection(new URL(url), method, timeout, userAgent, headers, postData);
             int status = conn.getResponseCode();
@@ -69,7 +69,7 @@ public abstract class AbstractSource<T extends SourceModel> implements Source<T>
         }
     }
 
-    protected final String getString(HttpURLConnection conn) throws APIException {
+    protected final @NonNull String getString(HttpURLConnection conn) throws APIException {
         try {
             return WebUtil.getString(conn);
         } catch (IOException ex) {
