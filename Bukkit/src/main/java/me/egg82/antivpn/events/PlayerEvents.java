@@ -43,7 +43,7 @@ public class PlayerEvents extends EventHolder {
     private void checkPerms(AsyncPlayerPreLoginEvent event) {
         if (Bukkit.hasWhitelist() && !isWhitelisted(event.getUniqueId())) {
             if (ConfigUtil.getDebugOrFalse()) {
-                logger.info(LogUtil.getHeading() + ChatColor.WHITE + event.getName() + " (" + event.getUniqueId() + ")" + ChatColor.YELLOW + " is not whitelisted while the server is in whitelist mode. Ignoring.");
+                logger.info(LogUtil.HEADING + "<c1>" + event.getName() + " (" + event.getUniqueId() + ")</c1><c2>" + " is not whitelisted while the server is in whitelist mode. Ignoring.</c2>");
             }
             return;
         }
@@ -82,7 +82,7 @@ public class PlayerEvents extends EventHolder {
     private void checkPermsPlayer(AsyncPlayerPreLoginEvent event, boolean hasBypass) {
         if (hasBypass) {
             if (ConfigUtil.getDebugOrFalse()) {
-                logger.info(LogUtil.getHeading() + ChatColor.WHITE + event.getName() + ChatColor.YELLOW + " bypasses pre-check. Ignoring.");
+                logger.info(LogUtil.HEADING + "<c1>" + event.getName() + "</c1> <c2>bypasses pre-check. Ignoring.</c2>");
             }
             return;
         }
@@ -92,13 +92,14 @@ public class PlayerEvents extends EventHolder {
             return;
         }
 
-        Optional<CachedConfig> cachedConfig = ConfigUtil.getCachedConfig();
-        if (!cachedConfig.isPresent()) {
+        CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
+        if (cachedConfig == null) {
+            logger.error("Cached config could not be fetched.");
             return;
         }
 
         // Check ignored IP addresses/ranges
-        for (String testAddress : cachedConfig.get().getIgnoredIps()) {
+        for (String testAddress : cachedConfig.getIgnoredIps()) {
             if (ValidationUtil.isValidIp(testAddress) && ip.equalsIgnoreCase(testAddress)) {
                 if (ConfigUtil.getDebugOrFalse()) {
                     logger.info(LogUtil.getHeading() + ChatColor.WHITE + event.getName() + ChatColor.YELLOW + " is using an ignored IP " + ChatColor.WHITE + ip + ChatColor.YELLOW + ". Ignoring.");
@@ -143,13 +144,14 @@ public class PlayerEvents extends EventHolder {
             return;
         }
 
-        Optional<CachedConfig> cachedConfig = ConfigUtil.getCachedConfig();
-        if (!cachedConfig.isPresent()) {
+        CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
+        if (cachedConfig == null) {
+            logger.error("Cached config could not be fetched.");
             return;
         }
 
         // Check ignored IP addresses/ranges
-        for (String testAddress : cachedConfig.get().getIgnoredIps()) {
+        for (String testAddress : cachedConfig.getIgnoredIps()) {
             if (
                     ValidationUtil.isValidIp(testAddress) && ip.equalsIgnoreCase(testAddress)
                     || ValidationUtil.isValidIPRange(testAddress) && rangeContains(testAddress, ip)
@@ -158,7 +160,7 @@ public class PlayerEvents extends EventHolder {
             }
         }
 
-        cacheData(ip, event.getUniqueId(), cachedConfig.get());
+        cacheData(ip, event.getUniqueId(), cachedConfig);
     }
 
     private void cacheData(String ip, UUID uuid, CachedConfig cachedConfig) {
@@ -231,8 +233,9 @@ public class PlayerEvents extends EventHolder {
             return;
         }
 
-        Optional<CachedConfig> cachedConfig = ConfigUtil.getCachedConfig();
-        if (!cachedConfig.isPresent()) {
+        CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
+        if (cachedConfig == null) {
+            logger.error("Cached config could not be fetched.");
             return;
         }
 

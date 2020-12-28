@@ -26,6 +26,7 @@
         <configurate.version>4.0.0</configurate.version>
         <flyway.version>7.3.2</flyway.version>
         <ebean.version>12.6.4</ebean.version>
+        <hikari.version>3.4.5</hikari.version>
         <flexjson.version>3.3</flexjson.version>
         <jedis.version>3.4.0</jedis.version>
         <rabbitmq.version>5.10.0</rabbitmq.version>

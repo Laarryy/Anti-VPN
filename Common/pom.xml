@@ -125,6 +125,7 @@
             <groupId>ninja.egg82</groupId>
             <artifactId>service-locator</artifactId>
             <version>${servicelocator.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
@@ -143,27 +144,32 @@
             <groupId>org.spongepowered</groupId>
             <artifactId>configurate-core</artifactId>
             <version>${configurate.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.spongepowered</groupId>
             <artifactId>configurate-yaml</artifactId>
             <version>${configurate.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
             <version>${flyway.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>io.ebean</groupId>
             <artifactId>ebean</artifactId>
             <version>${ebean.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>io.ebean</groupId>
             <artifactId>ebean-querybean</artifactId>
             <version>${ebean.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>io.ebean</groupId>
@@ -171,58 +177,74 @@
             <version>${ebean.version}</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+            <version>${hikari.version}</version>
+            <scope>provided</scope>
+        </dependency>
 
         <dependency>
             <groupId>redis.clients</groupId>
             <artifactId>jedis</artifactId>
             <version>${jedis.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.rabbitmq</groupId>
             <artifactId>amqp-client</artifactId>
             <version>${rabbitmq.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.github.luben</groupId>
             <artifactId>zstd-jni</artifactId>
             <version>${zstd.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>${guava.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>it.unimi.dsi</groupId>
             <artifactId>fastutil</artifactId>
             <version>${fastutil.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.github.ben-manes.caffeine</groupId>
             <artifactId>caffeine</artifactId>
             <version>${caffeine.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.github.seancfoley</groupId>
             <artifactId>ipaddress</artifactId>
             <version>${ipaddress.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>me.gong</groupId>
             <artifactId>mcleaks-api</artifactId>
             <version>${mcleaks.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
             <version>${slf4j.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>ninja.egg82</groupId>
             <artifactId>gameanalytics-api</artifactId>
             <version>${gameanalytics.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>

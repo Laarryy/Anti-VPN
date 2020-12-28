@@ -4,17 +4,15 @@ import java.nio.ByteBuffer;
 import java.util.Objects;
 import java.util.UUID;
 
-public class PlayerPacket extends AbstractPacket {
+public class DeletePlayerPacket extends AbstractPacket {
     private UUID uuid;
-    private boolean value;
 
-    public byte getPacketId() { return 0x02; }
+    public byte getPacketId() { return 0x04; }
 
-    public PlayerPacket(ByteBuffer data) { read(data); }
+    public DeletePlayerPacket(ByteBuffer data) { read(data); }
 
-    public PlayerPacket() {
+    public DeletePlayerPacket() {
         this.uuid = null;
-        this.value = false;
     }
 
     public void read(ByteBuffer buffer) {
@@ -23,7 +21,6 @@ public class PlayerPacket extends AbstractPacket {
         }
 
         this.uuid = getUUID(buffer);
-        this.value = getBoolean(buffer);
 
         checkReadPacket(buffer);
     }
@@ -32,30 +29,24 @@ public class PlayerPacket extends AbstractPacket {
         buffer.put(VERSION);
 
         putUUID(this.uuid, buffer);
-        putBoolean(this.value, buffer);
     }
 
     public UUID getUuid() { return uuid; }
 
     public void setUuid(UUID uuid) { this.uuid = uuid; }
 
-    public boolean getValue() { return value; }
-
-    public void setValue(boolean value) { this.value = value; }
-
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof PlayerPacket)) return false;
-        PlayerPacket that = (PlayerPacket) o;
-        return value == that.value && Objects.equals(uuid, that.uuid);
+        if (!(o instanceof DeletePlayerPacket)) return false;
+        DeletePlayerPacket that = (DeletePlayerPacket) o;
+        return Objects.equals(uuid, that.uuid);
     }
 
-    public int hashCode() { return Objects.hash(uuid, value); }
+    public int hashCode() { return Objects.hash(uuid); }
 
     public String toString() {
-        return "PlayerPacket{" +
+        return "DeletePlayerPacket{" +
                 "uuid=" + uuid +
-                ", value=" + value +
                 '}';
     }
 }

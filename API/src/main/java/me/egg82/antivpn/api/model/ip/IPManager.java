@@ -6,7 +6,6 @@ import java.util.concurrent.Executor;
 import java.util.function.Consumer;
 import me.egg82.antivpn.api.APIException;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Represents the object responsible for managing {@link IP} instances.
@@ -33,7 +32,7 @@ public interface IPManager {
      * @throws NullPointerException if ip is null
      * @throws IllegalArgumentException if the IP provided is invalid
      */
-    @Nullable CompletableFuture<IP> getIp(@NonNull String ip);
+    @NonNull CompletableFuture<IP> getIp(@NonNull String ip);
 
     /**
      * Saves an IP back to the plugin's storage provider.
@@ -77,8 +76,9 @@ public interface IPManager {
      * AntiVPN is currently using to determine IP statuses.
      *
      * @return the algorithm method
+     * @throws APIException if the configuration could not be retrieved
      */
-    @NonNull AlgorithmMethod getCurrentAlgorithmMethod();
+    @NonNull AlgorithmMethod getCurrentAlgorithmMethod() throws APIException;
 
     /**
      * Gets the cascade result from AntiVPN using the configuration

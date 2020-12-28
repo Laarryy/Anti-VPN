@@ -2,6 +2,7 @@ package me.egg82.antivpn.storage;
 
 import io.ebean.Database;
 import java.time.Instant;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -53,9 +54,6 @@ public abstract class AbstractStorageService implements StorageService {
         queueLock.readLock().unlock();
     }
 
-    /*
-    Note: Can be an expensive operation
-     */
     public IPModel getIpModel(String ip, long cacheTimeMillis) {
         if (ip == null) {
             throw new IllegalArgumentException("ip cannot be null.");
@@ -64,23 +62,31 @@ public abstract class AbstractStorageService implements StorageService {
         queueLock.readLock().lock();
         IPModel model = new QIPModel(connection)
                 .ip.equalTo(ip)
+                .modified.after(Instant.now().minusMillis(cacheTimeMillis))
                 .findOne();
         queueLock.readLock().unlock();
-        return model == null || model.getModified().isBefore(Instant.now().minusMillis(cacheTimeMillis)) ? null : model;
+        return model;
     }
 
     public IPModel getIpModel(long ipId, long cacheTimeMillis) {
         queueLock.readLock().lock();
         IPModel model = new QIPModel(connection)
                 .id.equalTo(ipId)
+                .modified.after(Instant.now().minusMillis(cacheTimeMillis))
                 .findOne();
         queueLock.readLock().unlock();
-        return model == null || model.getModified().isBefore(Instant.now().minusMillis(cacheTimeMillis)) ? null : model;
+        return model;
     }
 
-    /*
-    Note: Can be an expensive operation
-     */
+    public Set<IPModel> getAllIps(long cacheTimeMillis) {
+        queueLock.readLock().lock();
+        Set<IPModel> models = new QIPModel(connection)
+                .modified.after(Instant.now().minusMillis(cacheTimeMillis))
+                .findSet();
+        queueLock.readLock().unlock();
+        return models;
+    }
+
     public PlayerModel getPlayerModel(UUID player, long cacheTimeMillis) {
         if (player == null) {
             throw new IllegalArgumentException("player cannot be null.");
@@ -89,17 +95,28 @@ public abstract class AbstractStorageService implements StorageService {
         queueLock.readLock().lock();
         PlayerModel model = new QPlayerModel(connection)
                 .uuid.equalTo(player)
+                .modified.after(Instant.now().minusMillis(cacheTimeMillis))
                 .findOne();
         queueLock.readLock().unlock();
-        return model == null || model.getModified().isBefore(Instant.now().minusMillis(cacheTimeMillis)) ? null : model;
+        return model;
     }
 
     public PlayerModel getPlayerModel(long playerId, long cacheTimeMillis) {
         queueLock.readLock().lock();
         PlayerModel model = new QPlayerModel(connection)
                 .id.equalTo(playerId)
+                .modified.after(Instant.now().minusMillis(cacheTimeMillis))
                 .findOne();
         queueLock.readLock().unlock();
-        return model == null || model.getModified().isBefore(Instant.now().minusMillis(cacheTimeMillis)) ? null : model;
+        return model;
+    }
+
+    public Set<PlayerModel> getAllPlayers(long cacheTimeMillis) {
+        queueLock.readLock().lock();
+        Set<PlayerModel> models = new QPlayerModel(connection)
+                .modified.after(Instant.now().minusMillis(cacheTimeMillis))
+                .findSet();
+        queueLock.readLock().unlock();
+        return models;
     }
 }

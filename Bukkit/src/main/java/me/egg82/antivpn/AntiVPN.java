@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.logging.Level;
+import me.egg82.antivpn.api.VPNAPIProvider;
 import me.egg82.antivpn.apis.SourceAPI;
 import me.egg82.antivpn.bukkit.BukkitEnvironmentUtil;
 import me.egg82.antivpn.bukkit.BukkitVersionUtil;
@@ -283,7 +284,9 @@ public class AntiVPN {
         eventHolders.add(new PlayerEvents(plugin));
     }
 
-    private void loadTasks() { }
+    private void loadTasks() {
+        tasks.add(Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> VPNAPIProvider.getInstance().runUpdateTask(), 1L, 10L).getTaskId());
+    }
 
     private void loadHooks() {
         PluginManager manager = plugin.getServer().getPluginManager();

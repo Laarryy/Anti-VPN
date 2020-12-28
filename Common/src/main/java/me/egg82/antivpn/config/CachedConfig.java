@@ -1,15 +1,12 @@
 package me.egg82.antivpn.config;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import me.egg82.antivpn.api.model.ip.AlgorithmMethod;
-import me.egg82.antivpn.apis.SourceAPI;
 import me.egg82.antivpn.messaging.MessagingService;
 import me.egg82.antivpn.storage.StorageService;
 import me.egg82.antivpn.utils.TimeUtil;
@@ -22,9 +19,6 @@ public class CachedConfig {
 
     private ImmutableList<MessagingService> messaging = ImmutableList.of();
     public ImmutableList<MessagingService> getMessaging() { return messaging; }
-
-    private ImmutableMap<String, SourceAPI> sources = ImmutableMap.of();
-    public ImmutableMap<String, SourceAPI> getSources() { return sources; }
 
     private long sourceCacheTime = new TimeUtil.Time(6L, TimeUnit.HOURS).getMillis();
     public long getSourceCacheTime() { return sourceCacheTime; }
@@ -92,14 +86,6 @@ public class CachedConfig {
 
         public CachedConfig.Builder messaging(List<MessagingService> value) {
             values.messaging = ImmutableList.copyOf(value);
-            return this;
-        }
-
-        public CachedConfig.Builder sources(Map<String, SourceAPI> value) {
-            if (value == null) {
-                throw new IllegalArgumentException("value cannot be null.");
-            }
-            values.sources = ImmutableMap.copyOf(value);
             return this;
         }
 

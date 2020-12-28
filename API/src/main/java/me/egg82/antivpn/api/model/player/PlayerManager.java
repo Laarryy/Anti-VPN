@@ -7,7 +7,6 @@ import java.util.concurrent.Executor;
 import java.util.function.Consumer;
 import me.egg82.antivpn.api.APIException;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Represents the object responsible for managing {@link Player} instances.
@@ -33,7 +32,7 @@ public interface PlayerManager {
      * @return a {@link CompletableFuture} - a {@link Player} object, if one matching the uuid is available, or null if not
      * @throws NullPointerException if the uuid is null
      */
-    @Nullable CompletableFuture<Player> getPlayer(@NonNull UUID uniqueId);
+    @NonNull CompletableFuture<Player> getPlayer(@NonNull UUID uniqueId);
 
     /**
      * Gets a player.
@@ -42,7 +41,7 @@ public interface PlayerManager {
      * @return a {@link CompletableFuture} - a {@link Player} object, if one matching the name is available, or null if not
      * @throws NullPointerException if the name is null
      */
-    @Nullable CompletableFuture<Player> getPlayer(@NonNull String username);
+    @NonNull CompletableFuture<Player> getPlayer(@NonNull String username);
 
     /**
      * Saves a player back to the plugin's storage provider.

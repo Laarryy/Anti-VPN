@@ -1,11 +1,17 @@
 package me.egg82.antivpn.messaging;
 
-import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.LoadingCache;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import me.egg82.antivpn.api.model.ip.GenericIPManager;
+import me.egg82.antivpn.api.model.player.AbstractPlayerManager;
+import me.egg82.antivpn.config.CachedConfig;
 import me.egg82.antivpn.config.ConfigUtil;
 import me.egg82.antivpn.messaging.packets.*;
+import me.egg82.antivpn.storage.StorageService;
+import me.egg82.antivpn.storage.models.IPModel;
+import me.egg82.antivpn.storage.models.PlayerModel;
 import me.egg82.antivpn.utils.PacketUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,10 +19,16 @@ import org.slf4j.LoggerFactory;
 public class GenericMessagingHandler implements MessagingHandler {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private final Cache<UUID, Boolean> messageCache = Caffeine.newBuilder().expireAfterWrite(2L, TimeUnit.MINUTES).expireAfterAccess(30L, TimeUnit.SECONDS).build();
+    private final LoadingCache<UUID, Boolean> messageCache = Caffeine.newBuilder().expireAfterWrite(2L, TimeUnit.MINUTES).expireAfterAccess(30L, TimeUnit.SECONDS).build(k -> Boolean.FALSE);
     private final Object cacheLock = new Object();
 
-    public GenericMessagingHandler() { }
+    private final GenericIPManager ipManager;
+    private final AbstractPlayerManager playerManager;
+
+    public GenericMessagingHandler(GenericIPManager ipManager, AbstractPlayerManager playerManager) {
+        this.ipManager = ipManager;
+        this.playerManager = playerManager;
+    }
 
     public void handlePacket(UUID messageId, Packet packet) {
         if (isDuplicate(messageId)) {
@@ -28,40 +40,100 @@ public class GenericMessagingHandler implements MessagingHandler {
 
     private void handleIp(IPPacket packet) {
         if (ConfigUtil.getDebugOrFalse()) {
-            logger.info("Handling IP for " + packet.getId() + " (" + packet.getIp() + ")");
+            logger.info("Handling packet for " + packet.getIp() + ".");
         }
 
-        // TODO: set IP in storage
+        IPModel m = new IPModel();
+        m.setIp(packet.getIp());
+        m.setType(packet.getType());
+        m.setCascade(packet.getCascade());
+        m.setConsensus(packet.getConsensus());
+        ipManager.getIpCache().put(packet.getIp(), m);
+
+        CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
+        if (cachedConfig == null) {
+            logger.error("Cached config could not be fetched.");
+            return;
+        }
+
+        for (StorageService service : cachedConfig.getStorage()) {
+            IPModel model = new IPModel();
+            model.setIp(packet.getIp());
+            model.setType(packet.getType());
+            model.setCascade(packet.getCascade());
+            model.setConsensus(packet.getConsensus());
+            service.storeModel(model);
+        }
+
+        PacketUtil.queuePacket(packet);
+    }
+
+    private void handleDeleteIp(DeleteIPPacket packet) {
+        if (ConfigUtil.getDebugOrFalse()) {
+            logger.info("Handling deletion packet for " + packet.getIp() + ".");
+        }
+
+        ipManager.getIpCache().invalidate(packet.getIp());
+
+        CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
+        if (cachedConfig == null) {
+            logger.error("Cached config could not be fetched.");
+            return;
+        }
+
+        for (StorageService service : cachedConfig.getStorage()) {
+            IPModel model = new IPModel();
+            model.setIp(packet.getIp());
+            service.deleteModel(model);
+        }
 
         PacketUtil.queuePacket(packet);
     }
 
     private void handlePlayer(PlayerPacket packet) {
         if (ConfigUtil.getDebugOrFalse()) {
-            logger.info("Handling player for " + packet.getId() + " (" + packet.getUuid() + ")");
+            logger.info("Handling packet for " + packet.getUuid() + ".");
         }
 
-        // TODO: set player in storage
+        PlayerModel m = new PlayerModel();
+        m.setUuid(packet.getUuid());
+        m.setMcleaks(packet.getValue());
+        playerManager.getPlayerCache().put(packet.getUuid(), m);
+
+        CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
+        if (cachedConfig == null) {
+            logger.error("Cached config could not be fetched.");
+            return;
+        }
+
+        for (StorageService service : cachedConfig.getStorage()) {
+            PlayerModel model = new PlayerModel();
+            model.setUuid(packet.getUuid());
+            model.setMcleaks(packet.getValue());
+            service.storeModel(model);
+        }
 
         PacketUtil.queuePacket(packet);
     }
 
-    private void handleVpn(VPNPacket packet) {
+    private void handleDeletePlayer(DeletePlayerPacket packet) {
         if (ConfigUtil.getDebugOrFalse()) {
-            logger.info("Handling VPN data for " + packet.getId() + " (" + (packet.isCascade() ? packet.getCascade() : packet.getConsensus()) + ")");
+            logger.info("Handling deletion packet for " + packet.getUuid() + ".");
         }
 
-        // TODO: set VPN data in storage
+        playerManager.getPlayerCache().invalidate(packet.getUuid());
 
-        PacketUtil.queuePacket(packet);
-    }
-
-    private void handleMcLeaks(MCLeaksPacket packet) {
-        if (ConfigUtil.getDebugOrFalse()) {
-            logger.info("Handling MCLeaks data for " + packet.getId() + " (" + packet.getValue() + ")");
+        CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
+        if (cachedConfig == null) {
+            logger.error("Cached config could not be fetched.");
+            return;
         }
 
-        // TODO: set MCLeaks data in storage
+        for (StorageService service : cachedConfig.getStorage()) {
+            PlayerModel model = new PlayerModel();
+            model.setUuid(packet.getUuid());
+            service.deleteModel(model);
+        }
 
         PacketUtil.queuePacket(packet);
     }
@@ -81,10 +153,10 @@ public class GenericMessagingHandler implements MessagingHandler {
             handleIp((IPPacket) packet);
         } else if (packet instanceof PlayerPacket) {
             handlePlayer((PlayerPacket) packet);
-        } else if (packet instanceof VPNPacket) {
-            handleVpn((VPNPacket) packet);
-        } else if (packet instanceof MCLeaksPacket) {
-            handleMcLeaks((MCLeaksPacket) packet);
+        } else if (packet instanceof DeleteIPPacket) {
+            handleDeleteIp((DeleteIPPacket) packet);
+        } else if (packet instanceof DeletePlayerPacket) {
+            handleDeletePlayer((DeletePlayerPacket) packet);
         } else if (packet instanceof MultiPacket) {
             handleMulti((MultiPacket) packet);
         }
