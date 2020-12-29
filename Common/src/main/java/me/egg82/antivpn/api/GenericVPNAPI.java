@@ -1,6 +1,5 @@
 package me.egg82.antivpn.api;
 
-import java.io.File;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import me.egg82.antivpn.api.model.ip.IPManager;
@@ -8,7 +7,7 @@ import me.egg82.antivpn.api.model.player.PlayerManager;
 import me.egg82.antivpn.api.model.source.SourceManager;
 import me.egg82.antivpn.api.platform.Platform;
 import me.egg82.antivpn.api.platform.PluginMetadata;
-import me.egg82.antivpn.messaging.ServerIDUtil;
+import me.egg82.antivpn.config.CachedConfig;
 import me.egg82.antivpn.utils.PacketUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -20,9 +19,9 @@ public class GenericVPNAPI implements VPNAPI {
     private final PlayerManager playerManager;
     private final SourceManager sourceManager;
 
-    private final File serverIdFile;
+    private final CachedConfig cachedConfig;
 
-    public GenericVPNAPI(@NonNull Platform platform, @NonNull PluginMetadata pluginMetadata, @NonNull IPManager ipManager, @NonNull PlayerManager playerManager, @NonNull SourceManager sourceManager, @NonNull File serverIdFile) {
+    public GenericVPNAPI(@NonNull Platform platform, @NonNull PluginMetadata pluginMetadata, @NonNull IPManager ipManager, @NonNull PlayerManager playerManager, @NonNull SourceManager sourceManager, @NonNull CachedConfig cachedConfig) {
         this.platform = platform;
         this.pluginMetadata = pluginMetadata;
 
@@ -30,10 +29,10 @@ public class GenericVPNAPI implements VPNAPI {
         this.playerManager = playerManager;
         this.sourceManager = sourceManager;
 
-        this.serverIdFile = serverIdFile;
+        this.cachedConfig = cachedConfig;
     }
 
-    public @NonNull UUID getServerId() { return ServerIDUtil.getId(serverIdFile); }
+    public @NonNull UUID getServerId() { return cachedConfig.getServerId(); }
 
     public @NonNull IPManager getIpManager() { return ipManager; }
 

@@ -11,7 +11,6 @@ import me.egg82.antivpn.api.model.ip.AlgorithmMethod;
 import me.egg82.antivpn.api.model.source.Source;
 import me.egg82.antivpn.api.model.source.SourceManager;
 import me.egg82.antivpn.api.model.source.models.SourceModel;
-import me.egg82.antivpn.apis.SourceAPI;
 import me.egg82.antivpn.messaging.*;
 import me.egg82.antivpn.storage.MySQLStorageService;
 import me.egg82.antivpn.storage.SQLiteStorageService;
@@ -29,6 +28,7 @@ import org.spongepowered.configurate.CommentedConfigurationNode;
 import org.spongepowered.configurate.ConfigurationNode;
 import org.spongepowered.configurate.ConfigurationOptions;
 import org.spongepowered.configurate.loader.ConfigurationLoader;
+import org.spongepowered.configurate.serialize.SerializationException;
 import org.spongepowered.configurate.yaml.NodeStyle;
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader;
 import redis.clients.jedis.exceptions.JedisException;
@@ -77,6 +77,7 @@ public class ConfigurationFileUtil {
                 .mcleaksActionCommands(getMcLeaksActionCommands(config, debug, console))
                 .vpnAlgorithmMethod(getVpnAlgorithmMethod(config, debug, console))
                 .vpnAlgorithmConsensus(getVpnAlgorithmConsensus(config, debug, console))
+                .serverId(serverId)
                 .build();
 
         PacketUtil.setPoolSize(cachedConfig.getMessaging().size());
@@ -87,7 +88,7 @@ public class ConfigurationFileUtil {
 
         ConfigUtil.setConfiguration(config, cachedConfig);
 
-        addSources(config, debug, console, sourceManager);
+        setSources(config, debug, console, sourceManager);
 
 
 
@@ -99,48 +100,7 @@ public class ConfigurationFileUtil {
 
 
 
-        Map<String, SourceAPI> sources = getAllSources(debug);
-        Set<String> stringSources;
-        try {
-            stringSources = new LinkedHashSet<>(config.getNode("sources", "order").getList(TypeToken.of(String.class)));
-        } catch (ObjectMappingException ex) {
-            logger.error(ex.getMessage(), ex);
-            stringSources = new LinkedHashSet<>();
-        }
 
-        for (Iterator<String> i = stringSources.iterator(); i.hasNext();) {
-            String source = i.next();
-            if (!config.getNode("sources", source, "enabled").getBoolean()) {
-                if (debug) {
-                    logger.info(LogUtil.getHeading() + ChatColor.DARK_RED + source + " is disabled. Removing.");
-                }
-                i.remove();
-                continue;
-            }
-
-            Optional<SourceAPI> api = getAPI(source, sources);
-            if (api.isPresent() && api.get().isKeyRequired() && config.getNode("sources", source, "key").getString("").isEmpty()) {
-                if (debug) {
-                    logger.info(LogUtil.getHeading() + ChatColor.DARK_RED + source + " requires a key which was not provided. Removing.");
-                }
-                i.remove();
-            }
-        }
-        for(Iterator<Map.Entry<String, SourceAPI>> i = sources.entrySet().iterator(); i.hasNext(); ) {
-            Map.Entry<String, SourceAPI> kvp = i.next();
-            if (!stringSources.contains(kvp.getKey())) {
-                if (debug) {
-                    logger.info(LogUtil.getHeading() + ChatColor.DARK_RED + "Removed undefined source: " + ChatColor.WHITE + kvp.getKey());
-                }
-                i.remove();
-            }
-        }
-
-        if (debug) {
-            for (String source : stringSources) {
-                logger.info(LogUtil.getHeading() + ChatColor.YELLOW + "Added source: " + ChatColor.WHITE + source);
-            }
-        }
 
         Optional<TimeUtil.Time> sourceCacheTime = TimeUtil.getTime(config.getNode("sources", "cache-time").getString("6hours"));
         if (!sourceCacheTime.isPresent()) {
@@ -427,24 +387,81 @@ public class ConfigurationFileUtil {
         return null;
     }
 
-    private static SourceAPI getAPI(String name, Map<String, SourceAPI> sources) { return sources.getOrDefault(name, null); }
+    private static void setSources(ConfigurationNode config, boolean debug, CommandIssuer console, SourceManager sourceManager) {
+        List<Class<Source>> sourceClasses = PackageFilter.getClasses(Source.class, "me.egg82.antivpn.api.model.source.models", false, false, false);
+        Map<String, Source<? extends SourceModel>> initializedSources = new HashMap<>();
 
-    private static Map<String, Source> getAllSources(boolean debug) {
-        List<Class<Source>> sourceClasses = PackageFilter.getClasses(Source.class, "me.egg82.antivpn.api.model.source", false, false, false);
-        Map<String, Source> retVal = new HashMap<>();
         for (Class<Source> clazz : sourceClasses) {
             if (debug) {
-                logger.info("Initializing VPN API " + clazz.getName());
+                console.sendMessage(LogUtil.HEADING + "<c2>Initializing source</c2> <c1>" + clazz.getSimpleName() + "</c1>");
             }
 
             try {
-                Source api = clazz.newInstance();
-                retVal.put(api.getName(), api);
+                Source<? extends SourceModel> source = (Source<? extends SourceModel>) clazz.newInstance();
+                initializedSources.put(source.getName(), source);
             } catch (InstantiationException | IllegalAccessException ex) {
                 logger.error(ex.getMessage(), ex);
             }
         }
-        return retVal;
+
+        List<String> order;
+        try {
+            order = !config.node("sources", "order").empty() ? new ArrayList<>(config.node("sources", "order").getList(String.class)) : new ArrayList<>();
+        } catch (SerializationException ex) {
+            logger.error(ex.getMessage(), ex);
+            order = new ArrayList<>();
+        }
+
+        for (Iterator<String> i = order.iterator(); i.hasNext();) {
+            String s = i.next();
+            if (!config.node("sources", s, "enabled").getBoolean(false)) {
+                if (debug) {
+                    console.sendMessage(LogUtil.HEADING + "<c9>Source " + s + " is disabled. Removing.</c9>");
+                }
+                sourceManager.deregisterSource(s);
+                i.remove();
+                continue;
+            }
+
+            Source<? extends SourceModel> source = initializedSources.get(s);
+            if (source == null) {
+                if (debug) {
+                    console.sendMessage(LogUtil.HEADING + "<c9>Source " + s + " was not found. Removing.</c9>");
+                }
+                sourceManager.deregisterSource(s);
+                i.remove();
+                continue;
+            }
+
+            if (source.isKeyRequired() && config.node("sources", s, "key").getString("").isEmpty()) {
+                if (debug) {
+                    console.sendMessage(LogUtil.HEADING + "<c9>Source " + s + " requires a key which was not provided. Removing.</c9>");
+                }
+                sourceManager.deregisterSource(s);
+                i.remove();
+            }
+        }
+
+        for (Iterator<String> i = initializedSources.keySet().iterator(); i.hasNext();) {
+            String key = i.next();
+            if (!order.contains(key)) {
+                if (debug) {
+                    console.sendMessage(LogUtil.HEADING + "<c9>Source " + key + " was not provided in the source order. Removing.</c9>");
+                }
+                sourceManager.deregisterSource(key);
+                i.remove();
+            }
+        }
+
+        for (int i = 0; i < order.size(); i++) {
+            String s = order.get(i);
+            Source<? extends SourceModel> source = initializedSources.get(s);
+            sourceManager.deregisterSource(s);
+            sourceManager.registerSource(source, i);
+            if (debug) {
+                console.sendMessage(LogUtil.HEADING + "<c2>Added/Replaced source:</c2> <c1>" + s + " (" + source.getClass().getSimpleName() + ")</c1>");
+            }
+        }
     }
 
     private static CommentedConfigurationNode getConfig(String resourcePath, File fileOnDisk) throws IOException {

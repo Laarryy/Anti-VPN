@@ -5,20 +5,22 @@ import com.google.common.collect.ImmutableSet;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import me.egg82.antivpn.api.model.ip.AlgorithmMethod;
 import me.egg82.antivpn.messaging.MessagingService;
 import me.egg82.antivpn.storage.StorageService;
 import me.egg82.antivpn.utils.TimeUtil;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 public class CachedConfig {
     private CachedConfig() {}
 
     private ImmutableList<StorageService> storage = ImmutableList.of();
-    public ImmutableList<StorageService> getStorage() { return storage; }
+    public @NonNull ImmutableList<StorageService> getStorage() { return storage; }
 
     private ImmutableList<MessagingService> messaging = ImmutableList.of();
-    public ImmutableList<MessagingService> getMessaging() { return messaging; }
+    public @NonNull ImmutableList<MessagingService> getMessaging() { return messaging; }
 
     private long sourceCacheTime = new TimeUtil.Time(6L, TimeUnit.HOURS).getMillis();
     public long getSourceCacheTime() { return sourceCacheTime; }
@@ -27,7 +29,7 @@ public class CachedConfig {
     public long getMCLeaksCacheTime() { return mcleaksCacheTime; }
 
     private ImmutableSet<String> ignoredIps = ImmutableSet.of();
-    public ImmutableSet<String> getIgnoredIps() { return ignoredIps; }
+    public @NonNull ImmutableSet<String> getIgnoredIps() { return ignoredIps; }
 
     private TimeUtil.Time cacheTime = new TimeUtil.Time(1L, TimeUnit.MINUTES);
     public TimeUtil.Time getCacheTime() { return cacheTime; }
@@ -36,7 +38,7 @@ public class CachedConfig {
     public boolean getDebug() { return debug; }
 
     private Locale language = Locale.ENGLISH;
-    public Locale getLanguage() { return language; }
+    public @NonNull Locale getLanguage() { return language; }
 
     private int threads = 4;
     public int getThreads() { return threads; }
@@ -45,22 +47,28 @@ public class CachedConfig {
     public long getTimeout() { return timeout; }
 
     private String vpnKickMessage = "&cPlease disconnect from your proxy or VPN before re-joining!";
-    public String getVPNKickMessage() { return vpnKickMessage; }
+    public @NonNull String getVPNKickMessage() { return vpnKickMessage; }
 
     private ImmutableList<String> vpnActionCommands = ImmutableList.of();
-    public ImmutableList<String> getVPNActionCommands() { return vpnActionCommands; }
+    public @NonNull ImmutableList<String> getVPNActionCommands() { return vpnActionCommands; }
 
     private String mcleaksKickMessage = "&cPlease discontinue your use of an MCLeaks account!";
-    public String getMCLeaksKickMessage() { return mcleaksKickMessage; }
+    public @NonNull String getMCLeaksKickMessage() { return mcleaksKickMessage; }
 
     private ImmutableList<String> mcleaksActionCommands = ImmutableList.of();
-    public ImmutableList<String> getMCLeaksActionCommands() { return mcleaksActionCommands; }
+    public @NonNull ImmutableList<String> getMCLeaksActionCommands() { return mcleaksActionCommands; }
 
     private AlgorithmMethod algorithmMethod = AlgorithmMethod.CASCADE;
-    public AlgorithmMethod getVPNAlgorithmMethod() { return algorithmMethod; }
+    public @NonNull AlgorithmMethod getVPNAlgorithmMethod() { return algorithmMethod; }
 
     private double vpnAlgorithmConsensus = 0.6d;
     public double getVPNAlgorithmConsensus() { return vpnAlgorithmConsensus; }
+
+    private UUID serverId = UUID.randomUUID();
+    public @NonNull UUID getServerId() { return serverId; }
+
+    private String serverIdString = serverId.toString();
+    public @NonNull String getServerIdString() { return serverIdString; }
 
     public static CachedConfig.Builder builder() { return new CachedConfig.Builder(); }
 
@@ -74,25 +82,22 @@ public class CachedConfig {
             return this;
         }
 
-        public CachedConfig.Builder language(Locale value) {
+        public CachedConfig.Builder language(@NonNull Locale value) {
             values.language = value;
             return this;
         }
 
-        public CachedConfig.Builder storage(List<StorageService> value) {
+        public CachedConfig.Builder storage(@NonNull List<StorageService> value) {
             values.storage = ImmutableList.copyOf(value);
             return this;
         }
 
-        public CachedConfig.Builder messaging(List<MessagingService> value) {
+        public CachedConfig.Builder messaging(@NonNull List<MessagingService> value) {
             values.messaging = ImmutableList.copyOf(value);
             return this;
         }
 
         public CachedConfig.Builder sourceCacheTime(TimeUtil.Time value) {
-            if (value == null) {
-                throw new IllegalArgumentException("value cannot be null.");
-            }
             if (value.getMillis() <= 0L) {
                 throw new IllegalArgumentException("value cannot be <= 0.");
             }
@@ -102,9 +107,6 @@ public class CachedConfig {
         }
 
         public CachedConfig.Builder mcleaksCacheTime(TimeUtil.Time value) {
-            if (value == null) {
-                throw new IllegalArgumentException("value cannot be null.");
-            }
             if (value.getMillis() <= 0L) {
                 throw new IllegalArgumentException("value cannot be <= 0.");
             }
@@ -113,18 +115,12 @@ public class CachedConfig {
             return this;
         }
 
-        public CachedConfig.Builder ignoredIps(Collection<String> value) {
-            if (value == null) {
-                throw new IllegalArgumentException("value cannot be null.");
-            }
+        public CachedConfig.Builder ignoredIps(@NonNull Collection<String> value) {
             values.ignoredIps = ImmutableSet.copyOf(value);
             return this;
         }
 
         public CachedConfig.Builder cacheTime(TimeUtil.Time value) {
-            if (value == null) {
-                throw new IllegalArgumentException("value cannot be null.");
-            }
             if (value.getMillis() <= 0L) {
                 throw new IllegalArgumentException("value cannot be <= 0.");
             }
@@ -151,42 +147,27 @@ public class CachedConfig {
             return this;
         }
 
-        public CachedConfig.Builder vpnKickMessage(String value) {
-            if (value == null) {
-                throw new IllegalArgumentException("value cannot be null.");
-            }
+        public CachedConfig.Builder vpnKickMessage(@NonNull String value) {
             values.vpnKickMessage = value;
             return this;
         }
 
-        public CachedConfig.Builder vpnActionCommands(Collection<String> value) {
-            if (value == null) {
-                throw new IllegalArgumentException("value cannot be null.");
-            }
+        public CachedConfig.Builder vpnActionCommands(@NonNull Collection<String> value) {
             values.vpnActionCommands = ImmutableList.copyOf(value);
             return this;
         }
 
-        public CachedConfig.Builder mcleaksKickMessage(String value) {
-            if (value == null) {
-                throw new IllegalArgumentException("value cannot be null.");
-            }
+        public CachedConfig.Builder mcleaksKickMessage(@NonNull String value) {
             values.mcleaksKickMessage = value;
             return this;
         }
 
-        public CachedConfig.Builder mcleaksActionCommands(Collection<String> value) {
-            if (value == null) {
-                throw new IllegalArgumentException("value cannot be null.");
-            }
+        public CachedConfig.Builder mcleaksActionCommands(@NonNull Collection<String> value) {
             values.mcleaksActionCommands = ImmutableList.copyOf(value);
             return this;
         }
 
-        public CachedConfig.Builder vpnAlgorithmMethod(AlgorithmMethod value) {
-            if (value == null) {
-                throw new IllegalArgumentException("value cannot be null.");
-            }
+        public CachedConfig.Builder vpnAlgorithmMethod(@NonNull AlgorithmMethod value) {
             values.algorithmMethod = value;
             return this;
         }
@@ -199,6 +180,12 @@ public class CachedConfig {
                 throw new IllegalArgumentException("value cannot be > 1.");
             }
             values.vpnAlgorithmConsensus = value;
+            return this;
+        }
+
+        public CachedConfig.Builder serverId(@NonNull UUID value) {
+            values.serverId = value;
+            values.serverIdString = value.toString();
             return this;
         }
 

@@ -102,4 +102,6 @@ public interface VPNAPI {
      * @return a future
      */
     @NonNull CompletableFuture<Void> runUpdateTask();
+
+    // TODO: event system to detect things like changed sources, etc so plugin reloads don't screw with anything replacing sources in the API and the like
 }
