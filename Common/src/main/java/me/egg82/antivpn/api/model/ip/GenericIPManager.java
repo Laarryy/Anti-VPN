@@ -166,6 +166,10 @@ public class GenericIPManager implements IPManager {
             throw new APIException(false, "Cached config could not be fetched.");
         }
 
+        if (cachedConfig.getDebug()) {
+            logger.info("Getting web result for IP " + ip + ".");
+        }
+
         if (useCache) {
             for (StorageService service : cachedConfig.getStorage()) {
                 IPModel model = service.getIpModel(ip, cachedConfig.getSourceCacheTime());

@@ -16,9 +16,13 @@ import me.egg82.antivpn.storage.StorageService;
 import me.egg82.antivpn.storage.models.PlayerModel;
 import me.egg82.antivpn.utils.PacketUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class AbstractPlayerManager implements PlayerManager {
-    private final LoadingCache<UUID, PlayerModel> playerCache;
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
+
+    protected final LoadingCache<UUID, PlayerModel> playerCache;
 
     protected AbstractPlayerManager(long cacheTime, TimeUnit cacheTimeUnit) {
         playerCache = Caffeine.newBuilder().expireAfterAccess(cacheTime, cacheTimeUnit).expireAfterWrite(cacheTime, cacheTimeUnit).build(k -> calculatePlayerResult(k, true));

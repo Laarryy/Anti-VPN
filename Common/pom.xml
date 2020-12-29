@@ -113,11 +113,6 @@
             <id>aikar</id>
             <url>https://repo.aikar.co/content/groups/aikar/</url>
         </repository>
-
-        <repository>
-            <id>wesjd-repo</id>
-            <url>https://nexus.wesjd.net/repository/thirdparty/</url>
-        </repository>
     </repositories>
 
     <dependencies>
@@ -138,12 +133,6 @@
             <groupId>ninja.egg82</groupId>
             <artifactId>reflection-utils</artifactId>
             <version>${reflectionutils.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.spongepowered</groupId>
-            <artifactId>configurate-core</artifactId>
-            <version>${configurate.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -227,12 +216,6 @@
             <version>${ipaddress.version}</version>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>me.gong</groupId>
-            <artifactId>mcleaks-api</artifactId>
-            <version>${mcleaks.version}</version>
-            <scope>provided</scope>
-        </dependency>
 
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -250,6 +233,20 @@
         <dependency>
             <groupId>me.egg82</groupId>
             <artifactId>antivpn-api</artifactId>
+        </dependency>
+
+        <!-- API -->
+        <dependency>
+            <groupId>org.checkerframework</groupId>
+            <artifactId>checker</artifactId>
+            <version>${checkerframework.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.sf.flexjson</groupId>
+            <artifactId>flexjson</artifactId>
+            <version>${flexjson.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>

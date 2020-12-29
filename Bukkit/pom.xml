@@ -115,38 +115,6 @@
                                         <exclude>org/junit/**</exclude>
                                         <exclude>org/hamcrest/**</exclude>
                                         <exclude>ebean.mf</exclude>
-
-                                        <!-- dep-injected -->
-                                        <!-- mvn dependency:tree -->
-                                        <exclude>com/github/benmanes/caffeine/**</exclude>
-                                        <exclude>com/google/common/**</exclude> <!-- included with many things -->
-                                        <exclude>com/google/errorprone/annotations/**</exclude> <!-- included with guava -->
-                                        <exclude>com/google/j2objc/annotations/**</exclude> <!-- included with guava -->
-                                        <exclude>com/google/thirdparty/publicsuffix/**</exclude> <!-- included with guava -->
-                                        <exclude>com/rabbitmq/**</exclude>
-                                        <exclude>com/zaxxer/hikari/**</exclude> <!-- included with easy-sql -->
-                                        <exclude>me/gong/mcleaks/**</exclude>
-                                        <exclude>inet/ipaddr/**</exclude>
-                                        <exclude>javassist/**</exclude>
-                                        <exclude>javax/annotation/**</exclude>
-                                        <exclude>ninja/egg82/analytics/**</exclude>
-                                        <exclude>ninja/egg82/configuration/**</exclude>
-                                        <exclude>ninja/egg82/core/**</exclude> <!-- included with easy-sql -->
-                                        <exclude>ninja/egg82/json/**</exclude>
-                                        <exclude>ninja/egg82/reflect/**</exclude>
-                                        <exclude>ninja/egg82/service/**</exclude>
-                                        <exclude>ninja/egg82/sql/**</exclude>
-                                        <exclude>ninja/leaping/configurate/**</exclude>
-                                        <exclude>okio/**</exclude> <!-- included with mcleaks-api -->
-                                        <exclude>okhttp3/**</exclude> <!-- included with mcleaks-api -->
-                                        <exclude>org/apache/commons/pool2/**</exclude> <!-- included with jedis -->
-                                        <exclude>org/checkerframework/**</exclude> <!-- included with configurate-core -->
-                                        <exclude>org/codehaus/mojo/animal_sniffer/**</exclude> <!-- included with guava -->
-                                        <exclude>org/json/simple/**</exclude> <!-- included with gameanalytics-api/json-web -->
-                                        <exclude>org/reflections/**</exclude> <!-- included with reflection-utils -->
-                                        <exclude>redis/clients/jedis/**</exclude>
-                                        <exclude>rabbitmq-amqp-client.properties</exclude> <!-- included with rabbitmq -->
-                                        <exclude>version.properties</exclude> <!-- included with rabbitmq -->
                                     </excludes>
                                 </filter>
                                 <filter>
@@ -205,6 +173,11 @@
         </repository>
 
         <repository>
+            <id>mcleaks</id>
+            <url>https://nexus.wesjd.net/repository/thirdparty/</url>
+        </repository>
+
+        <repository>
             <id>jitpack.io</id>
             <url>https://jitpack.io</url>
         </repository>
@@ -226,34 +199,29 @@
 
         <dependency>
             <groupId>co.aikar</groupId>
-            <artifactId>taskchain-bukkit</artifactId>
-            <version>${taskchain.version}</version>
-            <scope>provided</scope>
+            <artifactId>acf-paper</artifactId>
+            <version>${acf.version}</version>
         </dependency>
         <dependency>
             <groupId>co.aikar</groupId>
-            <artifactId>acf-paper</artifactId>
-            <version>${acf.version}</version>
-            <scope>provided</scope>
+            <artifactId>taskchain-bukkit</artifactId>
+            <version>${taskchain.version}</version>
         </dependency>
         <dependency>
             <groupId>ninja.egg82</groupId>
             <artifactId>event-chain-bukkit</artifactId>
             <version>${eventchain.version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>ninja.egg82</groupId>
             <artifactId>spigot-updater</artifactId>
             <version>${updater.version}</version>
-            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>ninja.egg82</groupId>
             <artifactId>service-locator</artifactId>
             <version>${servicelocator.version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>ninja.egg82</groupId>
@@ -297,10 +265,111 @@
         </dependency>
 
         <dependency>
+            <groupId>me.gong</groupId>
+            <artifactId>mcleaks-api</artifactId>
+            <version>${mcleaks.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>me.egg82</groupId>
             <artifactId>antivpn-common</artifactId>
         </dependency>
+        <dependency>
+            <groupId>me.egg82</groupId>
+            <artifactId>antivpn-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
 
+        <!-- common -->
+        <dependency>
+            <groupId>ninja.egg82</groupId>
+            <artifactId>reflection-utils</artifactId>
+            <version>${reflectionutils.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.spongepowered</groupId>
+            <artifactId>configurate-yaml</artifactId>
+            <version>${configurate.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+            <version>${flyway.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.ebean</groupId>
+            <artifactId>ebean</artifactId>
+            <version>${ebean.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.ebean</groupId>
+            <artifactId>ebean-querybean</artifactId>
+            <version>${ebean.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.ebean</groupId>
+            <artifactId>querybean-generator</artifactId>
+            <version>${ebean.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+            <version>${hikari.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>redis.clients</groupId>
+            <artifactId>jedis</artifactId>
+            <version>${jedis.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.rabbitmq</groupId>
+            <artifactId>amqp-client</artifactId>
+            <version>${rabbitmq.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.luben</groupId>
+            <artifactId>zstd-jni</artifactId>
+            <version>${zstd.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${guava.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>it.unimi.dsi</groupId>
+            <artifactId>fastutil</artifactId>
+            <version>${fastutil.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.ben-manes.caffeine</groupId>
+            <artifactId>caffeine</artifactId>
+            <version>${caffeine.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.seancfoley</groupId>
+            <artifactId>ipaddress</artifactId>
+            <version>${ipaddress.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>ninja.egg82</groupId>
+            <artifactId>gameanalytics-api</artifactId>
+            <version>${gameanalytics.version}</version>
+        </dependency>
+
+        <!-- API -->
+        <dependency>
+            <groupId>org.checkerframework</groupId>
+            <artifactId>checker</artifactId>
+            <version>${checkerframework.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>net.sf.flexjson</groupId>
+            <artifactId>flexjson</artifactId>
+            <version>${flexjson.version}</version>
+        </dependency>
+
+        <!-- testing -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
