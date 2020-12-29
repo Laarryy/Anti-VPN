@@ -14,6 +14,10 @@ public class Shodan extends AbstractSource<ShodanModel> {
 
     public boolean isKeyRequired() { return true; }
 
+    public Shodan() {
+        super(ShodanModel.class);
+    }
+
     public @NonNull CompletableFuture<Boolean> getResult(@NonNull String ip) {
         return getRawResponse(ip).thenApply(model -> {
             if (model.getError() != null) {

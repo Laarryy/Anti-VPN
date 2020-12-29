@@ -25,6 +25,10 @@ public class Teoh extends AbstractSource<TeohModel> {
         threadPool.scheduleAtFixedRate(() -> requests.set(0), 0L, 24L, TimeUnit.HOURS);
     }
 
+    public Teoh() {
+        super(TeohModel.class);
+    }
+
     public @NonNull CompletableFuture<Boolean> getResult(@NonNull String ip) {
         return getRawResponse(ip).thenApply(model -> {
             if (model.getMessage() != null) {

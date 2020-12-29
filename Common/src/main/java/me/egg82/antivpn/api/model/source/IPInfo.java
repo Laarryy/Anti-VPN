@@ -14,6 +14,10 @@ public class IPInfo extends AbstractSource<IPInfoModel> {
 
     public boolean isKeyRequired() { return true; }
 
+    public IPInfo() {
+        super(IPInfoModel.class);
+    }
+
     public @NonNull CompletableFuture<Boolean> getResult(@NonNull String ip) {
         return getRawResponse(ip).thenApply(model -> {
             if (model.getError() != null) {

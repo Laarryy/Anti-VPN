@@ -14,6 +14,10 @@ public class IP2Proxy extends AbstractSource<IP2ProxyModel> {
 
     public boolean isKeyRequired() { return true; }
 
+    public IP2Proxy() {
+        super(IP2ProxyModel.class);
+    }
+
     public @NonNull CompletableFuture<Boolean> getResult(@NonNull String ip) {
         return getRawResponse(ip).thenApply(model -> {
             if (!"OK".equalsIgnoreCase(model.getResponse())) {

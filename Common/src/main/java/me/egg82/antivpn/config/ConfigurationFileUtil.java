@@ -9,6 +9,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import me.egg82.antivpn.api.model.ip.AlgorithmMethod;
 import me.egg82.antivpn.api.model.source.Source;
+import me.egg82.antivpn.api.model.source.SourceManager;
+import me.egg82.antivpn.api.model.source.models.SourceModel;
 import me.egg82.antivpn.apis.SourceAPI;
 import me.egg82.antivpn.messaging.*;
 import me.egg82.antivpn.storage.MySQLStorageService;
@@ -36,7 +38,7 @@ public class ConfigurationFileUtil {
 
     private ConfigurationFileUtil() {}
 
-    public static void reloadConfig(File dataDirectory, CommandIssuer console, MessagingHandler messagingHandler) {
+    public static void reloadConfig(File dataDirectory, CommandIssuer console, MessagingHandler messagingHandler, SourceManager sourceManager) {
         ConfigurationNode config;
         try {
             config = getConfig("config.yml", new File(dataDirectory, "config.yml"));
@@ -57,6 +59,45 @@ public class ConfigurationFileUtil {
         if (debug) {
             console.sendMessage(LogUtil.HEADING + "<c2>Server ID:</c2> <c1>" + serverId.toString() + "</c1>");
         }
+
+        CachedConfig cachedConfig = CachedConfig.builder()
+                .debug(debug)
+                .language(getLanguage(config, debug, console))
+                .storage(getStorage(config, dataDirectory, debug, console))
+                .messaging(getMessaging(config, serverId, messagingHandler, debug, console))
+                .sourceCacheTime(getSourceCacheTime(config, debug, console))
+                .mcleaksCacheTime(getMcLeaksCacheTime(config, debug, console))
+                .ignoredIps(getIgnoredIps(config, debug, console))
+                .cacheTime(getCacheTime(config, debug, console))
+                .threads(config.node("connection", "threads").getInt(4))
+                .timeout(config.node("connection", "timeout").getLong(5000L))
+                .vpnKickMessage(config.node("action", "vpn", "kick-message").getString("&cPlease disconnect from your proxy or VPN before re-joining!"))
+                .vpnActionCommands(getVpnActionCommands(config, debug, console))
+                .mcleaksKickMessage(config.node("action", "mcleaks", "kick-message").getString("&cPlease discontinue your use of an MCLeaks account!"))
+                .mcleaksActionCommands(getMcLeaksActionCommands(config, debug, console))
+                .vpnAlgorithmMethod(getVpnAlgorithmMethod(config, debug, console))
+                .vpnAlgorithmConsensus(getVpnAlgorithmConsensus(config, debug, console))
+                .build();
+
+        PacketUtil.setPoolSize(cachedConfig.getMessaging().size());
+
+        if (cachedConfig.getStorage().isEmpty()) {
+            logger.error("AntiVPN requires at least one storage service be enabled and configured.");
+        }
+
+        ConfigUtil.setConfiguration(config, cachedConfig);
+
+        addSources(config, debug, console, sourceManager);
+
+
+
+
+
+
+
+
+
+
 
         Map<String, SourceAPI> sources = getAllSources(debug);
         Set<String> stringSources;
@@ -193,33 +234,7 @@ public class ConfigurationFileUtil {
         double vpnAlgorithmConsensus = config.getNode("action", "vpn", "algorithm", "min-consensus").getDouble(0.6d);
         vpnAlgorithmConsensus = Math.max(0.0d, Math.min(1.0d, vpnAlgorithmConsensus));
 
-        CachedConfig cachedConfig = CachedConfig.builder()
-                .debug(debug)
-                .language(getLanguage(config, debug, console))
-                .storage(getStorage(config, dataDirectory, debug, console))
-                .messaging(getMessaging(config, serverId, messagingHandler, debug, console))
-                .sources(getSources(config, debug, console))
-                .sourceCacheTime(getSourceCacheTime(config, debug, console))
-                .mcleaksCacheTime(getMcLeaksCacheTime(config, debug, console))
-                .ignoredIps(getIgnoredIps(config, debug, console))
-                .cacheTime(getCacheTime(config, debug, console))
-                .threads(config.node("connection", "threads").getInt(4))
-                .timeout(config.node("connection", "timeout").getLong(5000L))
-                .vpnKickMessage(config.node("action", "vpn", "kick-message").getString("&cPlease disconnect from your proxy or VPN before re-joining!"))
-                .vpnActionCommands(getVpnActionCommands(config, debug, console))
-                .mcleaksKickMessage(config.node("action", "mcleaks", "kick-message").getString("&cPlease discontinue your use of an MCLeaks account!"))
-                .mcleaksActionCommands(getMcLeaksActionCommands(config, debug, console))
-                .vpnAlgorithmMethod(getVpnAlgorithmMethod(config, debug, console))
-                .vpnAlgorithmConsensus(getVpnAlgorithmConsensus(config, debug, console))
-                .build();
 
-        PacketUtil.setPoolSize(cachedConfig.getMessaging().size());
-
-        if (cachedConfig.getStorage().isEmpty()) {
-            logger.error("AntiVPN requires at least one storage service be enabled and configured.");
-        }
-
-        ConfigUtil.setConfiguration(config, cachedConfig);
 
         ServiceLocator.register(config);
         ServiceLocator.register(cachedValues);

@@ -24,6 +24,10 @@ public class GetIPIntel extends AbstractSource<GetIPIntelModel> {
         threadPool.scheduleAtFixedRate(() -> minuteRequests.set(0), 0L, 1L, TimeUnit.MINUTES);
     }
 
+    public GetIPIntel() {
+        super(GetIPIntelModel.class);
+    }
+
     public @NonNull String getName() { return "getipintel"; }
 
     public boolean isKeyRequired() { return false; }

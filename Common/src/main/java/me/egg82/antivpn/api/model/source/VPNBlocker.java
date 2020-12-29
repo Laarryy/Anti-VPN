@@ -14,6 +14,10 @@ public class VPNBlocker extends AbstractSource<VPNBlockerModel> {
 
     public boolean isKeyRequired() { return false; }
 
+    public VPNBlocker() {
+        super(VPNBlockerModel.class);
+    }
+
     public @NonNull CompletableFuture<Boolean> getResult(@NonNull String ip) {
         return getRawResponse(ip).thenApply(model -> {
             if (!"success".equalsIgnoreCase(model.getStatus())) {

@@ -14,6 +14,10 @@ public class ProxyCheck extends AbstractSource<ProxyCheckModel> {
 
     public boolean isKeyRequired() { return false; }
 
+    public ProxyCheck() {
+        super(ProxyCheckModel.class);
+    }
+
     public @NonNull CompletableFuture<Boolean> getResult(@NonNull String ip) {
         return getRawResponse(ip).thenApply(model -> {
             if (!"ok".equalsIgnoreCase(model.getStatus())) {

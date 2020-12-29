@@ -14,6 +14,14 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.spongepowered.configurate.ConfigurationNode;
 
 public abstract class AbstractSource<T extends SourceModel> implements Source<T> {
+    private final Class<T> modelClass;
+
+    protected AbstractSource(Class<T> modelClass) {
+        this.modelClass = modelClass;
+    }
+
+    public @NonNull Class<T> getModelClass() { return modelClass; }
+
     protected static final Map<String, String> headers = new HashMap<>();
     static {
         headers.put("Accept", "application/json");

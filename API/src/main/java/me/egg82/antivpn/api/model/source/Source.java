@@ -55,4 +55,11 @@ public interface Source<T extends SourceModel> {
      * @throws APIException in the result if the source returned an error
      */
     @NonNull CompletableFuture<T> getRawResponse(@NonNull String ip);
+
+    /**
+     * Returns the class of the {@link SourceModel} used for this source.
+     *
+     * @return the class of the SourceModel for this source.
+     */
+    @NonNull Class<T> getModelClass();
 }

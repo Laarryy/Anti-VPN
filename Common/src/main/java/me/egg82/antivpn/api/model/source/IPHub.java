@@ -16,6 +16,10 @@ public class IPHub extends AbstractSource<IPHubModel> {
 
     public boolean isKeyRequired() { return true; }
 
+    public IPHub() {
+        super(IPHubModel.class);
+    }
+
     public @NonNull CompletableFuture<Boolean> getResult(@NonNull String ip) {
         return getRawResponse(ip).thenApply(model -> {
             if (model.getError() != null) {

@@ -14,6 +14,10 @@ public class IPQualityScore extends AbstractSource<IPQualityScoreModel> {
 
     public boolean isKeyRequired() { return true; }
 
+    public IPQualityScore() {
+        super(IPQualityScoreModel.class);
+    }
+
     public @NonNull CompletableFuture<Boolean> getResult(@NonNull String ip) {
         return getRawResponse(ip).thenApply(model -> {
             if (!model.isSuccess()) {

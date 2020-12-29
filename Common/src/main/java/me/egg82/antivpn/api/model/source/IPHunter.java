@@ -16,6 +16,10 @@ public class IPHunter extends AbstractSource<IPHunterModel> {
 
     public boolean isKeyRequired() { return true; }
 
+    public IPHunter() {
+        super(IPHunterModel.class);
+    }
+
     public @NonNull CompletableFuture<Boolean> getResult(@NonNull String ip) {
         return getRawResponse(ip).thenApply(model -> {
             if (!"success".equalsIgnoreCase(model.getStatus())) {

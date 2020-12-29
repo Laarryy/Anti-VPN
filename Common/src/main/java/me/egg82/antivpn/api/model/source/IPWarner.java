@@ -14,6 +14,10 @@ public class IPWarner extends AbstractSource<IPWarnerModel> {
 
     public boolean isKeyRequired() { return true; }
 
+    public IPWarner() {
+        super(IPWarnerModel.class);
+    }
+
     public @NonNull CompletableFuture<Boolean> getResult(@NonNull String ip) {
         return getRawResponse(ip).thenApply(model -> {
             if (model.getError() != null) {

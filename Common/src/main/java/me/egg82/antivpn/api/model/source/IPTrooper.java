@@ -13,6 +13,10 @@ public class IPTrooper extends AbstractSource<IPTrooperModel> {
 
     public boolean isKeyRequired() { return false; }
 
+    public IPTrooper() {
+        super(IPTrooperModel.class);
+    }
+
     public @NonNull CompletableFuture<Boolean> getResult(@NonNull String ip) {
         return getRawResponse(ip).thenApply(model -> {
             if (model.getCode() == 3) {
