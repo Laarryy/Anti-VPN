@@ -1,0 +1,59 @@
+acf-minecraft:
+  multiple_players_match: "ru"
+  version: 1.0
+
+description:
+  reload: "Перезагрузка плагина."
+  import: "Импортирует данные из одного хранилища в другой."
+  check: "Проверьте IP-адрес или плеер, используя систему по умолчанию. Это вернет точно такое же значение, как и любой другой вызов API."
+  score: "Оценка конкретного источника на основе заранее составленного списка известных хороших и плохих IP-адресов. Обратите внимание, что это заставляет проверку использовать титры каждый раз, когда она выполняется."
+  test: "Проверьте IP-адрес с помощью различных (включенных) служб. Обратите внимание, что это заставляет проверять, так что будет использовать титры каждый раз, когда он запускается."
+
+general:
+  header: "<c2>[</c2><c3>Anti-VPN</c3><c2>]</c2> "
+  enabled: "<c4>Включен</c4>"
+  disabled: "<c5>Выключен</c5>"
+  load: "<c2>[</c2><c3>Версия</c3> {version}<c2>] [</c2>{commands} <c6>Команды</c6><c2>] [</c2>{events} <c7>Ивенты</c7><c2>] [</c2>{tasks} <c8>Цель</c8><c2>]</c2>"
+  hook_enable: "<c4>Включение поддержки</c4> {plugin}"
+  hook_disable: "{plugin} <c2>не был найден. Поддержка для него была отключена.</c2>"
+  update: "(Bukkit) <c3>Доступно</c3> <c4>обновление</c4> <c3>Обновитесь..</c3> Новая версия: <c2>{version}</c2>"
+
+error:
+  internal: "Внутренняя ошибка/Internal error"
+
+import:
+  same_storage: "The specified master and slave are the same!"
+  no_master: "The specified master storage was not found."
+  no_slave: "The specified slave storage was not found."
+  ips: "<c2>Importing IPs..</c2> <c8>[</c8><c2>ID:</c2> <c3>{id}</c3><c8>]</c8>"
+  players: "<c2>Importing players..</c2> <c8>[</c8><c2>ID:</c2> <c3>{id}</c3><c8>]</c8>"
+  vpns: "<c2>Importing VPN data..</c2> <c8>[</c8><c2>ID:</c2> <c3>{id}</c3><c8>]</c8>"
+  mcleaks: "<c2>Importing MCLeaks data..</c2> <c8>[</c8><c2>ID:</c2> <c3>{id}</c3><c8>]</c8>"
+  begin: "<c2>Importing data, please wait..</c2>"
+  end: "<c4>Data successfully imported!</c4>"
+
+check:
+  begin: "<c2>Проверка</c2> {type}<c2>, пожалуйста подождите...</c2>"
+  vpn_detected: "<c5>VPN/proxy обнаруженно</c5>"
+  no_vpn_detected: "<c4>VPN/proxy не обнаруженно</c4>"
+  mcleaks_detected: "<c5>Обнаружена учетная запись MCLeaks</c5>"
+  no_mcleaks_detected: "<c4>Учетная запись MCLeaks не обнаружена</c4>"
+
+score:
+  begin: "<c2>Scoring</c2> {source}<c2>, please wait..</c2>"
+  type: "<c2>Scoring against</c2> {type}<c2>..</c2>"
+  sleep: "<c2>Sleeping for one minute..</c2>"
+  error: "[{source}] {type} <c5>error</c5> {percent}%"
+  score: "[{source}] {type} <c2>score</c2> {percent}%"
+  end: "<c4>Scoring for</c4> {source} <c4>complete!</c4>"
+
+test:
+  begin: "<c2>Testing with</c2> {ip}<c2>, please wait..</c2>"
+  error: "[{source}] <c2>error</c2>"
+  vpn_detected: "[{source}] <c5>VPN/proxy detected</c5>"
+  no_vpn_detected: "[{source}] <c4>No VPN/proxy detected</c4>"
+  end: "<c4>Test for</c4> {ip} <c4>complete!</c4>"
+
+reload:
+  begin: "<c2>Перезагрузка, пожалуйста, подождите..</c2>"
+  end: "<c4>Конфигурация перезагружена!</c4>"
