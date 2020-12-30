@@ -42,7 +42,7 @@ public class BukkitBootstrap extends JavaPlugin {
     private final boolean isBukkit;
 
     private URLClassLoader proxiedClassLoader;
-    private final ExecutorService downloadPool = Executors.newWorkStealingPool(Math.max(4, Runtime.getRuntime().availableProcessors()));
+    private final ExecutorService downloadPool = Executors.newWorkStealingPool(Math.max(4, Runtime.getRuntime().availableProcessors() / 2));
 
     public BukkitBootstrap() {
         super();

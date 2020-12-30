@@ -143,12 +143,6 @@
         </dependency>
 
         <dependency>
-            <groupId>org.flywaydb</groupId>
-            <artifactId>flyway-core</artifactId>
-            <version>${flyway.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
             <groupId>io.ebean</groupId>
             <artifactId>ebean</artifactId>
             <version>${ebean.version}</version>

@@ -56,87 +56,8 @@ public class PacketUtil {
 
     public static Byte2ObjectMap<Class<Packet>> getPacketCache() { return packetCache; }
 
-    private static final ConcurrentMap<UUID, FakePlayerModel> playerModels = new ConcurrentHashMap<>();
     private static final DoubleBuffer<Packet> packetQueue = new DoubleBuffer<>();
     private static final AtomicBoolean requiresSending = new AtomicBoolean(false);
-
-    public static void spawnPlayer(Player player) {
-        FakePlayerModel model = new FakePlayerModel();
-        playerModels.put(player.getUniqueId(), model);
-
-        model.setName(player.getName());
-        model.setUuid(player.getUniqueId());
-        model.setDisplayName(player.getDisplayName());
-        model.setGameMode(player.getGameMode());
-        model.setPing(-1); // TODO: Set ping & create method that checks/sets player ping if it changes
-        model.setLocation(player.getLocation().clone());
-        model.setOnGround(!player.isFlying());
-        Location head = player.getEyeLocation();
-        model.setHeadPitch(head.getPitch());
-        model.setHeadYaw(head.getYaw());
-
-        PlayerSpawnPacket packet = new PlayerSpawnPacket();
-        packet.setName(model.getName());
-        packet.setUuid(model.getUuid());
-        packet.setDisplayName(model.getDisplayName());
-        packet.setGameMode(model.getGameMode().ordinal());
-        packet.setPing(model.getPing());
-        Location body = model.getLocation();
-        packet.setWorld(body.getWorld().getName());
-        packet.setX(body.getX());
-        packet.setY(body.getY());
-        packet.setZ(body.getZ());
-        packet.setPitch(body.getPitch());
-        packet.setYaw(body.getYaw());
-        packet.setOnGround(model.isOnGround());
-        packet.setHeadPitch(model.getHeadPitch());
-        packet.setHeadYaw(model.getHeadYaw());
-
-        packetQueue.getWriteBuffer().add(packet);
-        requiresSending.set(true);
-    }
-
-    public static void setEntityLocation(UUID uuid, Location newLocation, boolean isOnGround) {
-        FakePlayerModel model = playerModels.get(uuid);
-        if (model == null) {
-            logger.warn("Got data for model that does not exist: " + uuid);
-            return;
-        }
-
-        model.setLocation(newLocation);
-        model.setOnGround(isOnGround);
-    }
-
-    public static void setPlayerPing(UUID uuid, int ping) {
-        FakePlayerModel model = playerModels.get(uuid);
-        if (model == null) {
-            logger.warn("Got data for model that does not exist: " + uuid);
-            return;
-        }
-
-        model.setPing(ping);
-    }
-
-    public static void doEntityAnimation(UUID uuid, int animation) {
-        EntityAnimationPacket packet = new EntityAnimationPacket();
-        packet.setUuid(uuid);
-        packet.setAnimation(animation);
-
-        packetQueue.getWriteBuffer().add(packet);
-        requiresSending.set(true);
-    }
-
-    public static void despawnEntity(UUID uuid) {
-        if (playerModels.remove(uuid) == null) {
-            logger.warn("Got despawn for model that does not exist: " + uuid);
-        }
-
-        EntityDespawnPacket packet = new EntityDespawnPacket();
-        packet.setUuid(uuid);
-
-        packetQueue.getWriteBuffer().add(packet);
-        requiresSending.set(true);
-    }
 
     public static void queuePacket(Packet packet) {
         packetQueue.getWriteBuffer().add(packet);
@@ -144,7 +65,6 @@ public class PacketUtil {
     }
 
     public static void trySendQueue() {
-        consolidateModels();
         if (!requiresSending.compareAndSet(true, false)) {
             return;
         }
@@ -189,53 +109,6 @@ public class PacketUtil {
                         logger.warn("Could not broadcast packet " + packet.getClass().getSimpleName() + " through " + service.getName(), ex);
                     }
                 });
-            }
-        }
-    }
-
-    private static void consolidateModels() {
-        for (FakePlayerModel model : playerModels.values()) {
-            if (model.isLocationChanged()) {
-                if (model.isRotationChanged()) {
-                    EntityLocationRotationPacket packet = new EntityLocationRotationPacket();
-                    packet.setUuid(model.getUuid());
-                    Location to = model.getLocation();
-                    packet.setWorld(to.getWorld().getName());
-                    packet.setX(to.getX());
-                    packet.setY(to.getY());
-                    packet.setZ(to.getZ());
-                    packet.setPitch(to.getPitch());
-                    packet.setYaw(to.getYaw());
-                    packet.setOnGround(model.isOnGround());
-                    packet.setHeadPitch(model.getHeadPitch());
-                    packet.setHeadYaw(model.getHeadYaw());
-
-                    packetQueue.getWriteBuffer().add(packet);
-                    requiresSending.set(true);
-                } else {
-                    EntityLocationPacket packet = new EntityLocationPacket();
-                    packet.setUuid(model.getUuid());
-                    Location to = model.getLocation();
-                    packet.setWorld(to.getWorld().getName());
-                    packet.setX(to.getX());
-                    packet.setY(to.getY());
-                    packet.setZ(to.getZ());
-                    packet.setOnGround(model.isOnGround());
-
-                    packetQueue.getWriteBuffer().add(packet);
-                    requiresSending.set(true);
-                }
-            } else if (model.isRotationChanged()) {
-                EntityRotationPacket packet = new EntityRotationPacket();
-                packet.setUuid(model.getUuid());
-                Location to = model.getLocation();
-                packet.setPitch(to.getPitch());
-                packet.setYaw(to.getYaw());
-                packet.setHeadPitch(model.getHeadPitch());
-                packet.setHeadYaw(model.getHeadYaw());
-
-                packetQueue.getWriteBuffer().add(packet);
-                requiresSending.set(true);
             }
         }
     }

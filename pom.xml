@@ -24,7 +24,6 @@
         <checkerframework.version>3.8.0</checkerframework.version>
         <servicelocator.version>1.0.2</servicelocator.version>
         <configurate.version>4.0.0</configurate.version>
-        <flyway.version>7.3.2</flyway.version>
         <ebean.version>12.6.4</ebean.version>
         <hikari.version>3.4.5</hikari.version>
         <flexjson.version>3.3</flexjson.version>

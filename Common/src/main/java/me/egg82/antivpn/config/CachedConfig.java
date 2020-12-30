@@ -98,6 +98,9 @@ public class CachedConfig {
         }
 
         public CachedConfig.Builder sourceCacheTime(TimeUtil.Time value) {
+            if (value == null) {
+                throw new IllegalArgumentException("value cannot be null.");
+            }
             if (value.getMillis() <= 0L) {
                 throw new IllegalArgumentException("value cannot be <= 0.");
             }
@@ -107,6 +110,9 @@ public class CachedConfig {
         }
 
         public CachedConfig.Builder mcleaksCacheTime(TimeUtil.Time value) {
+            if (value == null) {
+                throw new IllegalArgumentException("value cannot be null.");
+            }
             if (value.getMillis() <= 0L) {
                 throw new IllegalArgumentException("value cannot be <= 0.");
             }
@@ -121,6 +127,9 @@ public class CachedConfig {
         }
 
         public CachedConfig.Builder cacheTime(TimeUtil.Time value) {
+            if (value == null) {
+                throw new IllegalArgumentException("value cannot be null.");
+            }
             if (value.getMillis() <= 0L) {
                 throw new IllegalArgumentException("value cannot be <= 0.");
             }

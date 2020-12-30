@@ -1,7 +1,6 @@
 package me.egg82.antivpn.config;
 
 import co.aikar.commands.CommandIssuer;
-import com.google.common.reflect.TypeToken;
 import java.io.*;
 import java.nio.file.Files;
 import java.util.*;
@@ -20,7 +19,6 @@ import me.egg82.antivpn.utils.PacketUtil;
 import me.egg82.antivpn.utils.TimeUtil;
 import me.egg82.antivpn.utils.ValidationUtil;
 import ninja.egg82.reflect.PackageFilter;
-import ninja.egg82.service.ServiceLocator;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,7 +34,7 @@ import redis.clients.jedis.exceptions.JedisException;
 public class ConfigurationFileUtil {
     private static final Logger logger = LoggerFactory.getLogger(ConfigurationFileUtil.class);
 
-    private ConfigurationFileUtil() {}
+    private ConfigurationFileUtil() { }
 
     public static void reloadConfig(File dataDirectory, CommandIssuer console, MessagingHandler messagingHandler, SourceManager sourceManager) {
         ConfigurationNode config;
@@ -60,6 +58,8 @@ public class ConfigurationFileUtil {
             console.sendMessage(LogUtil.HEADING + "<c2>Server ID:</c2> <c1>" + serverId.toString() + "</c1>");
         }
 
+        AlgorithmMethod vpnAlgorithmMethod = getVpnAlgorithmMethod(config, debug, console);
+
         CachedConfig cachedConfig = CachedConfig.builder()
                 .debug(debug)
                 .language(getLanguage(config, debug, console))
@@ -75,135 +75,20 @@ public class ConfigurationFileUtil {
                 .vpnActionCommands(getVpnActionCommands(config, debug, console))
                 .mcleaksKickMessage(config.node("action", "mcleaks", "kick-message").getString("&cPlease discontinue your use of an MCLeaks account!"))
                 .mcleaksActionCommands(getMcLeaksActionCommands(config, debug, console))
-                .vpnAlgorithmMethod(getVpnAlgorithmMethod(config, debug, console))
-                .vpnAlgorithmConsensus(getVpnAlgorithmConsensus(config, debug, console))
+                .vpnAlgorithmMethod(vpnAlgorithmMethod)
+                .vpnAlgorithmConsensus(getVpnAlgorithmConsensus(config, vpnAlgorithmMethod == AlgorithmMethod.CONSESNSUS, debug, console))
                 .serverId(serverId)
                 .build();
 
         PacketUtil.setPoolSize(cachedConfig.getMessaging().size());
 
-        if (cachedConfig.getStorage().isEmpty()) {
-            logger.error("AntiVPN requires at least one storage service be enabled and configured.");
-        }
-
         ConfigUtil.setConfiguration(config, cachedConfig);
 
         setSources(config, debug, console, sourceManager);
 
-
-
-
-
-
-
-
-
-
-
-
-
-        Optional<TimeUtil.Time> sourceCacheTime = TimeUtil.getTime(config.getNode("sources", "cache-time").getString("6hours"));
-        if (!sourceCacheTime.isPresent()) {
-            logger.warn("sources.cache-time is not a valid time pattern. Using default value.");
-            sourceCacheTime = Optional.of(new TimeUtil.Time(6L, TimeUnit.HOURS));
-        }
-
         if (debug) {
-            logger.info(LogUtil.getHeading() + ChatColor.YELLOW + "Source cache time: " + ChatColor.WHITE + sourceCacheTime.get().getMillis() + "ms");
-        }
-
-        Optional<TimeUtil.Time> mcleaksCacheTime = TimeUtil.getTime(config.getNode("mcleaks", "cache-time").getString("1day"));
-        if (!mcleaksCacheTime.isPresent()) {
-            logger.warn("mcleaks.cache-time is not a valid time pattern. Using default value.");
-            mcleaksCacheTime = Optional.of(new TimeUtil.Time(1L, TimeUnit.DAYS));
-        }
-
-        if (debug) {
-            logger.info(LogUtil.getHeading() + ChatColor.YELLOW + "MCLeaks cache time: " + ChatColor.WHITE + mcleaksCacheTime.get().getMillis() + "ms");
-        }
-
-        Set<String> ignoredIps;
-        try {
-            ignoredIps = new HashSet<>(config.getNode("action", "ignore").getList(TypeToken.of(String.class)));
-        } catch (ObjectMappingException ex) {
-            logger.error(ex.getMessage(), ex);
-            ignoredIps = new HashSet<>();
-        }
-        for (Iterator<String> i = ignoredIps.iterator(); i.hasNext();) {
-            String ip = i.next();
-            if (!ValidationUtil.isValidIp(ip) && !ValidationUtil.isValidIPRange(ip)) {
-                if (debug) {
-                    logger.info(LogUtil.getHeading() + ChatColor.DARK_RED + "Removed invalid ignore IP/range: " + ChatColor.WHITE + ip);
-                }
-                i.remove();
-            }
-        }
-
-        if (debug) {
-            for (String ip : ignoredIps) {
-                logger.info(LogUtil.getHeading() + ChatColor.YELLOW + "Adding ignored IP or range: " + ChatColor.WHITE + ip);
-            }
-        }
-
-        Optional<TimeUtil.Time> cacheTime = TimeUtil.getTime(config.getNode("connection", "cache-time").getString("1minute"));
-        if (!cacheTime.isPresent()) {
-            logger.warn("connection.cache-time is not a valid time pattern. Using default value.");
-            cacheTime = Optional.of(new TimeUtil.Time(1L, TimeUnit.MINUTES));
-        }
-
-        if (debug) {
-            logger.info(LogUtil.getHeading() + ChatColor.YELLOW + "Memory cache time: " + ChatColor.WHITE + cacheTime.get().getMillis() + "ms");
-        }
-
-        List<String> vpnActionCommands;
-        try {
-            vpnActionCommands = new ArrayList<>(config.getNode("action", "vpn", "commands").getList(TypeToken.of(String.class)));
-        } catch (ObjectMappingException ex) {
-            logger.error(ex.getMessage(), ex);
-            vpnActionCommands = new ArrayList<>();
-        }
-        vpnActionCommands.removeIf(action -> action == null || action.isEmpty());
-
-        if (debug) {
-            for (String action : vpnActionCommands) {
-                logger.info(LogUtil.getHeading() + ChatColor.YELLOW + "Including command action for VPN usage: " + ChatColor.WHITE + action);
-            }
-        }
-
-        List<String> mcleaksActionCommands;
-        try {
-            mcleaksActionCommands = new ArrayList<>(config.getNode("action", "mcleaks", "commands").getList(TypeToken.of(String.class)));
-        } catch (ObjectMappingException ex) {
-            logger.error(ex.getMessage(), ex);
-            mcleaksActionCommands = new ArrayList<>();
-        }
-        mcleaksActionCommands.removeIf(action -> action == null || action.isEmpty());
-
-        if (debug) {
-            for (String action : mcleaksActionCommands) {
-                logger.info(LogUtil.getHeading() + ChatColor.YELLOW + "Including command action for MCLeaks usage: " + ChatColor.WHITE + action);
-            }
-        }
-
-        AlgorithmMethod algorithmMethod = AlgorithmMethod.getByName(config.getNode("action", "vpn", "algorithm", "method").getString("cascade"));
-        if (algorithmMethod == null) {
-            logger.warn("action.vpn.algorithm.method is not a valid type. Using default value.");
-            algorithmMethod = AlgorithmMethod.CASCADE;
-        }
-
-        double vpnAlgorithmConsensus = config.getNode("action", "vpn", "algorithm", "min-consensus").getDouble(0.6d);
-        vpnAlgorithmConsensus = Math.max(0.0d, Math.min(1.0d, vpnAlgorithmConsensus));
-
-
-
-        ServiceLocator.register(config);
-        ServiceLocator.register(cachedValues);
-
-        VPNAPI.reload();
-
-        if (debug) {
-            logger.info(LogUtil.getHeading() + ChatColor.YELLOW + "API threads: " + ChatColor.WHITE + cachedValues.getThreads());
-            logger.info(LogUtil.getHeading() + ChatColor.YELLOW + "API timeout: " + ChatColor.WHITE + cachedValues.getTimeout() + "ms");
+            console.sendMessage(LogUtil.HEADING + "<c2>Source threads:</c2> <c1>" + cachedConfig.getThreads() + "</c1>");
+            console.sendMessage(LogUtil.HEADING + "<c2>Source timeout:</c2> <c1>" + cachedConfig.getTimeout() + "ms</c1>");
         }
     }
 
@@ -227,77 +112,6 @@ public class ConfigurationFileUtil {
         }
 
         return retVal;
-    }
-
-    private static List<MessagingService> getMessaging(ConfigurationNode config, UUID serverId, MessagingHandler handler, boolean debug, CommandIssuer console) {
-        List<MessagingService> retVal = new ArrayList<>();
-
-        PoolSettings poolSettings = new PoolSettings(config.node("messaging", "settings"));
-        for (Map.Entry<Object, ? extends ConfigurationNode> kvp : config.node("messaging", "engines").childrenMap().entrySet()) {
-            MessagingService service = getMessagingOf((String) kvp.getKey(), kvp.getValue(), serverId, handler, poolSettings, debug, console);
-            if (service == null) {
-                continue;
-            }
-
-            if (debug) {
-                console.sendMessage(LogUtil.HEADING + "<c2>Added messaging:</c2> <c1>" + service.getName() + " (" + service.getClass().getSimpleName() + ")</c1>");
-            }
-            retVal.add(service);
-        }
-
-        return retVal;
-    }
-
-    private static MessagingService getMessagingOf(String name, ConfigurationNode engineNode, UUID serverId, MessagingHandler handler, PoolSettings poolSettings, boolean debug, CommandIssuer console) {
-        if (!engineNode.node("enabled").getBoolean()) {
-            if (debug) {
-                console.sendMessage(LogUtil.HEADING + "<c9>Engine</c9> <c1>" + name + "</c1> <c9>is disabled. Removing.</c9>");
-            }
-            return null;
-        }
-
-        String type = engineNode.node("type").getString("").toLowerCase();
-        ConfigurationNode connectionNode = engineNode.node("connection");
-        switch (type) {
-            case "rabbitmq": {
-                AddressPort url = new AddressPort(connectionNode.key() + ".address", connectionNode.node("address").getString("127.0.0.1:5672"), 5672);
-                if (debug) {
-                    console.sendMessage(LogUtil.HEADING + "<c2>Creating engine</c2> <c1>" + name + "</c1> <c2>of type rabbitmq with address</c2> <c1>" + url.getAddress() + ":" + url.getPort() + connectionNode.node("v-host").getString("/") + "</c1>");
-                }
-                try {
-                    return RabbitMQMessagingService.builder(name, serverId, handler)
-                            .url(url.address, url.port, connectionNode.node("v-host").getString("/"))
-                            .credentials(connectionNode.node("username").getString("guest"), connectionNode.node("password").getString("guest"))
-                            .timeout((int) poolSettings.timeout)
-                            .build();
-                } catch (IOException | TimeoutException ex) {
-                    logger.error("Could not create engine \"" + name + "\".", ex);
-                }
-                break;
-            }
-            case "redis": {
-                AddressPort url = new AddressPort(connectionNode.key() + ".address", connectionNode.node("address").getString("127.0.0.1:6379"), 6379);
-                if (debug) {
-                    console.sendMessage(LogUtil.HEADING + "<c2>Creating engine</c2> <c1>" + name + "</c1> <c2>of type redis with address</c2> <c1>" + url.getAddress() + ":" + url.getPort() + "</c1>");
-                }
-                try {
-                    return RedisMessagingService.builder(name, serverId, handler)
-                            .url(url.address, url.port)
-                            .credentials(connectionNode.node("password").getString(""))
-                            .poolSize(poolSettings.minPoolSize, poolSettings.maxPoolSize)
-                            .life(poolSettings.maxLifetime, (int) poolSettings.timeout)
-                            .build();
-                } catch (JedisException ex) {
-                    logger.error("Could not create engine \"" + name + "\".", ex);
-                }
-                break;
-            }
-            default: {
-                console.sendMessage(LogUtil.HEADING + "<c9>Unknown messaging type</c9> <c1>" + type + "</c1> <c9>in engine</c9> <c1>" + name + "</c1>");
-                break;
-            }
-        }
-        return null;
     }
 
     private static List<StorageService> getStorage(ConfigurationNode config, File dataDirectory, boolean debug, CommandIssuer console) {
@@ -387,10 +201,209 @@ public class ConfigurationFileUtil {
         return null;
     }
 
+    private static List<MessagingService> getMessaging(ConfigurationNode config, UUID serverId, MessagingHandler handler, boolean debug, CommandIssuer console) {
+        List<MessagingService> retVal = new ArrayList<>();
+
+        PoolSettings poolSettings = new PoolSettings(config.node("messaging", "settings"));
+        for (Map.Entry<Object, ? extends ConfigurationNode> kvp : config.node("messaging", "engines").childrenMap().entrySet()) {
+            MessagingService service = getMessagingOf((String) kvp.getKey(), kvp.getValue(), serverId, handler, poolSettings, debug, console);
+            if (service == null) {
+                continue;
+            }
+
+            if (debug) {
+                console.sendMessage(LogUtil.HEADING + "<c2>Added messaging:</c2> <c1>" + service.getName() + " (" + service.getClass().getSimpleName() + ")</c1>");
+            }
+            retVal.add(service);
+        }
+
+        return retVal;
+    }
+
+    private static MessagingService getMessagingOf(String name, ConfigurationNode engineNode, UUID serverId, MessagingHandler handler, PoolSettings poolSettings, boolean debug, CommandIssuer console) {
+        if (!engineNode.node("enabled").getBoolean()) {
+            if (debug) {
+                console.sendMessage(LogUtil.HEADING + "<c9>Engine</c9> <c1>" + name + "</c1> <c9>is disabled. Removing.</c9>");
+            }
+            return null;
+        }
+
+        String type = engineNode.node("type").getString("").toLowerCase();
+        ConfigurationNode connectionNode = engineNode.node("connection");
+        switch (type) {
+            case "rabbitmq": {
+                AddressPort url = new AddressPort(connectionNode.key() + ".address", connectionNode.node("address").getString("127.0.0.1:5672"), 5672);
+                if (debug) {
+                    console.sendMessage(LogUtil.HEADING + "<c2>Creating engine</c2> <c1>" + name + "</c1> <c2>of type rabbitmq with address</c2> <c1>" + url.getAddress() + ":" + url.getPort() + connectionNode.node("v-host").getString("/") + "</c1>");
+                }
+                try {
+                    return RabbitMQMessagingService.builder(name, serverId, handler)
+                            .url(url.address, url.port, connectionNode.node("v-host").getString("/"))
+                            .credentials(connectionNode.node("username").getString("guest"), connectionNode.node("password").getString("guest"))
+                            .timeout((int) poolSettings.timeout)
+                            .build();
+                } catch (IOException | TimeoutException ex) {
+                    logger.error("Could not create engine \"" + name + "\".", ex);
+                }
+                break;
+            }
+            case "redis": {
+                AddressPort url = new AddressPort(connectionNode.key() + ".address", connectionNode.node("address").getString("127.0.0.1:6379"), 6379);
+                if (debug) {
+                    console.sendMessage(LogUtil.HEADING + "<c2>Creating engine</c2> <c1>" + name + "</c1> <c2>of type redis with address</c2> <c1>" + url.getAddress() + ":" + url.getPort() + "</c1>");
+                }
+                try {
+                    return RedisMessagingService.builder(name, serverId, handler)
+                            .url(url.address, url.port)
+                            .credentials(connectionNode.node("password").getString(""))
+                            .poolSize(poolSettings.minPoolSize, poolSettings.maxPoolSize)
+                            .life(poolSettings.maxLifetime, (int) poolSettings.timeout)
+                            .build();
+                } catch (JedisException ex) {
+                    logger.error("Could not create engine \"" + name + "\".", ex);
+                }
+                break;
+            }
+            default: {
+                console.sendMessage(LogUtil.HEADING + "<c9>Unknown messaging type</c9> <c1>" + type + "</c1> <c9>in engine</c9> <c1>" + name + "</c1>");
+                break;
+            }
+        }
+        return null;
+    }
+
+    private static TimeUtil.Time getSourceCacheTime(ConfigurationNode config, boolean debug, CommandIssuer console) {
+        TimeUtil.Time retVal = TimeUtil.getTime(config.node("sources", "cache-time").getString("6hours"));
+        if (retVal == null) {
+            console.sendMessage(LogUtil.HEADING + "<c2>sources.cache-time is not a valid time pattern. Using default value.<c2>");
+            retVal = new TimeUtil.Time(6L, TimeUnit.HOURS);
+        }
+
+        if (debug) {
+            console.sendMessage(LogUtil.HEADING + "<c2>Source cache time:</c2> <c1>" + retVal.getMillis() + "ms (" + retVal.getTime() + " " + retVal.getUnit().name() + ")</c1>");
+        }
+        return retVal;
+    }
+
+    private static TimeUtil.Time getMcLeaksCacheTime(ConfigurationNode config, boolean debug, CommandIssuer console) {
+        TimeUtil.Time retVal = TimeUtil.getTime(config.node("mcleaks", "cache-time").getString("1day"));
+        if (retVal == null) {
+            console.sendMessage(LogUtil.HEADING + "<c2>mcleaks.cache-time is not a valid time pattern. Using default value.<c2>");
+            retVal = new TimeUtil.Time(1L, TimeUnit.DAYS);
+        }
+
+        if (debug) {
+            console.sendMessage(LogUtil.HEADING + "<c2>MCLeaks cache time:</c2> <c1>" + retVal.getMillis() + "ms (" + retVal.getTime() + " " + retVal.getUnit().name() + ")</c1>");
+        }
+        return retVal;
+    }
+
+    private static TimeUtil.Time getCacheTime(ConfigurationNode config, boolean debug, CommandIssuer console) {
+        TimeUtil.Time retVal = TimeUtil.getTime(config.node("connection", "cache-time").getString("1minute"));
+        if (retVal == null) {
+            console.sendMessage(LogUtil.HEADING + "<c2>connection.cache-time is not a valid time pattern. Using default value.<c2>");
+            retVal = new TimeUtil.Time(1L, TimeUnit.MINUTES);
+        }
+
+        if (debug) {
+            console.sendMessage(LogUtil.HEADING + "<c2>Memory cache time:</c2> <c1>" + retVal.getMillis() + "ms (" + retVal.getTime() + " " + retVal.getUnit().name() + ")</c1>");
+        }
+        return retVal;
+    }
+
+    private static Set<String> getIgnoredIps(ConfigurationNode config, boolean debug, CommandIssuer console) {
+        Set<String> retVal;
+        try {
+            retVal = new HashSet<>(!config.node("ignore", "ips").empty() ? config.node("ignore", "ips").getList(String.class) : new ArrayList<>());
+        } catch (SerializationException ex) {
+            logger.error(ex.getMessage(), ex);
+            retVal = new HashSet<>();
+        }
+
+        for (Iterator<String> i = retVal.iterator(); i.hasNext();) {
+            String ip = i.next();
+            if (!ValidationUtil.isValidIp(ip) && !ValidationUtil.isValidIpRange(ip)) {
+                if (debug) {
+                    console.sendMessage(LogUtil.HEADING + "<c9>Removed invalid ignore IP/range:</c9> <c1>" + ip + "</c1>");
+                }
+                i.remove();
+            } else {
+                if (debug) {
+                    console.sendMessage(LogUtil.HEADING + "<c2>Adding ignored IP or range:</c2> <c1>" + ip + "</c1>");
+                }
+            }
+        }
+
+        return retVal;
+    }
+
+    private static Set<String> getVpnActionCommands(ConfigurationNode config, boolean debug, CommandIssuer console) {
+        Set<String> retVal;
+        try {
+            retVal = new HashSet<>(!config.node("action", "vpn", "commands").empty() ? config.node("action", "vpn", "commands").getList(String.class) : new ArrayList<>());
+        } catch (SerializationException ex) {
+            logger.error(ex.getMessage(), ex);
+            retVal = new HashSet<>();
+        }
+        retVal.removeIf(action -> action == null || action.isEmpty());
+
+        if (debug) {
+            for (String action : retVal) {
+                console.sendMessage(LogUtil.HEADING + "<c2>Adding command action for VPN usage:</c2> <c1>" + action + "</c1>");
+            }
+        }
+
+        return retVal;
+    }
+
+    private static Set<String> getMcLeaksActionCommands(ConfigurationNode config, boolean debug, CommandIssuer console) {
+        Set<String> retVal;
+        try {
+            retVal = new HashSet<>(!config.node("action", "mcleaks", "commands").empty() ? config.node("action", "mcleaks", "commands").getList(String.class) : new ArrayList<>());
+        } catch (SerializationException ex) {
+            logger.error(ex.getMessage(), ex);
+            retVal = new HashSet<>();
+        }
+        retVal.removeIf(action -> action == null || action.isEmpty());
+
+        if (debug) {
+            for (String action : retVal) {
+                console.sendMessage(LogUtil.HEADING + "<c2>Adding command action for MCLeaks usage:</c2> <c1>" + action + "</c1>");
+            }
+        }
+
+        return retVal;
+    }
+
+    private static AlgorithmMethod getVpnAlgorithmMethod(ConfigurationNode config, boolean debug, CommandIssuer console) {
+        AlgorithmMethod retVal = AlgorithmMethod.getByName(config.node("action", "vpn", "algorithm", "method").getString("cascade"));
+        if (retVal == null) {
+            console.sendMessage(LogUtil.HEADING + "<c2>action.vpn.algorithm.method is not a valid type. Using default value.<c2>");
+            retVal = AlgorithmMethod.CASCADE;
+        }
+
+        if (debug) {
+            console.sendMessage(LogUtil.HEADING + "<c2>Using VPN algorithm:</c2> <c1>" + retVal.name() + "</c1>");
+        }
+
+        return retVal;
+    }
+
+    private static double getVpnAlgorithmConsensus(ConfigurationNode config, boolean consensus, boolean debug, CommandIssuer console) {
+        double retVal = config.node("action", "vpn", "algorithm", "min-consensus").getDouble(0.6d);
+        retVal = Math.max(0.0d, Math.min(1.0d, retVal));
+
+        if (consensus && debug) {
+            console.sendMessage(LogUtil.HEADING + "<c2>Using consensus value:</c2> <c1>" + retVal + "</c1>");
+        }
+
+        return retVal;
+    }
+
     private static void setSources(ConfigurationNode config, boolean debug, CommandIssuer console, SourceManager sourceManager) {
-        List<Class<Source>> sourceClasses = PackageFilter.getClasses(Source.class, "me.egg82.antivpn.api.model.source.models", false, false, false);
         Map<String, Source<? extends SourceModel>> initializedSources = new HashMap<>();
 
+        List<Class<Source>> sourceClasses = PackageFilter.getClasses(Source.class, "me.egg82.antivpn.api.model.source.models", false, false, false);
         for (Class<Source> clazz : sourceClasses) {
             if (debug) {
                 console.sendMessage(LogUtil.HEADING + "<c2>Initializing source</c2> <c1>" + clazz.getSimpleName() + "</c1>");
@@ -399,7 +412,7 @@ public class ConfigurationFileUtil {
             try {
                 Source<? extends SourceModel> source = (Source<? extends SourceModel>) clazz.newInstance();
                 initializedSources.put(source.getName(), source);
-            } catch (InstantiationException | IllegalAccessException ex) {
+            } catch (InstantiationException | IllegalAccessException | ClassCastException ex) {
                 logger.error(ex.getMessage(), ex);
             }
         }

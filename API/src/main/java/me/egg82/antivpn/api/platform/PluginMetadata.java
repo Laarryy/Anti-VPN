@@ -18,5 +18,5 @@ public interface PluginMetadata {
      *
      * @return the version of the API running on the platform
      */
-    @NonNull String getApiVersion();
+    double getApiVersion();
 }
