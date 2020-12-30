@@ -64,6 +64,9 @@ public class CachedConfig {
     private double vpnAlgorithmConsensus = 0.6d;
     public double getVPNAlgorithmConsensus() { return vpnAlgorithmConsensus; }
 
+    private String mcleaksKey = "";
+    public @NonNull String getMcLeaksKey() { return mcleaksKey; }
+
     private UUID serverId = UUID.randomUUID();
     public @NonNull UUID getServerId() { return serverId; }
 
@@ -189,6 +192,11 @@ public class CachedConfig {
                 throw new IllegalArgumentException("value cannot be > 1.");
             }
             values.vpnAlgorithmConsensus = value;
+            return this;
+        }
+
+        public CachedConfig.Builder mcleaksKey(@NonNull String value) {
+            values.mcleaksKey = value;
             return this;
         }
 

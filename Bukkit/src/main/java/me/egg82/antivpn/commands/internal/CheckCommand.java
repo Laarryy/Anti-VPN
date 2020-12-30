@@ -4,18 +4,15 @@ import co.aikar.commands.CommandIssuer;
 import co.aikar.taskchain.TaskChainFactory;
 import java.util.UUID;
 import java.util.concurrent.CompletionException;
-import me.egg82.antivpn.api.VPNAPI;
 import me.egg82.antivpn.api.VPNAPIProvider;
 import me.egg82.antivpn.api.model.ip.AlgorithmMethod;
-import me.egg82.antivpn.config.CachedConfig;
-import me.egg82.antivpn.config.ConfigUtil;
+import me.egg82.antivpn.api.model.ip.IPManager;
+import me.egg82.antivpn.api.model.player.PlayerManager;
 import me.egg82.antivpn.lang.Message;
 import me.egg82.antivpn.utils.ValidationUtil;
 
 public class CheckCommand extends AbstractCommand {
     private final String type;
-
-    private final VPNAPI api = VPNAPIProvider.getInstance();
 
     public CheckCommand(CommandIssuer issuer, TaskChainFactory taskFactory, String type) {
         super(issuer, taskFactory);
@@ -33,25 +30,20 @@ public class CheckCommand extends AbstractCommand {
     }
 
     private void checkIp(String ip) {
+        IPManager ipManager = VPNAPIProvider.getInstance().getIpManager();
+
         taskFactory.<Void>newChain()
                 .<Boolean>asyncCallback((v, r) -> {
-                    if (api.getIpManager().getCurrentAlgorithmMethod() == AlgorithmMethod.CONSESNSUS) {
-                        CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
-                        if (cachedConfig == null) {
-                            logger.error("Cached config could not be fetched.");
-                            r.accept(null);
-                            return;
-                        }
-
+                    if (ipManager.getCurrentAlgorithmMethod() == AlgorithmMethod.CONSESNSUS) {
                         try {
-                            r.accept(api.getIpManager().consensus(ip, true)
+                            r.accept(ipManager.consensus(ip, true)
                                     .exceptionally(this::handleException)
-                                    .join() >= cachedConfig.getVPNAlgorithmConsensus());
+                                    .join() >= ipManager.getMinConsensusValue());
                             return;
                         } catch (CompletionException ignored) { }
                     } else {
                         try {
-                            r.accept(api.getIpManager().cascade(ip, true)
+                            r.accept(ipManager.cascade(ip, true)
                                     .exceptionally(this::handleException)
                                     .join());
                             return;
@@ -66,12 +58,14 @@ public class CheckCommand extends AbstractCommand {
     }
 
     private void checkPlayer(String playerName) {
+        PlayerManager playerManager = VPNAPIProvider.getInstance().getPlayerManager();
+
         taskFactory.<Void>newChain()
                 .<UUID>asyncCallback((v, r) -> r.accept(fetchUuid(playerName)))
                 .abortIfNull(this.handleAbort)
                 .<Boolean>asyncCallback((v, r) -> {
                     try {
-                        r.accept(api.getPlayerManager().checkMcLeaks(v, true)
+                        r.accept(playerManager.checkMcLeaks(v, true)
                                 .exceptionally(this::handleException)
                                 .join());
                         return;

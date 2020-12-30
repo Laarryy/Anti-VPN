@@ -160,6 +160,14 @@ public class GenericIPManager implements IPManager {
         });
     }
 
+    public double getMinConsensusValue() throws APIException {
+        CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
+        if (cachedConfig == null) {
+            throw new APIException(false, "Cached config could not be fetched.");
+        }
+        return cachedConfig.getVPNAlgorithmConsensus();
+    }
+
     private @NonNull IPModel calculateIpResult(@NonNull String ip, boolean useCache) throws APIException {
         CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
         if (cachedConfig == null) {

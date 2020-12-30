@@ -143,4 +143,17 @@ public interface IPManager {
      * @throws APIException in the result if a result could not be obtained
      */
     @NonNull CompletableFuture<Double> consensus(@NonNull String ip, boolean useCache);
+
+    /**
+     * Returns the minimum consensus value from
+     * AntiVPN's configuration.
+     *
+     * <p>This value is the minimum consensus needed
+     * for an IP to be considered "bad" while running
+     * in consensus mode.</p>
+     *
+     * @return the minimum consensus value
+     * @throws APIException if the configuration could not be retrieved
+     */
+    double getMinConsensusValue() throws APIException;
 }

@@ -77,6 +77,7 @@ public class ConfigurationFileUtil {
                 .mcleaksActionCommands(getMcLeaksActionCommands(config, debug, console))
                 .vpnAlgorithmMethod(vpnAlgorithmMethod)
                 .vpnAlgorithmConsensus(getVpnAlgorithmConsensus(config, vpnAlgorithmMethod == AlgorithmMethod.CONSESNSUS, debug, console))
+                .mcleaksKey(config.node("mcleaks", "key").getString(""))
                 .serverId(serverId)
                 .build();
 

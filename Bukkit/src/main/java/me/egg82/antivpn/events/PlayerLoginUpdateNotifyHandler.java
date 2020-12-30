@@ -1,11 +1,9 @@
 package me.egg82.antivpn.events;
 
 import co.aikar.commands.CommandManager;
-import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 import me.egg82.antivpn.config.ConfigUtil;
-import me.egg82.antivpn.extended.Configuration;
 import me.egg82.antivpn.lang.Message;
 import ninja.egg82.service.ServiceLocator;
 import ninja.egg82.service.ServiceNotFoundException;
@@ -15,6 +13,7 @@ import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.plugin.Plugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.spongepowered.configurate.ConfigurationNode;
 
 public class PlayerLoginUpdateNotifyHandler implements Consumer<PlayerLoginEvent> {
     private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -32,8 +31,8 @@ public class PlayerLoginUpdateNotifyHandler implements Consumer<PlayerLoginEvent
             return;
         }
 
-        Optional<Configuration> config = ConfigUtil.getConfig();
-        if (!config.isPresent()) {
+        ConfigurationNode config = ConfigUtil.getConfig();
+        if (config == null) {
             return;
         }
 
@@ -46,7 +45,7 @@ public class PlayerLoginUpdateNotifyHandler implements Consumer<PlayerLoginEvent
             return;
         }
 
-        if (!config.get().getNode("update", "check").getBoolean(true)) {
+        if (!config.node("update", "check").getBoolean(true)) {
             return;
         }
 
@@ -55,7 +54,7 @@ public class PlayerLoginUpdateNotifyHandler implements Consumer<PlayerLoginEvent
                 return;
             }
 
-            if (config.get().getNode("update", "notify").getBoolean(true)) {
+            if (config.node("update", "notify").getBoolean(true)) {
                 try {
                     String version = updater.getLatestVersion().get();
                     Bukkit.getScheduler().runTask(plugin, () -> commandManager.getCommandIssuer(event.getPlayer()).sendInfo(Message.GENERAL__UPDATE, "{version}", version));

@@ -80,8 +80,6 @@ public class AntiVPN {
     private final List<BukkitEventSubscriber<?>> events = new ArrayList<>();
     private final IntList tasks = new IntArrayList();
 
-    private Metrics metrics = null;
-
     private final Plugin plugin;
     private final boolean isBukkit;
 
@@ -220,7 +218,7 @@ public class AntiVPN {
         CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
 
         GenericIPManager ipManager = new GenericIPManager(sourceManager, cachedConfig.getCacheTime().getTime(), cachedConfig.getCacheTime().getUnit());
-        BukkitPlayerManager playerManager = new BukkitPlayerManager(cachedConfig.getThreads(), cachedConfig.getMCLeaksKey(), cachedConfig.getCacheTime().getTime(), cachedConfig.getCacheTime().getUnit());
+        BukkitPlayerManager playerManager = new BukkitPlayerManager(cachedConfig.getThreads(), cachedConfig.getMcLeaksKey(), cachedConfig.getCacheTime().getTime(), cachedConfig.getCacheTime().getUnit());
         Platform platform = new BukkitPlatform(System.currentTimeMillis());
         PluginMetadata metadata = new BukkitPluginMetadata(plugin.getDescription().getVersion());
         VPNAPI api = new GenericVPNAPI(platform, metadata, ipManager, playerManager, sourceManager, cachedConfig);
@@ -328,7 +326,7 @@ public class AntiVPN {
 
     private void loadEvents() {
         events.add(BukkitEvents.subscribe(plugin, PlayerLoginEvent.class, EventPriority.LOW).handler(e -> new PlayerLoginUpdateNotifyHandler(plugin, commandManager).accept(e)));
-        eventHolders.add(new PlayerEvents(plugin));
+        eventHolders.add(new PlayerEvents(plugin, consoleCommandIssuer));
     }
 
     private void loadTasks() {
@@ -359,7 +357,7 @@ public class AntiVPN {
             if (ConfigUtil.getDebugOrFalse()) {
                 consoleCommandIssuer.sendMessage(LogUtil.HEADING + "<c2>Running actions on async pre-login.</c2>");
             }
-            LuckPermsHook.create(plugin, luckperms);
+            LuckPermsHook.create(plugin, luckperms, consoleCommandIssuer);
         } else {
             consoleCommandIssuer.sendInfo(Message.GENERAL__HOOK_DISABLE, "{plugin}", "LuckPerms");
             Plugin vault;
@@ -368,7 +366,7 @@ public class AntiVPN {
                 if (ConfigUtil.getDebugOrFalse()) {
                     consoleCommandIssuer.sendMessage(LogUtil.HEADING + "<c2>Running actions on async pre-login.</c2>");
                 }
-                VaultHook.create(plugin, vault);
+                VaultHook.create(plugin, vault, consoleCommandIssuer);
             } else {
                 consoleCommandIssuer.sendInfo(Message.GENERAL__HOOK_DISABLE, "{plugin}", "Vault");
                 if (ConfigUtil.getDebugOrFalse()) {
@@ -379,7 +377,7 @@ public class AntiVPN {
     }
 
     private void loadMetrics() {
-        metrics = new Metrics(plugin, 3249); // TODO: Change ID when bStats finally allows multiple plugins of the same name
+        Metrics metrics = new Metrics(plugin, 3249); // TODO: Change ID when bStats finally allows multiple plugins of the same name
         metrics.addCustomChart(new Metrics.SingleLineChart("blocked_vpns", () -> {
             ConfigurationNode config = ConfigUtil.getConfig();
             if (config == null) {
