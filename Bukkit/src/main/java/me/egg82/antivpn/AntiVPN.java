@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Level;
 import me.egg82.antivpn.api.APIRegistrationUtil;
 import me.egg82.antivpn.api.GenericVPNAPI;
@@ -37,7 +38,6 @@ import me.egg82.antivpn.events.EventHolder;
 import me.egg82.antivpn.events.PlayerEvents;
 import me.egg82.antivpn.events.PlayerLoginUpdateNotifyHandler;
 import me.egg82.antivpn.hooks.*;
-import me.egg82.antivpn.hooks.plan.AnalyticsUtil;
 import me.egg82.antivpn.lang.LanguageFileUtil;
 import me.egg82.antivpn.lang.Message;
 import me.egg82.antivpn.lang.PluginMessageFormatter;
@@ -376,6 +376,14 @@ public class AntiVPN {
         }
     }
 
+    private static final AtomicLong blockedVPNs = new AtomicLong(0L);
+
+    private static final AtomicLong blockedMCLeaks = new AtomicLong(0L);
+
+    public static void incrementBlockedVPNs() { blockedVPNs.getAndIncrement(); }
+
+    public static void incrementBlockedMCLeaks() { blockedMCLeaks.getAndIncrement(); }
+
     private void loadMetrics() {
         Metrics metrics = new Metrics(plugin, 3249); // TODO: Change ID when bStats finally allows multiple plugins of the same name
         metrics.addCustomChart(new Metrics.SingleLineChart("blocked_vpns", () -> {
@@ -388,7 +396,7 @@ public class AntiVPN {
                 return null;
             }
 
-            return (int) AnalyticsUtil.getBlockedVPNs();
+            return (int) blockedVPNs.getAndSet(0L);
         }));
         metrics.addCustomChart(new Metrics.SingleLineChart("blocked_mcleaks", () -> {
             ConfigurationNode config = ConfigUtil.getConfig();
@@ -400,7 +408,7 @@ public class AntiVPN {
                 return null;
             }
 
-            return (int) AnalyticsUtil.getBlockedMCLeaks();
+            return (int) blockedMCLeaks.getAndSet(0L);
         }));
         metrics.addCustomChart(new Metrics.AdvancedPie("storage", () -> {
             ConfigurationNode config = ConfigUtil.getConfig();

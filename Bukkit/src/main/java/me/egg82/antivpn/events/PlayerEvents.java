@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletionException;
+import me.egg82.antivpn.AntiVPN;
 import me.egg82.antivpn.api.APIException;
 import me.egg82.antivpn.api.VPNAPIProvider;
 import me.egg82.antivpn.api.model.ip.AlgorithmMethod;
@@ -18,7 +19,6 @@ import me.egg82.antivpn.config.ConfigUtil;
 import me.egg82.antivpn.hooks.LuckPermsHook;
 import me.egg82.antivpn.hooks.PlaceholderAPIHook;
 import me.egg82.antivpn.hooks.VaultHook;
-import me.egg82.antivpn.hooks.plan.AnalyticsUtil;
 import me.egg82.antivpn.utils.LogUtil;
 import me.egg82.antivpn.utils.ValidationUtil;
 import ninja.egg82.events.BukkitEvents;
@@ -134,7 +134,7 @@ public class PlayerEvents extends EventHolder {
         cacheData(ip, event.getUniqueId(), cachedConfig);
 
         if (isVpn(ip, event.getName(), cachedConfig)) {
-            AnalyticsUtil.incrementBlockedVPNs();
+            AntiVPN.incrementBlockedVPNs();
             if (!cachedConfig.getVPNActionCommands().isEmpty()) {
                 tryRunCommands(cachedConfig.getVPNActionCommands(), event.getName(), event.getUniqueId(), ip);
             }
@@ -145,7 +145,7 @@ public class PlayerEvents extends EventHolder {
         }
 
         if (isMcLeaks(event.getName(), event.getUniqueId(), cachedConfig)) {
-            AnalyticsUtil.incrementBlockedMCLeaks();
+            AntiVPN.incrementBlockedMCLeaks();
             if (!cachedConfig.getMCLeaksActionCommands().isEmpty()) {
                 tryRunCommands(cachedConfig.getMCLeaksActionCommands(), event.getName(), event.getUniqueId(), ip);
             }
@@ -269,7 +269,7 @@ public class PlayerEvents extends EventHolder {
         }
 
         if (isVpn(ip, event.getPlayer().getName(), cachedConfig)) {
-            AnalyticsUtil.incrementBlockedVPNs();
+            AntiVPN.incrementBlockedVPNs();
             if (!cachedConfig.getVPNActionCommands().isEmpty()) {
                 tryRunCommands(cachedConfig.getVPNActionCommands(), event.getPlayer().getName(), event.getPlayer().getUniqueId(), ip);
             }
@@ -280,7 +280,7 @@ public class PlayerEvents extends EventHolder {
         }
 
         if (isMcLeaks(event.getPlayer().getName(), event.getPlayer().getUniqueId(), cachedConfig)) {
-            AnalyticsUtil.incrementBlockedMCLeaks();
+            AntiVPN.incrementBlockedMCLeaks();
             if (!cachedConfig.getMCLeaksActionCommands().isEmpty()) {
                 tryRunCommands(cachedConfig.getMCLeaksActionCommands(), event.getPlayer().getName(), event.getPlayer().getUniqueId(), ip);
             }
