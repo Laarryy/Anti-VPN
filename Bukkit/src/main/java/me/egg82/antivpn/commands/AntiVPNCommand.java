@@ -6,8 +6,6 @@ import co.aikar.commands.CommandIssuer;
 import co.aikar.commands.annotation.*;
 import co.aikar.taskchain.TaskChainFactory;
 import me.egg82.antivpn.commands.internal.*;
-import ninja.egg82.service.ServiceLocator;
-import ninja.egg82.service.ServiceNotFoundException;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.Plugin;
