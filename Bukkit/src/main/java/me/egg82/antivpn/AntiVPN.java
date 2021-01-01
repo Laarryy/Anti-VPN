@@ -43,7 +43,6 @@ import me.egg82.antivpn.messaging.MessagingService;
 import me.egg82.antivpn.messaging.ServerIDUtil;
 import me.egg82.antivpn.services.GameAnalyticsErrorHandler;
 import me.egg82.antivpn.storage.StorageService;
-import me.egg82.antivpn.utils.LogUtil;
 import me.egg82.antivpn.utils.ValidationUtil;
 import ninja.egg82.events.BukkitEventSubscriber;
 import ninja.egg82.events.BukkitEvents;
@@ -115,6 +114,8 @@ public class AntiVPN {
         taskFactory = BukkitTaskChainFactory.create(plugin);
         commandManager = new PaperCommandManager(plugin);
         commandManager.enableUnstableAPI("help");
+
+        setChatColors();
 
         consoleCommandIssuer = commandManager.getCommandIssuer(plugin.getServer().getConsoleSender());
 
@@ -203,6 +204,10 @@ public class AntiVPN {
 
         commandManager.setFormat(MessageType.ERROR, new PluginMessageFormatter(commandManager, Message.GENERAL__HEADER));
         commandManager.setFormat(MessageType.INFO, new PluginMessageFormatter(commandManager, Message.GENERAL__HEADER));
+        setChatColors();
+    }
+
+    private void setChatColors() {
         commandManager.setFormat(MessageType.ERROR, ChatColor.DARK_RED, ChatColor.YELLOW, ChatColor.AQUA, ChatColor.WHITE);
         commandManager.setFormat(MessageType.INFO, ChatColor.WHITE, ChatColor.YELLOW, ChatColor.AQUA, ChatColor.GREEN, ChatColor.RED, ChatColor.GOLD, ChatColor.BLUE, ChatColor.GRAY, ChatColor.DARK_RED);
     }
@@ -354,7 +359,7 @@ public class AntiVPN {
         if ((luckperms = manager.getPlugin("LuckPerms")) != null) {
             consoleCommandIssuer.sendInfo(Message.GENERAL__HOOK_ENABLE, "{plugin}", "LuckPerms");
             if (ConfigUtil.getDebugOrFalse()) {
-                consoleCommandIssuer.sendMessage(LogUtil.HEADING + "<c2>Running actions on async pre-login.</c2>");
+                consoleCommandIssuer.sendMessage("<c2>Running actions on async pre-login.</c2>");
             }
             LuckPermsHook.create(plugin, luckperms, consoleCommandIssuer);
         } else {
@@ -363,13 +368,13 @@ public class AntiVPN {
             if ((vault = manager.getPlugin("Vault")) != null) {
                 consoleCommandIssuer.sendInfo(Message.GENERAL__HOOK_ENABLE, "{plugin}", "Vault");
                 if (ConfigUtil.getDebugOrFalse()) {
-                    consoleCommandIssuer.sendMessage(LogUtil.HEADING + "<c2>Running actions on async pre-login.</c2>");
+                    consoleCommandIssuer.sendMessage("<c2>Running actions on async pre-login.</c2>");
                 }
                 VaultHook.create(plugin, vault, consoleCommandIssuer);
             } else {
                 consoleCommandIssuer.sendInfo(Message.GENERAL__HOOK_DISABLE, "{plugin}", "Vault");
                 if (ConfigUtil.getDebugOrFalse()) {
-                    consoleCommandIssuer.sendMessage(LogUtil.HEADING + "<c2>Running actions on sync login.</c2>");
+                    consoleCommandIssuer.sendMessage("<c2>Running actions on sync login.</c2>");
                 }
             }
         }

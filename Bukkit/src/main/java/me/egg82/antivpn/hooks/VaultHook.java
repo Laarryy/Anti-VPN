@@ -2,7 +2,6 @@ package me.egg82.antivpn.hooks;
 
 import co.aikar.commands.CommandIssuer;
 import me.egg82.antivpn.config.ConfigUtil;
-import me.egg82.antivpn.utils.LogUtil;
 import net.milkbowl.vault.permission.Permission;
 import ninja.egg82.events.BukkitEvents;
 import ninja.egg82.service.ServiceLocator;
@@ -34,12 +33,12 @@ public class VaultHook implements PluginHook {
         final RegisteredServiceProvider<Permission> permissionProvider = Bukkit.getServicesManager().getRegistration(Permission.class);
         if (permissionProvider != null) {
             if (ConfigUtil.getDebugOrFalse()) {
-                console.sendMessage(LogUtil.HEADING + "<c2>Found Vault permissions provider.</c2>");
+                console.sendMessage("<c2>Found Vault permissions provider.</c2>");
             }
             permission = permissionProvider.getProvider();
         } else {
             if (ConfigUtil.getDebugOrFalse()) {
-                console.sendMessage(LogUtil.HEADING + "<c9>Could not find Vault permissions provider.</c9>");
+                console.sendMessage("<c9>Could not find Vault permissions provider.</c9>");
             }
             permission = null;
         }
@@ -49,7 +48,7 @@ public class VaultHook implements PluginHook {
 
     public @Nullable Permission getPermission() {
         if (permission == null && ConfigUtil.getDebugOrFalse()) {
-            console.sendMessage(LogUtil.HEADING + "<c2>Returning null Vault permissions provider.</c2>");
+            console.sendMessage("<c2>Returning null Vault permissions provider.</c2>");
         }
         return this.permission;
     }

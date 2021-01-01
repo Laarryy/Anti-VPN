@@ -4,7 +4,6 @@ import co.aikar.commands.CommandIssuer;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import me.egg82.antivpn.config.ConfigUtil;
-import me.egg82.antivpn.utils.LogUtil;
 import net.luckperms.api.LuckPermsProvider;
 import net.luckperms.api.context.ContextManager;
 import net.luckperms.api.context.ImmutableContextSet;
@@ -56,13 +55,13 @@ public class LuckPermsHook implements PluginHook {
         }
         if (user == null) {
             if (ConfigUtil.getDebugOrFalse()) {
-                console.sendMessage(LogUtil.HEADING + "<c2>UUID</c2> <c1>" + uuid + "</c1><c2> is not loaded, forcing data load..</c2>");
+                console.sendMessage("<c2>UUID</c2> <c1>" + uuid + "</c1><c2> is not loaded, forcing data load..</c2>");
             }
             CompletableFuture<User> future = userManager.loadUser(uuid);
             user = future.join(); // Expensive
         } else {
             if (ConfigUtil.getDebugOrFalse()) {
-                console.sendMessage(LogUtil.HEADING + "<c2>UUID</c2> <c1>" + uuid + "</c1><c2> is previously loaded, using cached data..</c2>");
+                console.sendMessage("<c2>UUID</c2> <c1>" + uuid + "</c1><c2> is previously loaded, using cached data..</c2>");
             }
         }
 

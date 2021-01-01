@@ -19,7 +19,6 @@ import me.egg82.antivpn.config.ConfigUtil;
 import me.egg82.antivpn.hooks.LuckPermsHook;
 import me.egg82.antivpn.hooks.PlaceholderAPIHook;
 import me.egg82.antivpn.hooks.VaultHook;
-import me.egg82.antivpn.utils.LogUtil;
 import me.egg82.antivpn.utils.ValidationUtil;
 import ninja.egg82.events.BukkitEvents;
 import ninja.egg82.service.ServiceLocator;
@@ -63,7 +62,7 @@ public class PlayerEvents extends EventHolder {
     private void checkPerms(@NonNull AsyncPlayerPreLoginEvent event) {
         if (Bukkit.hasWhitelist() && !isWhitelisted(event.getUniqueId())) {
             if (ConfigUtil.getDebugOrFalse()) {
-                console.sendMessage(LogUtil.HEADING + "<c1>" + event.getName() + " (" + event.getUniqueId() + ")</c1><c2>" + " is not whitelisted while the server is in whitelist mode. Ignoring.</c2>");
+                console.sendMessage("<c1>" + event.getName() + " (" + event.getUniqueId() + ")</c1><c2>" + " is not whitelisted while the server is in whitelist mode. Ignoring.</c2>");
             }
             return;
         }
@@ -102,7 +101,7 @@ public class PlayerEvents extends EventHolder {
     private void checkPermsPlayer(@NonNull AsyncPlayerPreLoginEvent event, boolean hasBypass) {
         if (hasBypass) {
             if (ConfigUtil.getDebugOrFalse()) {
-                console.sendMessage(LogUtil.HEADING + "<c1>" + event.getName() + "</c1> <c2>bypasses pre-check. Ignoring.</c2>");
+                console.sendMessage("<c1>" + event.getName() + "</c1> <c2>bypasses pre-check. Ignoring.</c2>");
             }
             return;
         }
@@ -122,12 +121,12 @@ public class PlayerEvents extends EventHolder {
         for (String testAddress : cachedConfig.getIgnoredIps()) {
             if (ValidationUtil.isValidIp(testAddress) && ip.equalsIgnoreCase(testAddress)) {
                 if (ConfigUtil.getDebugOrFalse()) {
-                    console.sendMessage(LogUtil.HEADING + "<c1>" + event.getName() + "</c1> <c2>is using an ignored IP</c2> <c1>" + ip + "</c1><c2>. Ignoring.</c2>");
+                    console.sendMessage("<c1>" + event.getName() + "</c1> <c2>is using an ignored IP</c2> <c1>" + ip + "</c1><c2>. Ignoring.</c2>");
                 }
                 return;
             } else if (ValidationUtil.isValidIpRange(testAddress) && rangeContains(testAddress, ip)) {
                 if (ConfigUtil.getDebugOrFalse()) {
-                    console.sendMessage(LogUtil.HEADING + "<c1>" + event.getName() + "</c1> <c2>is under an ignored range</c2> <c1>" + testAddress + " (" + ip + ")" + "</c1><c2>. Ignoring.</c2>");
+                    console.sendMessage("<c1>" + event.getName() + "</c1> <c2>is under an ignored range</c2> <c1>" + testAddress + " (" + ip + ")" + "</c1><c2>. Ignoring.</c2>");
                 }
                 return;
             }
@@ -251,7 +250,7 @@ public class PlayerEvents extends EventHolder {
 
         if (event.getPlayer().hasPermission("avpn.bypass")) {
             if (ConfigUtil.getDebugOrFalse()) {
-                console.sendMessage(LogUtil.HEADING + "<c1>" + event.getPlayer().getName() + "</c1> <c2>bypasses actions. Ignoring.</c2>");
+                console.sendMessage("<c1>" + event.getPlayer().getName() + "</c1> <c2>bypasses actions. Ignoring.</c2>");
             }
             return;
         }
@@ -259,12 +258,12 @@ public class PlayerEvents extends EventHolder {
         for (String testAddress : cachedConfig.getIgnoredIps()) {
             if (ValidationUtil.isValidIp(testAddress) && ip.equalsIgnoreCase(testAddress)) {
                 if (ConfigUtil.getDebugOrFalse()) {
-                    console.sendMessage(LogUtil.HEADING + "<c1>" + event.getPlayer().getName() + "</c1> <c2>is using an ignored IP</c2> <c1>" + ip + "</c1><c2>. Ignoring.</c2>");
+                    console.sendMessage("<c1>" + event.getPlayer().getName() + "</c1> <c2>is using an ignored IP</c2> <c1>" + ip + "</c1><c2>. Ignoring.</c2>");
                 }
                 return;
             } else if (ValidationUtil.isValidIpRange(testAddress) && rangeContains(testAddress, ip)) {
                 if (ConfigUtil.getDebugOrFalse()) {
-                    console.sendMessage(LogUtil.HEADING + "<c1>" + event.getPlayer().getName() + "</c1> <c2>is under an ignored range</c2> <c1>" + testAddress + " (" + ip + ")" + "</c1><c2>. Ignoring.</c2>");
+                    console.sendMessage("<c1>" + event.getPlayer().getName() + "</c1> <c2>is under an ignored range</c2> <c1>" + testAddress + " (" + ip + ")" + "</c1><c2>. Ignoring.</c2>");
                 }
                 return;
             }
@@ -318,17 +317,17 @@ public class PlayerEvents extends EventHolder {
 
             if (isVPN) {
                 if (cachedConfig.getDebug()) {
-                    console.sendMessage(LogUtil.HEADING + "<c1>" + name + "</c1> <c9>found using a VPN. Running required actions.</c9>");
+                    console.sendMessage("<c1>" + name + "</c1> <c9>found using a VPN. Running required actions.</c9>");
                 }
             } else {
                 if (cachedConfig.getDebug()) {
-                    console.sendMessage(LogUtil.HEADING + "<c1>" + name + "</c1> <c4>passed VPN check.</c4>");
+                    console.sendMessage("<c1>" + name + "</c1> <c4>passed VPN check.</c4>");
                 }
             }
             return isVPN;
         } else {
             if (cachedConfig.getDebug()) {
-                console.sendMessage(LogUtil.HEADING + "<c2>Plugin set to API-only. Ignoring VPN check for</c2> <c1>" + name + "</c1>");
+                console.sendMessage("<c2>Plugin set to API-only. Ignoring VPN check for</c2> <c1>" + name + "</c1>");
             }
         }
 
@@ -350,17 +349,17 @@ public class PlayerEvents extends EventHolder {
 
             if (isMCLeaks) {
                 if (cachedConfig.getDebug()) {
-                    console.sendMessage(LogUtil.HEADING + "<c1>" + name + "</c1> <c9>found using an MCLeaks account. Running required actions.</c9>");
+                    console.sendMessage("<c1>" + name + "</c1> <c9>found using an MCLeaks account. Running required actions.</c9>");
                 }
             } else {
                 if (cachedConfig.getDebug()) {
-                    console.sendMessage(LogUtil.HEADING + "<c1>" + name + "</c1> <c4>passed MCLeaks check.</c4>");
+                    console.sendMessage("<c1>" + name + "</c1> <c4>passed MCLeaks check.</c4>");
                 }
             }
             return isMCLeaks;
         } else {
             if (cachedConfig.getDebug()) {
-                console.sendMessage(LogUtil.HEADING + "<c2>Plugin set to API-only. Ignoring MCLeaks check for</c2> <c1>" + name + "</c1>");
+                console.sendMessage("<c2>Plugin set to API-only. Ignoring MCLeaks check for</c2> <c1>" + name + "</c1>");
             }
         }
 
