@@ -14,6 +14,7 @@ import me.egg82.antivpn.messaging.*;
 import me.egg82.antivpn.storage.MySQLStorageService;
 import me.egg82.antivpn.storage.SQLiteStorageService;
 import me.egg82.antivpn.storage.StorageService;
+import me.egg82.antivpn.utils.LogUtil;
 import me.egg82.antivpn.utils.PacketUtil;
 import me.egg82.antivpn.utils.TimeUtil;
 import me.egg82.antivpn.utils.ValidationUtil;
@@ -51,12 +52,12 @@ public class ConfigurationFileUtil {
             Reflections.log = null;
         }
         if (debug) {
-            console.sendMessage("<c2>Debug</c2> <c1>enabled</c1>");
+            console.sendMessage(LogUtil.HEADING + "<c2>Debug</c2> <c1>enabled</c1>");
         }
 
         UUID serverId = ServerIDUtil.getId(new File(dataDirectory, "server-id.txt"));
         if (debug) {
-            console.sendMessage("<c2>Server ID:</c2> <c1>" + serverId.toString() + "</c1>");
+            console.sendMessage(LogUtil.HEADING + "<c2>Server ID:</c2> <c1>" + serverId.toString() + "</c1>");
         }
 
         AlgorithmMethod vpnAlgorithmMethod = getVpnAlgorithmMethod(config, debug, console);
@@ -89,8 +90,8 @@ public class ConfigurationFileUtil {
         setSources(config, debug, console, sourceManager);
 
         if (debug) {
-            console.sendMessage("<c2>Source threads:</c2> <c1>" + cachedConfig.getThreads() + "</c1>");
-            console.sendMessage("<c2>Source timeout:</c2> <c1>" + cachedConfig.getTimeout() + "ms</c1>");
+            console.sendMessage(LogUtil.HEADING + "<c2>Source threads:</c2> <c1>" + cachedConfig.getThreads() + "</c1>");
+            console.sendMessage(LogUtil.HEADING + "<c2>Source timeout:</c2> <c1>" + cachedConfig.getTimeout() + "ms</c1>");
         }
     }
 
@@ -107,10 +108,10 @@ public class ConfigurationFileUtil {
 
         if (retVal == null) {
             retVal = Locale.ENGLISH;
-            console.sendMessage("<c9>lang</c9> <c1>" + configLanguage + "</c1> <c9>is not a valid language. Using default value of</c9> <c1>" + (retVal.getCountry() == null || retVal.getCountry().isEmpty() ? retVal.getLanguage() : retVal.getLanguage() + "-" + retVal.getCountry()) + "</c1>");
+            console.sendMessage(LogUtil.HEADING + "<c9>lang</c9> <c1>" + configLanguage + "</c1> <c9>is not a valid language. Using default value of</c9> <c1>" + (retVal.getCountry() == null || retVal.getCountry().isEmpty() ? retVal.getLanguage() : retVal.getLanguage() + "-" + retVal.getCountry()) + "</c1>");
         }
         if (debug) {
-            console.sendMessage("<c2>Default language:</c2> <c1>" + (retVal.getCountry() == null || retVal.getCountry().isEmpty() ? retVal.getLanguage() : retVal.getLanguage() + "-" + retVal.getCountry()) + "</c1>");
+            console.sendMessage(LogUtil.HEADING + "<c2>Default language:</c2> <c1>" + (retVal.getCountry() == null || retVal.getCountry().isEmpty() ? retVal.getLanguage() : retVal.getLanguage() + "-" + retVal.getCountry()) + "</c1>");
         }
 
         return retVal;
@@ -127,7 +128,7 @@ public class ConfigurationFileUtil {
             }
 
             if (debug) {
-                console.sendMessage("<c2>Added storage:</c2> <c1>" + service.getName() + " (" + service.getClass().getSimpleName() + ")</c1>");
+                console.sendMessage(LogUtil.HEADING + "<c2>Added storage:</c2> <c1>" + service.getName() + " (" + service.getClass().getSimpleName() + ")</c1>");
             }
             retVal.add(service);
         }
@@ -138,7 +139,7 @@ public class ConfigurationFileUtil {
     private static @Nullable StorageService getStorageOf(@NonNull String name, @NonNull ConfigurationNode engineNode, @NonNull File dataDirectory, @NonNull PoolSettings poolSettings, boolean debug, @NonNull CommandIssuer console) {
         if (!engineNode.node("enabled").getBoolean()) {
             if (debug) {
-                console.sendMessage("<c9>Engine</c9> <c1>" + name + "</c1> <c9>is disabled. Removing.</c9>");
+                console.sendMessage(LogUtil.HEADING + "<c9>Engine</c9> <c1>" + name + "</c1> <c9>is disabled. Removing.</c9>");
             }
             return null;
         }
@@ -149,14 +150,14 @@ public class ConfigurationFileUtil {
             case "mysql": {
                 AddressPort url = new AddressPort(connectionNode.key() + ".address", connectionNode.node("address").getString("127.0.0.1:3306"), 3306);
                 if (debug) {
-                    console.sendMessage("<c2>Creating engine</c2> <c1>" + name + "</c1> <c2>of type mysql with address</c2> <c1>" + url.getAddress() + ":" + url.getPort() + "/" + connectionNode.node("database").getString("anti_vpn") + "</c1>");
+                    console.sendMessage(LogUtil.HEADING + "<c2>Creating engine</c2> <c1>" + name + "</c1> <c2>of type mysql with address</c2> <c1>" + url.getAddress() + ":" + url.getPort() + "/" + connectionNode.node("database").getString("anti_vpn") + "</c1>");
                 }
                 String options = connectionNode.node("options").getString("useSSL=false&useUnicode=true&characterEncoding=utf8");
                 if (options.length() > 0 && options.charAt(0) == '?') {
                     options = options.substring(1);
                 }
                 if (debug) {
-                    console.sendMessage("<c2>Setting options for engine</c2> <c1>" + name + "</c1> <c2>to</c2> <c1>" + options + "</c1>");
+                    console.sendMessage(LogUtil.HEADING + "<c2>Setting options for engine</c2> <c1>" + name + "</c1> <c2>to</c2> <c1>" + options.replace("&", "&&") + "</c1>");
                 }
                 try {
                     return MySQLStorageService.builder(name)
@@ -174,14 +175,14 @@ public class ConfigurationFileUtil {
             case "sqlite": {
                 AddressPort url = new AddressPort(connectionNode.key() + ".address", connectionNode.node("address").getString("127.0.0.1:6379"), 6379);
                 if (debug) {
-                    console.sendMessage("<c2>Creating engine</c2> <c1>" + name + "</c1> <c2>of type redis with address</c2> <c1>" + url.getAddress() + ":" + url.getPort() + "</c1>");
+                    console.sendMessage(LogUtil.HEADING + "<c2>Creating engine</c2> <c1>" + name + "</c1> <c2>of type redis with address</c2> <c1>" + url.getAddress() + ":" + url.getPort() + "</c1>");
                 }
                 String options = connectionNode.node("options").getString("useUnicode=true&characterEncoding=utf8");
                 if (options.length() > 0 && options.charAt(0) == '?') {
                     options = options.substring(1);
                 }
                 if (debug) {
-                    console.sendMessage("<c2>Setting options for engine</c2> <c1>" + name + "</c1> <c2>to</c2> <c1>" + options + "</c1>");
+                    console.sendMessage(LogUtil.HEADING + "<c2>Setting options for engine</c2> <c1>" + name + "</c1> <c2>to</c2> <c1>" + options.replace("&", "&&") + "</c1>");
                 }
                 try {
                     return SQLiteStorageService.builder(name)
@@ -196,7 +197,7 @@ public class ConfigurationFileUtil {
                 break;
             }
             default: {
-                console.sendMessage("<c9>Unknown storage type</c9> <c1>" + type + "</c1> <c9>in engine</c9> <c1>" + name + "</c1>");
+                console.sendMessage(LogUtil.HEADING + "<c9>Unknown storage type</c9> <c1>" + type + "</c1> <c9>in engine</c9> <c1>" + name + "</c1>");
                 break;
             }
         }
@@ -214,7 +215,7 @@ public class ConfigurationFileUtil {
             }
 
             if (debug) {
-                console.sendMessage("<c2>Added messaging:</c2> <c1>" + service.getName() + " (" + service.getClass().getSimpleName() + ")</c1>");
+                console.sendMessage(LogUtil.HEADING + "<c2>Added messaging:</c2> <c1>" + service.getName() + " (" + service.getClass().getSimpleName() + ")</c1>");
             }
             retVal.add(service);
         }
@@ -225,7 +226,7 @@ public class ConfigurationFileUtil {
     private static @Nullable MessagingService getMessagingOf(@NonNull String name, @NonNull ConfigurationNode engineNode, @NonNull UUID serverId, @NonNull MessagingHandler handler, @NonNull PoolSettings poolSettings, boolean debug, @NonNull CommandIssuer console) {
         if (!engineNode.node("enabled").getBoolean()) {
             if (debug) {
-                console.sendMessage("<c9>Engine</c9> <c1>" + name + "</c1> <c9>is disabled. Removing.</c9>");
+                console.sendMessage(LogUtil.HEADING + "<c9>Engine</c9> <c1>" + name + "</c1> <c9>is disabled. Removing.</c9>");
             }
             return null;
         }
@@ -236,7 +237,7 @@ public class ConfigurationFileUtil {
             case "rabbitmq": {
                 AddressPort url = new AddressPort(connectionNode.key() + ".address", connectionNode.node("address").getString("127.0.0.1:5672"), 5672);
                 if (debug) {
-                    console.sendMessage("<c2>Creating engine</c2> <c1>" + name + "</c1> <c2>of type rabbitmq with address</c2> <c1>" + url.getAddress() + ":" + url.getPort() + connectionNode.node("v-host").getString("/") + "</c1>");
+                    console.sendMessage(LogUtil.HEADING + "<c2>Creating engine</c2> <c1>" + name + "</c1> <c2>of type rabbitmq with address</c2> <c1>" + url.getAddress() + ":" + url.getPort() + connectionNode.node("v-host").getString("/") + "</c1>");
                 }
                 try {
                     return RabbitMQMessagingService.builder(name, serverId, handler)
@@ -252,7 +253,7 @@ public class ConfigurationFileUtil {
             case "redis": {
                 AddressPort url = new AddressPort(connectionNode.key() + ".address", connectionNode.node("address").getString("127.0.0.1:6379"), 6379);
                 if (debug) {
-                    console.sendMessage("<c2>Creating engine</c2> <c1>" + name + "</c1> <c2>of type redis with address</c2> <c1>" + url.getAddress() + ":" + url.getPort() + "</c1>");
+                    console.sendMessage(LogUtil.HEADING + "<c2>Creating engine</c2> <c1>" + name + "</c1> <c2>of type redis with address</c2> <c1>" + url.getAddress() + ":" + url.getPort() + "</c1>");
                 }
                 try {
                     return RedisMessagingService.builder(name, serverId, handler)
@@ -267,7 +268,7 @@ public class ConfigurationFileUtil {
                 break;
             }
             default: {
-                console.sendMessage("<c9>Unknown messaging type</c9> <c1>" + type + "</c1> <c9>in engine</c9> <c1>" + name + "</c1>");
+                console.sendMessage(LogUtil.HEADING + "<c9>Unknown messaging type</c9> <c1>" + type + "</c1> <c9>in engine</c9> <c1>" + name + "</c1>");
                 break;
             }
         }
@@ -277,12 +278,12 @@ public class ConfigurationFileUtil {
     private static TimeUtil.Time getSourceCacheTime(@NonNull ConfigurationNode config, boolean debug, @NonNull CommandIssuer console) {
         TimeUtil.Time retVal = TimeUtil.getTime(config.node("sources", "cache-time").getString("6hours"));
         if (retVal == null) {
-            console.sendMessage("<c2>sources.cache-time is not a valid time pattern. Using default value.<c2>");
+            console.sendMessage(LogUtil.HEADING + "<c2>sources.cache-time is not a valid time pattern. Using default value.<c2>");
             retVal = new TimeUtil.Time(6L, TimeUnit.HOURS);
         }
 
         if (debug) {
-            console.sendMessage("<c2>Source cache time:</c2> <c1>" + retVal.getMillis() + "ms (" + retVal.getTime() + " " + retVal.getUnit().name() + ")</c1>");
+            console.sendMessage(LogUtil.HEADING + "<c2>Source cache time:</c2> <c1>" + retVal.getMillis() + "ms (" + retVal.getTime() + " " + retVal.getUnit().name() + ")</c1>");
         }
         return retVal;
     }
@@ -290,12 +291,12 @@ public class ConfigurationFileUtil {
     private static TimeUtil.Time getMcLeaksCacheTime(@NonNull ConfigurationNode config, boolean debug, @NonNull CommandIssuer console) {
         TimeUtil.Time retVal = TimeUtil.getTime(config.node("mcleaks", "cache-time").getString("1day"));
         if (retVal == null) {
-            console.sendMessage("<c2>mcleaks.cache-time is not a valid time pattern. Using default value.<c2>");
+            console.sendMessage(LogUtil.HEADING + "<c2>mcleaks.cache-time is not a valid time pattern. Using default value.<c2>");
             retVal = new TimeUtil.Time(1L, TimeUnit.DAYS);
         }
 
         if (debug) {
-            console.sendMessage("<c2>MCLeaks cache time:</c2> <c1>" + retVal.getMillis() + "ms (" + retVal.getTime() + " " + retVal.getUnit().name() + ")</c1>");
+            console.sendMessage(LogUtil.HEADING + "<c2>MCLeaks cache time:</c2> <c1>" + retVal.getMillis() + "ms (" + retVal.getTime() + " " + retVal.getUnit().name() + ")</c1>");
         }
         return retVal;
     }
@@ -303,12 +304,12 @@ public class ConfigurationFileUtil {
     private static TimeUtil.Time getCacheTime(@NonNull ConfigurationNode config, boolean debug, @NonNull CommandIssuer console) {
         TimeUtil.Time retVal = TimeUtil.getTime(config.node("connection", "cache-time").getString("1minute"));
         if (retVal == null) {
-            console.sendMessage("<c2>connection.cache-time is not a valid time pattern. Using default value.<c2>");
+            console.sendMessage(LogUtil.HEADING + "<c2>connection.cache-time is not a valid time pattern. Using default value.<c2>");
             retVal = new TimeUtil.Time(1L, TimeUnit.MINUTES);
         }
 
         if (debug) {
-            console.sendMessage("<c2>Memory cache time:</c2> <c1>" + retVal.getMillis() + "ms (" + retVal.getTime() + " " + retVal.getUnit().name() + ")</c1>");
+            console.sendMessage(LogUtil.HEADING + "<c2>Memory cache time:</c2> <c1>" + retVal.getMillis() + "ms (" + retVal.getTime() + " " + retVal.getUnit().name() + ")</c1>");
         }
         return retVal;
     }
@@ -326,12 +327,12 @@ public class ConfigurationFileUtil {
             String ip = i.next();
             if (!ValidationUtil.isValidIp(ip) && !ValidationUtil.isValidIpRange(ip)) {
                 if (debug) {
-                    console.sendMessage("<c9>Removed invalid ignore IP/range:</c9> <c1>" + ip + "</c1>");
+                    console.sendMessage(LogUtil.HEADING + "<c9>Removed invalid ignore IP/range:</c9> <c1>" + ip + "</c1>");
                 }
                 i.remove();
             } else {
                 if (debug) {
-                    console.sendMessage("<c2>Adding ignored IP or range:</c2> <c1>" + ip + "</c1>");
+                    console.sendMessage(LogUtil.HEADING + "<c2>Adding ignored IP or range:</c2> <c1>" + ip + "</c1>");
                 }
             }
         }
@@ -351,7 +352,7 @@ public class ConfigurationFileUtil {
 
         if (debug) {
             for (String action : retVal) {
-                console.sendMessage("<c2>Adding command action for VPN usage:</c2> <c1>" + action + "</c1>");
+                console.sendMessage(LogUtil.HEADING + "<c2>Adding command action for VPN usage:</c2> <c1>" + action + "</c1>");
             }
         }
 
@@ -370,7 +371,7 @@ public class ConfigurationFileUtil {
 
         if (debug) {
             for (String action : retVal) {
-                console.sendMessage("<c2>Adding command action for MCLeaks usage:</c2> <c1>" + action + "</c1>");
+                console.sendMessage(LogUtil.HEADING + "<c2>Adding command action for MCLeaks usage:</c2> <c1>" + action + "</c1>");
             }
         }
 
@@ -380,12 +381,12 @@ public class ConfigurationFileUtil {
     private static @NonNull AlgorithmMethod getVpnAlgorithmMethod(@NonNull ConfigurationNode config, boolean debug, @NonNull CommandIssuer console) {
         AlgorithmMethod retVal = AlgorithmMethod.getByName(config.node("action", "vpn", "algorithm", "method").getString("cascade"));
         if (retVal == null) {
-            console.sendMessage("<c2>action.vpn.algorithm.method is not a valid type. Using default value.<c2>");
+            console.sendMessage(LogUtil.HEADING + "<c2>action.vpn.algorithm.method is not a valid type. Using default value.<c2>");
             retVal = AlgorithmMethod.CASCADE;
         }
 
         if (debug) {
-            console.sendMessage("<c2>Using VPN algorithm:</c2> <c1>" + retVal.name() + "</c1>");
+            console.sendMessage(LogUtil.HEADING + "<c2>Using VPN algorithm:</c2> <c1>" + retVal.name() + "</c1>");
         }
 
         return retVal;
@@ -396,7 +397,7 @@ public class ConfigurationFileUtil {
         retVal = Math.max(0.0d, Math.min(1.0d, retVal));
 
         if (consensus && debug) {
-            console.sendMessage("<c2>Using consensus value:</c2> <c1>" + retVal + "</c1>");
+            console.sendMessage(LogUtil.HEADING + "<c2>Using consensus value:</c2> <c1>" + retVal + "</c1>");
         }
 
         return retVal;
@@ -408,7 +409,7 @@ public class ConfigurationFileUtil {
         List<Class<Source>> sourceClasses = PackageFilter.getClasses(Source.class, "me.egg82.antivpn.api.model.source.models", false, false, false);
         for (Class<Source> clazz : sourceClasses) {
             if (debug) {
-                console.sendMessage("<c2>Initializing source</c2> <c1>" + clazz.getSimpleName() + "</c1>");
+                console.sendMessage(LogUtil.HEADING + "<c2>Initializing source</c2> <c1>" + clazz.getSimpleName() + "</c1>");
             }
 
             try {
@@ -431,7 +432,7 @@ public class ConfigurationFileUtil {
             String s = i.next();
             if (!config.node("sources", s, "enabled").getBoolean(false)) {
                 if (debug) {
-                    console.sendMessage("<c9>Source " + s + " is disabled. Removing.</c9>");
+                    console.sendMessage(LogUtil.HEADING + "<c9>Source " + s + " is disabled. Removing.</c9>");
                 }
                 sourceManager.deregisterSource(s);
                 i.remove();
@@ -441,7 +442,7 @@ public class ConfigurationFileUtil {
             Source<? extends SourceModel> source = initializedSources.get(s);
             if (source == null) {
                 if (debug) {
-                    console.sendMessage("<c9>Source " + s + " was not found. Removing.</c9>");
+                    console.sendMessage(LogUtil.HEADING + "<c9>Source " + s + " was not found. Removing.</c9>");
                 }
                 sourceManager.deregisterSource(s);
                 i.remove();
@@ -450,7 +451,7 @@ public class ConfigurationFileUtil {
 
             if (source.isKeyRequired() && config.node("sources", s, "key").getString("").isEmpty()) {
                 if (debug) {
-                    console.sendMessage("<c9>Source " + s + " requires a key which was not provided. Removing.</c9>");
+                    console.sendMessage(LogUtil.HEADING + "<c9>Source " + s + " requires a key which was not provided. Removing.</c9>");
                 }
                 sourceManager.deregisterSource(s);
                 i.remove();
@@ -461,7 +462,7 @@ public class ConfigurationFileUtil {
             String key = i.next();
             if (!order.contains(key)) {
                 if (debug) {
-                    console.sendMessage("<c9>Source " + key + " was not provided in the source order. Removing.</c9>");
+                    console.sendMessage(LogUtil.HEADING + "<c9>Source " + key + " was not provided in the source order. Removing.</c9>");
                 }
                 sourceManager.deregisterSource(key);
                 i.remove();
@@ -474,7 +475,7 @@ public class ConfigurationFileUtil {
             sourceManager.deregisterSource(s);
             sourceManager.registerSource(source, i);
             if (debug) {
-                console.sendMessage("<c2>Added/Replaced source:</c2> <c1>" + s + " (" + source.getClass().getSimpleName() + ")</c1>");
+                console.sendMessage(LogUtil.HEADING + "<c2>Added/Replaced source:</c2> <c1>" + s + " (" + source.getClass().getSimpleName() + ")</c1>");
             }
         }
     }
