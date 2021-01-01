@@ -5,7 +5,6 @@ import co.aikar.taskchain.TaskChainFactory;
 import java.util.Map;
 import java.util.Optional;
 import me.egg82.antivpn.api.APIException;
-import me.egg82.antivpn.api.VPNAPIProvider;
 import me.egg82.antivpn.config.ConfigUtil;
 import me.egg82.antivpn.lang.Message;
 import org.slf4j.Logger;

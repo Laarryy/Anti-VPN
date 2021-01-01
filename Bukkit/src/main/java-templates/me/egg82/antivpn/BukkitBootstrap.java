@@ -21,7 +21,10 @@ import ninja.egg82.maven.Scope;
 import ninja.egg82.utils.DownloadUtil;
 import ninja.egg82.utils.InjectUtil;
 import org.bukkit.ChatColor;
+import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.plugin.java.JavaPluginLoader;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
@@ -37,6 +40,11 @@ public class BukkitBootstrap extends JavaPlugin {
 
     public BukkitBootstrap() {
         super();
+        isBukkit = BukkitEnvironmentUtil.getEnvironment() == BukkitEnvironmentUtil.Environment.BUKKIT;
+    }
+
+    protected BukkitBootstrap(@NotNull final JavaPluginLoader loader, @NotNull final PluginDescriptionFile description, @NotNull final File dataFolder, @NotNull final File file) {
+        super(loader, description, dataFolder, file);
         isBukkit = BukkitEnvironmentUtil.getEnvironment() == BukkitEnvironmentUtil.Environment.BUKKIT;
     }
 
