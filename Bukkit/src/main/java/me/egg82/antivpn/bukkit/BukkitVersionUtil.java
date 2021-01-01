@@ -50,7 +50,11 @@ public class BukkitVersionUtil {
                         if (localVersion == null || !isVersion(localVersion)) {
                             localVersion = getVersionFromServerPackageString(Bukkit.getServer().getClass().getPackage().getName());
                             if (!isVersion(localVersion)) {
-                                throw new RuntimeException("Could not get version from Bukkit! (Is the server or another plugin changing it?)");
+                                if (localVersion.equalsIgnoreCase("mockbukkit")) {
+                                    return "1.8";
+                                } else {
+                                    throw new RuntimeException("Could not get version from Bukkit! (Is the server or another plugin changing it?)");
+                                }
                             }
                         }
                     }

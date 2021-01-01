@@ -56,16 +56,48 @@
                 <configuration>
                     <relocations>
                         <relocation>
+                            <pattern>annotated-jdk</pattern>
+                            <shadedPattern>me.egg82.antivpn.external.annotated-jdk</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>annotator</pattern>
+                            <shadedPattern>me.egg82.antivpn.external.annotator</shadedPattern>
+                        </relocation>
+                        <relocation>
                             <pattern>com.github.benmanes.caffeine</pattern>
                             <shadedPattern>me.egg82.antivpn.external.com.github.benmanes.caffeine</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>it.unimi.dsi.fastutil</pattern>
+                            <shadedPattern>me.egg82.antivpn.external.it.unimi.dsi.fastutil</shadedPattern>
                         </relocation>
                         <relocation>
                             <pattern>me.lucko.jarrelocator</pattern>
                             <shadedPattern>me.egg82.antivpn.external.me.lucko.jarrelocator</shadedPattern>
                         </relocation>
                         <relocation>
+                            <pattern>me.gong.mcleaks</pattern>
+                            <shadedPattern>me.egg82.antivpn.external.me.gong.mcleaks</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>okhttp</pattern>
+                            <shadedPattern>me.egg82.antivpn.external.okhttp</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>okio</pattern>
+                            <shadedPattern>me.egg82.antivpn.external.okio</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>org.checkerframework</pattern>
+                            <shadedPattern>me.egg82.antivpn.external.org.checkerframework</shadedPattern>
+                        </relocation>
+                        <relocation>
                             <pattern>org.bstats</pattern>
                             <shadedPattern>me.egg82.antivpn.external.org.bstats</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>org.jmlspecs</pattern>
+                            <shadedPattern>me.egg82.antivpn.external.org.jmlspecs</shadedPattern>
                         </relocation>
                         <relocation>
                             <pattern>ninja.egg82.maven</pattern>
@@ -90,6 +122,10 @@
                                 <include>ninja.egg82.utils.XMLUtil</include>
                             </includes>
                         </relocation>
+                        <relocation>
+                            <pattern>scenelib</pattern>
+                            <shadedPattern>me.egg82.antivpn.external.scenelib</shadedPattern>
+                        </relocation>
                     </relocations>
                 </configuration>
                 <executions>
@@ -110,6 +146,9 @@
                                     <excludes>
                                         <!-- included or useless -->
                                         <exclude>LICENSE*</exclude>
+                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>META-INF/*.DSA</exclude>
+                                        <exclude>META-INF/*.RSA</exclude>
                                         <exclude>junit/**</exclude>
                                         <exclude>org/intellij/**</exclude>
                                         <exclude>org/junit/**</exclude>
@@ -118,8 +157,8 @@
                                     </excludes>
                                 </filter>
                                 <filter>
-                                    <!-- prevent removal of things from common -->
-                                    <artifact>me.egg82:antivpn-common</artifact>
+                                    <!-- prevent removal of things from API -->
+                                    <artifact>me.egg82:antivpn-api</artifact>
                                     <includes>
                                         <include>**</include>
                                     </includes>
@@ -268,6 +307,7 @@
             <groupId>me.gong</groupId>
             <artifactId>mcleaks-api</artifactId>
             <version>${mcleaks.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
@@ -305,6 +345,7 @@
             <groupId>io.ebean</groupId>
             <artifactId>querybean-generator</artifactId>
             <version>${ebean.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.zaxxer</groupId>
@@ -330,11 +371,13 @@
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>${guava.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>it.unimi.dsi</groupId>
             <artifactId>fastutil</artifactId>
             <version>${fastutil.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.github.ben-manes.caffeine</groupId>
@@ -356,11 +399,13 @@
             <groupId>org.xerial</groupId>
             <artifactId>sqlite-jdbc</artifactId>
             <version>${sqlite.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <version>${mysql.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- API -->
@@ -368,6 +413,7 @@
             <groupId>org.checkerframework</groupId>
             <artifactId>checker</artifactId>
             <version>${checkerframework.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>net.sf.flexjson</groupId>

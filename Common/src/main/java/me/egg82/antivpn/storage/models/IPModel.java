@@ -4,9 +4,11 @@ import io.ebean.annotation.Index;
 import io.ebean.annotation.Length;
 import io.ebean.annotation.NotNull;
 import javax.persistence.Entity;
+import javax.persistence.Table;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-@Entity(name = "avpn_ip")
+@Entity
+@Table(name = "avpn_ip")
 public class IPModel extends BaseModel {
     @Index(unique = true) @NotNull @Length(45)
     private String ip;
