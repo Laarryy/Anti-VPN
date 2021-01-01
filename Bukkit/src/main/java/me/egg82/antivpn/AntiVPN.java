@@ -14,10 +14,7 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Level;
-import me.egg82.antivpn.api.APIRegistrationUtil;
-import me.egg82.antivpn.api.GenericVPNAPI;
-import me.egg82.antivpn.api.VPNAPI;
-import me.egg82.antivpn.api.VPNAPIProvider;
+import me.egg82.antivpn.api.*;
 import me.egg82.antivpn.api.model.ip.GenericIPManager;
 import me.egg82.antivpn.api.model.player.BukkitPlayerManager;
 import me.egg82.antivpn.api.model.source.GenericSourceManager;
@@ -212,7 +209,10 @@ public class AntiVPN {
     }
 
     private void loadServices() {
-        SourceManager sourceManager = new GenericSourceManager();
+        GenericSourceManager sourceManager = new GenericSourceManager();
+
+        MessagingHandler messagingHandler = new GenericMessagingHandler();
+        ServiceLocator.register(messagingHandler);
 
         ConfigurationFileUtil.reloadConfig(plugin.getDataFolder(), consoleCommandIssuer, messagingHandler, sourceManager);
 
@@ -224,8 +224,7 @@ public class AntiVPN {
         PluginMetadata metadata = new BukkitPluginMetadata(plugin.getDescription().getVersion());
         VPNAPI api = new GenericVPNAPI(platform, metadata, ipManager, playerManager, sourceManager, cachedConfig);
 
-        MessagingHandler messagingHandler = new GenericMessagingHandler(ipManager, playerManager);
-        ServiceLocator.register(messagingHandler);
+        APIUtil.setManagers(ipManager, playerManager, sourceManager);
 
         ServiceLocator.register(new SpigotUpdater(plugin, 58291));
 
@@ -322,7 +321,7 @@ public class AntiVPN {
             return ImmutableList.copyOf(commands);
         });
 
-        commandManager.registerCommand(new AntiVPNCommand(plugin, taskFactory));
+        commandManager.registerCommand(new AntiVPNCommand(plugin, taskFactory, consoleCommandIssuer));
     }
 
     private void loadEvents() {

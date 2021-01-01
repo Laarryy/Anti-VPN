@@ -2,28 +2,53 @@ package me.egg82.antivpn.commands.internal;
 
 import co.aikar.commands.CommandIssuer;
 import co.aikar.taskchain.TaskChainFactory;
+import java.io.File;
+import me.egg82.antivpn.api.*;
+import me.egg82.antivpn.api.model.ip.GenericIPManager;
+import me.egg82.antivpn.api.model.player.BukkitPlayerManager;
+import me.egg82.antivpn.api.model.source.GenericSourceManager;
+import me.egg82.antivpn.config.CachedConfig;
+import me.egg82.antivpn.config.ConfigUtil;
 import me.egg82.antivpn.config.ConfigurationFileUtil;
 import me.egg82.antivpn.lang.Message;
-import org.bukkit.plugin.Plugin;
+import me.egg82.antivpn.messaging.GenericMessagingHandler;
+import me.egg82.antivpn.messaging.MessagingHandler;
+import ninja.egg82.service.ServiceLocator;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-public class ReloadCommand implements Runnable {
-    private final Plugin plugin;
-    private final TaskChainFactory taskFactory;
-    private final CommandIssuer issuer;
+public class ReloadCommand extends AbstractCommand {
+    private final File dataFolder;
+    private final CommandIssuer console;
 
-    public ReloadCommand(@NonNull Plugin plugin, @NonNull TaskChainFactory taskFactory, @NonNull CommandIssuer issuer) {
-        this.plugin = plugin;
-        this.taskFactory = taskFactory;
-        this.issuer = issuer;
+    public ReloadCommand(@NonNull CommandIssuer issuer, @NonNull TaskChainFactory taskFactory, @NonNull File dataFolder, @NonNull CommandIssuer console) {
+        super(issuer, taskFactory);
+        this.dataFolder = dataFolder;
+        this.console = console;
     }
 
     public void run() {
         issuer.sendInfo(Message.RELOAD__BEGIN);
 
         taskFactory.<Void>newChain()
-                .async(() -> ConfigurationFileUtil.reloadConfig(plugin, handler, handler))
-                .sync(() -> issuer.sendInfo(Message.RELOAD__END))
+                .async(() -> {
+                    GenericSourceManager sourceManager = new GenericSourceManager();
+
+                    MessagingHandler messagingHandler = new GenericMessagingHandler();
+                    ServiceLocator.register(messagingHandler);
+
+                    ConfigurationFileUtil.reloadConfig(dataFolder, console, messagingHandler, sourceManager);
+
+                    CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
+
+                    GenericIPManager ipManager = new GenericIPManager(sourceManager, cachedConfig.getCacheTime().getTime(), cachedConfig.getCacheTime().getUnit());
+                    BukkitPlayerManager playerManager = new BukkitPlayerManager(cachedConfig.getThreads(), cachedConfig.getMcLeaksKey(), cachedConfig.getCacheTime().getTime(), cachedConfig.getCacheTime().getUnit());
+                    VPNAPI api = new GenericVPNAPI(VPNAPIProvider.getInstance().getPlatform(), VPNAPIProvider.getInstance().getPluginMetadata(), ipManager, playerManager, sourceManager, cachedConfig);
+
+                    APIUtil.setManagers(ipManager, playerManager, sourceManager);
+
+                    APIRegistrationUtil.register(api);
+                })
+                .syncLast(v -> issuer.sendInfo(Message.RELOAD__END))
                 .execute();
     }
 }

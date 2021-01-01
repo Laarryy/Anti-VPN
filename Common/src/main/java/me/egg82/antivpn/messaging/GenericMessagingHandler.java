@@ -4,6 +4,7 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import me.egg82.antivpn.api.APIUtil;
 import me.egg82.antivpn.api.model.ip.GenericIPManager;
 import me.egg82.antivpn.api.model.player.AbstractPlayerManager;
 import me.egg82.antivpn.config.CachedConfig;
@@ -23,13 +24,7 @@ public class GenericMessagingHandler implements MessagingHandler {
     private final LoadingCache<UUID, Boolean> messageCache = Caffeine.newBuilder().expireAfterWrite(2L, TimeUnit.MINUTES).expireAfterAccess(30L, TimeUnit.SECONDS).build(k -> Boolean.FALSE);
     private final Object cacheLock = new Object();
 
-    private final GenericIPManager ipManager;
-    private final AbstractPlayerManager playerManager;
-
-    public GenericMessagingHandler(@NonNull GenericIPManager ipManager, @NonNull AbstractPlayerManager playerManager) {
-        this.ipManager = ipManager;
-        this.playerManager = playerManager;
-    }
+    public GenericMessagingHandler() { }
 
     public void handlePacket(@NonNull UUID messageId, @NonNull Packet packet) {
         if (isDuplicate(messageId)) {
@@ -42,6 +37,12 @@ public class GenericMessagingHandler implements MessagingHandler {
     private void handleIp(@NonNull IPPacket packet) {
         if (ConfigUtil.getDebugOrFalse()) {
             logger.info("Handling packet for " + packet.getIp() + ".");
+        }
+
+        GenericIPManager ipManager = APIUtil.getIpManager();
+        if (ipManager == null) {
+            logger.error("IP manager could not be fetched.");
+            return;
         }
 
         IPModel m = new IPModel();
@@ -74,6 +75,12 @@ public class GenericMessagingHandler implements MessagingHandler {
             logger.info("Handling deletion packet for " + packet.getIp() + ".");
         }
 
+        GenericIPManager ipManager = APIUtil.getIpManager();
+        if (ipManager == null) {
+            logger.error("IP manager could not be fetched.");
+            return;
+        }
+
         ipManager.getIpCache().invalidate(packet.getIp());
 
         CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
@@ -94,6 +101,12 @@ public class GenericMessagingHandler implements MessagingHandler {
     private void handlePlayer(@NonNull PlayerPacket packet) {
         if (ConfigUtil.getDebugOrFalse()) {
             logger.info("Handling packet for " + packet.getUuid() + ".");
+        }
+
+        AbstractPlayerManager playerManager = APIUtil.getPlayerManager();
+        if (playerManager == null) {
+            logger.error("Player manager could not be fetched.");
+            return;
         }
 
         PlayerModel m = new PlayerModel();
@@ -120,6 +133,12 @@ public class GenericMessagingHandler implements MessagingHandler {
     private void handleDeletePlayer(@NonNull DeletePlayerPacket packet) {
         if (ConfigUtil.getDebugOrFalse()) {
             logger.info("Handling deletion packet for " + packet.getUuid() + ".");
+        }
+
+        AbstractPlayerManager playerManager = APIUtil.getPlayerManager();
+        if (playerManager == null) {
+            logger.error("Player manager could not be fetched.");
+            return;
         }
 
         playerManager.getPlayerCache().invalidate(packet.getUuid());

@@ -21,24 +21,19 @@ public class AntiVPNCommand extends BaseCommand {
 
     private final Plugin plugin;
     private final TaskChainFactory taskFactory;
+    private final CommandIssuer console;
 
-    public AntiVPNCommand(@NonNull Plugin plugin, @NonNull TaskChainFactory taskFactory) {
+    public AntiVPNCommand(@NonNull Plugin plugin, @NonNull TaskChainFactory taskFactory, @NonNull CommandIssuer console) {
         this.plugin = plugin;
         this.taskFactory = taskFactory;
+        this.console = console;
     }
 
     @Subcommand("reload")
     @CommandPermission("avpn.admin")
     @Description("{@@description.reload}")
     public void onReload(@NonNull CommandIssuer issuer) {
-        StorageMessagingHandler handler;
-        try {
-            handler = ServiceLocator.get(StorageMessagingHandler.class);
-        } catch (InstantiationException | IllegalAccessException | ServiceNotFoundException ex) {
-            logger.error(ex.getMessage(), ex);
-            return;
-        }
-        new ReloadCommand(plugin, taskFactory, handler, issuer).run();
+        new ReloadCommand(issuer, taskFactory, plugin.getDataFolder(), console).run();
     }
 
     @Subcommand("import")
