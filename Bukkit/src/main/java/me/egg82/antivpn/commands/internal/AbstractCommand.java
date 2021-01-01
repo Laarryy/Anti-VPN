@@ -11,6 +11,8 @@ import me.egg82.antivpn.config.ConfigUtil;
 import me.egg82.antivpn.lang.Message;
 import me.egg82.antivpn.services.lookup.PlayerInfo;
 import me.egg82.antivpn.services.lookup.PlayerLookup;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,12 +22,12 @@ public abstract class AbstractCommand implements Runnable {
     protected final CommandIssuer issuer;
     protected final TaskChainFactory taskFactory;
 
-    protected AbstractCommand(CommandIssuer issuer, TaskChainFactory taskFactory) {
+    protected AbstractCommand(@NonNull CommandIssuer issuer, @NonNull TaskChainFactory taskFactory) {
         this.issuer = issuer;
         this.taskFactory = taskFactory;
     }
 
-    protected final <T> T handleException(Throwable ex) {
+    protected final <T> @Nullable T handleException(@NonNull Throwable ex) {
         if (ex instanceof APIException) {
             if (ConfigUtil.getDebugOrFalse()) {
                 logger.error("[Hard: " + ((APIException) ex).isHard() + "] " + ex.getMessage(), ex);
@@ -42,7 +44,7 @@ public abstract class AbstractCommand implements Runnable {
         return null;
     }
 
-    protected UUID fetchUuid(String name) {
+    protected @Nullable UUID fetchUuid(@NonNull String name) {
         PlayerInfo info;
         try {
             info = PlayerLookup.get(name);

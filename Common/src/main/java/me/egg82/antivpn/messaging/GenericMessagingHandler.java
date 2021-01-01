@@ -13,6 +13,7 @@ import me.egg82.antivpn.storage.StorageService;
 import me.egg82.antivpn.storage.models.IPModel;
 import me.egg82.antivpn.storage.models.PlayerModel;
 import me.egg82.antivpn.utils.PacketUtil;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,12 +26,12 @@ public class GenericMessagingHandler implements MessagingHandler {
     private final GenericIPManager ipManager;
     private final AbstractPlayerManager playerManager;
 
-    public GenericMessagingHandler(GenericIPManager ipManager, AbstractPlayerManager playerManager) {
+    public GenericMessagingHandler(@NonNull GenericIPManager ipManager, @NonNull AbstractPlayerManager playerManager) {
         this.ipManager = ipManager;
         this.playerManager = playerManager;
     }
 
-    public void handlePacket(UUID messageId, Packet packet) {
+    public void handlePacket(@NonNull UUID messageId, @NonNull Packet packet) {
         if (isDuplicate(messageId)) {
             return;
         }
@@ -38,7 +39,7 @@ public class GenericMessagingHandler implements MessagingHandler {
         handleGenericPacket(packet);
     }
 
-    private void handleIp(IPPacket packet) {
+    private void handleIp(@NonNull IPPacket packet) {
         if (ConfigUtil.getDebugOrFalse()) {
             logger.info("Handling packet for " + packet.getIp() + ".");
         }
@@ -68,7 +69,7 @@ public class GenericMessagingHandler implements MessagingHandler {
         PacketUtil.queuePacket(packet);
     }
 
-    private void handleDeleteIp(DeleteIPPacket packet) {
+    private void handleDeleteIp(@NonNull DeleteIPPacket packet) {
         if (ConfigUtil.getDebugOrFalse()) {
             logger.info("Handling deletion packet for " + packet.getIp() + ".");
         }
@@ -90,7 +91,7 @@ public class GenericMessagingHandler implements MessagingHandler {
         PacketUtil.queuePacket(packet);
     }
 
-    private void handlePlayer(PlayerPacket packet) {
+    private void handlePlayer(@NonNull PlayerPacket packet) {
         if (ConfigUtil.getDebugOrFalse()) {
             logger.info("Handling packet for " + packet.getUuid() + ".");
         }
@@ -116,7 +117,7 @@ public class GenericMessagingHandler implements MessagingHandler {
         PacketUtil.queuePacket(packet);
     }
 
-    private void handleDeletePlayer(DeletePlayerPacket packet) {
+    private void handleDeletePlayer(@NonNull DeletePlayerPacket packet) {
         if (ConfigUtil.getDebugOrFalse()) {
             logger.info("Handling deletion packet for " + packet.getUuid() + ".");
         }
@@ -138,7 +139,7 @@ public class GenericMessagingHandler implements MessagingHandler {
         PacketUtil.queuePacket(packet);
     }
 
-    private void handleMulti(MultiPacket packet) {
+    private void handleMulti(@NonNull MultiPacket packet) {
         if (ConfigUtil.getDebugOrFalse()) {
             logger.info("Handling multi-packet.");
         }
@@ -148,7 +149,7 @@ public class GenericMessagingHandler implements MessagingHandler {
         }
     }
 
-    private void handleGenericPacket(Packet packet) {
+    private void handleGenericPacket(@NonNull Packet packet) {
         if (packet instanceof IPPacket) {
             handleIp((IPPacket) packet);
         } else if (packet instanceof PlayerPacket) {
@@ -164,7 +165,7 @@ public class GenericMessagingHandler implements MessagingHandler {
 
     public void cancel() { }
 
-    private boolean isDuplicate(UUID messageId) {
+    private boolean isDuplicate(@NonNull UUID messageId) {
         if (Boolean.TRUE.equals(messageCache.getIfPresent(messageId))) {
             return true;
         }

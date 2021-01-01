@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 
 // https://github.com/lucko/LuckPerms/blob/master/common/src/main/java/me/lucko/luckperms/common/api/ApiRegistrationUtil.java
 public class APIRegistrationUtil {
-    private static Logger logger = LoggerFactory.getLogger(APIRegistrationUtil.class);
+    private static final Logger logger = LoggerFactory.getLogger(APIRegistrationUtil.class);
 
     private static final Method REGISTER;
     private static final Method DEREGISTER;

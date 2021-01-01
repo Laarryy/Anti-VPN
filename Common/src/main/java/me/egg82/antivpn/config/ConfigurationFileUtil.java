@@ -19,6 +19,8 @@ import me.egg82.antivpn.utils.PacketUtil;
 import me.egg82.antivpn.utils.TimeUtil;
 import me.egg82.antivpn.utils.ValidationUtil;
 import ninja.egg82.reflect.PackageFilter;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,7 +38,7 @@ public class ConfigurationFileUtil {
 
     private ConfigurationFileUtil() { }
 
-    public static void reloadConfig(File dataDirectory, CommandIssuer console, MessagingHandler messagingHandler, SourceManager sourceManager) {
+    public static void reloadConfig(@NonNull File dataDirectory, @NonNull CommandIssuer console, @NonNull MessagingHandler messagingHandler, @NonNull SourceManager sourceManager) {
         ConfigurationNode config;
         try {
             config = getConfig("config.yml", new File(dataDirectory, "config.yml"));
@@ -93,7 +95,7 @@ public class ConfigurationFileUtil {
         }
     }
 
-    private static Locale getLanguage(ConfigurationNode config, boolean debug, CommandIssuer console) {
+    private static @NonNull Locale getLanguage(@NonNull ConfigurationNode config, boolean debug, @NonNull CommandIssuer console) {
         String configLanguage = config.node("lang").getString("en");
         Locale retVal = null;
         for (Locale locale : Locale.getAvailableLocales()) {
@@ -115,7 +117,7 @@ public class ConfigurationFileUtil {
         return retVal;
     }
 
-    private static List<StorageService> getStorage(ConfigurationNode config, File dataDirectory, boolean debug, CommandIssuer console) {
+    private static @NonNull List<StorageService> getStorage(@NonNull ConfigurationNode config, @NonNull File dataDirectory, boolean debug, @NonNull CommandIssuer console) {
         List<StorageService> retVal = new ArrayList<>();
 
         PoolSettings poolSettings = new PoolSettings(config.node("storage", "settings"));
@@ -134,7 +136,7 @@ public class ConfigurationFileUtil {
         return retVal;
     }
 
-    private static StorageService getStorageOf(String name, ConfigurationNode engineNode, File dataDirectory, PoolSettings poolSettings, boolean debug, CommandIssuer console) {
+    private static @Nullable StorageService getStorageOf(@NonNull String name, @NonNull ConfigurationNode engineNode, @NonNull File dataDirectory, @NonNull PoolSettings poolSettings, boolean debug, @NonNull CommandIssuer console) {
         if (!engineNode.node("enabled").getBoolean()) {
             if (debug) {
                 console.sendMessage(LogUtil.HEADING + "<c9>Engine</c9> <c1>" + name + "</c1> <c9>is disabled. Removing.</c9>");
@@ -202,7 +204,7 @@ public class ConfigurationFileUtil {
         return null;
     }
 
-    private static List<MessagingService> getMessaging(ConfigurationNode config, UUID serverId, MessagingHandler handler, boolean debug, CommandIssuer console) {
+    private static @NonNull List<MessagingService> getMessaging(@NonNull ConfigurationNode config, @NonNull UUID serverId, @NonNull MessagingHandler handler, boolean debug, @NonNull CommandIssuer console) {
         List<MessagingService> retVal = new ArrayList<>();
 
         PoolSettings poolSettings = new PoolSettings(config.node("messaging", "settings"));
@@ -221,7 +223,7 @@ public class ConfigurationFileUtil {
         return retVal;
     }
 
-    private static MessagingService getMessagingOf(String name, ConfigurationNode engineNode, UUID serverId, MessagingHandler handler, PoolSettings poolSettings, boolean debug, CommandIssuer console) {
+    private static @Nullable MessagingService getMessagingOf(@NonNull String name, @NonNull ConfigurationNode engineNode, @NonNull UUID serverId, @NonNull MessagingHandler handler, @NonNull PoolSettings poolSettings, boolean debug, @NonNull CommandIssuer console) {
         if (!engineNode.node("enabled").getBoolean()) {
             if (debug) {
                 console.sendMessage(LogUtil.HEADING + "<c9>Engine</c9> <c1>" + name + "</c1> <c9>is disabled. Removing.</c9>");
@@ -273,7 +275,7 @@ public class ConfigurationFileUtil {
         return null;
     }
 
-    private static TimeUtil.Time getSourceCacheTime(ConfigurationNode config, boolean debug, CommandIssuer console) {
+    private static TimeUtil.Time getSourceCacheTime(@NonNull ConfigurationNode config, boolean debug, @NonNull CommandIssuer console) {
         TimeUtil.Time retVal = TimeUtil.getTime(config.node("sources", "cache-time").getString("6hours"));
         if (retVal == null) {
             console.sendMessage(LogUtil.HEADING + "<c2>sources.cache-time is not a valid time pattern. Using default value.<c2>");
@@ -286,7 +288,7 @@ public class ConfigurationFileUtil {
         return retVal;
     }
 
-    private static TimeUtil.Time getMcLeaksCacheTime(ConfigurationNode config, boolean debug, CommandIssuer console) {
+    private static TimeUtil.Time getMcLeaksCacheTime(@NonNull ConfigurationNode config, boolean debug, @NonNull CommandIssuer console) {
         TimeUtil.Time retVal = TimeUtil.getTime(config.node("mcleaks", "cache-time").getString("1day"));
         if (retVal == null) {
             console.sendMessage(LogUtil.HEADING + "<c2>mcleaks.cache-time is not a valid time pattern. Using default value.<c2>");
@@ -299,7 +301,7 @@ public class ConfigurationFileUtil {
         return retVal;
     }
 
-    private static TimeUtil.Time getCacheTime(ConfigurationNode config, boolean debug, CommandIssuer console) {
+    private static TimeUtil.Time getCacheTime(@NonNull ConfigurationNode config, boolean debug, @NonNull CommandIssuer console) {
         TimeUtil.Time retVal = TimeUtil.getTime(config.node("connection", "cache-time").getString("1minute"));
         if (retVal == null) {
             console.sendMessage(LogUtil.HEADING + "<c2>connection.cache-time is not a valid time pattern. Using default value.<c2>");
@@ -312,7 +314,7 @@ public class ConfigurationFileUtil {
         return retVal;
     }
 
-    private static Set<String> getIgnoredIps(ConfigurationNode config, boolean debug, CommandIssuer console) {
+    private static @NonNull Set<String> getIgnoredIps(@NonNull ConfigurationNode config, boolean debug, @NonNull CommandIssuer console) {
         Set<String> retVal;
         try {
             retVal = new HashSet<>(!config.node("ignore", "ips").empty() ? config.node("ignore", "ips").getList(String.class) : new ArrayList<>());
@@ -338,7 +340,7 @@ public class ConfigurationFileUtil {
         return retVal;
     }
 
-    private static Set<String> getVpnActionCommands(ConfigurationNode config, boolean debug, CommandIssuer console) {
+    private static @NonNull Set<String> getVpnActionCommands(@NonNull ConfigurationNode config, boolean debug, @NonNull CommandIssuer console) {
         Set<String> retVal;
         try {
             retVal = new HashSet<>(!config.node("action", "vpn", "commands").empty() ? config.node("action", "vpn", "commands").getList(String.class) : new ArrayList<>());
@@ -357,7 +359,7 @@ public class ConfigurationFileUtil {
         return retVal;
     }
 
-    private static Set<String> getMcLeaksActionCommands(ConfigurationNode config, boolean debug, CommandIssuer console) {
+    private static @NonNull Set<String> getMcLeaksActionCommands(@NonNull ConfigurationNode config, boolean debug, @NonNull CommandIssuer console) {
         Set<String> retVal;
         try {
             retVal = new HashSet<>(!config.node("action", "mcleaks", "commands").empty() ? config.node("action", "mcleaks", "commands").getList(String.class) : new ArrayList<>());
@@ -376,7 +378,7 @@ public class ConfigurationFileUtil {
         return retVal;
     }
 
-    private static AlgorithmMethod getVpnAlgorithmMethod(ConfigurationNode config, boolean debug, CommandIssuer console) {
+    private static @NonNull AlgorithmMethod getVpnAlgorithmMethod(@NonNull ConfigurationNode config, boolean debug, @NonNull CommandIssuer console) {
         AlgorithmMethod retVal = AlgorithmMethod.getByName(config.node("action", "vpn", "algorithm", "method").getString("cascade"));
         if (retVal == null) {
             console.sendMessage(LogUtil.HEADING + "<c2>action.vpn.algorithm.method is not a valid type. Using default value.<c2>");
@@ -401,7 +403,7 @@ public class ConfigurationFileUtil {
         return retVal;
     }
 
-    private static void setSources(ConfigurationNode config, boolean debug, CommandIssuer console, SourceManager sourceManager) {
+    private static void setSources(@NonNull ConfigurationNode config, boolean debug, @NonNull CommandIssuer console, @NonNull SourceManager sourceManager) {
         Map<String, Source<? extends SourceModel>> initializedSources = new HashMap<>();
 
         List<Class<Source>> sourceClasses = PackageFilter.getClasses(Source.class, "me.egg82.antivpn.api.model.source.models", false, false, false);
@@ -478,7 +480,7 @@ public class ConfigurationFileUtil {
         }
     }
 
-    private static CommentedConfigurationNode getConfig(String resourcePath, File fileOnDisk) throws IOException {
+    private static @NonNull CommentedConfigurationNode getConfig(@NonNull String resourcePath, @NonNull File fileOnDisk) throws IOException {
         File parentDir = fileOnDisk.getParentFile();
         if (parentDir.exists() && !parentDir.isDirectory()) {
             Files.delete(parentDir.toPath());
@@ -515,7 +517,7 @@ public class ConfigurationFileUtil {
         private final String address;
         private final int port;
 
-        public AddressPort(String node, String raw, int defaultPort) {
+        public AddressPort(@NonNull String node, @NonNull String raw, int defaultPort) {
             String a = raw;
             int portIndex = a.indexOf(':');
             int p;
@@ -531,7 +533,7 @@ public class ConfigurationFileUtil {
             this.port = p;
         }
 
-        public String getAddress() { return address; }
+        public @NonNull String getAddress() { return address; }
 
         public int getPort() { return port; }
     }

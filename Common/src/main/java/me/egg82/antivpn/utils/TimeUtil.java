@@ -4,6 +4,8 @@ import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class TimeUtil {
     private TimeUtil() { }
@@ -11,7 +13,7 @@ public class TimeUtil {
     private static final Pattern timePattern = Pattern.compile("^(\\d+)\\s*(?:seconds?|s|minutes?|m|hours?|h|days?|d)$");
     private static final Pattern unitPattern = Pattern.compile("^(?:\\d+)\\s*(seconds?|s|minutes?|m|hours?|h|days?|d)$");
 
-    public static Time getTime(String input) {
+    public static @Nullable Time getTime(@NonNull String input) {
         Matcher timeMatcher = timePattern.matcher(input);
         if (!timeMatcher.matches()) {
             return null;
@@ -39,7 +41,7 @@ public class TimeUtil {
         }
     }
 
-    public static String getTimeString(Time time) {
+    public static @Nullable String getTimeString(@NonNull Time time) {
         if (time.unit == TimeUnit.DAYS) {
             return time.time + (time.time == 1 ? "day" : "days");
         } else if (time.unit == TimeUnit.HOURS) {
@@ -58,11 +60,7 @@ public class TimeUtil {
 
         private final int hc;
 
-        public Time(long time, TimeUnit unit) {
-            if (unit == null) {
-                throw new IllegalArgumentException("unit cannot be null.");
-            }
-
+        public Time(long time, @NonNull TimeUnit unit) {
             this.time = time;
             this.unit = unit;
 

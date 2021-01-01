@@ -7,20 +7,21 @@ import io.ebean.config.DatabaseConfig;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.Properties;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 public class MySQLStorageService extends AbstractStorageService {
-    public static Builder builder(String name) { return new MySQLStorageService.Builder(name); }
+    private MySQLStorageService(@NonNull String name) {
+        super(name);
+    }
+
+    public static Builder builder(@NonNull String name) { return new MySQLStorageService.Builder(name); }
 
     public static class Builder {
-        private final MySQLStorageService service = new MySQLStorageService();
+        private final MySQLStorageService service;
         private final HikariConfig config = new HikariConfig();
 
-        private Builder(String name) {
-            if (name == null) {
-                throw new IllegalArgumentException("name cannot be null.");
-            }
-
-            service.name = name;
+        private Builder(@NonNull String name) {
+            service = new MySQLStorageService(name);
 
             // Baseline
             config.setPoolName("AntiVPN-MySQL");
@@ -49,18 +50,18 @@ public class MySQLStorageService extends AbstractStorageService {
             config.addDataSourceProperty("elideSetAutoCommits", "true");
         }
 
-        public MySQLStorageService.Builder url(String address, int port, String database) {
+        public MySQLStorageService.Builder url(@NonNull String address, int port, @NonNull String database) {
             config.setJdbcUrl("jdbc:mysql://" + address + ":" + port + "/" + database);
             return this;
         }
 
-        public MySQLStorageService.Builder credentials(String user, String pass) {
+        public MySQLStorageService.Builder credentials(@NonNull String user, @NonNull String pass) {
             config.setUsername(user);
             config.setPassword(pass);
             return this;
         }
 
-        public MySQLStorageService.Builder options(String options) throws IOException {
+        public MySQLStorageService.Builder options(@NonNull String options) throws IOException {
             options = !options.isEmpty() && options.charAt(0) == '?' ? options.substring(1) : options;
             Properties p = new Properties();
             p.load(new StringReader(options.replace("&", "\n")));
@@ -80,7 +81,7 @@ public class MySQLStorageService extends AbstractStorageService {
             return this;
         }
 
-        public MySQLStorageService build() {
+        public @NonNull MySQLStorageService build() {
             HikariDataSource source = new HikariDataSource(config);
             DatabaseConfig dbConfig = new DatabaseConfig();
             dbConfig.setDataSource(source);

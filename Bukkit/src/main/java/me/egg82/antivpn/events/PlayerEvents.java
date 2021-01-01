@@ -29,11 +29,13 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.plugin.Plugin;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class PlayerEvents extends EventHolder {
     private final CommandIssuer console;
 
-    public PlayerEvents(Plugin plugin, CommandIssuer console) {
+    public PlayerEvents(@NonNull Plugin plugin, @NonNull CommandIssuer console) {
         this.console = console;
 
         events.add(
@@ -58,7 +60,7 @@ public class PlayerEvents extends EventHolder {
         );
     }
 
-    private void checkPerms(AsyncPlayerPreLoginEvent event) {
+    private void checkPerms(@NonNull AsyncPlayerPreLoginEvent event) {
         if (Bukkit.hasWhitelist() && !isWhitelisted(event.getUniqueId())) {
             if (ConfigUtil.getDebugOrFalse()) {
                 console.sendMessage(LogUtil.HEADING + "<c1>" + event.getName() + " (" + event.getUniqueId() + ")</c1><c2>" + " is not whitelisted while the server is in whitelist mode. Ignoring.</c2>");
@@ -97,7 +99,7 @@ public class PlayerEvents extends EventHolder {
         }
     }
 
-    private void checkPermsPlayer(AsyncPlayerPreLoginEvent event, boolean hasBypass) {
+    private void checkPermsPlayer(@NonNull AsyncPlayerPreLoginEvent event, boolean hasBypass) {
         if (hasBypass) {
             if (ConfigUtil.getDebugOrFalse()) {
                 console.sendMessage(LogUtil.HEADING + "<c1>" + event.getName() + "</c1> <c2>bypasses pre-check. Ignoring.</c2>");
@@ -156,7 +158,7 @@ public class PlayerEvents extends EventHolder {
         }
     }
 
-    private void cachePlayer(AsyncPlayerPreLoginEvent event) {
+    private void cachePlayer(@NonNull AsyncPlayerPreLoginEvent event) {
         String ip = getIp(event.getAddress());
         if (ip == null || ip.isEmpty()) {
             return;
@@ -181,7 +183,7 @@ public class PlayerEvents extends EventHolder {
         cacheData(ip, event.getUniqueId(), cachedConfig);
     }
 
-    private void cacheData(String ip, UUID uuid, CachedConfig cachedConfig) {
+    private void cacheData(@NonNull String ip, @NonNull UUID uuid, @NonNull CachedConfig cachedConfig) {
         // Cache IP data
         if ((!cachedConfig.getVPNKickMessage().isEmpty() || !cachedConfig.getVPNActionCommands().isEmpty())) {
             IPManager ipManager = VPNAPIProvider.getInstance().getIpManager();
@@ -211,7 +213,7 @@ public class PlayerEvents extends EventHolder {
         }
     }
 
-    private void checkPlayer(PlayerLoginEvent event) {
+    private void checkPlayer(@NonNull PlayerLoginEvent event) {
         Optional<LuckPermsHook> luckPermsHook;
         try {
             luckPermsHook = ServiceLocator.getOptional(LuckPermsHook.class);
@@ -291,7 +293,7 @@ public class PlayerEvents extends EventHolder {
         }
     }
 
-    private boolean isVpn(String ip, String name, CachedConfig cachedConfig) {
+    private boolean isVpn(@NonNull String ip, @NonNull String name, @NonNull CachedConfig cachedConfig) {
         if (!cachedConfig.getVPNKickMessage().isEmpty() || !cachedConfig.getVPNActionCommands().isEmpty()) {
             boolean isVPN;
 
@@ -333,7 +335,7 @@ public class PlayerEvents extends EventHolder {
         return false;
     }
 
-    private boolean isMcLeaks(String name, UUID uuid, CachedConfig cachedConfig) {
+    private boolean isMcLeaks(@NonNull String name, @NonNull UUID uuid, @NonNull CachedConfig cachedConfig) {
         if (!cachedConfig.getMCLeaksKickMessage().isEmpty() || !cachedConfig.getMCLeaksActionCommands().isEmpty()) {
             boolean isMCLeaks;
 
@@ -365,7 +367,7 @@ public class PlayerEvents extends EventHolder {
         return false;
     }
 
-    private void tryRunCommands(List<String> commands, String name, UUID uuid, String ip) {
+    private void tryRunCommands(@NonNull List<String> commands, @NonNull String name, @NonNull UUID uuid, @NonNull String ip) {
         Optional<PlaceholderAPIHook> placeholderapi;
         try {
             placeholderapi = ServiceLocator.getOptional(PlaceholderAPIHook.class);
@@ -388,7 +390,7 @@ public class PlayerEvents extends EventHolder {
         }
     }
 
-    private String getKickMessage(String message, String name, UUID uuid, String ip) {
+    private @NonNull String getKickMessage(@NonNull String message, @NonNull String name, @NonNull UUID uuid, @NonNull String ip) {
         Optional<PlaceholderAPIHook> placeholderapi;
         try {
             placeholderapi = ServiceLocator.getOptional(PlaceholderAPIHook.class);
@@ -404,7 +406,7 @@ public class PlayerEvents extends EventHolder {
         return message;
     }
 
-    private String getIp(InetAddress address) {
+    private @Nullable String getIp(InetAddress address) {
         if (address == null) {
             return null;
         }
@@ -423,7 +425,7 @@ public class PlayerEvents extends EventHolder {
 
     private boolean rangeContains(String range, String ip) { return new IPAddressString(range).contains(new IPAddressString(ip)); }
 
-    private <T> T handleException(Throwable ex) {
+    private <T> @Nullable T handleException(@NonNull Throwable ex) {
         if (ex instanceof APIException) {
             if (ConfigUtil.getDebugOrFalse()) {
                 logger.error("[Hard: " + ((APIException) ex).isHard() + "] " + ex.getMessage(), ex);

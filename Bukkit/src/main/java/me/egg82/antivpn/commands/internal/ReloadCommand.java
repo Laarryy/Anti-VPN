@@ -5,13 +5,14 @@ import co.aikar.taskchain.TaskChainFactory;
 import me.egg82.antivpn.config.ConfigurationFileUtil;
 import me.egg82.antivpn.lang.Message;
 import org.bukkit.plugin.Plugin;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 public class ReloadCommand implements Runnable {
     private final Plugin plugin;
     private final TaskChainFactory taskFactory;
     private final CommandIssuer issuer;
 
-    public ReloadCommand(Plugin plugin, TaskChainFactory taskFactory, CommandIssuer issuer) {
+    public ReloadCommand(@NonNull Plugin plugin, @NonNull TaskChainFactory taskFactory, @NonNull CommandIssuer issuer) {
         this.plugin = plugin;
         this.taskFactory = taskFactory;
         this.issuer = issuer;

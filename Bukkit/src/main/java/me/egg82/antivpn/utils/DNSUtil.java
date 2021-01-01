@@ -15,6 +15,7 @@ import javax.naming.NamingException;
 import javax.naming.directory.Attributes;
 import javax.naming.directory.InitialDirContext;
 import me.egg82.antivpn.config.ConfigUtil;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,7 +24,7 @@ public class DNSUtil {
 
     private DNSUtil() { }
 
-    public static Set<String> getNordVpnIps() {
+    public static @NonNull Set<String> getNordVpnIps() {
         Set<String> dns = new HashSet<>();
         dns.addAll(validNordVpn.get("al{}.nordvpn.com"));
         dns.addAll(validNordVpn.get("ar{}.nordvpn.com"));
@@ -87,7 +88,7 @@ public class DNSUtil {
 
     private static LoadingCache<String, Set<String>> validNordVpn = Caffeine.newBuilder().build(DNSUtil::findNordVpn);
 
-    private static Set<String> findNordVpn(String dns) {
+    private static @NonNull Set<String> findNordVpn(@NonNull String dns) {
         if (ConfigUtil.getDebugOrFalse()) {
             logger.info("Building NordVPN set " + dns.replace("{}", ""));
         }
@@ -106,7 +107,7 @@ public class DNSUtil {
         return retVal;
     }
 
-    public static Set<String> getCryptostormIps() {
+    public static @NonNull Set<String> getCryptostormIps() {
         String[] dns = new String[] {
                 "balancer.cstorm.is",
                 "balancer.cstorm.net",
@@ -118,7 +119,7 @@ public class DNSUtil {
 
     private static LoadingCache<String, Set<String>> records = Caffeine.newBuilder().build(DNSUtil::collectRecords);
 
-    private static Set<String> collectRecords(String dns) {
+    private static @NonNull Set<String> collectRecords(@NonNull String dns) {
         if (ConfigUtil.getDebugOrFalse()) {
             logger.info("Collecting A records for " + dns);
         }
@@ -139,7 +140,7 @@ public class DNSUtil {
         return retVal;
     }
 
-    public static Set<String> getHomeIps() {
+    public static @NonNull Set<String> getHomeIps() {
         String[] dns = new String[] {
                 // Comcast - https://postmaster.comcast.net/dynamic-IP-ranges.html
                 "24.0.0.0/12",
@@ -216,7 +217,7 @@ public class DNSUtil {
         return getIps(dns, 50);
     }
 
-    private static Set<String> getIps(String[] dns, int count) {
+    private static @NonNull Set<String> getIps(String[] dns, int count) {
         Set<String> retVal = new HashSet<>();
 
         int fails = 0;
@@ -248,7 +249,7 @@ public class DNSUtil {
         return retVal;
     }
 
-    private static Set<String> getIps(String mask, int count) {
+    private static @NonNull Set<String> getIps(@NonNull String mask, int count) {
         Set<String> retVal = new HashSet<>();
         IPAddress range = new IPAddressString(mask).getAddress();
 

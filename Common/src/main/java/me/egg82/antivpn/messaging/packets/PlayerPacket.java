@@ -3,6 +3,7 @@ package me.egg82.antivpn.messaging.packets;
 import java.nio.ByteBuffer;
 import java.util.Objects;
 import java.util.UUID;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 public class PlayerPacket extends AbstractPacket {
     private UUID uuid;
@@ -10,14 +11,14 @@ public class PlayerPacket extends AbstractPacket {
 
     public byte getPacketId() { return 0x02; }
 
-    public PlayerPacket(ByteBuffer data) { read(data); }
+    public PlayerPacket(@NonNull ByteBuffer data) { read(data); }
 
     public PlayerPacket() {
         this.uuid = null;
         this.value = false;
     }
 
-    public void read(ByteBuffer buffer) {
+    public void read(@NonNull ByteBuffer buffer) {
         if (!checkVersion(buffer)) {
             return;
         }
@@ -28,16 +29,16 @@ public class PlayerPacket extends AbstractPacket {
         checkReadPacket(buffer);
     }
 
-    public void write(ByteBuffer buffer) {
+    public void write(@NonNull ByteBuffer buffer) {
         buffer.put(VERSION);
 
         putUUID(this.uuid, buffer);
         putBoolean(this.value, buffer);
     }
 
-    public UUID getUuid() { return uuid; }
+    public @NonNull UUID getUuid() { return uuid; }
 
-    public void setUuid(UUID uuid) { this.uuid = uuid; }
+    public void setUuid(@NonNull UUID uuid) { this.uuid = uuid; }
 
     public boolean getValue() { return value; }
 
@@ -47,7 +48,7 @@ public class PlayerPacket extends AbstractPacket {
         if (this == o) return true;
         if (!(o instanceof PlayerPacket)) return false;
         PlayerPacket that = (PlayerPacket) o;
-        return value == that.value && Objects.equals(uuid, that.uuid);
+        return value == that.value && uuid.equals(that.uuid);
     }
 
     public int hashCode() { return Objects.hash(uuid, value); }

@@ -7,6 +7,7 @@ import java.nio.ByteBuffer;
 import java.text.DecimalFormat;
 import java.util.UUID;
 import me.egg82.antivpn.config.ConfigUtil;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,14 +16,18 @@ public abstract class AbstractMessagingService implements MessagingService {
 
     private static final DecimalFormat ratioFormat = new DecimalFormat("0.#####");
 
-    protected String name;
+    protected final String name;
     protected UUID serverId;
     protected String serverIdString;
     protected byte[] serverIdBytes;
 
     protected MessagingHandler handler;
 
-    public String getName() { return name; }
+    protected AbstractMessagingService(@NonNull String name) {
+        this.name = name;
+    }
+
+    public @NonNull String getName() { return name; }
 
     private static final double TOLERANCE = 1.1; // Compression ratio tolerance. Determines when compression should happen
 
@@ -66,7 +71,7 @@ public abstract class AbstractMessagingService implements MessagingService {
         return out;
     }
 
-    protected final ByteBuffer decompressData(ByteBuffer data) throws IOException {
+    protected final @NonNull ByteBuffer decompressData(ByteBuffer data) throws IOException {
         if (data == null || data.capacity() == 0) {
             return ByteBuffer.allocateDirect(0);
         }
@@ -101,7 +106,7 @@ public abstract class AbstractMessagingService implements MessagingService {
         return dest;
     }
 
-    private void printBytes(ByteBuffer buffer) {
+    private void printBytes(@NonNull ByteBuffer buffer) {
         StringBuilder sb = new StringBuilder();
 
         sb.append('\n');

@@ -4,20 +4,21 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 public class DoubleBuffer<T> {
     private volatile Queue<T> currentBuffer = new ConcurrentLinkedQueue<>();
     private volatile Queue<T> backBuffer = new ConcurrentLinkedQueue<>();
     private final ReadWriteLock lock = new ReentrantReadWriteLock();
 
-    public Queue<T> getReadBuffer() {
+    public @NonNull Queue<T> getReadBuffer() {
         lock.readLock().lock();
         Queue<T> t = backBuffer;
         lock.readLock().unlock();
         return t;
     }
 
-    public Queue<T> getWriteBuffer() {
+    public @NonNull Queue<T> getWriteBuffer() {
         lock.readLock().lock();
         Queue<T> t = currentBuffer;
         lock.readLock().unlock();

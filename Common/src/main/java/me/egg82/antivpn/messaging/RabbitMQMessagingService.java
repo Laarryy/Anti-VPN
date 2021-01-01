@@ -13,6 +13,8 @@ import me.egg82.antivpn.config.ConfigUtil;
 import me.egg82.antivpn.messaging.packets.Packet;
 import me.egg82.antivpn.utils.PacketUtil;
 import me.egg82.antivpn.utils.ValidationUtil;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class RabbitMQMessagingService extends AbstractMessagingService {
     // https://www.rabbitmq.com/api-guide.html#recovery
@@ -26,7 +28,9 @@ public class RabbitMQMessagingService extends AbstractMessagingService {
 
     private static final String EXCHANGE_NAME = "avpn-data";
 
-    private RabbitMQMessagingService() { }
+    private RabbitMQMessagingService(@NonNull String name) {
+        super(name);
+    }
 
     public void close() {
         queueLock.writeLock().lock();
@@ -39,24 +43,14 @@ public class RabbitMQMessagingService extends AbstractMessagingService {
 
     public boolean isClosed() { return closed || !connection.isOpen(); }
 
-    public static Builder builder(String name, UUID serverId, MessagingHandler handler) { return new Builder(name, serverId, handler); }
+    public static Builder builder(@NonNull String name, @NonNull UUID serverId, @NonNull MessagingHandler handler) { return new Builder(name, serverId, handler); }
 
     public static class Builder {
-        private final RabbitMQMessagingService service = new RabbitMQMessagingService();
+        private final RabbitMQMessagingService service;
         private final ConnectionFactory config = new ConnectionFactory();
 
-        public Builder(String name, UUID serverId, MessagingHandler handler) {
-            if (name == null) {
-                throw new IllegalArgumentException("name cannot be null.");
-            }
-            if (serverId == null) {
-                throw new IllegalArgumentException("serverId cannot be null.");
-            }
-            if (handler == null) {
-                throw new IllegalArgumentException("handler cannot be null.");
-            }
-
-            service.name = name;
+        public Builder(@NonNull String name, @NonNull UUID serverId, @NonNull MessagingHandler handler) {
+            service = new RabbitMQMessagingService(name);
             service.serverId = serverId;
             service.serverIdString = serverId.toString();
             byte[] bytes = new byte[16];
@@ -71,14 +65,14 @@ public class RabbitMQMessagingService extends AbstractMessagingService {
             config.setTopologyRecoveryEnabled(true);
         }
 
-        public Builder url(String address, int port, String vhost) {
+        public Builder url(@NonNull String address, int port, @NonNull String vhost) {
             config.setHost(address);
             config.setPort(port);
             config.setVirtualHost(vhost);
             return this;
         }
 
-        public Builder credentials(String user, String pass) {
+        public Builder credentials(@NonNull String user, @NonNull String pass) {
             config.setUsername(user);
             config.setPassword(pass);
             return this;
@@ -89,7 +83,7 @@ public class RabbitMQMessagingService extends AbstractMessagingService {
             return this;
         }
 
-        public RabbitMQMessagingService build() throws IOException, TimeoutException {
+        public @NonNull RabbitMQMessagingService build() throws IOException, TimeoutException {
             service.factory = config;
             service.connection = service.getConnection();
             service.bind();
@@ -144,14 +138,7 @@ public class RabbitMQMessagingService extends AbstractMessagingService {
         channel.basicConsume(queue, true, consumer);
     }
 
-    public void sendPacket(UUID messageId, Packet packet) throws IOException, TimeoutException {
-        if (messageId == null) {
-            throw new IllegalArgumentException("messageId cannot be null.");
-        }
-        if (packet == null) {
-            throw new IllegalArgumentException("packet cannot be null.");
-        }
-
+    public void sendPacket(@NonNull UUID messageId, @NonNull Packet packet) throws IOException, TimeoutException {
         queueLock.readLock().lock();
         try (RecoverableChannel channel = getChannel()) {
             ByteBuffer buffer = ByteBuffer.allocateDirect(8 * 1024); // 8 KB
@@ -168,7 +155,7 @@ public class RabbitMQMessagingService extends AbstractMessagingService {
         queueLock.readLock().unlock();
     }
 
-    private AMQP.BasicProperties getProperties(DeliveryMode deliveryMode, UUID messageId) {
+    private AMQP.BasicProperties getProperties(@NonNull DeliveryMode deliveryMode, @NonNull UUID messageId) {
         Map<String, Object> headers = new HashMap<>();
         headers.put("sender", serverIdBytes);
 
@@ -193,9 +180,9 @@ public class RabbitMQMessagingService extends AbstractMessagingService {
         return true;
     }
 
-    private RecoverableConnection getConnection() throws IOException, TimeoutException { return (RecoverableConnection) factory.newConnection(); }
+    private @NonNull RecoverableConnection getConnection() throws IOException, TimeoutException { return (RecoverableConnection) factory.newConnection(); }
 
-    private RecoverableChannel getChannel() throws IOException { return (RecoverableChannel) connection.createChannel(); }
+    private @Nullable RecoverableChannel getChannel() throws IOException { return (RecoverableChannel) connection.createChannel(); }
 
     private enum DeliveryMode {
         /**
@@ -219,7 +206,7 @@ public class RabbitMQMessagingService extends AbstractMessagingService {
         HEADERS("match"); // AMQP compatibility
 
         private final String type;
-        ExchangeType(String type) { this.type = type; }
-        public String getType() { return type; }
+        ExchangeType(@NonNull String type) { this.type = type; }
+        public @NonNull String getType() { return type; }
     }
 }

@@ -1,10 +1,12 @@
 package me.egg82.antivpn.bukkit;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+
 public class BukkitEnvironmentUtil {
     private BukkitEnvironmentUtil() { }
 
     private static Environment environment;
-    public static Environment getEnvironment() { return environment; }
+    public static @NonNull Environment getEnvironment() { return environment; }
 
     static {
         try {

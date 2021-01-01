@@ -16,6 +16,7 @@ import me.egg82.antivpn.utils.WebUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class BukkitPlayerInfo implements PlayerInfo {
     private final UUID uuid;
@@ -37,7 +38,7 @@ public class BukkitPlayerInfo implements PlayerInfo {
         headers.put("Accept-Language", "en-US,en;q=0.8");
     }
 
-    BukkitPlayerInfo(UUID uuid) throws IOException {
+    BukkitPlayerInfo(@NonNull UUID uuid) throws IOException {
         this.uuid = uuid;
 
         Optional<String> name = Optional.ofNullable(uuidCache.getIfPresent(uuid));
@@ -68,7 +69,7 @@ public class BukkitPlayerInfo implements PlayerInfo {
         }
     }
 
-    BukkitPlayerInfo(String name) throws IOException {
+    BukkitPlayerInfo(@NonNull String name) throws IOException {
         this.name = name;
 
         Optional<UUID> uuid = Optional.ofNullable(nameCache.getIfPresent(name));
@@ -105,7 +106,7 @@ public class BukkitPlayerInfo implements PlayerInfo {
 
     public @NonNull ImmutableList<ProfileModel.ProfilePropertyModel> getProperties() { return ImmutableList.copyOf(properties); }
 
-    private static String nameExpensive(UUID uuid) throws IOException {
+    private static @Nullable String nameExpensive(@NonNull UUID uuid) throws IOException {
         // Currently-online lookup
         Player player = Bukkit.getPlayer(uuid);
         if (player != null) {
@@ -137,7 +138,7 @@ public class BukkitPlayerInfo implements PlayerInfo {
         throw new IOException("Could not load player data from Mojang (rate-limited?)");
     }
 
-    private static UUID uuidExpensive(String name) throws IOException {
+    private static @Nullable UUID uuidExpensive(@NonNull String name) throws IOException {
         // Currently-online lookup
         Player player = Bukkit.getPlayer(name);
         if (player != null) {
@@ -168,7 +169,7 @@ public class BukkitPlayerInfo implements PlayerInfo {
         throw new IOException("Could not load player data from Mojang (rate-limited?)");
     }
 
-    private static List<ProfileModel.ProfilePropertyModel> propertiesExpensive(UUID uuid) throws IOException {
+    private static @Nullable List<ProfileModel.ProfilePropertyModel> propertiesExpensive(@NonNull UUID uuid) throws IOException {
         // Network lookup
         HttpURLConnection conn = WebUtil.getConnection(new URL("https://sessionserver.mojang.com/session/minecraft/profile/" + uuid.toString().replace("-", "") + "?unsigned=false"), "GET", 5000, "egg82/PlayerInfo", headers);
         int status = conn.getResponseCode();

@@ -3,6 +3,7 @@ package me.egg82.antivpn.messaging.packets;
 import java.nio.ByteBuffer;
 import java.util.Objects;
 import me.egg82.antivpn.api.model.ip.AlgorithmMethod;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 public class IPPacket extends AbstractPacket {
     private String ip;
@@ -12,16 +13,16 @@ public class IPPacket extends AbstractPacket {
 
     public byte getPacketId() { return 0x01; }
 
-    public IPPacket(ByteBuffer data) { read(data); }
+    public IPPacket(@NonNull ByteBuffer data) { read(data); }
 
     public IPPacket() {
-        this.ip = null;
+        this.ip = "";
         this.type = -1;
         this.cascade = false;
         this.consensus = -1.0d;
     }
 
-    public void read(ByteBuffer buffer) {
+    public void read(@NonNull ByteBuffer buffer) {
         if (!checkVersion(buffer)) {
             return;
         }
@@ -38,7 +39,7 @@ public class IPPacket extends AbstractPacket {
         checkReadPacket(buffer);
     }
 
-    public void write(ByteBuffer buffer) {
+    public void write(@NonNull ByteBuffer buffer) {
         buffer.put(VERSION);
 
         putString(this.ip, buffer);
@@ -51,9 +52,9 @@ public class IPPacket extends AbstractPacket {
         }
     }
 
-    public String getIp() { return ip; }
+    public @NonNull String getIp() { return ip; }
 
-    public void setIp(String ip) { this.ip = ip; }
+    public void setIp(@NonNull String ip) { this.ip = ip; }
 
     public boolean getCascade() { return cascade; }
 
@@ -71,7 +72,7 @@ public class IPPacket extends AbstractPacket {
         if (this == o) return true;
         if (!(o instanceof IPPacket)) return false;
         IPPacket ipPacket = (IPPacket) o;
-        return type == ipPacket.type && cascade == ipPacket.cascade && Double.compare(ipPacket.consensus, consensus) == 0 && Objects.equals(ip, ipPacket.ip);
+        return type == ipPacket.type && cascade == ipPacket.cascade && Double.compare(ipPacket.consensus, consensus) == 0 && ip.equals(ipPacket.ip);
     }
 
     public int hashCode() { return Objects.hash(ip, type, cascade, consensus); }

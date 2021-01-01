@@ -4,19 +4,20 @@ import java.io.*;
 import java.nio.file.Files;
 import java.util.Locale;
 import java.util.Optional;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.spongepowered.configurate.CommentedConfigurationNode;
 import org.spongepowered.configurate.loader.ConfigurationLoader;
 import org.spongepowered.configurate.yaml.NodeStyle;
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader;
 
 public class LanguageFileUtil {
-    private LanguageFileUtil() {}
+    private LanguageFileUtil() { }
 
-    public static Optional<File> getLanguage(File dataDirectory, Locale locale) throws IOException {
+    public static @NonNull Optional<File> getLanguage(@NonNull File dataDirectory, @NonNull Locale locale) throws IOException {
         return getLanguage(dataDirectory, locale, false);
     }
 
-    public static Optional<File> getLanguage(File dataDirectory, Locale locale, boolean ignoreCountry) throws IOException {
+    public static @NonNull Optional<File> getLanguage(@NonNull File dataDirectory, @NonNull Locale locale, boolean ignoreCountry) throws IOException {
         // Build resource path & file path for language
         // Use country is specified (and lang provides country)
         String resourcePath = ignoreCountry || locale.getCountry() == null || locale.getCountry().isEmpty() ? "lang_" + locale.getLanguage() + ".yml" : "lang_" + locale.getLanguage() + "_" + locale.getCountry() + ".yml";

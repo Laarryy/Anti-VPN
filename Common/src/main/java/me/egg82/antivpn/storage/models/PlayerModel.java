@@ -4,6 +4,7 @@ import io.ebean.annotation.Index;
 import io.ebean.annotation.NotNull;
 import java.util.UUID;
 import javax.persistence.Entity;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 @Entity(name = "avpn_player")
 public class PlayerModel extends BaseModel {
@@ -13,19 +14,19 @@ public class PlayerModel extends BaseModel {
 
     public PlayerModel() {
         super();
-        this.uuid = null;
+        this.uuid = new UUID(0L, 0L);
         this.mcleaks = false;
     }
 
-    public PlayerModel(String dbName) {
+    public PlayerModel(@NonNull String dbName) {
         super(dbName);
-        this.uuid = null;
+        this.uuid = new UUID(0L, 0L);
         this.mcleaks = false;
     }
 
-    public UUID getUuid() { return uuid; }
+    public @NonNull UUID getUuid() { return uuid; }
 
-    public void setUuid(UUID uuid) { this.uuid = uuid; }
+    public void setUuid(@NonNull UUID uuid) { this.uuid = uuid; }
 
     public boolean isMcleaks() { return mcleaks; }
 
@@ -33,12 +34,12 @@ public class PlayerModel extends BaseModel {
 
     public String toString() {
         return "PlayerModel{" +
-                "uuid=" + uuid +
-                ", mcleaks=" + mcleaks +
-                ", id=" + id +
+                "id=" + id +
                 ", version=" + version +
                 ", created=" + created +
                 ", modified=" + modified +
+                ", uuid=" + uuid +
+                ", mcleaks=" + mcleaks +
                 '}';
     }
 }

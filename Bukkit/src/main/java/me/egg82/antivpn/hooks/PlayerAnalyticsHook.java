@@ -27,6 +27,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.server.PluginEnableEvent;
 import org.bukkit.plugin.Plugin;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,7 +36,7 @@ public class PlayerAnalyticsHook implements PluginHook {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final CapabilityService capabilities;
 
-    public static void create(Plugin plugin, Plugin plan) {
+    public static void create(@NonNull Plugin plugin, @NonNull Plugin plan) {
         if (!plan.isEnabled()) {
             BukkitEvents.subscribe(plugin, PluginEnableEvent.class, EventPriority.MONITOR)
                     .expireIf(e -> e.getPlugin().getName().equals("Plan"))
@@ -66,7 +68,7 @@ public class PlayerAnalyticsHook implements PluginHook {
 
     public void cancel() { }
 
-    private boolean isCapabilityAvailable(String capability) {
+    private boolean isCapabilityAvailable(@NonNull String capability) {
         try {
             return capabilities.hasCapability(capability);
         } catch (NoClassDefFoundError ignored) {
@@ -159,7 +161,7 @@ public class PlayerAnalyticsHook implements PluginHook {
                 iconFamily = Family.SOLID,
                 iconColor = Color.NONE
         )
-        public boolean getUsingVpn(UUID playerID) {
+        public boolean getUsingVpn(@NonNull UUID playerID) {
             Player player = Bukkit.getPlayer(playerID);
             if (player == null) {
                 return false;
@@ -196,7 +198,7 @@ public class PlayerAnalyticsHook implements PluginHook {
                 iconFamily = Family.SOLID,
                 iconColor = Color.NONE
         )
-        public boolean getMcLeaks(UUID playerId) {
+        public boolean getMcLeaks(@NonNull UUID playerId) {
             PlayerManager playerManager = VPNAPIProvider.getInstance().getPlayerManager();
 
             try {
@@ -208,7 +210,7 @@ public class PlayerAnalyticsHook implements PluginHook {
             return false;
         }
 
-        private String getIp(Player player) {
+        private @Nullable String getIp(@NonNull Player player) {
             InetSocketAddress address = player.getAddress();
             if (address == null) {
                 return null;
@@ -220,7 +222,7 @@ public class PlayerAnalyticsHook implements PluginHook {
             return host.getHostAddress();
         }
 
-        private <T> T handleException(Throwable ex) {
+        private <T> @Nullable T handleException(@NonNull Throwable ex) {
             if (ex instanceof APIException) {
                 if (ConfigUtil.getDebugOrFalse()) {
                     logger.error("[Hard: " + ((APIException) ex).isHard() + "] " + ex.getMessage(), ex);
@@ -237,6 +239,6 @@ public class PlayerAnalyticsHook implements PluginHook {
             return null;
         }
 
-        public CallEvents[] callExtensionMethodsOn() { return events; }
+        public @NonNull CallEvents[] callExtensionMethodsOn() { return events; }
     }
 }

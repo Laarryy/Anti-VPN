@@ -2,58 +2,61 @@ package me.egg82.antivpn.commands.internal;
 
 import co.aikar.commands.CommandIssuer;
 import co.aikar.taskchain.TaskChainFactory;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import me.egg82.antivpn.api.APIException;
-import me.egg82.antivpn.config.ConfigUtil;
+import java.util.concurrent.CompletionException;
+import me.egg82.antivpn.api.VPNAPIProvider;
+import me.egg82.antivpn.api.model.source.Source;
+import me.egg82.antivpn.api.model.source.SourceManager;
+import me.egg82.antivpn.api.model.source.models.SourceModel;
 import me.egg82.antivpn.lang.Message;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
-public class TestCommand implements Runnable {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
-
-    private final CommandIssuer issuer;
+public class TestCommand extends AbstractCommand {
     private final String ip;
-    private final TaskChainFactory taskFactory;
 
-    public TestCommand(CommandIssuer issuer, String ip, TaskChainFactory taskFactory) {
-        this.issuer = issuer;
+    public TestCommand(@NonNull CommandIssuer issuer, @NonNull TaskChainFactory taskFactory, @NonNull String ip) {
+        super(issuer, taskFactory);
         this.ip = ip;
-        this.taskFactory = taskFactory;
     }
 
     public void run() {
         issuer.sendInfo(Message.TEST__BEGIN, "{ip}", ip);
 
-        chain
-                .<Optional<Map<String, Optional<Boolean>>>>asyncCallback((v, f) -> {
-                    try {
-                        f.accept(Optional.of(api.testAllSources(ip)));
-                        return;
-                    } catch (APIException ex) {
-                        if (ConfigUtil.getDebugOrFalse()) {
-                            logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
-                        } else {
-                            logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage());
-                        }
+        SourceManager sourceManager = VPNAPIProvider.getInstance().getSourceManager();
+
+        taskFactory.<Void>newChain()
+                .<Map<String, Optional<Boolean>>>asyncCallback((v, r) -> {
+                    Map<String, Optional<Boolean>> retVal = new HashMap<>();
+
+                    List<Source<? extends SourceModel>> sources = sourceManager.getSources();
+                    // TODO: multi-thread this
+                    for (Source<? extends SourceModel> source : sources) {
+                        try {
+                            retVal.put(source.getName(), Optional.ofNullable(source.getResult(ip)
+                                    .exceptionally(this::handleException)
+                                    .join()));
+                            return;
+                        } catch (CompletionException ignored) { }
                     }
-                    f.accept(Optional.empty());
+
+                    r.accept(retVal);
                 })
-                .syncLast(f -> {
-                    if (!f.isPresent()) {
+                .syncLast(v -> {
+                    if (v.isEmpty()) {
                         issuer.sendError(Message.ERROR__INTERNAL);
                         return;
                     }
 
-                    for (Map.Entry<String, Optional<Boolean>> kvp : f.get().entrySet()) {
+                    for (Map.Entry<String, Optional<Boolean>> kvp : v.entrySet()) {
                         if (!kvp.getValue().isPresent()) {
                             issuer.sendInfo(Message.TEST__ERROR, "{source}", kvp.getKey());
                             continue;
                         }
                         issuer.sendInfo(kvp.getValue().get() ? Message.TEST__VPN_DETECTED : Message.TEST__NO_VPN_DETECTED, "{source}", kvp.getKey());
                     }
-                    issuer.sendInfo(Message.TEST__END, "{ip}", ip);
                 })
                 .execute();
     }

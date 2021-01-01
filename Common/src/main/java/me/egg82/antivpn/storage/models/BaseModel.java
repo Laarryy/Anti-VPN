@@ -8,6 +8,7 @@ import java.time.Instant;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.Version;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 @MappedSuperclass
 public abstract class BaseModel extends Model implements Serializable {
@@ -20,7 +21,7 @@ public abstract class BaseModel extends Model implements Serializable {
     @WhenModified
     protected Instant modified;
 
-    public BaseModel() {
+    protected BaseModel() {
         super();
         this.id = -1L;
         this.version = -1L;
@@ -28,7 +29,7 @@ public abstract class BaseModel extends Model implements Serializable {
         this.modified = null;
     }
 
-    public BaseModel(String dbName) {
+    protected BaseModel(String dbName) {
         super(dbName);
         this.id = -1L;
         this.version = -1L;
@@ -44,13 +45,13 @@ public abstract class BaseModel extends Model implements Serializable {
 
     public void setVersion(long version) { this.version = version; }
 
-    public Instant getCreated() {  return created; }
+    public @NonNull Instant getCreated() {  return created; }
 
-    public void setCreated(Instant created) { this.created = created; }
+    public void setCreated(@NonNull Instant created) { this.created = created; }
 
-    public Instant getModified() { return modified; }
+    public @NonNull Instant getModified() { return modified; }
 
-    public void setModified(Instant modified) { this.modified = modified; }
+    public void setModified(@NonNull Instant modified) { this.modified = modified; }
 
     public String toString() {
         return "BaseModel{" +

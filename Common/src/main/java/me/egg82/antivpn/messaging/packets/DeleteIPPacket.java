@@ -2,19 +2,20 @@ package me.egg82.antivpn.messaging.packets;
 
 import java.nio.ByteBuffer;
 import java.util.Objects;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 public class DeleteIPPacket extends AbstractPacket {
     private String ip;
 
     public byte getPacketId() { return 0x03; }
 
-    public DeleteIPPacket(ByteBuffer data) { read(data); }
+    public DeleteIPPacket(@NonNull ByteBuffer data) { read(data); }
 
     public DeleteIPPacket() {
-        this.ip = null;
+        this.ip = "";
     }
 
-    public void read(ByteBuffer buffer) {
+    public void read(@NonNull ByteBuffer buffer) {
         if (!checkVersion(buffer)) {
             return;
         }
@@ -24,21 +25,21 @@ public class DeleteIPPacket extends AbstractPacket {
         checkReadPacket(buffer);
     }
 
-    public void write(ByteBuffer buffer) {
+    public void write(@NonNull ByteBuffer buffer) {
         buffer.put(VERSION);
 
         putString(this.ip, buffer);
     }
 
-    public String getIp() { return ip; }
+    public @NonNull String getIp() { return ip; }
 
-    public void setIp(String ip) { this.ip = ip; }
+    public void setIp(@NonNull String ip) { this.ip = ip; }
 
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof DeleteIPPacket)) return false;
         DeleteIPPacket that = (DeleteIPPacket) o;
-        return Objects.equals(ip, that.ip);
+        return ip.equals(that.ip);
     }
 
     public int hashCode() { return Objects.hash(ip); }

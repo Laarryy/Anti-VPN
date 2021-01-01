@@ -26,7 +26,7 @@ public class PaperPlayerInfo implements PlayerInfo {
     private static final Object nameCacheLock = new Object();
     private static final Object propertiesCacheLock = new Object();
 
-    PaperPlayerInfo(UUID uuid) throws IOException {
+    PaperPlayerInfo(@NonNull UUID uuid) throws IOException {
         this.uuid = uuid;
 
         Optional<String> name = Optional.ofNullable(uuidCache.getIfPresent(uuid));
@@ -57,7 +57,7 @@ public class PaperPlayerInfo implements PlayerInfo {
         }
     }
 
-    PaperPlayerInfo(String name) throws IOException {
+    PaperPlayerInfo(@NonNull String name) throws IOException {
         this.name = name;
 
         Optional<UUID> uuid = Optional.ofNullable(nameCache.getIfPresent(name));
@@ -94,7 +94,7 @@ public class PaperPlayerInfo implements PlayerInfo {
 
     public @NonNull ImmutableList<ProfileModel.ProfilePropertyModel> getProperties() { return ImmutableList.copyOf(properties); }
 
-    private static String nameExpensive(UUID uuid) throws IOException {
+    private static @NonNull String nameExpensive(@NonNull UUID uuid) throws IOException {
         // Currently-online lookup
         Player player = Bukkit.getPlayer(uuid);
         if (player != null) {
@@ -119,7 +119,7 @@ public class PaperPlayerInfo implements PlayerInfo {
         throw new IOException("Could not load player data from Mojang (rate-limited?)");
     }
 
-    private static UUID uuidExpensive(String name) throws IOException {
+    private static @NonNull UUID uuidExpensive(@NonNull String name) throws IOException {
         // Currently-online lookup
         Player player = Bukkit.getPlayer(name);
         if (player != null) {
@@ -144,7 +144,7 @@ public class PaperPlayerInfo implements PlayerInfo {
         throw new IOException("Could not load player data from Mojang (rate-limited?)");
     }
 
-    private static List<ProfileModel.ProfilePropertyModel> propertiesExpensive(UUID uuid) throws IOException {
+    private static @NonNull List<ProfileModel.ProfilePropertyModel> propertiesExpensive(@NonNull UUID uuid) throws IOException {
         // Cached profile lookup
         PlayerProfile profile = Bukkit.createProfile(uuid);
         if ((profile.isComplete() || profile.completeFromCache()) && profile.getName() != null && profile.getId() != null) {
@@ -159,7 +159,7 @@ public class PaperPlayerInfo implements PlayerInfo {
         throw new IOException("Could not load skin data from Mojang (rate-limited?)");
     }
 
-    private static List<ProfileModel.ProfilePropertyModel> toPropertiesModel(Set<ProfileProperty> properties) {
+    private static @NonNull List<ProfileModel.ProfilePropertyModel> toPropertiesModel(@NonNull Set<ProfileProperty> properties) {
         List<ProfileModel.ProfilePropertyModel> retVal = new ArrayList<>();
         for (ProfileProperty property : properties) {
             ProfileModel.ProfilePropertyModel newProperty = new ProfileModel.ProfilePropertyModel();

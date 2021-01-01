@@ -11,6 +11,7 @@ import ninja.egg82.analytics.events.GAError;
 import ninja.egg82.analytics.events.GASessionEnd;
 import ninja.egg82.analytics.events.GASessionStart;
 import ninja.egg82.analytics.events.base.GAEventBase;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.json.simple.parser.ParseException;
 
 public class GameAnalyticsErrorHandler {
@@ -18,9 +19,9 @@ public class GameAnalyticsErrorHandler {
     private static GAEventBase eventBase = null;
     private static long start = -1L;
 
-    private GameAnalyticsErrorHandler() {}
+    private GameAnalyticsErrorHandler() { }
 
-    public static void sendException(Throwable exception) {
+    public static void sendException(@NonNull Throwable exception) {
         try {
             gameAnalytics.queueEvent(GAError.builder(eventBase, exception).build());
         } catch (IOException ex) {
@@ -30,7 +31,7 @@ public class GameAnalyticsErrorHandler {
         }
     }
 
-    public static void sendMessage(Severity severity, String message) {
+    public static void sendMessage(@NonNull Severity severity, @NonNull String message) {
         if (gameAnalytics == null) {
             return;
         }
@@ -44,7 +45,7 @@ public class GameAnalyticsErrorHandler {
         }
     }
 
-    public static void open(UUID userID, String buildVersion, String serverVersion) {
+    public static void open(@NonNull UUID userID, @NonNull String buildVersion, @NonNull String serverVersion) {
         try {
             gameAnalytics = new GameAnalytics(ServiceKeys.GAMEANALYTICS_KEY, ServiceKeys.GAMEANALYTICS_SECRET, 5);
         } catch (IOException | NoSuchAlgorithmException | InvalidKeyException | ParseException ex) {

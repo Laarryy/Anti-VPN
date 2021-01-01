@@ -4,52 +4,79 @@ import co.aikar.commands.CommandIssuer;
 import co.aikar.taskchain.TaskChainFactory;
 import java.text.DecimalFormat;
 import java.util.Set;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.TimeUnit;
 import me.egg82.antivpn.api.APIException;
+import me.egg82.antivpn.api.VPNAPIProvider;
+import me.egg82.antivpn.api.model.source.Source;
+import me.egg82.antivpn.api.model.source.SourceManager;
+import me.egg82.antivpn.api.model.source.models.SourceModel;
 import me.egg82.antivpn.config.ConfigUtil;
 import me.egg82.antivpn.lang.Message;
 import me.egg82.antivpn.utils.DNSUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
-public class ScoreCommand implements Runnable {
-    private static final Logger logger = LoggerFactory.getLogger(ScoreCommand.class);
-
-    private final CommandIssuer issuer;
-    private final String source;
-    private final TaskChainFactory taskFactory;
+public class ScoreCommand extends AbstractCommand {
+    private final String sourceName;
 
     private static final DecimalFormat format = new DecimalFormat("##0.00");
 
-    public ScoreCommand(CommandIssuer issuer, String source, TaskChainFactory taskFactory) {
-        this.issuer = issuer;
-        this.source = source;
-        this.taskFactory = taskFactory;
+    public ScoreCommand(@NonNull CommandIssuer issuer, @NonNull TaskChainFactory taskFactory, @NonNull String sourceName) {
+        super(issuer, taskFactory);
+        this.sourceName = sourceName;
     }
 
     public void run() {
-        issuer.sendInfo(Message.SCORE__BEGIN, "{source}", source);
+        issuer.sendInfo(Message.SCORE__BEGIN, "{source}", sourceName);
+
+        SourceManager sourceManager = VPNAPIProvider.getInstance().getSourceManager();
 
         taskFactory.<Void>newChain()
-                .sync(() -> issuer.sendInfo(Message.SCORE__TYPE, "{type}", "NordVPN"))
-                .async(() -> test(issuer, source, "NordVPN", DNSUtil.getNordVpnIps()))
-                .sync(() -> issuer.sendInfo(Message.SCORE__SLEEP))
+                .<Source<? extends SourceModel>>currentCallback((v, r) -> r.accept(sourceManager.getSource(sourceName)))
+                .abortIfNull(this.handleAbort)
+                .sync(v -> {
+                    issuer.sendInfo(Message.SCORE__TYPE, "{type}", "NordVPN");
+                    return v;
+                })
+                .async(v -> {
+                    test(v, "NordVPN", DNSUtil.getNordVpnIps());
+                    return v;
+                })
+                .sync(v -> {
+                    issuer.sendInfo(Message.SCORE__SLEEP);
+                    return v;
+                })
                 .delay(60, TimeUnit.SECONDS)
-                .sync(() -> issuer.sendInfo(Message.SCORE__TYPE, "{type}", "Cryptostorm"))
-                .async(() -> test(issuer, source, "Cryptostorm", DNSUtil.getCryptostormIps()))
-                .sync(() -> issuer.sendInfo(Message.SCORE__SLEEP))
+                .sync(v -> {
+                    issuer.sendInfo(Message.SCORE__TYPE, "{type}", "Cryptostorm");
+                    return v;
+                })
+                .async(v -> {
+                    test(v, "Cryptostorm", DNSUtil.getCryptostormIps());
+                    return v;
+                })
+                .sync(v -> {
+                    issuer.sendInfo(Message.SCORE__SLEEP);
+                    return v;
+                })
                 .delay(60, TimeUnit.SECONDS)
-                .sync(() -> issuer.sendInfo(Message.SCORE__TYPE, "{type}", "random home IPs"))
-                .async(() -> test(issuer, source, "Random home IP", DNSUtil.getHomeIps(), true))
-                .sync(() -> issuer.sendInfo(Message.SCORE__END, "{source}", source))
+                .sync(v -> {
+                    issuer.sendInfo(Message.SCORE__TYPE, "{type}", "random home IPs");
+                    return v;
+                })
+                .async(v -> {
+                    test(v, "Random home IP", DNSUtil.getHomeIps(), true);
+                    return v;
+                })
+                .syncLast(v -> issuer.sendInfo(Message.SCORE__END, "{source}", v.getName()))
                 .execute();
     }
 
-    private void test(CommandIssuer issuer, String source, String vpnName, Set<String> ips) {
-        test(issuer, source, vpnName, ips, false);
+    private void test(@NonNull Source<? extends SourceModel> source, @NonNull String vpnName, @NonNull Set<String> ips) {
+        test(source, vpnName, ips, false);
     }
 
-    private void test(CommandIssuer issuer, String source, String vpnName, Set<String> ips, boolean flipResult) {
+    private void test(@NonNull Source<? extends SourceModel> source, @NonNull String vpnName, @NonNull Set<String> ips, boolean flipResult) {
         if (ConfigUtil.getDebugOrFalse()) {
             logger.info("Testing against " + vpnName);
         }
@@ -61,7 +88,7 @@ public class ScoreCommand implements Runnable {
         for (String ip : ips) {
             i++;
             try {
-                if (source.equalsIgnoreCase("getipintel")) {
+                if (source.getName().equalsIgnoreCase("getipintel")) {
                     Thread.sleep(5000L); // 15req/min max, so every 4 seconds. 5 to be safe.
                 } else {
                     Thread.sleep(1000L);
@@ -79,13 +106,13 @@ public class ScoreCommand implements Runnable {
 
             boolean result;
             try {
-                result = api.getSourceResult(ip, source);
-            } catch (APIException ex) {
-                if (ex.isHard()) {
-                    logger.error(ex.getMessage(), ex);
-                    continue;
+                result = source.getResult(ip)
+                        .exceptionally(this::handleException)
+                        .join();
+            } catch (CompletionException ex) {
+                if (!(ex.getCause() instanceof APIException) || !((APIException) ex.getCause()).isHard()) {
+                    error += 1;
                 }
-                error++;
                 continue;
             }
 
@@ -95,8 +122,8 @@ public class ScoreCommand implements Runnable {
         }
 
         if (error > 0) {
-            issuer.sendInfo(Message.SCORE__ERROR, "{source}", source, "{type}", vpnName, "{percent}", format.format((error / ips.size()) * 100.0d));
+            issuer.sendInfo(Message.SCORE__ERROR, "{source}", source.getName(), "{type}", vpnName, "{percent}", format.format((error / ips.size()) * 100.0d));
         }
-        issuer.sendInfo(Message.SCORE__SCORE, "{source}", source, "{type}", vpnName, "{percent}", format.format((good / ips.size()) * 100.0d));
+        issuer.sendInfo(Message.SCORE__SCORE, "{source}", source.getName(), "{type}", vpnName, "{percent}", format.format((good / ips.size()) * 100.0d));
     }
 }

@@ -18,6 +18,7 @@ import me.egg82.antivpn.messaging.MessagingService;
 import me.egg82.antivpn.messaging.packets.MultiPacket;
 import me.egg82.antivpn.messaging.packets.Packet;
 import ninja.egg82.reflect.PackageFilter;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,12 +58,12 @@ public class PacketUtil {
         workPool = Executors.newFixedThreadPool(size, new ThreadFactoryBuilder().setNameFormat("AntiVPN-Messaging-%d").build());
     }
 
-    public static Byte2ObjectMap<Class<Packet>> getPacketCache() { return packetCache; }
+    public static @NonNull Byte2ObjectMap<Class<Packet>> getPacketCache() { return packetCache; }
 
     private static final DoubleBuffer<Packet> packetQueue = new DoubleBuffer<>();
     private static final AtomicBoolean requiresSending = new AtomicBoolean(false);
 
-    public static void queuePacket(Packet packet) {
+    public static void queuePacket(@NonNull Packet packet) {
         packetQueue.getWriteBuffer().add(packet);
         requiresSending.set(true);
     }
@@ -90,7 +91,6 @@ public class PacketUtil {
                 multi.getPackets().add(packet);
             }
 
-            // TODO: Split workload across several messaging services?
             for (MessagingService service : cachedConfig.getMessaging()) {
                 workPool.execute(() -> {
                     try {
@@ -102,16 +102,16 @@ public class PacketUtil {
             }
         } else {
             Packet packet = packetQueue.getReadBuffer().poll();
-
-            // TODO: Split workload across several messaging services?
-            for (MessagingService service : cachedConfig.getMessaging()) {
-                workPool.execute(() -> {
-                    try {
-                        service.sendPacket(messageId, packet);
-                    } catch (IOException | TimeoutException ex) {
-                        logger.warn("Could not broadcast packet " + packet.getClass().getSimpleName() + " through " + service.getName(), ex);
-                    }
-                });
+            if (packet != null) {
+                for (MessagingService service : cachedConfig.getMessaging()) {
+                    workPool.execute(() -> {
+                        try {
+                            service.sendPacket(messageId, packet);
+                        } catch (IOException | TimeoutException ex) {
+                            logger.warn("Could not broadcast packet " + packet.getClass().getSimpleName() + " through " + service.getName(), ex);
+                        }
+                    });
+                }
             }
         }
     }

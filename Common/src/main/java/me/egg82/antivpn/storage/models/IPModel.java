@@ -4,6 +4,7 @@ import io.ebean.annotation.Index;
 import io.ebean.annotation.Length;
 import io.ebean.annotation.NotNull;
 import javax.persistence.Entity;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 @Entity(name = "avpn_ip")
 public class IPModel extends BaseModel {
@@ -15,7 +16,7 @@ public class IPModel extends BaseModel {
 
     public IPModel() {
         super();
-        this.ip = null;
+        this.ip = "";
         this.type = -1;
         this.cascade = false;
         this.consensus = Double.NaN;
@@ -23,15 +24,15 @@ public class IPModel extends BaseModel {
 
     public IPModel(String dbName) {
         super(dbName);
-        this.ip = null;
+        this.ip = "";
         this.type = -1;
         this.cascade = false;
         this.consensus = Double.NaN;
     }
 
-    public String getIp() { return ip; }
+    public @NonNull String getIp() { return ip; }
 
-    public void setIp(String ip) { this.ip = ip; }
+    public void setIp(@NonNull String ip) { this.ip = ip; }
 
     public int getType() { return type; }
 

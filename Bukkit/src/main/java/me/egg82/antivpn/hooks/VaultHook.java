@@ -11,13 +11,15 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.server.PluginEnableEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class VaultHook implements PluginHook {
     private final Permission permission;
     private final CommandIssuer console;
 
-    public static void create(Plugin plugin, Plugin vault, CommandIssuer console) {
-        if (vault != null && !vault.isEnabled()) {
+    public static void create(@NonNull Plugin plugin, @NonNull Plugin vault, @NonNull CommandIssuer console) {
+        if (!vault.isEnabled()) {
             BukkitEvents.subscribe(plugin, PluginEnableEvent.class, EventPriority.MONITOR)
                     .expireIf(e -> e.getPlugin().getName().equals("Vault"))
                     .filter(e -> e.getPlugin().getName().equals("Vault"))
@@ -27,7 +29,7 @@ public class VaultHook implements PluginHook {
         ServiceLocator.register(new VaultHook(console));
     }
 
-    private VaultHook(CommandIssuer console) {
+    private VaultHook(@NonNull CommandIssuer console) {
         this.console = console;
         final RegisteredServiceProvider<Permission> permissionProvider = Bukkit.getServicesManager().getRegistration(Permission.class);
         if (permissionProvider != null) {
@@ -45,8 +47,7 @@ public class VaultHook implements PluginHook {
 
     public void cancel() { }
 
-    /* Can return null */
-    public Permission getPermission() {
+    public @Nullable Permission getPermission() {
         if (permission == null && ConfigUtil.getDebugOrFalse()) {
             console.sendMessage(LogUtil.HEADING + "<c2>Returning null Vault permissions provider.</c2>");
         }

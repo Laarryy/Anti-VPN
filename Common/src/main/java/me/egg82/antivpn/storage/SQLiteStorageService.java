@@ -8,20 +8,21 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.Properties;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 public class SQLiteStorageService extends AbstractStorageService {
-    public static SQLiteStorageService.Builder builder(String name) { return new SQLiteStorageService.Builder(name); }
+    private SQLiteStorageService(@NonNull String name) {
+        super(name);
+    }
+
+    public static SQLiteStorageService.Builder builder(@NonNull String name) { return new SQLiteStorageService.Builder(name); }
 
     public static class Builder {
-        private final SQLiteStorageService service = new SQLiteStorageService();
+        private final SQLiteStorageService service;
         private final HikariConfig config = new HikariConfig();
 
-        private Builder(String name) {
-            if (name == null) {
-                throw new IllegalArgumentException("name cannot be null.");
-            }
-
-            service.name = name;
+        private Builder(@NonNull String name) {
+            service = new SQLiteStorageService(name);
 
             // Baseline
             config.setPoolName("AntiVPN-SQLite");
@@ -32,12 +33,12 @@ public class SQLiteStorageService extends AbstractStorageService {
             config.addDataSourceProperty("serverTimezone", "UTC");
         }
 
-        public SQLiteStorageService.Builder file(File file) {
+        public SQLiteStorageService.Builder file(@NonNull File file) {
             config.setJdbcUrl("jdbc:sqlite:" + file.getAbsolutePath());
             return this;
         }
 
-        public SQLiteStorageService.Builder options(String options) throws IOException {
+        public SQLiteStorageService.Builder options(@NonNull String options) throws IOException {
             options = !options.isEmpty() && options.charAt(0) == '?' ? options.substring(1) : options;
             Properties p = new Properties();
             p.load(new StringReader(options.replace("&", "\n")));
@@ -57,7 +58,7 @@ public class SQLiteStorageService extends AbstractStorageService {
             return this;
         }
 
-        public SQLiteStorageService build() {
+        public @NonNull SQLiteStorageService build() {
             HikariDataSource source = new HikariDataSource(config);
             DatabaseConfig dbConfig = new DatabaseConfig();
             dbConfig.setDataSource(source);

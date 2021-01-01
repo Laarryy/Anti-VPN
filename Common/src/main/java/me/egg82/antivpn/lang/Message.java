@@ -2,6 +2,7 @@ package me.egg82.antivpn.lang;
 
 import co.aikar.locales.MessageKey;
 import co.aikar.locales.MessageKeyProvider;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 public enum Message implements MessageKeyProvider {
     GENERAL__HEADER,
@@ -47,5 +48,5 @@ public enum Message implements MessageKeyProvider {
     RELOAD__END;
 
     private final MessageKey key = MessageKey.of(name().toLowerCase().replace("__", "."));
-    public MessageKey getMessageKey() { return key; }
+    public @NonNull MessageKey getMessageKey() { return key; }
 }

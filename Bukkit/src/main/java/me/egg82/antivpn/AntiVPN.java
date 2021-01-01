@@ -64,6 +64,7 @@ import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongepowered.configurate.ConfigurationNode;
@@ -85,7 +86,7 @@ public class AntiVPN {
 
     private CommandIssuer consoleCommandIssuer = null;
 
-    public AntiVPN(Plugin plugin) {
+    public AntiVPN(@NonNull Plugin plugin) {
         this.plugin = plugin;
         isBukkit = BukkitEnvironmentUtil.getEnvironment() == BukkitEnvironmentUtil.Environment.BUKKIT;
     }
@@ -595,11 +596,11 @@ public class AntiVPN {
         }
     }
 
-    private void log(Level level, String message) {
+    private void log(@NonNull Level level, @NonNull String message) {
         plugin.getServer().getLogger().log(level, (isBukkit) ? ChatColor.stripColor(message) : message);
     }
 
-    private boolean isVanished(Player player) {
+    private boolean isVanished(@NonNull Player player) {
         for (MetadataValue meta : player.getMetadata("vanished")) {
             if (meta.asBoolean()) return true;
         }

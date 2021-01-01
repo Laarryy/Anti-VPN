@@ -11,6 +11,7 @@ import ninja.egg82.service.ServiceNotFoundException;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.Plugin;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,7 +22,7 @@ public class AntiVPNCommand extends BaseCommand {
     private final Plugin plugin;
     private final TaskChainFactory taskFactory;
 
-    public AntiVPNCommand(Plugin plugin, TaskChainFactory taskFactory) {
+    public AntiVPNCommand(@NonNull Plugin plugin, @NonNull TaskChainFactory taskFactory) {
         this.plugin = plugin;
         this.taskFactory = taskFactory;
     }
@@ -29,7 +30,7 @@ public class AntiVPNCommand extends BaseCommand {
     @Subcommand("reload")
     @CommandPermission("avpn.admin")
     @Description("{@@description.reload}")
-    public void onReload(CommandIssuer issuer) {
+    public void onReload(@NonNull CommandIssuer issuer) {
         StorageMessagingHandler handler;
         try {
             handler = ServiceLocator.get(StorageMessagingHandler.class);
@@ -45,8 +46,8 @@ public class AntiVPNCommand extends BaseCommand {
     @Description("{@@description.import}")
     @Syntax("<master> <slave> [batchSize]")
     @CommandCompletion("@storage @storage @nothing")
-    public void onImport(CommandIssuer issuer, @Conditions("storage") String master, @Conditions("storage") String slave, @Default("50") String batchSize) {
-        new ImportCommand(issuer, master, slave, batchSize, taskFactory).run();
+    public void onImport(@NonNull CommandIssuer issuer, @NonNull @Conditions("storage") String master, @NonNull @Conditions("storage") String slave, @Default("50") String batchSize) {
+        new ImportCommand(issuer, taskFactory, master, slave, batchSize).run();
     }
 
     @Subcommand("test")
@@ -54,8 +55,8 @@ public class AntiVPNCommand extends BaseCommand {
     @Description("{@@description.test}")
     @Syntax("<ip>")
     @CommandCompletion("@nothing")
-    public void onTest(CommandIssuer issuer, @Conditions("ip") String ip) {
-        new TestCommand(issuer, ip, taskFactory).run();
+    public void onTest(@NonNull CommandIssuer issuer, @NonNull @Conditions("ip") String ip) {
+        new TestCommand(issuer, taskFactory, ip).run();
     }
 
     @Subcommand("score")
@@ -63,8 +64,8 @@ public class AntiVPNCommand extends BaseCommand {
     @Description("{@@description.score}")
     @Syntax("<source>")
     @CommandCompletion("@source @nothing")
-    public void onScore(CommandIssuer issuer, @Conditions("source") String source) {
-        new ScoreCommand(issuer, source, taskFactory).run();
+    public void onScore(@NonNull CommandIssuer issuer, @NonNull @Conditions("source") String source) {
+        new ScoreCommand(issuer, taskFactory, source).run();
     }
 
     @Subcommand("check")
@@ -72,17 +73,17 @@ public class AntiVPNCommand extends BaseCommand {
     @Description("{@@description.check}")
     @Syntax("<ip|player>")
     @CommandCompletion("@player @nothing")
-    public void onCheck(CommandIssuer issuer, String type) {
+    public void onCheck(@NonNull CommandIssuer issuer, @NonNull String type) {
         new CheckCommand(issuer, taskFactory, type).run();
     }
 
     @CatchUnknown @Default
     @CommandCompletion("@subcommand")
-    public void onDefault(CommandSender sender, String[] args) {
+    public void onDefault(@NonNull CommandSender sender, String[] args) {
         Bukkit.getServer().dispatchCommand(sender, "antivpn help");
     }
 
     @HelpCommand
     @Syntax("[command]")
-    public void onHelp(CommandSender sender, CommandHelp help) { help.showHelp(); }
+    public void onHelp(@NonNull CommandSender sender, @NonNull CommandHelp help) { help.showHelp(); }
 }

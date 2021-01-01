@@ -24,6 +24,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.java.JavaPluginLoader;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,7 +79,7 @@ public class BukkitBootstrap extends JavaPlugin {
     @Override
     public void onDisable() { concrete.onDisable(); }
 
-    private void loadJars(File jarsDir, URLClassLoader parentLoader) throws IOException, IllegalAccessException, InvocationTargetException {
+    private void loadJars(@NonNull File jarsDir, @NonNull URLClassLoader parentLoader) throws IOException, IllegalAccessException, InvocationTargetException {
         if (jarsDir.exists() && !jarsDir.isDirectory()) {
             Files.delete(jarsDir.toPath());
         }
@@ -96,22 +97,22 @@ public class BukkitBootstrap extends JavaPlugin {
     }
 
     // Prevent Maven from relocating this
-    private String getCaffeinePackage() { return new String(new byte[] {'c', 'o', 'm', '.', 'g', 'i', 't', 'h', 'u', 'b', '.', 'b', 'e', 'n', 'm', 'a', 'n', 'e', 's', '.', 'c', 'a', 'f', 'f', 'e', 'i', 'n', 'e'}); }
+    private @NonNull String getCaffeinePackage() { return new String(new byte[] {'c', 'o', 'm', '.', 'g', 'i', 't', 'h', 'u', 'b', '.', 'b', 'e', 'n', 'm', 'a', 'n', 'e', 's', '.', 'c', 'a', 'f', 'f', 'e', 'i', 'n', 'e'}); }
 
-    private void printLatest(String friendlyName) {
+    private void printLatest(@NonNull String friendlyName) {
         log(Level.INFO, LogUtil.HEADING + ChatColor.YELLOW + "Checking version of " + ChatColor.WHITE + friendlyName);
     }
 
-    private void buildInject(Artifact.Builder builder, File jarsDir, URLClassLoader classLoader, String friendlyName) {
+    private void buildInject(Artifact.Builder builder, @NonNull File jarsDir, @NonNull URLClassLoader classLoader, @NonNull String friendlyName) {
         buildInject(builder, jarsDir, classLoader, friendlyName, 0);
     }
 
-    private void buildInject(Artifact.Builder builder, File jarsDir, URLClassLoader classLoader, String friendlyName, int depth) {
+    private void buildInject(Artifact.Builder builder, @NonNull File jarsDir, @NonNull URLClassLoader classLoader, @NonNull String friendlyName, int depth) {
         downloadPool.submit(() -> buildInjectWait(builder, jarsDir, classLoader, friendlyName, depth));
     }
 
-    private void buildInjectWait(Artifact.Builder builder, File jarsDir, URLClassLoader classLoader, String friendlyName, int depth) {
-        Exception lastEx = null;
+    private void buildInjectWait(Artifact.Builder builder, @NonNull File jarsDir, @NonNull URLClassLoader classLoader, @NonNull String friendlyName, int depth) {
+        Exception lastEx;
         try {
             injectArtifact(builder.build(), jarsDir, classLoader, friendlyName, depth, null);
             return;
@@ -136,16 +137,16 @@ public class BukkitBootstrap extends JavaPlugin {
         }
     }
 
-    private void buildRelocateInject(Artifact.Builder builder, File jarsDir, List<Relocation> rules, URLClassLoader classLoader, String friendlyName) {
+    private void buildRelocateInject(Artifact.Builder builder, @NonNull File jarsDir, @NonNull List<Relocation> rules, @NonNull URLClassLoader classLoader, @NonNull String friendlyName) {
         buildRelocateInject(builder, jarsDir, rules, classLoader, friendlyName, 0);
     }
 
-    private void buildRelocateInject(Artifact.Builder builder, File jarsDir, List<Relocation> rules, URLClassLoader classLoader, String friendlyName, int depth) {
+    private void buildRelocateInject(Artifact.Builder builder, @NonNull File jarsDir, @NonNull List<Relocation> rules, @NonNull URLClassLoader classLoader, @NonNull String friendlyName, int depth) {
         downloadPool.submit(() -> buildRelocateInjectWait(builder, jarsDir, rules, classLoader, friendlyName, depth));
     }
 
-    private void buildRelocateInjectWait(Artifact.Builder builder, File jarsDir, List<Relocation> rules, URLClassLoader classLoader, String friendlyName, int depth) {
-        Exception lastEx = null;
+    private void buildRelocateInjectWait(Artifact.Builder builder, @NonNull File jarsDir, @NonNull List<Relocation> rules, @NonNull URLClassLoader classLoader, @NonNull String friendlyName, int depth) {
+        Exception lastEx;
         try {
             injectArtifact(builder.build(), jarsDir, classLoader, friendlyName, depth, rules);
             return;
@@ -170,7 +171,7 @@ public class BukkitBootstrap extends JavaPlugin {
         }
     }
 
-    private void injectArtifact(Artifact artifact, File jarsDir, URLClassLoader classLoader, String friendlyName, int depth, List<Relocation> rules) throws IOException, IllegalAccessException, InvocationTargetException, URISyntaxException, XPathExpressionException, SAXException {
+    private void injectArtifact(@NonNull Artifact artifact, @NonNull File jarsDir, @NonNull URLClassLoader classLoader, String friendlyName, int depth, List<Relocation> rules) throws IOException, IllegalAccessException, InvocationTargetException, URISyntaxException, XPathExpressionException, SAXException {
         File output = new File(jarsDir, artifact.getGroupId()
                 + "-" + artifact.getArtifactId()
                 + "-" + artifact.getRealVersion() + ".jar"
@@ -206,7 +207,7 @@ public class BukkitBootstrap extends JavaPlugin {
         }
     }
 
-    private void injectArtifact(Artifact.Builder builder, File jarsDir, URLClassLoader classLoader, List<Relocation> rules) throws IOException, IllegalAccessException, InvocationTargetException {
+    private void injectArtifact(Artifact.Builder builder, @NonNull File jarsDir, @NonNull URLClassLoader classLoader, List<Relocation> rules) throws IOException, IllegalAccessException, InvocationTargetException {
         File[] files = jarsDir.listFiles();
         if (files == null) {
             throw new IOException();
@@ -237,7 +238,7 @@ public class BukkitBootstrap extends JavaPlugin {
         }
     }
 
-    private void log(Level level, String message) {
+    private void log(@NonNull Level level, @NonNull String message) {
         getServer().getLogger().log(level, (isBukkit) ? ChatColor.stripColor(message) : message);
     }
 }

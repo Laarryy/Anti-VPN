@@ -5,28 +5,25 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import me.egg82.antivpn.utils.PacketUtil;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 public class MultiPacket extends AbstractPacket {
     private List<Packet> packets;
 
     public byte getPacketId() { return 0x21; }
 
-    public MultiPacket(ByteBuffer data) { read(data); }
+    public MultiPacket(@NonNull ByteBuffer data) { read(data); }
 
     public MultiPacket() {
         this.packets = new ArrayList<>();
     }
 
-    public void read(ByteBuffer buffer) {
+    public void read(@NonNull ByteBuffer buffer) {
         if (!checkVersion(buffer)) {
             return;
         }
 
-        if (this.packets == null) {
-            this.packets = new ArrayList<>();
-        } else {
-            this.packets.clear();
-        }
+        this.packets.clear();
 
         byte nextPacket;
         while (buffer.remaining() > 0 && (nextPacket = buffer.get()) != 0x00) { // Seek end of multi-packet or end of buffer
@@ -54,10 +51,10 @@ public class MultiPacket extends AbstractPacket {
         checkReadPacket(buffer);
     }
 
-    public void write(ByteBuffer buffer) {
+    public void write(@NonNull ByteBuffer buffer) {
         buffer.put(VERSION);
 
-        if (packets == null || packets.isEmpty()) {
+        if (packets.isEmpty()) {
             buffer.put((byte) 0x00); // End of multi-packet
             return;
         }
@@ -77,15 +74,15 @@ public class MultiPacket extends AbstractPacket {
         buffer.put((byte) 0x00); // End of multi-packet
     }
 
-    public List<Packet> getPackets() { return packets; }
+    public @NonNull List<Packet> getPackets() { return packets; }
 
-    public void setPackets(List<Packet> packets) { this.packets = packets; }
+    public void setPackets(@NonNull List<Packet> packets) { this.packets = packets; }
 
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof MultiPacket)) return false;
         MultiPacket that = (MultiPacket) o;
-        return Objects.equals(packets, that.packets);
+        return packets.equals(that.packets);
     }
 
     public int hashCode() { return Objects.hash(packets); }

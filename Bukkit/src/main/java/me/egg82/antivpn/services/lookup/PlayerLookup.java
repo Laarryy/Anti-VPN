@@ -19,19 +19,7 @@ public class PlayerLookup {
         IS_PAPER = paper;
     }
 
-    public static @NonNull PlayerInfo get(UUID uuid) throws IOException {
-        if (uuid == null) {
-            throw new IllegalArgumentException("uuid cannot be null.");
-        }
+    public static @NonNull PlayerInfo get(@NonNull UUID uuid) throws IOException { return (IS_PAPER) ? new PaperPlayerInfo(uuid) : new BukkitPlayerInfo(uuid); }
 
-        return (IS_PAPER) ? new PaperPlayerInfo(uuid) : new BukkitPlayerInfo(uuid);
-    }
-
-    public static @NonNull PlayerInfo get(String name) throws IOException {
-        if (name == null) {
-            throw new IllegalArgumentException("name cannot be null.");
-        }
-
-        return (IS_PAPER) ? new PaperPlayerInfo(name) : new BukkitPlayerInfo(name);
-    }
+    public static @NonNull PlayerInfo get(@NonNull String name) throws IOException { return (IS_PAPER) ? new PaperPlayerInfo(name) : new BukkitPlayerInfo(name); }
 }

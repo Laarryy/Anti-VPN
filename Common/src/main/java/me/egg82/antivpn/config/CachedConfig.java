@@ -14,7 +14,7 @@ import me.egg82.antivpn.utils.TimeUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 public class CachedConfig {
-    private CachedConfig() {}
+    private CachedConfig() { }
 
     private ImmutableList<StorageService> storage = ImmutableList.of();
     public @NonNull ImmutableList<StorageService> getStorage() { return storage; }

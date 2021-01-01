@@ -10,11 +10,12 @@ import me.egg82.antivpn.api.model.ip.IPManager;
 import me.egg82.antivpn.api.model.player.PlayerManager;
 import me.egg82.antivpn.lang.Message;
 import me.egg82.antivpn.utils.ValidationUtil;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 public class CheckCommand extends AbstractCommand {
     private final String type;
 
-    public CheckCommand(CommandIssuer issuer, TaskChainFactory taskFactory, String type) {
+    public CheckCommand(@NonNull CommandIssuer issuer, @NonNull TaskChainFactory taskFactory, @NonNull String type) {
         super(issuer, taskFactory);
         this.type = type;
     }
@@ -29,7 +30,7 @@ public class CheckCommand extends AbstractCommand {
         }
     }
 
-    private void checkIp(String ip) {
+    private void checkIp(@NonNull String ip) {
         IPManager ipManager = VPNAPIProvider.getInstance().getIpManager();
 
         taskFactory.<Void>newChain()
@@ -57,7 +58,7 @@ public class CheckCommand extends AbstractCommand {
                 .execute();
     }
 
-    private void checkPlayer(String playerName) {
+    private void checkPlayer(@NonNull String playerName) {
         PlayerManager playerManager = VPNAPIProvider.getInstance().getPlayerManager();
 
         taskFactory.<Void>newChain()

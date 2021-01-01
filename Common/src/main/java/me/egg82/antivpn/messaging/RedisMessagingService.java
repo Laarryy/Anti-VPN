@@ -13,6 +13,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import me.egg82.antivpn.config.ConfigUtil;
 import me.egg82.antivpn.messaging.packets.Packet;
 import me.egg82.antivpn.utils.PacketUtil;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import redis.clients.jedis.BinaryJedisPubSub;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
@@ -20,18 +21,20 @@ import redis.clients.jedis.JedisPoolConfig;
 import redis.clients.jedis.exceptions.JedisException;
 
 public class RedisMessagingService extends AbstractMessagingService {
-    private ExecutorService workPool = Executors.newFixedThreadPool(1, new ThreadFactoryBuilder().setNameFormat("AntiVPN-Redis-%d").build());
+    private final ExecutorService workPool = Executors.newFixedThreadPool(1, new ThreadFactoryBuilder().setNameFormat("AntiVPN-Redis-%d").build());
 
     private JedisPool pool;
-    private PubSub pubSub = new PubSub(this);
+    private final PubSub pubSub = new PubSub(this);
 
     private volatile boolean closed = false;
-    private ReadWriteLock queueLock = new ReentrantReadWriteLock();
+    private final ReadWriteLock queueLock = new ReentrantReadWriteLock();
 
     private static final String CHANNEL_NAME = "avpn-data";
     private static final byte[] CHANNEL_NAME_BYTES = CHANNEL_NAME.getBytes(StandardCharsets.UTF_8);
 
-    private RedisMessagingService() { }
+    private RedisMessagingService(@NonNull String name) {
+        super(name);
+    }
 
     public void close() {
         queueLock.writeLock().lock();
@@ -50,10 +53,10 @@ public class RedisMessagingService extends AbstractMessagingService {
 
     public boolean isClosed() { return closed || pool.isClosed(); }
 
-    public static Builder builder(String name, UUID serverId, MessagingHandler handler) { return new Builder(name, serverId, handler); }
+    public static Builder builder(@NonNull String name, @NonNull UUID serverId, @NonNull MessagingHandler handler) { return new Builder(name, serverId, handler); }
 
     public static class Builder {
-        private final RedisMessagingService service = new RedisMessagingService();
+        private final RedisMessagingService service;
         private final JedisPoolConfig config = new JedisPoolConfig();
 
         private String address = "127.0.0.1";
@@ -61,18 +64,8 @@ public class RedisMessagingService extends AbstractMessagingService {
         private int timeout = 5000;
         private String pass = "";
 
-        public Builder(String name, UUID serverId, MessagingHandler handler) {
-            if (name == null) {
-                throw new IllegalArgumentException("name cannot be null.");
-            }
-            if (serverId == null) {
-                throw new IllegalArgumentException("serverId cannot be null.");
-            }
-            if (handler == null) {
-                throw new IllegalArgumentException("handler cannot be null.");
-            }
-
-            service.name = name;
+        public Builder(@NonNull String name, @NonNull UUID serverId, @NonNull MessagingHandler handler) {
+            service = new RedisMessagingService(name);
             service.serverId = serverId;
             service.serverIdString = serverId.toString();
             byte[] bytes = new byte[16];
@@ -84,13 +77,13 @@ public class RedisMessagingService extends AbstractMessagingService {
             service.handler = handler;
         }
 
-        public Builder url(String address, int port) {
+        public Builder url(@NonNull String address, int port) {
             this.address = address;
             this.port = port;
             return this;
         }
 
-        public Builder credentials(String pass) {
+        public Builder credentials(@NonNull String pass) {
             this.pass = pass;
             return this;
         }
@@ -108,7 +101,7 @@ public class RedisMessagingService extends AbstractMessagingService {
             return this;
         }
 
-        public RedisMessagingService build() {
+        public @NonNull RedisMessagingService build() {
             service.pool = new JedisPool(config, address, port, timeout, pass == null || pass.isEmpty() ? null : pass);
             // Warm up pool
             // https://partners-intl.aliyun.com/help/doc-detail/98726.htm
@@ -134,7 +127,7 @@ public class RedisMessagingService extends AbstractMessagingService {
             });
         }
 
-        private void warmup(JedisPool pool) {
+        private void warmup(@NonNull JedisPool pool) {
             Jedis[] warmpupArr = new Jedis[config.getMinIdle()];
 
             for (int i = 0; i < config.getMinIdle(); i++) {
@@ -155,7 +148,7 @@ public class RedisMessagingService extends AbstractMessagingService {
     private static class PubSub extends BinaryJedisPubSub {
         private final RedisMessagingService service;
 
-        private PubSub(RedisMessagingService service) { this.service = service; }
+        private PubSub(@NonNull RedisMessagingService service) { this.service = service; }
 
         public void onMessage(byte[] c, byte[] m) {
             String channel = new String(c, StandardCharsets.UTF_8);
@@ -208,14 +201,7 @@ public class RedisMessagingService extends AbstractMessagingService {
         }
     }
 
-    public void sendPacket(UUID messageId, Packet packet) throws IOException {
-        if (messageId == null) {
-            throw new IllegalArgumentException("messageId cannot be null.");
-        }
-        if (packet == null) {
-            throw new IllegalArgumentException("packet cannot be null.");
-        }
-
+    public void sendPacket(@NonNull UUID messageId, @NonNull Packet packet) throws IOException {
         queueLock.readLock().lock();
         try (Jedis redis = pool.getResource()) {
             ByteBuffer buffer = ByteBuffer.allocateDirect(8 * 1024); // 8 KB

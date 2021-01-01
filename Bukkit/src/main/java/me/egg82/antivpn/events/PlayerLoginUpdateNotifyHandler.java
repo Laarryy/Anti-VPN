@@ -11,6 +11,7 @@ import ninja.egg82.updater.SpigotUpdater;
 import org.bukkit.Bukkit;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.plugin.Plugin;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongepowered.configurate.ConfigurationNode;
@@ -21,12 +22,12 @@ public class PlayerLoginUpdateNotifyHandler implements Consumer<PlayerLoginEvent
     private final Plugin plugin;
     private final CommandManager commandManager;
 
-    public PlayerLoginUpdateNotifyHandler(Plugin plugin, CommandManager commandManager) {
+    public PlayerLoginUpdateNotifyHandler(@NonNull Plugin plugin, @NonNull CommandManager commandManager) {
         this.plugin = plugin;
         this.commandManager = commandManager;
     }
 
-    public void accept(PlayerLoginEvent event) {
+    public void accept(@NonNull PlayerLoginEvent event) {
         if (!event.getPlayer().hasPermission("avpn.admin")) {
             return;
         }
