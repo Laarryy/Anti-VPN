@@ -33,8 +33,6 @@ public class ScoreCommand implements Runnable {
     private final String source;
     private final TaskChainFactory taskFactory;
 
-    private final VPNAPI api = VPNAPIProvider.getInstance();
-
     private static final DecimalFormat format = new DecimalFormat("##0.00");
 
     public ScoreCommand(CommandIssuer issuer, String source, TaskChainFactory taskFactory) {

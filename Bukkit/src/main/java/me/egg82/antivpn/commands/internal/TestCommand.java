@@ -18,8 +18,6 @@ public class TestCommand implements Runnable {
     private final String ip;
     private final TaskChainFactory taskFactory;
 
-    private final VPNAPI api = VPNAPIProvider.getInstance();
-
     public TestCommand(CommandIssuer issuer, String ip, TaskChainFactory taskFactory) {
         this.issuer = issuer;
         this.ip = ip;

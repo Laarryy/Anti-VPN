@@ -6,10 +6,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.URISyntaxException;
 import java.net.URLClassLoader;
 import java.nio.file.Files;
-import java.sql.Driver;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -21,13 +17,10 @@ import me.egg82.antivpn.utils.LogUtil;
 import me.lucko.jarrelocator.JarRelocator;
 import me.lucko.jarrelocator.Relocation;
 import ninja.egg82.maven.Artifact;
-import ninja.egg82.maven.Repository;
 import ninja.egg82.maven.Scope;
-import ninja.egg82.services.ProxiedURLClassLoader;
 import ninja.egg82.utils.DownloadUtil;
 import ninja.egg82.utils.InjectUtil;
 import org.bukkit.ChatColor;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,12 +29,10 @@ import org.xml.sax.SAXException;
 public class BukkitBootstrap extends JavaPlugin {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private Object concrete;
-    private Class<?> concreteClass;
+    private AntiVPN concrete;
 
     private final boolean isBukkit;
 
-    private URLClassLoader proxiedClassLoader;
     private final ExecutorService downloadPool = Executors.newWorkStealingPool(Math.max(4, Runtime.getRuntime().availableProcessors() / 2));
 
     public BukkitBootstrap() {
@@ -51,13 +42,11 @@ public class BukkitBootstrap extends JavaPlugin {
 
     @Override
     public void onLoad() {
-        proxiedClassLoader = new ProxiedURLClassLoader(getClass().getClassLoader(), new String[] { "org\\.slf4j\\..*", "com\\.mysql\\.jdbc\\..*" });
-
         try {
-            loadJars(new File(getDataFolder(), "external"), proxiedClassLoader, (URLClassLoader) getClass().getClassLoader());
+            loadJars(new File(getDataFolder(), "external"), (URLClassLoader) getClass().getClassLoader());
         } catch (ClassCastException | IOException | IllegalAccessException | InvocationTargetException ex) {
             logger.error(ex.getMessage(), ex);
-            throw new RuntimeException("Could not load required deps.");
+            throw new RuntimeException("Could not load required dependencies.");
         }
 
         downloadPool.shutdown();
@@ -71,54 +60,17 @@ public class BukkitBootstrap extends JavaPlugin {
             Thread.currentThread().interrupt();
         }
 
-        try {
-            DriverManager.registerDriver((Driver) Class.forName("org.sqlite.JDBC", true, proxiedClassLoader).newInstance());
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | SQLException ex) {
-            logger.error(ex.getMessage(), ex);
-        }
-
-        // MySQL is automatically registered
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver", true, proxiedClassLoader).newInstance();
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException ex) {
-            logger.error(ex.getMessage(), ex);
-        }
-
-        try {
-            concreteClass = proxiedClassLoader.loadClass("me.egg82.antivpn.AntiVPN");
-            concrete = concreteClass.getDeclaredConstructor(Plugin.class).newInstance(this);
-            concreteClass.getMethod("onLoad").invoke(concrete);
-        } catch (ClassNotFoundException | NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException ex) {
-            logger.error(ex.getMessage(), ex);
-            throw new RuntimeException("Could not create main class.");
-        }
+        concrete = new AntiVPN(this);
+        concrete.onLoad();
     }
 
     @Override
-    public void onEnable() {
-        try {
-            concreteClass.getMethod("onEnable").invoke(concrete);
-        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ex) {
-            logger.error(ex.getMessage(), ex);
-            throw new RuntimeException("Could not invoke onEnable.");
-        }
-
-        if (ExternalAPI.getInstance() == null) {
-            ExternalAPI.setInstance(proxiedClassLoader);
-        }
-    }
+    public void onEnable() { concrete.onEnable(); }
 
     @Override
-    public void onDisable() {
-        try {
-            concreteClass.getMethod("onDisable").invoke(concrete);
-        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ex) {
-            logger.error(ex.getMessage(), ex);
-            throw new RuntimeException("Could not invoke onDisable.");
-        }
-    }
+    public void onDisable() { concrete.onDisable(); }
 
-    private void loadJars(File jarsDir, URLClassLoader classLoader, URLClassLoader parentLoader) throws IOException, IllegalAccessException, InvocationTargetException {
+    private void loadJars(File jarsDir, URLClassLoader parentLoader) throws IOException, IllegalAccessException, InvocationTargetException {
         if (jarsDir.exists() && !jarsDir.isDirectory()) {
             Files.delete(jarsDir.toPath());
         }
@@ -130,127 +82,16 @@ public class BukkitBootstrap extends JavaPlugin {
 
         File cacheDir = new File(jarsDir, "cache");
 
-        // First
-
-        Artifact.Builder guava = Artifact.builder("com.google.guava", "guava", "${guava.version}", cacheDir)
+        /*Artifact.Builder caffeine = Artifact.builder("com.github.ben-manes.caffeine", "caffeine", "${caffeine.version}", cacheDir)
                 .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
-        buildInjectWait(guava, jarsDir, classLoader, "Google Guava", 1);
-
-        // Same file
-
-        InjectUtil.injectFile(getFile(), classLoader);
-
-        // Local
-
-        Artifact.Builder taskchainBukkit = Artifact.builder("co.aikar", "taskchain-bukkit", "${taskchain.version}", cacheDir)
-                .addRepository(Repository.builder("https://repo.aikar.co/nexus/content/groups/aikar/").addProxy("https://nexus.egg82.me/repository/aikar/").build())
-                .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
-        buildInject(taskchainBukkit, jarsDir, classLoader, "Taskchain", 1);
-
-        printLatest("ACF");
-        Artifact.Builder acfPaper = Artifact.builder("co.aikar", "acf-paper", "${acf.version}", cacheDir)
-                .addDirectJarURL("https://nexus.egg82.me/repository/aikar/{GROUP}/{ARTIFACT}/{VERSION}/{ARTIFACT}-{SNAPSHOT}-shaded.jar")
-                .addDirectJarURL("https://repo.aikar.co/nexus/content/groups/aikar/{GROUP}/{ARTIFACT}/{VERSION}/{ARTIFACT}-{SNAPSHOT}-shaded.jar")
-                .addRepository(Repository.builder("https://repo.aikar.co/nexus/content/groups/aikar/").addProxy("https://nexus.egg82.me/repository/aikar/").build())
-                .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
-        buildInject(acfPaper, jarsDir, classLoader, "ACF");
-
-        Artifact.Builder eventChainBukkit = Artifact.builder("ninja.egg82", "event-chain-bukkit", "${eventchain.version}", cacheDir)
-                .addRepository(Repository.builder("https://nexus.egg82.me/repository/maven-releases/").addProxy("https://www.myget.org/F/egg82-proxy/maven/").build())
-                .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
-        buildInject(eventChainBukkit, jarsDir, classLoader, "Event Chain");
-
-        Artifact.Builder configurateYaml = Artifact.builder("org.spongepowered", "configurate-yaml", "${configurate.version}", cacheDir)
-                .addRepository(Repository.builder("https://repo.spongepowered.org/maven/").addProxy("https://nexus.egg82.me/repository/sponge/").build())
-                .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
-        buildInject(configurateYaml, jarsDir, classLoader, "Configurate", 2);
-
-        Artifact.Builder spigotUpdater = Artifact.builder("ninja.egg82", "spigot-updater", "${updater.version}", cacheDir)
-                .addRepository(Repository.builder("https://nexus.egg82.me/repository/maven-releases/").addProxy("https://www.myget.org/F/egg82-proxy/maven/").build())
-                .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
-        buildInject(spigotUpdater, jarsDir, classLoader, "Spigot Updater");
-
-        Artifact.Builder serviceLocator = Artifact.builder("ninja.egg82", "service-locator", "${servicelocator.version}", cacheDir)
-                .addRepository(Repository.builder("https://nexus.egg82.me/repository/maven-releases/").addProxy("https://www.myget.org/F/egg82-proxy/maven/").build())
-                .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
-        buildInject(serviceLocator, jarsDir, classLoader, "Service Locator");
-
-        Artifact.Builder javassist = Artifact.builder("org.javassist", "javassist", "${javassist.version}", cacheDir)
-                .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
-        buildInject(javassist, jarsDir, classLoader, "Javassist");
-
-        Artifact.Builder javaxAnnotationApi = Artifact.builder("javax.annotation", "javax.annotation-api", "${javaxannotation.version}", cacheDir)
-                .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
-        buildInject(javaxAnnotationApi, jarsDir, classLoader, "Javax Annotations");
-
-        Artifact.Builder reflectionUtils = Artifact.builder("ninja.egg82", "reflection-utils", "${reflectionutils.version}", cacheDir)
-                .addRepository(Repository.builder("https://nexus.egg82.me/repository/maven-releases/").addProxy("https://www.myget.org/F/egg82-proxy/maven/").build())
-                .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
-        buildInject(reflectionUtils, jarsDir, classLoader, "Reflection Utils");
-
-        printLatest("SQLite");
-        Artifact.Builder sqlite = Artifact.builder("org.xerial", "sqlite-jdbc", "${sqlite.version}", cacheDir)
-                .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
-        buildInject(sqlite, jarsDir, classLoader, "SQLite");
-
-        printLatest("MySQL");
-        Artifact.Builder mysql = Artifact.builder("mysql", "mysql-connector-java", "${mysql.version}", cacheDir)
-                .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
-        buildInject(mysql, jarsDir, classLoader, "MySQL", 1);
-
-        // Global
-
-        Artifact.Builder caffeine = Artifact.builder("com.github.ben-manes.caffeine", "caffeine", "${caffeine.version}", cacheDir)
-                .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
-        buildRelocateInject(caffeine, jarsDir, Collections.singletonList(new Relocation(getCaffeinePackage(), "me.egg82.antivpn.external." + getCaffeinePackage())), parentLoader, "Caffeine");
-
-        Artifact.Builder amqpClient = Artifact.builder("com.rabbitmq", "amqp-client", "${rabbitmq.version}", cacheDir)
-                .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
-        buildInject(amqpClient, jarsDir, classLoader, "RabbitMQ");
-
-        Artifact.Builder mcleaks = Artifact.builder("me.gong", "mcleaks-api", "${mcleaks.version}", cacheDir)
-                .addRepository(Repository.builder("https://nexus.wesjd.net/repository/thirdparty/").addProxy("https://nexus.egg82.me/repository/wesjd/").build())
-                .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
-        buildInject(mcleaks, jarsDir, classLoader, "MCLeaks API");
-
-        Artifact.Builder ipaddress = Artifact.builder("com.github.seancfoley", "ipaddress", "${ipaddress.version}", cacheDir)
-                .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
-        buildInject(ipaddress, jarsDir, classLoader, "IPAddress");
-
-        Artifact.Builder gameanalyticsApi = Artifact.builder("ninja.egg82", "gameanalytics-api", "${gameanalytics.version}", cacheDir)
-                .addRepository(Repository.builder("https://nexus.egg82.me/repository/maven-releases/").addProxy("https://www.myget.org/F/egg82-proxy/maven/").build())
-                .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
-        buildInject(gameanalyticsApi, jarsDir, classLoader, "GameAnalytics API", 1);
-
-        Artifact.Builder abstractConfiguration = Artifact.builder("ninja.egg82", "abstract-configuration", "${abstractconfiguration.version}", cacheDir)
-                .addRepository(Repository.builder("https://nexus.egg82.me/repository/maven-releases/").addProxy("https://www.myget.org/F/egg82-proxy/maven/").build())
-                .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
-        buildInject(abstractConfiguration, jarsDir, classLoader, "Abstract Configuration");
-
-        Artifact.Builder easySql = Artifact.builder("ninja.egg82", "easy-sql", "${easysql.version}", cacheDir)
-                .addRepository(Repository.builder("https://nexus.egg82.me/repository/maven-releases/").addProxy("https://www.myget.org/F/egg82-proxy/maven/").build())
-                .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
-        buildInject(easySql, jarsDir, classLoader, "EasySQL");
-
-        Artifact.Builder jsonWeb = Artifact.builder("ninja.egg82", "json-web", "${jsonweb.version}", cacheDir)
-                .addRepository(Repository.builder("https://nexus.egg82.me/repository/maven-releases/").addProxy("https://www.myget.org/F/egg82-proxy/maven/").build())
-                .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
-        buildInject(jsonWeb, jarsDir, classLoader, "JSON Web");
-
-        Artifact.Builder commonsValidator = Artifact.builder("commons-validator", "commons-validator", "${commonsvalidator.version}", cacheDir)
-                .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
-        buildInject(commonsValidator, jarsDir, classLoader, "Apache Commons Validator", 1);
-
-        Artifact.Builder jedis = Artifact.builder("redis.clients", "jedis", "${jedis.version}", cacheDir)
-                .addRepository((Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build()));
-        buildInject(jedis, jarsDir, classLoader, "Jedis", 1);
+        buildRelocateInject(caffeine, jarsDir, Collections.singletonList(new Relocation(getCaffeinePackage(), "me.egg82.antivpn.external." + getCaffeinePackage())), parentLoader, "Caffeine");*/
     }
 
     // Prevent Maven from relocating this
     private String getCaffeinePackage() { return new String(new byte[] {'c', 'o', 'm', '.', 'g', 'i', 't', 'h', 'u', 'b', '.', 'b', 'e', 'n', 'm', 'a', 'n', 'e', 's', '.', 'c', 'a', 'f', 'f', 'e', 'i', 'n', 'e'}); }
 
     private void printLatest(String friendlyName) {
-        log(Level.INFO, LogUtil.getHeading() + ChatColor.YELLOW + "Checking version of " + ChatColor.WHITE + friendlyName);
+        log(Level.INFO, LogUtil.HEADING + ChatColor.YELLOW + "Checking version of " + ChatColor.WHITE + friendlyName);
     }
 
     private void buildInject(Artifact.Builder builder, File jarsDir, URLClassLoader classLoader, String friendlyName) {
@@ -328,7 +169,7 @@ public class BukkitBootstrap extends JavaPlugin {
         );
 
         if (friendlyName != null && !artifact.fileExists(output)) {
-            log(Level.INFO, LogUtil.getHeading() + ChatColor.YELLOW + "Downloading " + ChatColor.WHITE + friendlyName);
+            log(Level.INFO, LogUtil.HEADING + ChatColor.YELLOW + "Downloading " + ChatColor.WHITE + friendlyName);
         }
 
         if (rules == null) {

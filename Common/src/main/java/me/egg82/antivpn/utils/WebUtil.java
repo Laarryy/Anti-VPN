@@ -67,6 +67,46 @@ public class WebUtil {
         }
     }
 
+    public static @NonNull byte[] getBytes(URL url) throws IOException { return getBytes(url, null, 5000, null, null, null); }
+
+    public static @NonNull byte[] getBytes(URL url, String method) throws IOException { return getBytes(url, method, 5000, null, null, null); }
+
+    public static @NonNull byte[] getBytes(URL url, String method, int timeout) throws IOException { return getBytes(url, method, timeout, null, null, null); }
+
+    public static @NonNull byte[] getBytes(URL url, String method, int timeout, String userAgent) throws IOException { return getBytes(url, method, timeout, userAgent, null, null); }
+
+    public static @NonNull byte[] getBytes(URL url, String method, int timeout, String userAgent, Map<String, String> headers) throws IOException { return getBytes(url, method, timeout, userAgent, headers, null); }
+
+    public static @NonNull byte[] getBytes(URL url, String method, int timeout, String userAgent, Map<String, String> headers, Map<String, String> postData) throws IOException {
+        if (headers == null) {
+            headers = new HashMap<>();
+        }
+        headers.put("Connection", "close");
+        headers.put("Accept-Language", "en-US,en;q=0.8");
+
+        try (InputStream in = getInputStream(url, method, timeout, userAgent, headers, postData); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            int read;
+            byte[] buffer = new byte[4096];
+            while ((read = in.read(buffer, 0, buffer.length)) > 0) {
+                out.write(buffer, 0, read);
+            }
+            out.flush();
+            return out.toByteArray();
+        }
+    }
+
+    public static @NonNull byte[] getBytes(HttpURLConnection conn) throws IOException {
+        try (InputStream in = getInputStream(conn); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            int read;
+            byte[] buffer = new byte[4096];
+            while ((read = in.read(buffer, 0, buffer.length)) > 0) {
+                out.write(buffer, 0, read);
+            }
+            out.flush();
+            return out.toByteArray();
+        }
+    }
+
     public static @NonNull HttpURLConnection getConnection(URL url) throws IOException { return getConnection(url, null, 5000, null, null, null); }
 
     public static @NonNull HttpURLConnection getConnection(URL url, String method) throws IOException { return getConnection(url, method, 5000, null, null, null); }
@@ -84,7 +124,7 @@ public class WebUtil {
         }
 
         if (ConfigUtil.getDebugOrFalse()) {
-            logger.debug("Fetching URL: " + url);
+            logger.info("Fetching URL: " + url);
         }
 
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();

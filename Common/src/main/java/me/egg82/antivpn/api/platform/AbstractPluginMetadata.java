@@ -1,7 +1,9 @@
 package me.egg82.antivpn.api.platform;
 
-public abstract class AbstractPluginMetadata implements PluginMetadata {
-    private static final double API_VERSION = 1.0d;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
-    public double getApiVersion() { return API_VERSION; }
+public abstract class AbstractPluginMetadata implements PluginMetadata {
+    private static final String API_VERSION = "2.0.0";
+
+    public @NonNull String getApiVersion() { return API_VERSION; }
 }
