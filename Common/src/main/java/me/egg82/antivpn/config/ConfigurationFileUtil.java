@@ -83,7 +83,7 @@ public class ConfigurationFileUtil {
                 .serverId(serverId)
                 .build();
 
-        PacketUtil.setPoolSize(cachedConfig.getMessaging().size());
+        PacketUtil.setPoolSize(cachedConfig.getMessaging().size() + 1);
 
         ConfigUtil.setConfiguration(config, cachedConfig);
 

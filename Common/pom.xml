@@ -61,10 +61,7 @@
                         </goals>
                         <configuration>
                             <dependencyReducedPomLocation>${project.build.directory}/dependency-reduced-pom.xml</dependencyReducedPomLocation>
-                            <minimizeJar>true</minimizeJar>
-                            <transformers>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
-                            </transformers>
+                            <minimizeJar>false</minimizeJar>
                         </configuration>
                     </execution>
                 </executions>
@@ -144,7 +141,7 @@
 
         <dependency>
             <groupId>io.ebean</groupId>
-            <artifactId>ebean</artifactId>
+            <artifactId>ebean-api</artifactId>
             <version>${ebean.version}</version>
             <scope>provided</scope>
         </dependency>

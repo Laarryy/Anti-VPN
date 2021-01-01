@@ -68,6 +68,10 @@
                             <shadedPattern>me.egg82.antivpn.external.com.github.benmanes.caffeine</shadedPattern>
                         </relocation>
                         <relocation>
+                            <pattern>com.github.luben.zstd</pattern>
+                            <shadedPattern>me.egg82.antivpn.external.com.github.luben.zstd</shadedPattern>
+                        </relocation>
+                        <relocation>
                             <pattern>it.unimi.dsi.fastutil</pattern>
                             <shadedPattern>me.egg82.antivpn.external.it.unimi.dsi.fastutil</shadedPattern>
                         </relocation>
@@ -138,6 +142,7 @@
                             <dependencyReducedPomLocation>${project.build.directory}/dependency-reduced-pom.xml</dependencyReducedPomLocation>
                             <minimizeJar>false</minimizeJar>
                             <transformers>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.PluginXmlResourceTransformer"/>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
                             </transformers>
                             <filters>
@@ -146,6 +151,11 @@
                                     <excludes>
                                         <!-- included or useless -->
                                         <exclude>LICENSE*</exclude>
+                                        <exclude>NOTICE*</exclude>
+                                        <exclude>README*</exclude>
+                                        <exclude>META-INF/LICENSE*</exclude>
+                                        <exclude>META-INF/NOTICE*</exclude>
+                                        <exclude>META-INF/README*</exclude>
                                         <exclude>META-INF/*.SF</exclude>
                                         <exclude>META-INF/*.DSA</exclude>
                                         <exclude>META-INF/*.RSA</exclude>
@@ -333,7 +343,7 @@
         </dependency>
         <dependency>
             <groupId>io.ebean</groupId>
-            <artifactId>ebean</artifactId>
+            <artifactId>ebean-core</artifactId>
             <version>${ebean.version}</version>
         </dependency>
         <dependency>
@@ -366,6 +376,7 @@
             <groupId>com.github.luben</groupId>
             <artifactId>zstd-jni</artifactId>
             <version>${zstd.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
