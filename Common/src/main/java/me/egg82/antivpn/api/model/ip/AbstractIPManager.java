@@ -65,9 +65,7 @@ public abstract class AbstractIPManager implements IPManager {
             }
 
             for (StorageService service : cachedConfig.getStorage()) {
-                IPModel model = new IPModel();
-                model.setIp(ip.getIp());
-                model.setType(cachedConfig.getVPNAlgorithmMethod().ordinal());
+                IPModel model = service.getOrCreateIpModel(ip.getIp(), cachedConfig.getVPNAlgorithmMethod().ordinal());
                 model.setCascade(ip.getCascade());
                 model.setConsensus(ip.getConsensus());
                 service.storeModel(model);
@@ -318,9 +316,7 @@ public abstract class AbstractIPManager implements IPManager {
 
     private void storeResult(@NonNull IPModel model, @NonNull CachedConfig cachedConfig) {
         for (StorageService service : cachedConfig.getStorage()) {
-            IPModel m = new IPModel();
-            m.setIp(model.getIp());
-            m.setType(model.getType());
+            IPModel m = service.getOrCreateIpModel(model.getIp(), model.getType());
             m.setCascade(model.getCascade());
             m.setConsensus(model.getConsensus());
             service.storeModel(m);

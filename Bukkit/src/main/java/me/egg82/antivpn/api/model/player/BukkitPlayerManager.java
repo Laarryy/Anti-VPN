@@ -167,9 +167,7 @@ public class BukkitPlayerManager extends AbstractPlayerManager {
 
     private void storeResult(@NonNull PlayerModel model, @NonNull CachedConfig cachedConfig) {
         for (StorageService service : cachedConfig.getStorage()) {
-            PlayerModel m = new PlayerModel();
-            m.setUuid(model.getUuid());
-            m.setMcleaks(model.isMcleaks());
+            PlayerModel m = service.getOrCreatePlayerModel(model.getUuid(), model.isMcleaks());
             service.storeModel(m);
         }
 

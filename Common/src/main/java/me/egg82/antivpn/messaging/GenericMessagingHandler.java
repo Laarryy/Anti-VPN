@@ -61,9 +61,7 @@ public class GenericMessagingHandler implements MessagingHandler {
         }
 
         for (StorageService service : cachedConfig.getStorage()) {
-            IPModel model = new IPModel();
-            model.setIp(packet.getIp());
-            model.setType(packet.getType());
+            IPModel model = service.getOrCreateIpModel(packet.getIp(), packet.getType());
             model.setCascade(packet.getCascade());
             model.setConsensus(packet.getConsensus());
             service.storeModel(model);
@@ -124,9 +122,7 @@ public class GenericMessagingHandler implements MessagingHandler {
         }
 
         for (StorageService service : cachedConfig.getStorage()) {
-            PlayerModel model = new PlayerModel();
-            model.setUuid(packet.getUuid());
-            model.setMcleaks(packet.getValue());
+            PlayerModel model = service.getOrCreatePlayerModel(packet.getUuid(), packet.getValue());
             service.storeModel(model);
         }
 

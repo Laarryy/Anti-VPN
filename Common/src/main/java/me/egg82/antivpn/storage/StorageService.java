@@ -22,6 +22,7 @@ public interface StorageService {
     /*
     Note: Can be an expensive operation
      */
+    @NonNull IPModel getOrCreateIpModel(@NonNull String ip, int type);
     @Nullable IPModel getIpModel(@NonNull String ip, long cacheTimeMillis);
     @Nullable IPModel getIpModel(long ipId, long cacheTimeMillis);
     @NonNull Set<IPModel> getAllIps(long cacheTimeMillis);
@@ -30,6 +31,7 @@ public interface StorageService {
     /*
    Note: Can be an expensive operation
     */
+    @NonNull PlayerModel getOrCreatePlayerModel(@NonNull UUID player, boolean isMcLeaks);
     @Nullable PlayerModel getPlayerModel(@NonNull UUID player, long cacheTimeMillis);
     @Nullable PlayerModel getPlayerModel(long playerId, long cacheTimeMillis);
     @NonNull Set<PlayerModel> getAllPlayers(long cacheTimeMillis);

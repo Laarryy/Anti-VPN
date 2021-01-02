@@ -38,9 +38,7 @@ public abstract class AbstractPlayerManager implements PlayerManager {
             }
 
             for (StorageService service : cachedConfig.getStorage()) {
-                PlayerModel model = new PlayerModel();
-                model.setUuid(player.getUuid());
-                model.setMcleaks(player.isMcLeaks());
+                PlayerModel model = service.getOrCreatePlayerModel(player.getUuid(), player.isMcLeaks());
                 service.storeModel(model);
             }
 

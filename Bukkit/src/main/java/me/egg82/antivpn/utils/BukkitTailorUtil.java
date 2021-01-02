@@ -57,6 +57,6 @@ public class BukkitTailorUtil {
         if (placeholderapi.isPresent()) {
             message = placeholderapi.get().withPlaceholders(Bukkit.getOfflinePlayer(uuid), message);
         }
-        return ChatColor.translateAlternateColorCodes('&', message);
+        return ChatColor.translateAlternateColorCodes('&', message.replace("\\r", "").replace("\r", "").replace("\\n", "\n"));
     }
 }

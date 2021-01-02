@@ -72,6 +72,14 @@
                             <shadedPattern>me.egg82.antivpn.external.com.github.luben.zstd</shadedPattern>
                         </relocation>
                         <relocation>
+                            <pattern>io.ebeaninternal</pattern>
+                            <shadedPattern>me.egg82.antivpn.external.io.ebeaninternal</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>io.ebeanservice</pattern>
+                            <shadedPattern>me.egg82.antivpn.external.io.ebeanservice</shadedPattern>
+                        </relocation>
+                        <relocation>
                             <pattern>it.unimi.dsi.fastutil</pattern>
                             <shadedPattern>me.egg82.antivpn.external.it.unimi.dsi.fastutil</shadedPattern>
                         </relocation>
@@ -164,6 +172,13 @@
                                         <exclude>org/junit/**</exclude>
                                         <exclude>org/hamcrest/**</exclude>
                                         <exclude>ebean.mf</exclude>
+
+                                        <!-- dep injected (keep this to as few as possible) -->
+                                        <exclude>io/ebeaninternal/api/**</exclude>
+                                        <exclude>io/ebeaninternal/json/**</exclude>
+                                        <exclude>io/ebeaninternal/server/**</exclude>
+                                        <exclude>io/ebeaninternal/util/**</exclude>
+                                        <exclude>io/ebeanservice/**</exclude>
                                     </excludes>
                                 </filter>
                                 <filter>
