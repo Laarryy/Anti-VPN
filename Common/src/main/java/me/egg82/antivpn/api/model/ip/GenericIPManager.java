@@ -214,13 +214,20 @@ public class GenericIPManager implements IPManager {
                         logger.info("Getting result from source " + source.getName() + ".");
                     }
                     try {
-                        if (source.getResult(ip)
+                        Boolean result = source.getResult(ip)
                                 .exceptionally(this::handleException)
-                                .join()) {
-                            results.addAndGet(1L);
+                                .join();
+                        if (result != null) {
+                            if (Boolean.TRUE.equals(result)) {
+                                results.addAndGet(1L);
+                            }
+                            totalSources.addAndGet(1L);
+                        } else {
+                            logger.error("Source " + source.getName() + " returned an error. Skipping.");
+                            sourceInvalidationCache.put(source.getName(), Boolean.TRUE);
                         }
-                        totalSources.addAndGet(1L);
                     } catch (Exception ignored) {
+                        logger.error("Source " + source.getName() + " returned an error. Skipping.");
                         sourceInvalidationCache.put(source.getName(), Boolean.TRUE);
                     }
                     latch.countDown();
@@ -264,15 +271,23 @@ public class GenericIPManager implements IPManager {
                     retVal.setCascade(source.getResult(ip)
                             .exceptionally(this::handleException)
                             .join());
-                    if (useCache) {
-                        storeResult(retVal, cachedConfig);
-                        sendResult(retVal, cachedConfig);
+                    if (retVal.getCascade() != null) {
+                        break;
+                    } else {
+                        logger.error("Source " + source.getName() + " returned an error. Skipping.");
+                        sourceInvalidationCache.put(source.getName(), Boolean.TRUE);
                     }
-                    return retVal;
                 } catch (Exception ignored) {
+                    logger.error("Source " + source.getName() + " returned an error. Skipping.");
                     sourceInvalidationCache.put(source.getName(), Boolean.TRUE);
                 }
             }
+
+            if (useCache && retVal.getCascade() != null) {
+                storeResult(retVal, cachedConfig);
+                sendResult(retVal, cachedConfig);
+            }
+            return retVal;
         }
 
         throw new APIException(false, "No sources were available to query. See https://github.com/egg82/AntiVPN/wiki/FAQ#Errors");

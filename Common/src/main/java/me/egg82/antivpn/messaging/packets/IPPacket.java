@@ -65,11 +65,11 @@ public class IPPacket extends AbstractPacket {
 
     public @Nullable Boolean getCascade() { return cascade; }
 
-    public void setCascade(boolean cascade) { this.cascade = cascade; }
+    public void setCascade(Boolean cascade) { this.cascade = cascade; }
 
     public @Nullable Double getConsensus() { return consensus; }
 
-    public void setConsensus(double consensus) { this.consensus = consensus; }
+    public void setConsensus(Double consensus) { this.consensus = consensus; }
 
     public int getType() { return type; }
 
