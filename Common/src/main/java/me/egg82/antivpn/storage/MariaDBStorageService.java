@@ -4,7 +4,7 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import io.ebean.DatabaseFactory;
 import io.ebean.config.DatabaseConfig;
-import io.ebean.config.dbplatform.mysql.MySqlPlatform;
+import io.ebean.config.dbplatform.mariadb.MariaDbPlatform;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.Arrays;
@@ -14,22 +14,22 @@ import me.egg82.antivpn.storage.models.IPModel;
 import me.egg82.antivpn.storage.models.PlayerModel;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-public class MySQLStorageService extends AbstractStorageService {
-    private MySQLStorageService(@NonNull String name) {
+public class MariaDBStorageService extends AbstractStorageService {
+    private MariaDBStorageService(@NonNull String name) {
         super(name);
     }
 
-    public static Builder builder(@NonNull String name) { return new MySQLStorageService.Builder(name); }
+    public static Builder builder(@NonNull String name) { return new MariaDBStorageService.Builder(name); }
 
     public static class Builder {
-        private final MySQLStorageService service;
+        private final MariaDBStorageService service;
         private final HikariConfig config = new HikariConfig();
 
         private Builder(@NonNull String name) {
-            service = new MySQLStorageService(name);
+            service = new MariaDBStorageService(name);
 
             // Baseline
-            config.setPoolName("AntiVPN-MySQL");
+            config.setPoolName("AntiVPN-MariaDB");
             config.setDriverClassName("com.mysql.cj.jdbc.Driver");
             config.setConnectionTestQuery("SELECT 1;");
             config.setAutoCommit(true);
@@ -55,18 +55,18 @@ public class MySQLStorageService extends AbstractStorageService {
             config.addDataSourceProperty("elideSetAutoCommits", "true");
         }
 
-        public MySQLStorageService.Builder url(@NonNull String address, int port, @NonNull String database) {
+        public MariaDBStorageService.Builder url(@NonNull String address, int port, @NonNull String database) {
             config.setJdbcUrl("jdbc:mysql://" + address + ":" + port + "/" + database);
             return this;
         }
 
-        public MySQLStorageService.Builder credentials(@NonNull String user, @NonNull String pass) {
+        public MariaDBStorageService.Builder credentials(@NonNull String user, @NonNull String pass) {
             config.setUsername(user);
             config.setPassword(pass);
             return this;
         }
 
-        public MySQLStorageService.Builder options(@NonNull String options) throws IOException {
+        public MariaDBStorageService.Builder options(@NonNull String options) throws IOException {
             options = !options.isEmpty() && options.charAt(0) == '?' ? options.substring(1) : options;
             Properties p = new Properties();
             p.load(new StringReader(options.replace("&", "\n")));
@@ -74,23 +74,23 @@ public class MySQLStorageService extends AbstractStorageService {
             return this;
         }
 
-        public MySQLStorageService.Builder poolSize(int min, int max) {
+        public MariaDBStorageService.Builder poolSize(int min, int max) {
             config.setMaximumPoolSize(max);
             config.setMinimumIdle(min);
             return this;
         }
 
-        public MySQLStorageService.Builder life(long lifetime, long timeout) {
+        public MariaDBStorageService.Builder life(long lifetime, long timeout) {
             config.setMaxLifetime(lifetime);
             config.setConnectionTimeout(timeout);
             return this;
         }
 
-        public @NonNull MySQLStorageService build() {
+        public @NonNull MariaDBStorageService build() {
             service.source = new HikariDataSource(config);
             DatabaseConfig dbConfig = new DatabaseConfig();
             dbConfig.setDataSource(service.source);
-            dbConfig.setDatabasePlatform(new MySqlPlatform());
+            dbConfig.setDatabasePlatform(new MariaDbPlatform());
             dbConfig.setDefaultServer(false);
             dbConfig.setRegister(false);
             dbConfig.setName(service.name);

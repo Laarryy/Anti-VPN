@@ -4,10 +4,15 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import io.ebean.DatabaseFactory;
 import io.ebean.config.DatabaseConfig;
+import io.ebean.config.dbplatform.sqlite.SQLitePlatform;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.Arrays;
 import java.util.Properties;
+import me.egg82.antivpn.storage.models.BaseModel;
+import me.egg82.antivpn.storage.models.IPModel;
+import me.egg82.antivpn.storage.models.PlayerModel;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 public class SQLiteStorageService extends AbstractStorageService {
@@ -59,10 +64,14 @@ public class SQLiteStorageService extends AbstractStorageService {
         }
 
         public @NonNull SQLiteStorageService build() {
-            HikariDataSource source = new HikariDataSource(config);
+            service.source = new HikariDataSource(config);
             DatabaseConfig dbConfig = new DatabaseConfig();
-            dbConfig.setDataSource(source);
+            dbConfig.setDataSource(service.source);
+            dbConfig.setDatabasePlatform(new SQLitePlatform());
+            dbConfig.setDefaultServer(false);
+            dbConfig.setRegister(false);
             dbConfig.setName(service.name);
+            dbConfig.setClasses(Arrays.asList(BaseModel.class, IPModel.class, PlayerModel.class));
             service.connection = DatabaseFactory.createWithContextClassLoader(dbConfig, getClass().getClassLoader());
 
             return service;

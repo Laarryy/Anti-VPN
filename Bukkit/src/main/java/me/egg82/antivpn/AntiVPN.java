@@ -135,6 +135,7 @@ public class AntiVPN {
         consoleCommandIssuer.sendInfo(Message.GENERAL__ENABLED);
         consoleCommandIssuer.sendInfo(Message.GENERAL__LOAD,
                 "{version}", plugin.getDescription().getVersion(),
+                "{apiversion}", VPNAPIProvider.getInstance().getPluginMetadata().getApiVersion(),
                 "{commands}", String.valueOf(commandManager.getRegisteredRootCommands().size()),
                 "{events}", String.valueOf(numEvents),
                 "{tasks}", String.valueOf(tasks.size())

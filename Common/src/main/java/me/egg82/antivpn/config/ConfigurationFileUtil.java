@@ -14,9 +14,7 @@ import me.egg82.antivpn.api.model.source.Source;
 import me.egg82.antivpn.api.model.source.SourceManager;
 import me.egg82.antivpn.api.model.source.models.SourceModel;
 import me.egg82.antivpn.messaging.*;
-import me.egg82.antivpn.storage.MySQLStorageService;
-import me.egg82.antivpn.storage.SQLiteStorageService;
-import me.egg82.antivpn.storage.StorageService;
+import me.egg82.antivpn.storage.*;
 import me.egg82.antivpn.utils.LogUtil;
 import me.egg82.antivpn.utils.PacketUtil;
 import me.egg82.antivpn.utils.TimeUtil;
@@ -150,6 +148,31 @@ public class ConfigurationFileUtil {
         String type = engineNode.node("type").getString("").toLowerCase();
         ConfigurationNode connectionNode = engineNode.node("connection");
         switch (type) {
+            case "old_mysql": {
+                AddressPort url = new AddressPort(connectionNode.key() + ".address", connectionNode.node("address").getString("127.0.0.1:3306"), 3306);
+                if (debug) {
+                    console.sendMessage(LogUtil.HEADING + "<c2>Creating engine</c2> <c1>" + name + "</c1> <c2>of type old_mysql with address</c2> <c1>" + url.getAddress() + ":" + url.getPort() + "/" + connectionNode.node("database").getString("anti_vpn") + "</c1>");
+                }
+                String options = connectionNode.node("options").getString("useSSL=false&useUnicode=true&characterEncoding=utf8");
+                if (options.length() > 0 && options.charAt(0) == '?') {
+                    options = options.substring(1);
+                }
+                if (debug) {
+                    console.sendMessage(LogUtil.HEADING + "<c2>Setting options for engine</c2> <c1>" + name + "</c1> <c2>to</c2> <c1>" + options.replace("&", "&\\") + "</c1>");
+                }
+                try {
+                    return MySQL55StorageService.builder(name)
+                            .url(url.address, url.port, connectionNode.node("database").getString("anti_vpn"))
+                            .credentials(connectionNode.node("username").getString(""), connectionNode.node("password").getString(""))
+                            .options(options)
+                            .poolSize(poolSettings.minPoolSize, poolSettings.maxPoolSize)
+                            .life(poolSettings.maxLifetime, poolSettings.timeout)
+                            .build();
+                } catch (IOException ex) {
+                    logger.error("Could not create engine \"" + name + "\".", ex);
+                }
+                break;
+            }
             case "mysql": {
                 AddressPort url = new AddressPort(connectionNode.key() + ".address", connectionNode.node("address").getString("127.0.0.1:3306"), 3306);
                 if (debug) {
@@ -160,10 +183,35 @@ public class ConfigurationFileUtil {
                     options = options.substring(1);
                 }
                 if (debug) {
-                    console.sendMessage(LogUtil.HEADING + "<c2>Setting options for engine</c2> <c1>" + name + "</c1> <c2>to</c2> <c1>" + options.replace("&", "&&") + "</c1>");
+                    console.sendMessage(LogUtil.HEADING + "<c2>Setting options for engine</c2> <c1>" + name + "</c1> <c2>to</c2> <c1>" + options.replace("&", "&\\") + "</c1>");
                 }
                 try {
                     return MySQLStorageService.builder(name)
+                            .url(url.address, url.port, connectionNode.node("database").getString("anti_vpn"))
+                            .credentials(connectionNode.node("username").getString(""), connectionNode.node("password").getString(""))
+                            .options(options)
+                            .poolSize(poolSettings.minPoolSize, poolSettings.maxPoolSize)
+                            .life(poolSettings.maxLifetime, poolSettings.timeout)
+                            .build();
+                } catch (IOException ex) {
+                    logger.error("Could not create engine \"" + name + "\".", ex);
+                }
+                break;
+            }
+            case "mariadb": {
+                AddressPort url = new AddressPort(connectionNode.key() + ".address", connectionNode.node("address").getString("127.0.0.1:3306"), 3306);
+                if (debug) {
+                    console.sendMessage(LogUtil.HEADING + "<c2>Creating engine</c2> <c1>" + name + "</c1> <c2>of type mariadb with address</c2> <c1>" + url.getAddress() + ":" + url.getPort() + "/" + connectionNode.node("database").getString("anti_vpn") + "</c1>");
+                }
+                String options = connectionNode.node("options").getString("useSSL=false&useUnicode=true&characterEncoding=utf8");
+                if (options.length() > 0 && options.charAt(0) == '?') {
+                    options = options.substring(1);
+                }
+                if (debug) {
+                    console.sendMessage(LogUtil.HEADING + "<c2>Setting options for engine</c2> <c1>" + name + "</c1> <c2>to</c2> <c1>" + options.replace("&", "&\\") + "</c1>");
+                }
+                try {
+                    return MariaDBStorageService.builder(name)
                             .url(url.address, url.port, connectionNode.node("database").getString("anti_vpn"))
                             .credentials(connectionNode.node("username").getString(""), connectionNode.node("password").getString(""))
                             .options(options)
@@ -185,7 +233,7 @@ public class ConfigurationFileUtil {
                     options = options.substring(1);
                 }
                 if (debug) {
-                    console.sendMessage(LogUtil.HEADING + "<c2>Setting options for engine</c2> <c1>" + name + "</c1> <c2>to</c2> <c1>" + options.replace("&", "&&") + "</c1>");
+                    console.sendMessage(LogUtil.HEADING + "<c2>Setting options for engine</c2> <c1>" + name + "</c1> <c2>to</c2> <c1>" + options.replace("&", "&\\") + "</c1>");
                 }
                 try {
                     return SQLiteStorageService.builder(name)

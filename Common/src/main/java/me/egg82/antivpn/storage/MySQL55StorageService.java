@@ -4,7 +4,7 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import io.ebean.DatabaseFactory;
 import io.ebean.config.DatabaseConfig;
-import io.ebean.config.dbplatform.mysql.MySqlPlatform;
+import io.ebean.config.dbplatform.mysql.MySql55Platform;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.Arrays;
@@ -14,19 +14,19 @@ import me.egg82.antivpn.storage.models.IPModel;
 import me.egg82.antivpn.storage.models.PlayerModel;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-public class MySQLStorageService extends AbstractStorageService {
-    private MySQLStorageService(@NonNull String name) {
+public class MySQL55StorageService extends AbstractStorageService {
+    private MySQL55StorageService(@NonNull String name) {
         super(name);
     }
 
-    public static Builder builder(@NonNull String name) { return new MySQLStorageService.Builder(name); }
+    public static Builder builder(@NonNull String name) { return new MySQL55StorageService.Builder(name); }
 
     public static class Builder {
-        private final MySQLStorageService service;
+        private final MySQL55StorageService service;
         private final HikariConfig config = new HikariConfig();
 
         private Builder(@NonNull String name) {
-            service = new MySQLStorageService(name);
+            service = new MySQL55StorageService(name);
 
             // Baseline
             config.setPoolName("AntiVPN-MySQL");
@@ -55,18 +55,18 @@ public class MySQLStorageService extends AbstractStorageService {
             config.addDataSourceProperty("elideSetAutoCommits", "true");
         }
 
-        public MySQLStorageService.Builder url(@NonNull String address, int port, @NonNull String database) {
+        public MySQL55StorageService.Builder url(@NonNull String address, int port, @NonNull String database) {
             config.setJdbcUrl("jdbc:mysql://" + address + ":" + port + "/" + database);
             return this;
         }
 
-        public MySQLStorageService.Builder credentials(@NonNull String user, @NonNull String pass) {
+        public MySQL55StorageService.Builder credentials(@NonNull String user, @NonNull String pass) {
             config.setUsername(user);
             config.setPassword(pass);
             return this;
         }
 
-        public MySQLStorageService.Builder options(@NonNull String options) throws IOException {
+        public MySQL55StorageService.Builder options(@NonNull String options) throws IOException {
             options = !options.isEmpty() && options.charAt(0) == '?' ? options.substring(1) : options;
             Properties p = new Properties();
             p.load(new StringReader(options.replace("&", "\n")));
@@ -74,23 +74,23 @@ public class MySQLStorageService extends AbstractStorageService {
             return this;
         }
 
-        public MySQLStorageService.Builder poolSize(int min, int max) {
+        public MySQL55StorageService.Builder poolSize(int min, int max) {
             config.setMaximumPoolSize(max);
             config.setMinimumIdle(min);
             return this;
         }
 
-        public MySQLStorageService.Builder life(long lifetime, long timeout) {
+        public MySQL55StorageService.Builder life(long lifetime, long timeout) {
             config.setMaxLifetime(lifetime);
             config.setConnectionTimeout(timeout);
             return this;
         }
 
-        public @NonNull MySQLStorageService build() {
+        public @NonNull MySQL55StorageService build() {
             service.source = new HikariDataSource(config);
             DatabaseConfig dbConfig = new DatabaseConfig();
             dbConfig.setDataSource(service.source);
-            dbConfig.setDatabasePlatform(new MySqlPlatform());
+            dbConfig.setDatabasePlatform(new MySql55Platform());
             dbConfig.setDefaultServer(false);
             dbConfig.setRegister(false);
             dbConfig.setName(service.name);

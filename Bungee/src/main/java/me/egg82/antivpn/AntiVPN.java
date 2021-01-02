@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.logging.Level;
+import me.egg82.antivpn.api.VPNAPIProvider;
 import me.egg82.antivpn.apis.SourceAPI;
 import me.egg82.antivpn.commands.AntiVPNCommand;
 import me.egg82.antivpn.config.CachedConfig;
@@ -101,6 +102,7 @@ public class AntiVPN {
         consoleCommandIssuer.sendInfo(Message.GENERAL__ENABLED);
         consoleCommandIssuer.sendInfo(Message.GENERAL__LOAD,
                 "{version}", plugin.getDescription().getVersion(),
+                "{apiversion}", VPNAPIProvider.getInstance().getPluginMetadata().getApiVersion(),
                 "{commands}", String.valueOf(commandManager.getRegisteredRootCommands().size()),
                 "{events}", String.valueOf(numEvents),
                 "{tasks}", String.valueOf(tasks.size())

@@ -4,7 +4,8 @@ storage:
   engines:
     # Engine name. Can be anything
     engine1:
-      # Engine type. Can be "mysql" or "sqlite"
+      # Engine type. Can be "mysql", "old_mysql", "mariadb" or "sqlite"
+      # "mysql" is for MySQL versions > 5.5, "old_mysql" is for MySQL versions <= 5.5
       # https://mariadb.org/
       # https://www.sqlite.org/index.html
       type: 'mysql'
@@ -24,7 +25,8 @@ storage:
         options: 'useSSL=false&useUnicode=true&characterEncoding=utf8'
     # Engine name. Can be anything
     engine2:
-      # Engine type. Can be "mysql" or "sqlite"
+      # Engine type. Can be "mysql", "old_mysql", "mariadb" or "sqlite"
+      # "mysql" is for MySQL versions > 5.5, "old_mysql" is for MySQL versions <= 5.5
       # https://mariadb.org/
       # https://www.sqlite.org/index.html
       type: 'sqlite'

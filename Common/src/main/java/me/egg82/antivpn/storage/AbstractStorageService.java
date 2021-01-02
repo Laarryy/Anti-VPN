@@ -1,5 +1,6 @@
 package me.egg82.antivpn.storage;
 
+import com.zaxxer.hikari.HikariDataSource;
 import io.ebean.Database;
 import java.time.Instant;
 import java.util.Collection;
@@ -22,6 +23,7 @@ public abstract class AbstractStorageService implements StorageService {
 
     protected final String name;
     protected Database connection;
+    protected HikariDataSource source;
 
     public @NonNull String getName() { return name; }
 
@@ -36,6 +38,7 @@ public abstract class AbstractStorageService implements StorageService {
         queueLock.writeLock().lock();
         closed = true;
         connection.shutdown(false, false);
+        source.close();
         queueLock.writeLock().unlock();
     }
 

@@ -1,6 +1,6 @@
 acf-minecraft:
   multiple_players_match: "es"
-  version: 1.1
+  version: 1.2
 
 description:
   reload: "Recargar el plugin."
@@ -13,7 +13,7 @@ general:
   header: "<c2>[</c2><c3>Anti-VPN</c3><c2>]</c2> "
   enabled: "<c4>Activado</c4>"
   disabled: "<c5>Desactivado</c5>"
-  load: "<c2>[</c2><c3>Versión</c3> {version}<c2>] [</c2>{commands} <c6>Comandos</c6><c2>] [</c2>{events} <c7>Eventos</c7><c2>] [</c2>{tasks} <c8>Tareas</c8><c2>]</c2>"
+  load: "<c2>[</c2><c3>Versión</c3> {version}<c2>] [</c2><c3>API Versión</c3> {apiversion}<c2>] [</c2>{commands} <c6>Comandos</c6><c2>] [</c2>{events} <c7>Eventos</c7><c2>] [</c2>{tasks} <c8>Tareas</c8><c2>]</c2>"
   hook_enable: "<c4>Activando compatibilidad con</c4> {plugin}"
   hook_disable: "{plugin} <c2>no se encontró. El soporte para esto ha sido desactivado.</c2>"
   update: "<c3>tiene una</c3> <c4>actualización</c4> <c3>disponible!</c3> Nueva versión: <c2>{version}</c2>"
