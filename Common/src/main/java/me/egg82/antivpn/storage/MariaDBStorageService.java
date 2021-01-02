@@ -1,18 +1,10 @@
 package me.egg82.antivpn.storage;
 
 import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
-import io.ebean.DatabaseFactory;
-import io.ebean.config.DatabaseConfig;
 import io.ebean.config.dbplatform.mariadb.MariaDbPlatform;
-import io.ebean.config.dbplatform.sqlite.SQLitePlatform;
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.Arrays;
 import java.util.Properties;
-import me.egg82.antivpn.storage.models.BaseModel;
-import me.egg82.antivpn.storage.models.IPModel;
-import me.egg82.antivpn.storage.models.PlayerModel;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 public class MariaDBStorageService extends AbstractStorageService {
