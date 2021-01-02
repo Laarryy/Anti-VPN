@@ -52,6 +52,8 @@ public abstract class AbstractStorageService implements StorageService {
     public boolean isClosed() { return closed; }
 
     public void storeModel(@NonNull BaseModel model) {
+        model.setModified(null);
+
         queueLock.readLock().lock();
         try {
             connection.save(model);
@@ -61,6 +63,10 @@ public abstract class AbstractStorageService implements StorageService {
     }
 
     public void storeModels(@NonNull Collection<? extends BaseModel> models) {
+        for (BaseModel model : models) {
+            model.setModified(null);
+        }
+
         queueLock.readLock().lock();
         try {
             connection.saveAll(models);
@@ -98,6 +104,7 @@ public abstract class AbstractStorageService implements StorageService {
             }
             if (model.getType() != type) {
                 model.setType(type);
+                model.setModified(null);
                 connection.save(model);
             }
             return model;
@@ -172,6 +179,7 @@ public abstract class AbstractStorageService implements StorageService {
             }
             if (model.isMcleaks() != isMcLeaks) {
                 model.setMcleaks(isMcLeaks);
+                model.setModified(null);
                 connection.save(model);
             }
             return model;

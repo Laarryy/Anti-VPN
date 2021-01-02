@@ -50,7 +50,7 @@ public abstract class AbstractIPManager implements IPManager {
             for (StorageService service : cachedConfig.getStorage()) {
                 IPModel model = service.getIpModel(ip, cachedConfig.getSourceCacheTime());
                 if (model != null) {
-                    return new GenericIP(ip, model.getCascade(), model.getConsensus());
+                    return new GenericIP(ip, AlgorithmMethod.values()[model.getType()], model.getCascade(), model.getConsensus());
                 }
             }
             return null;
@@ -65,7 +65,7 @@ public abstract class AbstractIPManager implements IPManager {
             }
 
             for (StorageService service : cachedConfig.getStorage()) {
-                IPModel model = service.getOrCreateIpModel(ip.getIp(), cachedConfig.getVPNAlgorithmMethod().ordinal());
+                IPModel model = service.getOrCreateIpModel(ip.getIp(), ip.getType().ordinal());
                 model.setCascade(ip.getCascade());
                 model.setConsensus(ip.getConsensus());
                 service.storeModel(model);
@@ -73,7 +73,7 @@ public abstract class AbstractIPManager implements IPManager {
 
             IPPacket packet = new IPPacket();
             packet.setIp(ip.getIp());
-            packet.setType(cachedConfig.getVPNAlgorithmMethod().ordinal());
+            packet.setType(ip.getType().ordinal());
             packet.setCascade(ip.getCascade());
             packet.setConsensus(ip.getConsensus());
             PacketUtil.queuePacket(packet);
