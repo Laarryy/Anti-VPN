@@ -1,8 +1,14 @@
 package me.egg82.antivpn.storage;
 
+import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import io.ebean.Database;
+import io.ebean.DatabaseFactory;
+import io.ebean.config.DatabaseConfig;
+import io.ebean.config.dbplatform.DatabasePlatform;
+import io.ebean.config.dbplatform.sqlite.SQLitePlatform;
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Set;
 import java.util.UUID;
@@ -136,5 +142,38 @@ public abstract class AbstractStorageService implements StorageService {
                 .findSet();
         queueLock.readLock().unlock();
         return models;
+    }
+
+    protected final void createSource(HikariConfig config, DatabasePlatform platform, String scriptPath) {
+        boolean isAutoCommit = config.isAutoCommit();
+        if (isAutoCommit) {
+            config.setAutoCommit(false);
+            source = new HikariDataSource(config);
+            DatabaseConfig dbConfig = new DatabaseConfig();
+            dbConfig.setDataSource(source);
+            dbConfig.setDatabasePlatform(platform);
+            dbConfig.setDefaultServer(false);
+            dbConfig.setRegister(false);
+            dbConfig.setName(UUID.randomUUID().toString());
+            dbConfig.setClasses(Arrays.asList(BaseModel.class, IPModel.class, PlayerModel.class));
+            connection = DatabaseFactory.createWithContextClassLoader(dbConfig, getClass().getClassLoader());
+            connection.script().run(scriptPath);
+            connection.shutdown(false, false);
+            source.close();
+            config.setAutoCommit(true);
+        }
+
+        source = new HikariDataSource(config);
+        DatabaseConfig dbConfig = new DatabaseConfig();
+        dbConfig.setDataSource(source);
+        dbConfig.setDatabasePlatform(new SQLitePlatform());
+        dbConfig.setDefaultServer(false);
+        dbConfig.setRegister(false);
+        dbConfig.setName(name);
+        dbConfig.setClasses(Arrays.asList(BaseModel.class, IPModel.class, PlayerModel.class));
+        connection = DatabaseFactory.createWithContextClassLoader(dbConfig, getClass().getClassLoader());
+        if (!isAutoCommit) {
+            connection.script().run(scriptPath);
+        }
     }
 }

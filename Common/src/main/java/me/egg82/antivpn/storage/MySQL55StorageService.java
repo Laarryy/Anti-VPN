@@ -5,6 +5,7 @@ import com.zaxxer.hikari.HikariDataSource;
 import io.ebean.DatabaseFactory;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.config.dbplatform.mysql.MySql55Platform;
+import io.ebean.config.dbplatform.sqlite.SQLitePlatform;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.Arrays;
@@ -87,17 +88,7 @@ public class MySQL55StorageService extends AbstractStorageService {
         }
 
         public @NonNull MySQL55StorageService build() {
-            service.source = new HikariDataSource(config);
-            DatabaseConfig dbConfig = new DatabaseConfig();
-            dbConfig.setDataSource(service.source);
-            dbConfig.setDatabasePlatform(new MySql55Platform());
-            dbConfig.setDefaultServer(false);
-            dbConfig.setRegister(false);
-            dbConfig.setName(service.name);
-            dbConfig.setClasses(Arrays.asList(BaseModel.class, IPModel.class, PlayerModel.class));
-            service.connection = DatabaseFactory.createWithContextClassLoader(dbConfig, getClass().getClassLoader());
-            // TODO: Generate tables
-
+            service.createSource(config, new MySql55Platform(), "/db/mysql55.sql");
             return service;
         }
     }
