@@ -13,17 +13,17 @@ import me.egg82.antivpn.api.platform.PluginMetadata;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * The AntiVPN API.
+ * The Anti-VPN API.
  *
- * <p>The API allows other plugins on the server to read and modify AntiVPN
+ * <p>The API allows other plugins on the server to read and modify Anti-VPN
  * data, change behaviour of the plugin, listen to certain events, and integrate
- * AntiVPN into other plugins and systems.</p>
+ * Anti-VPN into other plugins and systems.</p>
  *
  * <p>This interface represents the base of the API package. All functions are
  * accessed via this interface.</p>
  *
  * <p>To start using the API, you need to obtain an instance of this interface.
- * These are registered by the AntiVPN plugin.</p>
+ * These are registered by the Anti-VPN plugin.</p>
  *
  * <p>An instance can be obtained from the static singleton accessor in
  * {@link VPNAPIProvider}.</p>
@@ -32,7 +32,7 @@ public interface VPNAPI {
     /**
      * Gets the {@link UUID} of this server.
      *
-     * <p>This is defined in the AntiVPN stats-id file, and is used in
+     * <p>This is defined in the Anti-VPN stats-id file, and is used in
      * messaging services and server statistics (if enabled).</p>
      *
      * <p>The default server UUID is randomly-generated.</p>
@@ -84,7 +84,7 @@ public interface VPNAPI {
 
     /**
      * Gets the {@link PluginMetadata}, responsible for providing metadata about
-     * the AntiVPN plugin currently running.
+     * the Anti-VPN plugin currently running.
      *
      * @return the plugin metadata
      */

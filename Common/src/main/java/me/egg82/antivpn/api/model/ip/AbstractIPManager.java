@@ -23,15 +23,15 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class GenericIPManager implements IPManager {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+public abstract class AbstractIPManager implements IPManager {
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final LoadingCache<Pair<String, AlgorithmMethod>, IPModel> ipCache;
     private final LoadingCache<String, Boolean> sourceInvalidationCache;
 
     private final SourceManager sourceManager;
 
-    public GenericIPManager(SourceManager sourceManager, long cacheTime, TimeUnit cacheTimeUnit) {
+    protected AbstractIPManager(@NonNull SourceManager sourceManager, long cacheTime, TimeUnit cacheTimeUnit) {
         this.sourceManager = sourceManager;
 
         ipCache = Caffeine.newBuilder().expireAfterAccess(cacheTime, cacheTimeUnit).expireAfterWrite(cacheTime, cacheTimeUnit).build(k -> calculateIpResult(k.getT1(), k.getT2(), true));

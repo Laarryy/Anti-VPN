@@ -125,7 +125,7 @@ public interface SourceManager {
 
     /**
      * Gets a list of all enabled {@link Source}s, in the order
-     * they are used in the AntiVPN plugin.
+     * they are used in the Anti-VPN plugin.
      *
      * @return a list of sources
      */

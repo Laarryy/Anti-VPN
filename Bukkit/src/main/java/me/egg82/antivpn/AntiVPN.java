@@ -15,7 +15,7 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Level;
 import me.egg82.antivpn.api.*;
-import me.egg82.antivpn.api.model.ip.GenericIPManager;
+import me.egg82.antivpn.api.model.ip.BukkitIPManager;
 import me.egg82.antivpn.api.model.player.BukkitPlayerManager;
 import me.egg82.antivpn.api.model.source.GenericSourceManager;
 import me.egg82.antivpn.api.model.source.Source;
@@ -223,7 +223,7 @@ public class AntiVPN {
 
         CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
 
-        GenericIPManager ipManager = new GenericIPManager(sourceManager, cachedConfig.getCacheTime().getTime(), cachedConfig.getCacheTime().getUnit());
+        BukkitIPManager ipManager = new BukkitIPManager(sourceManager, cachedConfig.getCacheTime().getTime(), cachedConfig.getCacheTime().getUnit());
         BukkitPlayerManager playerManager = new BukkitPlayerManager(cachedConfig.getThreads(), cachedConfig.getMcLeaksKey(), cachedConfig.getCacheTime().getTime(), cachedConfig.getCacheTime().getUnit());
         Platform platform = new BukkitPlatform(System.currentTimeMillis());
         PluginMetadata metadata = new BukkitPluginMetadata(plugin.getDescription().getVersion());
@@ -312,6 +312,18 @@ public class AntiVPN {
                 }
             }
             return ImmutableList.copyOf(players);
+        });
+
+        commandManager.getCommandCompletions().registerCompletion("type", c -> {
+            String lower = c.getInput().toLowerCase();
+            Set<String> retVal = new LinkedHashSet<>();
+            if ("vpn".startsWith(lower)) {
+                retVal.add("vpn");
+            }
+            if ("mcleaks".startsWith(lower)) {
+                retVal.add("mcleaks");
+            }
+            return ImmutableList.copyOf(retVal);
         });
 
         commandManager.getCommandCompletions().registerCompletion("subcommand", c -> {

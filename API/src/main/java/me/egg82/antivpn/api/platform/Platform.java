@@ -6,13 +6,13 @@ import java.util.UUID;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Provides information about the platform AntiVPN is running on.
+ * Provides information about the platform Anti-VPN is running on.
  */
 public interface Platform {
     /**
-     * Gets the type of platform AntiVPN is running on.
+     * Gets the type of platform Anti-VPN is running on.
      *
-     * @return the type of platform AntiVPN is running on
+     * @return the type of platform Anti-VPN is running on
      */
     Platform.@NonNull Type getType();
 
@@ -38,7 +38,7 @@ public interface Platform {
     @NonNull Instant getStartTime();
 
     /**
-     * Represents a type of platform which AntiVPN can run on.
+     * Represents a type of platform which Anti-VPN can run on.
      */
     enum Type {
         BUKKIT("Bukkit"),

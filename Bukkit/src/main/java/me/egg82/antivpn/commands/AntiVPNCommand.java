@@ -43,6 +43,15 @@ public class AntiVPNCommand extends BaseCommand {
         new ImportCommand(issuer, taskFactory, master, slave, batchSize).run();
     }
 
+    @Subcommand("kick")
+    @CommandPermission("avpn.admin")
+    @Description("{@@description.kick}")
+    @Syntax("<player> [type]")
+    @CommandCompletion("@player @type")
+    public void onKick(@NonNull CommandIssuer issuer, @NonNull String player, @Default("vpn") String type) {
+        new KickCommand(issuer, taskFactory, player, type).run();
+    }
+
     @Subcommand("test")
     @CommandPermission("avpn.admin")
     @Description("{@@description.test}")

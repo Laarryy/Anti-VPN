@@ -5,6 +5,7 @@ acf-minecraft:
 description:
   reload: "Lädt das Plugin neu."
   import: "Importiert Daten von einer Speicher-Engine in eine andere."
+  kick: "(Plz translate) Kicks a player for VPN or MCLeaks usage using the plugin configuration."
   check: "Überprüfen Sie eine IP-Adresse oder einen Player mit dem Standardsystem. Dies gibt genau den gleichen Wert wie jeder andere API-Aufruf zurück."
   score: "Bewertet eine bestimmte Quelle anhand einer vorab erstellten Liste bekannter guter und schlechter IP-Adressen. Beachten Sie, dass dies eine Überprüfung erzwingt, sodass bei jeder Ausführung Credits verwendet werden."
   test: "Testen Sie eine IP über die verschiedenen (aktivierten) Dienste. Beachten Sie, dass dies eine Überprüfung erzwingt, sodass bei jeder Ausführung Credits verwendet werden."
@@ -31,6 +32,12 @@ import:
   mcleaks: "<c2>MCLeaks-Daten importieren..</c2> <c8>[</c8><c2>ID:</c2> <c3>{id}</c3><c8>]</c8>"
   begin: "<c2>Daten werden importiert, bitte warten..</c2>"
   end: "<c4>Daten erfolgreich importiert!</c4>"
+
+kick:
+  api_mode: "(Plz translate) The plugin is in API mode, and no actions have been performed."
+  end_vpn: "(Plz translate) <c4>Player</c4> {player} <c4>has been kicked for VPN usage, and/or all necessary commands have been run.</c4>"
+  end_mcleaks: "(Plz translate) <c4>Player</c4> {player} <c4>has been kicked for MCLeaks usage, and/or and all necessary commands have been run.</c4>"
+  no_player: "(Plz translate) The specified player was not online."
 
 check:
   begin: "{type} <c2>wird überprüft, bitte warten..</c2>"

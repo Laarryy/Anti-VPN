@@ -44,6 +44,11 @@ public enum Message implements MessageKeyProvider {
     TEST__NO_VPN_DETECTED,
     TEST__END,
 
+    KICK__API_MODE,
+    KICK__END_VPN,
+    KICK__END_MCLEAKS,
+    KICK__NO_PLAYER,
+
     RELOAD__BEGIN,
     RELOAD__END;
 

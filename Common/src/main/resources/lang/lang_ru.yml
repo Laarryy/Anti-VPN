@@ -5,6 +5,7 @@ acf-minecraft:
 description:
   reload: "Перезагрузка плагина."
   import: "Импортирует данные из одного хранилища в другой."
+  kick: "(Plz translate) Kicks a player for VPN or MCLeaks usage using the plugin configuration."
   check: "Проверьте IP-адрес или плеер, используя систему по умолчанию. Это вернет точно такое же значение, как и любой другой вызов API."
   score: "Оценка конкретного источника на основе заранее составленного списка известных хороших и плохих IP-адресов. Обратите внимание, что это заставляет проверку использовать титры каждый раз, когда она выполняется."
   test: "Проверьте IP-адрес с помощью различных (включенных) служб. Обратите внимание, что это заставляет проверять, так что будет использовать титры каждый раз, когда он запускается."
@@ -31,6 +32,12 @@ import:
   mcleaks: "(Plz translate) <c2>Importing MCLeaks data..</c2> <c8>[</c8><c2>ID:</c2> <c3>{id}</c3><c8>]</c8>"
   begin: "(Plz translate) <c2>Importing data, please wait..</c2>"
   end: "(Plz translate) <c4>Data successfully imported!</c4>"
+
+kick:
+  api_mode: "(Plz translate) The plugin is in API mode, and no actions have been performed."
+  end_vpn: "(Plz translate) <c4>Player</c4> {player} <c4>has been kicked for VPN usage, and/or all necessary commands have been run.</c4>"
+  end_mcleaks: "(Plz translate) <c4>Player</c4> {player} <c4>has been kicked for MCLeaks usage, and/or and all necessary commands have been run.</c4>"
+  no_player: "(Plz translate) The specified player was not online."
 
 check:
   begin: "<c2>Проверка</c2> {type}<c2>, пожалуйста подождите...</c2>"

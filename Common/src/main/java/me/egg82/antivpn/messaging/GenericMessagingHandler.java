@@ -5,8 +5,8 @@ import com.github.benmanes.caffeine.cache.LoadingCache;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import me.egg82.antivpn.api.APIUtil;
+import me.egg82.antivpn.api.model.ip.AbstractIPManager;
 import me.egg82.antivpn.api.model.ip.AlgorithmMethod;
-import me.egg82.antivpn.api.model.ip.GenericIPManager;
 import me.egg82.antivpn.api.model.player.AbstractPlayerManager;
 import me.egg82.antivpn.config.CachedConfig;
 import me.egg82.antivpn.config.ConfigUtil;
@@ -41,7 +41,7 @@ public class GenericMessagingHandler implements MessagingHandler {
             logger.info("Handling packet for " + packet.getIp() + ".");
         }
 
-        GenericIPManager ipManager = APIUtil.getIpManager();
+        AbstractIPManager ipManager = APIUtil.getIpManager();
         if (ipManager == null) {
             logger.error("IP manager could not be fetched.");
             return;
@@ -77,7 +77,7 @@ public class GenericMessagingHandler implements MessagingHandler {
             logger.info("Handling deletion packet for " + packet.getIp() + ".");
         }
 
-        GenericIPManager ipManager = APIUtil.getIpManager();
+        AbstractIPManager ipManager = APIUtil.getIpManager();
         if (ipManager == null) {
             logger.error("IP manager could not be fetched.");
             return;

@@ -17,7 +17,6 @@ import me.egg82.antivpn.api.platform.BukkitPlatform;
 import me.egg82.antivpn.config.CachedConfig;
 import me.egg82.antivpn.config.ConfigUtil;
 import me.egg82.antivpn.hooks.LuckPermsHook;
-import me.egg82.antivpn.hooks.PlaceholderAPIHook;
 import me.egg82.antivpn.hooks.VaultHook;
 import me.egg82.antivpn.utils.ValidationUtil;
 import ninja.egg82.events.BukkitEvents;
@@ -136,23 +135,29 @@ public class PlayerEvents extends EventHolder {
 
         if (isVpn(ip, event.getName(), cachedConfig)) {
             AntiVPN.incrementBlockedVPNs();
-            if (!cachedConfig.getVPNActionCommands().isEmpty()) {
-                tryRunCommands(cachedConfig.getVPNActionCommands(), event.getName(), event.getUniqueId(), ip);
+            IPManager ipManager = VPNAPIProvider.getInstance().getIpManager();
+            List<String> commands = ipManager.getVpnCommands(event.getName(), event.getUniqueId(), ip);
+            for (String command : commands) {
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
             }
-            if (!cachedConfig.getVPNKickMessage().isEmpty()) {
+            String kickMessage = ipManager.getVpnKickMessage(event.getName(), event.getUniqueId(), ip);
+            if (kickMessage != null) {
                 event.setLoginResult(AsyncPlayerPreLoginEvent.Result.KICK_OTHER);
-                event.setKickMessage(getKickMessage(cachedConfig.getVPNKickMessage(), event.getName(), event.getUniqueId(), ip));
+                event.setKickMessage(kickMessage);
             }
         }
 
         if (isMcLeaks(event.getName(), event.getUniqueId(), cachedConfig)) {
             AntiVPN.incrementBlockedMCLeaks();
-            if (!cachedConfig.getMCLeaksActionCommands().isEmpty()) {
-                tryRunCommands(cachedConfig.getMCLeaksActionCommands(), event.getName(), event.getUniqueId(), ip);
+            PlayerManager playerManager = VPNAPIProvider.getInstance().getPlayerManager();
+            List<String> commands = playerManager.getMcLeaksCommands(event.getName(), event.getUniqueId(), ip);
+            for (String command : commands) {
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
             }
-            if (!cachedConfig.getMCLeaksKickMessage().isEmpty()) {
+            String kickMessage = playerManager.getMcLeaksKickMessage(event.getName(), event.getUniqueId(), ip);
+            if (kickMessage != null) {
                 event.setLoginResult(AsyncPlayerPreLoginEvent.Result.KICK_OTHER);
-                event.setKickMessage(getKickMessage(cachedConfig.getVPNKickMessage(), event.getName(), event.getUniqueId(), ip));
+                event.setKickMessage(kickMessage);
             }
         }
     }
@@ -271,23 +276,29 @@ public class PlayerEvents extends EventHolder {
 
         if (isVpn(ip, event.getPlayer().getName(), cachedConfig)) {
             AntiVPN.incrementBlockedVPNs();
-            if (!cachedConfig.getVPNActionCommands().isEmpty()) {
-                tryRunCommands(cachedConfig.getVPNActionCommands(), event.getPlayer().getName(), event.getPlayer().getUniqueId(), ip);
+            IPManager ipManager = VPNAPIProvider.getInstance().getIpManager();
+            List<String> commands = ipManager.getVpnCommands(event.getPlayer().getName(), event.getPlayer().getUniqueId(), ip);
+            for (String command : commands) {
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
             }
-            if (!cachedConfig.getVPNKickMessage().isEmpty()) {
+            String kickMessage = ipManager.getVpnKickMessage(event.getPlayer().getName(), event.getPlayer().getUniqueId(), ip);
+            if (kickMessage != null) {
                 event.setResult(PlayerLoginEvent.Result.KICK_OTHER);
-                event.setKickMessage(getKickMessage(cachedConfig.getVPNKickMessage(), event.getPlayer().getName(), event.getPlayer().getUniqueId(), ip));
+                event.setKickMessage(kickMessage);
             }
         }
 
         if (isMcLeaks(event.getPlayer().getName(), event.getPlayer().getUniqueId(), cachedConfig)) {
             AntiVPN.incrementBlockedMCLeaks();
-            if (!cachedConfig.getMCLeaksActionCommands().isEmpty()) {
-                tryRunCommands(cachedConfig.getMCLeaksActionCommands(), event.getPlayer().getName(), event.getPlayer().getUniqueId(), ip);
+            PlayerManager playerManager = VPNAPIProvider.getInstance().getPlayerManager();
+            List<String> commands = playerManager.getMcLeaksCommands(event.getPlayer().getName(), event.getPlayer().getUniqueId(), ip);
+            for (String command : commands) {
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
             }
-            if (!cachedConfig.getMCLeaksKickMessage().isEmpty()) {
+            String kickMessage = playerManager.getMcLeaksKickMessage(event.getPlayer().getName(), event.getPlayer().getUniqueId(), ip);
+            if (kickMessage != null) {
                 event.setResult(PlayerLoginEvent.Result.KICK_OTHER);
-                event.setKickMessage(getKickMessage(cachedConfig.getVPNKickMessage(), event.getPlayer().getName(), event.getPlayer().getUniqueId(), ip));
+                event.setKickMessage(kickMessage);
             }
         }
     }
@@ -364,45 +375,6 @@ public class PlayerEvents extends EventHolder {
         }
 
         return false;
-    }
-
-    private void tryRunCommands(@NonNull List<String> commands, @NonNull String name, @NonNull UUID uuid, @NonNull String ip) {
-        Optional<PlaceholderAPIHook> placeholderapi;
-        try {
-            placeholderapi = ServiceLocator.getOptional(PlaceholderAPIHook.class);
-        } catch (InstantiationException | IllegalAccessException ex) {
-            logger.error(ex.getMessage(), ex);
-            placeholderapi = Optional.empty();
-        }
-
-        for (String command : commands) {
-            command = command.replace("%player%", name).replace("%uuid%", uuid.toString()).replace("%ip%", ip);
-            if (command.charAt(0) == '/') {
-                command = command.substring(1);
-            }
-
-            if (placeholderapi.isPresent()) {
-                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), placeholderapi.get().withPlaceholders(Bukkit.getOfflinePlayer(uuid), command));
-            } else {
-                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
-            }
-        }
-    }
-
-    private @NonNull String getKickMessage(@NonNull String message, @NonNull String name, @NonNull UUID uuid, @NonNull String ip) {
-        Optional<PlaceholderAPIHook> placeholderapi;
-        try {
-            placeholderapi = ServiceLocator.getOptional(PlaceholderAPIHook.class);
-        } catch (InstantiationException | IllegalAccessException ex) {
-            logger.error(ex.getMessage(), ex);
-            placeholderapi = Optional.empty();
-        }
-
-        message = message.replace("%player%", name).replace("%uuid%", uuid.toString()).replace("%ip%", ip);
-        if (placeholderapi.isPresent()) {
-            message = placeholderapi.get().withPlaceholders(Bukkit.getOfflinePlayer(uuid), message);
-        }
-        return message;
     }
 
     private @Nullable String getIp(InetAddress address) {

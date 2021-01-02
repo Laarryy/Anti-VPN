@@ -4,7 +4,7 @@ import co.aikar.commands.CommandIssuer;
 import co.aikar.taskchain.TaskChainFactory;
 import java.io.File;
 import me.egg82.antivpn.api.*;
-import me.egg82.antivpn.api.model.ip.GenericIPManager;
+import me.egg82.antivpn.api.model.ip.BukkitIPManager;
 import me.egg82.antivpn.api.model.player.BukkitPlayerManager;
 import me.egg82.antivpn.api.model.source.GenericSourceManager;
 import me.egg82.antivpn.config.CachedConfig;
@@ -40,7 +40,7 @@ public class ReloadCommand extends AbstractCommand {
 
                     CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
 
-                    GenericIPManager ipManager = new GenericIPManager(sourceManager, cachedConfig.getCacheTime().getTime(), cachedConfig.getCacheTime().getUnit());
+                    BukkitIPManager ipManager = new BukkitIPManager(sourceManager, cachedConfig.getCacheTime().getTime(), cachedConfig.getCacheTime().getUnit());
                     BukkitPlayerManager playerManager = new BukkitPlayerManager(cachedConfig.getThreads(), cachedConfig.getMcLeaksKey(), cachedConfig.getCacheTime().getTime(), cachedConfig.getCacheTime().getUnit());
                     VPNAPI api = new GenericVPNAPI(VPNAPIProvider.getInstance().getPlatform(), VPNAPIProvider.getInstance().getPluginMetadata(), ipManager, playerManager, sourceManager, cachedConfig);
 

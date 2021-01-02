@@ -1,6 +1,8 @@
 package me.egg82.antivpn.api.model.player;
 
+import com.google.common.collect.ImmutableList;
 import java.io.IOException;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
@@ -11,9 +13,12 @@ import me.egg82.antivpn.messaging.packets.PlayerPacket;
 import me.egg82.antivpn.services.lookup.PlayerLookup;
 import me.egg82.antivpn.storage.StorageService;
 import me.egg82.antivpn.storage.models.PlayerModel;
+import me.egg82.antivpn.utils.BukkitTailorUtil;
 import me.egg82.antivpn.utils.PacketUtil;
 import me.gong.mcleaks.MCLeaksAPI;
+import org.bukkit.Bukkit;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class BukkitPlayerManager extends AbstractPlayerManager {
     private final MCLeaksAPI api;
@@ -71,6 +76,54 @@ public class BukkitPlayerManager extends AbstractPlayerManager {
             }
             return null;
         });
+    }
+
+    public boolean kickForMcLeaks(@NonNull String playerName, @NonNull UUID playerUuid, @NonNull String ip) {
+        CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
+        if (cachedConfig == null) {
+            logger.error("Cached config could not be fetched.");
+            return false;
+        }
+
+        org.bukkit.entity.Player p = Bukkit.getPlayer(playerUuid);
+        if (p == null) {
+            return false;
+        }
+
+        List<String> commands = BukkitTailorUtil.tailorCommands(cachedConfig.getMCLeaksActionCommands(), playerName, playerUuid, ip);
+        for (String command : commands) {
+            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
+        }
+        if (!cachedConfig.getMCLeaksKickMessage().isEmpty()) {
+            p.kickPlayer(BukkitTailorUtil.tailorKickMessage(cachedConfig.getMCLeaksKickMessage(), playerName, playerUuid, ip));
+        }
+        return true;
+    }
+
+    public @Nullable String getMcLeaksKickMessage(@NonNull String playerName, @NonNull UUID playerUuid, @NonNull String ip) {
+        CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
+        if (cachedConfig == null) {
+            logger.error("Cached config could not be fetched.");
+            return null;
+        }
+
+        if (!cachedConfig.getMCLeaksKickMessage().isEmpty()) {
+            return BukkitTailorUtil.tailorKickMessage(cachedConfig.getMCLeaksKickMessage(), playerName, playerUuid, ip);
+        }
+        return null;
+    }
+
+    public @NonNull List<String> getMcLeaksCommands(@NonNull String playerName, @NonNull UUID playerUuid, @NonNull String ip) {
+        CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
+        if (cachedConfig == null) {
+            logger.error("Cached config could not be fetched.");
+            return ImmutableList.of();
+        }
+
+        if (!cachedConfig.getMCLeaksActionCommands().isEmpty()) {
+            return ImmutableList.copyOf(BukkitTailorUtil.tailorCommands(cachedConfig.getMCLeaksActionCommands(), playerName, playerUuid, ip));
+        }
+        return ImmutableList.of();
     }
 
     protected @NonNull PlayerModel calculatePlayerResult(@NonNull UUID uuid, boolean useCache) throws APIException {
