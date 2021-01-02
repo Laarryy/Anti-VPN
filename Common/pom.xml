@@ -224,6 +224,7 @@
         <dependency>
             <groupId>me.egg82</groupId>
             <artifactId>antivpn-api</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <!-- API -->

@@ -119,9 +119,17 @@ public class BukkitBootstrap extends JavaPlugin {
                 new Relocation(getSceneLibPackage(), "me.egg82.antivpn.external." + getSceneLibPackage())
         ), parentLoader, "Checker Framework");
 
+        Artifact.Builder caffeine = Artifact.builder("com.github.ben-manes.caffeine", "caffeine", "${caffeine.version}", cacheDir)
+                .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
+        buildRelocateInject(caffeine, jarsDir, Collections.singletonList(new Relocation(getCaffeinePackage(), "me.egg82.antivpn.external." + getCaffeinePackage())), parentLoader, "Caffeine");
+
         Artifact.Builder zstd = Artifact.builder("com.github.luben", "zstd-jni", "${zstd.version}", cacheDir)
                 .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
         buildRelocateInject(zstd, jarsDir, Collections.singletonList(new Relocation(getZstdPackage(), "me.egg82.antivpn.external." + getZstdPackage())), parentLoader, "Zstd");
+
+        Artifact.Builder ipaddr = Artifact.builder("com.github.seancfoley", "ipaddress", "${ipaddress.version}", cacheDir)
+                .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
+        buildRelocateInject(ipaddr, jarsDir, Collections.singletonList(new Relocation(getInetIpaddrPackage(), "me.egg82.antivpn.external." + getInetIpaddrPackage())), parentLoader, "IP Address");
 
         Artifact.Builder ebeanCore = Artifact.builder("io.ebean", "ebean-core", "${ebean.version}", cacheDir)
                 .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
@@ -154,7 +162,11 @@ public class BukkitBootstrap extends JavaPlugin {
 
     private @NonNull String getSceneLibPackage() { return new String(new byte[] {'s', 'c', 'e', 'n', 'e', 'l', 'i', 'b'}); }
 
+    private @NonNull String getCaffeinePackage() { return new String(new byte[] {'c', 'o', 'm', '.', 'g', 'i', 't', 'h', 'u', 'b', '.', 'b', 'e', 'n', 'm', 'a', 'n', 'e', 's', '.', 'c', 'a', 'f', 'f', 'e', 'i', 'n', 'e'}); }
+
     private @NonNull String getZstdPackage() { return new String(new byte[] {'c', 'o', 'm', '.', 'g', 'i', 't', 'h', 'u', 'b', '.', 'l', 'u', 'b', 'e', 'n', '.', 'z', 's', 't', 'd'}); }
+
+    private @NonNull String getInetIpaddrPackage() { return new String(new byte[] {'i', 'n', 'e', 't', '.', 'i', 'p', 'a', 'd', 'd', 'r'}); }
 
     private @NonNull String getEbeanInternalPackage() { return new String(new byte[] {'i', 'o', '.', 'e', 'b', 'e', 'a', 'n', 'i', 'n', 't', 'e', 'r', 'n', 'a', 'l'}); }
 

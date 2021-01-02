@@ -72,6 +72,10 @@
                             <shadedPattern>me.egg82.antivpn.external.com.github.luben.zstd</shadedPattern>
                         </relocation>
                         <relocation>
+                            <pattern>inet.ipaddr</pattern>
+                            <shadedPattern>me.egg82.antivpn.external.inet.ipaddr</shadedPattern>
+                        </relocation>
+                        <relocation>
                             <pattern>io.ebeaninternal</pattern>
                             <shadedPattern>me.egg82.antivpn.external.io.ebeaninternal</shadedPattern>
                         </relocation>
@@ -342,7 +346,6 @@
         <dependency>
             <groupId>me.egg82</groupId>
             <artifactId>antivpn-api</artifactId>
-            <scope>provided</scope>
         </dependency>
 
         <!-- common -->
@@ -409,11 +412,13 @@
             <groupId>com.github.ben-manes.caffeine</groupId>
             <artifactId>caffeine</artifactId>
             <version>${caffeine.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.github.seancfoley</groupId>
             <artifactId>ipaddress</artifactId>
             <version>${ipaddress.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>ninja.egg82</groupId>
