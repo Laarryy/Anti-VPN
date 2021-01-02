@@ -70,8 +70,8 @@ public class ConfigurationFileUtil {
                 .messaging(getMessaging(config, serverId, messagingHandler, debug, console))
                 .sourceCacheTime(getSourceCacheTime(config, debug, console))
                 .mcleaksCacheTime(getMcLeaksCacheTime(config, debug, console))
-                .ignoredIps(getIgnoredIps(config, debug, console))
                 .cacheTime(getCacheTime(config, debug, console))
+                .ignoredIps(getIgnoredIps(config, debug, console))
                 .threads(config.node("connection", "threads").getInt(4))
                 .timeout(config.node("connection", "timeout").getLong(5000L))
                 .vpnKickMessage(config.node("action", "vpn", "kick-message").getString("&cPlease disconnect from your proxy or VPN before re-joining!"))
@@ -93,6 +93,11 @@ public class ConfigurationFileUtil {
         if (debug) {
             console.sendMessage(LogUtil.HEADING + "<c2>Source threads:</c2> <c1>" + cachedConfig.getThreads() + "</c1>");
             console.sendMessage(LogUtil.HEADING + "<c2>Source timeout:</c2> <c1>" + cachedConfig.getTimeout() + "ms</c1>");
+            console.sendMessage(LogUtil.HEADING + "<c2>VPN kick message:</c2> <c1>" + cachedConfig.getVPNKickMessage() + "</c1>");
+            console.sendMessage(LogUtil.HEADING + "<c2>MCLeaks kick message:</c2> <c1>" + cachedConfig.getMCLeaksKickMessage() + "</c1>");
+            if (!cachedConfig.getMcLeaksKey().isEmpty()) {
+                console.sendMessage(LogUtil.HEADING + "<c2>MCLeaks key:</c2> <c1>****************</c1>");
+            }
         }
     }
 
@@ -140,7 +145,7 @@ public class ConfigurationFileUtil {
     private static @Nullable StorageService getStorageOf(@NonNull String name, @NonNull ConfigurationNode engineNode, @NonNull File dataDirectory, @NonNull PoolSettings poolSettings, boolean debug, @NonNull CommandIssuer console) {
         if (!engineNode.node("enabled").getBoolean()) {
             if (debug) {
-                console.sendMessage(LogUtil.HEADING + "<c9>Engine</c9> <c1>" + name + "</c1> <c9>is disabled. Removing.</c9>");
+                console.sendMessage(LogUtil.HEADING + "<c9>Storage engine</c9> <c1>" + name + "</c1> <c9>is disabled. Removing.</c9>");
             }
             return null;
         }
@@ -277,7 +282,7 @@ public class ConfigurationFileUtil {
     private static @Nullable MessagingService getMessagingOf(@NonNull String name, @NonNull ConfigurationNode engineNode, @NonNull UUID serverId, @NonNull MessagingHandler handler, @NonNull PoolSettings poolSettings, boolean debug, @NonNull CommandIssuer console) {
         if (!engineNode.node("enabled").getBoolean()) {
             if (debug) {
-                console.sendMessage(LogUtil.HEADING + "<c9>Engine</c9> <c1>" + name + "</c1> <c9>is disabled. Removing.</c9>");
+                console.sendMessage(LogUtil.HEADING + "<c9>Messaging engine</c9> <c1>" + name + "</c1> <c9>is disabled. Removing.</c9>");
             }
             return null;
         }
@@ -368,7 +373,7 @@ public class ConfigurationFileUtil {
     private static @NonNull Set<String> getIgnoredIps(@NonNull ConfigurationNode config, boolean debug, @NonNull CommandIssuer console) {
         Set<String> retVal;
         try {
-            retVal = new HashSet<>(!config.node("ignore", "ips").empty() ? config.node("ignore", "ips").getList(String.class) : new ArrayList<>());
+            retVal = new HashSet<>(!config.node("action", "ignore").empty() ? config.node("action", "ignore").getList(String.class) : new ArrayList<>());
         } catch (SerializationException ex) {
             logger.error(ex.getMessage(), ex);
             retVal = new HashSet<>();

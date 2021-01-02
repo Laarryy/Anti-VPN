@@ -425,19 +425,21 @@ public class PlayerEvents extends EventHolder {
     private boolean rangeContains(String range, String ip) { return new IPAddressString(range).contains(new IPAddressString(ip)); }
 
     private <T> @Nullable T handleException(@NonNull Throwable ex) {
+        Throwable oldEx = null;
         if (ex instanceof CompletionException) {
+            oldEx = ex;
             ex = ex.getCause();
         }
 
         if (ex instanceof APIException) {
             if (ConfigUtil.getDebugOrFalse()) {
-                logger.error("[Hard: " + ((APIException) ex).isHard() + "] " + ex.getMessage(), ex);
+                logger.error("[Hard: " + ((APIException) ex).isHard() + "] " + ex.getMessage(), oldEx != null ? oldEx : ex);
             } else {
                 logger.error("[Hard: " + ((APIException) ex).isHard() + "] " + ex.getMessage());
             }
         } else {
             if (ConfigUtil.getDebugOrFalse()) {
-                logger.error(ex.getMessage(), ex);
+                logger.error(ex.getMessage(), oldEx != null ? oldEx : ex);
             } else {
                 logger.error(ex.getMessage());
             }
