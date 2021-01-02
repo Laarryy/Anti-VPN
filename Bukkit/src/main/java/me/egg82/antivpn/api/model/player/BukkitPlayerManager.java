@@ -79,17 +79,20 @@ public class BukkitPlayerManager extends AbstractPlayerManager {
             throw new APIException(false, "Cached config could not be fetched.");
         }
 
-        if (cachedConfig.getDebug()) {
-            logger.info("Getting web result for player " + uuid + ".");
-        }
-
         if (useCache) {
             for (StorageService service : cachedConfig.getStorage()) {
                 PlayerModel model = service.getPlayerModel(uuid, cachedConfig.getSourceCacheTime());
                 if (model != null) {
+                    if (cachedConfig.getDebug()) {
+                        logger.info("Found database value for player " + uuid + ".");
+                    }
                     return model;
                 }
             }
+        }
+
+        if (cachedConfig.getDebug()) {
+            logger.info("Getting web result for player " + uuid + ".");
         }
 
         PlayerModel retVal = new PlayerModel();
@@ -103,7 +106,6 @@ public class BukkitPlayerManager extends AbstractPlayerManager {
         retVal.setMcleaks(result.isMCLeaks());
 
         if (useCache) {
-            playerCache.put(uuid, retVal);
             storeResult(retVal, cachedConfig);
             sendResult(retVal, cachedConfig);
         }

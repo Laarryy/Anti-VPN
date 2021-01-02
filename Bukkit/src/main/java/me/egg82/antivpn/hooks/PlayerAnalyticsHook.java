@@ -114,7 +114,7 @@ public class PlayerAnalyticsHook implements PluginHook {
                                 .join() >= ipManager.getMinConsensusValue()) {
                             retVal += 1;
                         }
-                    } catch (CompletionException ignored) { }
+                    } catch (Exception ignored) { }
                 } else {
                     try {
                         if (ipManager.cascade(ip, true)
@@ -122,7 +122,7 @@ public class PlayerAnalyticsHook implements PluginHook {
                                 .join()) {
                             retVal += 1;
                         }
-                    } catch (CompletionException ignored) { }
+                    } catch (Exception ignored) { }
                 }
             }
             return retVal;
@@ -149,7 +149,7 @@ public class PlayerAnalyticsHook implements PluginHook {
                             .join()) {
                         retVal += 1;
                     }
-                } catch (CompletionException ignored) { }
+                } catch (Exception ignored) { }
             }
             return retVal;
         }
@@ -179,13 +179,13 @@ public class PlayerAnalyticsHook implements PluginHook {
                     return ipManager.consensus(ip, true)
                             .exceptionally(this::handleException)
                             .join() >= ipManager.getMinConsensusValue();
-                } catch (CompletionException ignored) { }
+                } catch (Exception ignored) { }
             } else {
                 try {
                     return ipManager.cascade(ip, true)
                             .exceptionally(this::handleException)
                             .join();
-                } catch (CompletionException ignored) { }
+                } catch (Exception ignored) { }
             }
 
             return false;
@@ -205,7 +205,7 @@ public class PlayerAnalyticsHook implements PluginHook {
                 return playerManager.checkMcLeaks(playerId, true)
                         .exceptionally(this::handleException)
                         .join();
-            } catch (CompletionException ignored) { }
+            } catch (Exception ignored) { }
 
             return false;
         }
@@ -223,6 +223,10 @@ public class PlayerAnalyticsHook implements PluginHook {
         }
 
         private <T> @Nullable T handleException(@NonNull Throwable ex) {
+            if (ex instanceof CompletionException) {
+                ex = ex.getCause();
+            }
+
             if (ex instanceof APIException) {
                 if (ConfigUtil.getDebugOrFalse()) {
                     logger.error("[Hard: " + ((APIException) ex).isHard() + "] " + ex.getMessage(), ex);

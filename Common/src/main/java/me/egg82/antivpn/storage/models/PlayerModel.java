@@ -12,6 +12,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 public class PlayerModel extends BaseModel {
     @Index(unique = true) @NotNull
     private UUID uuid;
+    @NotNull
     private boolean mcleaks;
 
     public PlayerModel() {

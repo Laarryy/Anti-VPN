@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.CompletionException;
 import me.egg82.antivpn.api.VPNAPIProvider;
 import me.egg82.antivpn.api.model.source.Source;
 import me.egg82.antivpn.api.model.source.SourceManager;
@@ -38,8 +37,7 @@ public class TestCommand extends AbstractCommand {
                             retVal.put(source.getName(), Optional.ofNullable(source.getResult(ip)
                                     .exceptionally(this::handleException)
                                     .join()));
-                            return;
-                        } catch (CompletionException ignored) { }
+                        } catch (Exception ignored) { }
                     }
 
                     r.accept(retVal);

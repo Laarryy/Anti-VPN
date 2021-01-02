@@ -9,10 +9,10 @@ import java.util.Objects;
  * in this Pair won't be reflected in the hashCode.
  */
 public class Pair<T1, T2> {
-    private T1 t1;
-    private T2 t2;
+    private final T1 t1;
+    private final T2 t2;
 
-    private int hc;
+    private final int hc;
 
     public Pair(T1 t1, T2 t2) {
         this.t1 = t1;

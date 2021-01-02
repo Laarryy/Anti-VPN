@@ -4,12 +4,13 @@ import java.nio.ByteBuffer;
 import java.util.Objects;
 import me.egg82.antivpn.api.model.ip.AlgorithmMethod;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class IPPacket extends AbstractPacket {
     private String ip;
     private int type;
-    private boolean cascade;
-    private double consensus;
+    private Boolean cascade;
+    private Double consensus;
 
     public byte getPacketId() { return 0x01; }
 
@@ -18,8 +19,8 @@ public class IPPacket extends AbstractPacket {
     public IPPacket() {
         this.ip = "";
         this.type = -1;
-        this.cascade = false;
-        this.consensus = -1.0d;
+        this.cascade = null;
+        this.consensus = null;
     }
 
     public void read(@NonNull ByteBuffer buffer) {
@@ -46,8 +47,14 @@ public class IPPacket extends AbstractPacket {
         putVarInt(this.type, buffer);
         AlgorithmMethod method = AlgorithmMethod.values()[type];
         if (method == AlgorithmMethod.CASCADE) {
+            if (this.cascade == null) {
+                throw new RuntimeException("cascade was selected as type but value is null.");
+            }
             putBoolean(this.cascade, buffer);
         } else {
+            if (this.consensus == null) {
+                throw new RuntimeException("consensus was selected as type but value is null.");
+            }
             buffer.putDouble(this.consensus);
         }
     }
@@ -56,11 +63,11 @@ public class IPPacket extends AbstractPacket {
 
     public void setIp(@NonNull String ip) { this.ip = ip; }
 
-    public boolean getCascade() { return cascade; }
+    public @Nullable Boolean getCascade() { return cascade; }
 
     public void setCascade(boolean cascade) { this.cascade = cascade; }
 
-    public double getConsensus() { return consensus; }
+    public @Nullable Double getConsensus() { return consensus; }
 
     public void setConsensus(double consensus) { this.consensus = consensus; }
 
@@ -72,7 +79,7 @@ public class IPPacket extends AbstractPacket {
         if (this == o) return true;
         if (!(o instanceof IPPacket)) return false;
         IPPacket ipPacket = (IPPacket) o;
-        return type == ipPacket.type && cascade == ipPacket.cascade && Double.compare(ipPacket.consensus, consensus) == 0 && ip.equals(ipPacket.ip);
+        return type == ipPacket.type && Objects.equals(ip, ipPacket.ip) && Objects.equals(cascade, ipPacket.cascade) && Objects.equals(consensus, ipPacket.consensus);
     }
 
     public int hashCode() { return Objects.hash(ip, type, cascade, consensus); }

@@ -457,7 +457,7 @@ public class ConfigurationFileUtil {
     private static void setSources(@NonNull ConfigurationNode config, boolean debug, @NonNull CommandIssuer console, @NonNull SourceManager sourceManager) {
         Map<String, Source<? extends SourceModel>> initializedSources = new HashMap<>();
 
-        List<Class<Source>> sourceClasses = PackageFilter.getClasses(Source.class, "me.egg82.antivpn.api.model.source.models", false, false, false);
+        List<Class<Source>> sourceClasses = PackageFilter.getClasses(Source.class, "me.egg82.antivpn.api.model.source", false, false, false);
         for (Class<Source> clazz : sourceClasses) {
             if (debug) {
                 console.sendMessage(LogUtil.HEADING + "<c2>Initializing source</c2> <c1>" + clazz.getSimpleName() + "</c1>");

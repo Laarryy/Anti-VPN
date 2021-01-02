@@ -13,6 +13,7 @@ import me.egg82.antivpn.api.model.source.SourceManager;
 import me.egg82.antivpn.api.model.source.models.SourceModel;
 import me.egg82.antivpn.config.CachedConfig;
 import me.egg82.antivpn.config.ConfigUtil;
+import me.egg82.antivpn.core.Pair;
 import me.egg82.antivpn.messaging.packets.DeleteIPPacket;
 import me.egg82.antivpn.messaging.packets.IPPacket;
 import me.egg82.antivpn.storage.StorageService;
@@ -25,7 +26,7 @@ import org.slf4j.LoggerFactory;
 public class GenericIPManager implements IPManager {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private final LoadingCache<String, IPModel> ipCache;
+    private final LoadingCache<Pair<String, AlgorithmMethod>, IPModel> ipCache;
     private final LoadingCache<String, Boolean> sourceInvalidationCache;
 
     private final SourceManager sourceManager;
@@ -33,11 +34,11 @@ public class GenericIPManager implements IPManager {
     public GenericIPManager(SourceManager sourceManager, long cacheTime, TimeUnit cacheTimeUnit) {
         this.sourceManager = sourceManager;
 
-        ipCache = Caffeine.newBuilder().expireAfterAccess(cacheTime, cacheTimeUnit).expireAfterWrite(cacheTime, cacheTimeUnit).build(k -> calculateIpResult(k, true));
+        ipCache = Caffeine.newBuilder().expireAfterAccess(cacheTime, cacheTimeUnit).expireAfterWrite(cacheTime, cacheTimeUnit).build(k -> calculateIpResult(k.getT1(), k.getT2(), true));
         sourceInvalidationCache = Caffeine.newBuilder().expireAfterWrite(1L, TimeUnit.MINUTES).build(k -> Boolean.FALSE);
     }
 
-    public LoadingCache<String, IPModel> getIpCache() { return ipCache; }
+    public LoadingCache<Pair<String, AlgorithmMethod>, IPModel> getIpCache() { return ipCache; }
 
     public @NonNull CompletableFuture<IP> getIp(@NonNull String ip) {
         return CompletableFuture.supplyAsync(() -> {
@@ -134,9 +135,9 @@ public class GenericIPManager implements IPManager {
         return CompletableFuture.supplyAsync(() -> {
             IPModel model;
             if (useCache) {
-                model = ipCache.get(ip);
+                model = ipCache.get(new Pair<>(ip, AlgorithmMethod.CASCADE));
             } else {
-                model = calculateIpResult(ip, false);
+                model = calculateIpResult(ip, AlgorithmMethod.CASCADE, false);
             }
             if (model == null) {
                 throw new APIException(false, "Could not get data for IP " + ip);
@@ -149,9 +150,9 @@ public class GenericIPManager implements IPManager {
         return CompletableFuture.supplyAsync(() -> {
             IPModel model;
             if (useCache) {
-                model = ipCache.get(ip);
+                model = ipCache.get(new Pair<>(ip, AlgorithmMethod.CONSESNSUS));
             } else {
-                model = calculateIpResult(ip, false);
+                model = calculateIpResult(ip, AlgorithmMethod.CONSESNSUS, false);
             }
             if (model == null) {
                 throw new APIException(false, "Could not get data for IP " + ip);
@@ -168,55 +169,33 @@ public class GenericIPManager implements IPManager {
         return cachedConfig.getVPNAlgorithmConsensus();
     }
 
-    private @NonNull IPModel calculateIpResult(@NonNull String ip, boolean useCache) throws APIException {
+    private @NonNull IPModel calculateIpResult(@NonNull String ip, @NonNull AlgorithmMethod method, boolean useCache) throws APIException {
         CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
         if (cachedConfig == null) {
             throw new APIException(false, "Cached config could not be fetched.");
-        }
-
-        if (cachedConfig.getDebug()) {
-            logger.info("Getting web result for IP " + ip + ".");
         }
 
         if (useCache) {
             for (StorageService service : cachedConfig.getStorage()) {
                 IPModel model = service.getIpModel(ip, cachedConfig.getSourceCacheTime());
                 if (model != null) {
+                    if (cachedConfig.getDebug()) {
+                        logger.info("Found database value for IP " + ip + ".");
+                    }
                     return model;
                 }
             }
+        }
+
+        if (cachedConfig.getDebug()) {
+            logger.info("Getting web result for IP " + ip + ".");
         }
 
         IPModel retVal = new IPModel();
         retVal.setIp(ip);
         retVal.setType(cachedConfig.getVPNAlgorithmMethod().ordinal());
 
-        if (cachedConfig.getVPNAlgorithmMethod() == AlgorithmMethod.CONSESNSUS) {
-            for (Source<? extends SourceModel> source : sourceManager.getSources()) {
-                if (Boolean.TRUE.equals(sourceInvalidationCache.get(source.getName()))) {
-                    if (cachedConfig.getDebug()) {
-                        logger.info("Skipping source " + source.getName() + " due to recent failure.");
-                    }
-                    continue;
-                }
-                if (cachedConfig.getDebug()) {
-                    logger.info("Getting result from source " + source.getName() + ".");
-                }
-                try {
-                    retVal.setCascade(source.getResult(ip)
-                            .exceptionally(this::handleException)
-                            .join());
-                    if (useCache) {
-                        ipCache.put(ip, retVal);
-                        storeResult(retVal, cachedConfig);
-                        sendResult(retVal, cachedConfig);
-                    }
-                    return retVal;
-                } catch (CompletionException ignored) {
-                    sourceInvalidationCache.put(source.getName(), Boolean.TRUE);
-                }
-            }
-        } else {
+        if (method == AlgorithmMethod.CONSESNSUS) {
             ExecutorService pool = Executors.newWorkStealingPool(cachedConfig.getThreads());
             List<Source<? extends SourceModel>> sources = sourceManager.getSources();
             CountDownLatch latch = new CountDownLatch(sources.size());
@@ -241,7 +220,7 @@ public class GenericIPManager implements IPManager {
                             results.addAndGet(1L);
                         }
                         totalSources.addAndGet(1L);
-                    } catch (CompletionException ignored) {
+                    } catch (Exception ignored) {
                         sourceInvalidationCache.put(source.getName(), Boolean.TRUE);
                     }
                     latch.countDown();
@@ -265,11 +244,34 @@ public class GenericIPManager implements IPManager {
             if (totalSources.get() > 0L) {
                 retVal.setConsensus((double) results.get() / (double) totalSources.get());
                 if (useCache) {
-                    ipCache.put(ip, retVal);
                     storeResult(retVal, cachedConfig);
                     sendResult(retVal, cachedConfig);
                 }
                 return retVal;
+            }
+        } else {
+            for (Source<? extends SourceModel> source : sourceManager.getSources()) {
+                if (Boolean.TRUE.equals(sourceInvalidationCache.get(source.getName()))) {
+                    if (cachedConfig.getDebug()) {
+                        logger.info("Skipping source " + source.getName() + " due to recent failure.");
+                    }
+                    continue;
+                }
+                if (cachedConfig.getDebug()) {
+                    logger.info("Getting result from source " + source.getName() + ".");
+                }
+                try {
+                    retVal.setCascade(source.getResult(ip)
+                            .exceptionally(this::handleException)
+                            .join());
+                    if (useCache) {
+                        storeResult(retVal, cachedConfig);
+                        sendResult(retVal, cachedConfig);
+                    }
+                    return retVal;
+                } catch (Exception ignored) {
+                    sourceInvalidationCache.put(source.getName(), Boolean.TRUE);
+                }
             }
         }
 
@@ -277,6 +279,10 @@ public class GenericIPManager implements IPManager {
     }
 
     protected final <T> T handleException(Throwable ex) {
+        if (ex instanceof CompletionException) {
+            ex = ex.getCause();
+        }
+
         if (ex instanceof APIException) {
             if (ConfigUtil.getDebugOrFalse()) {
                 logger.error("[Hard: " + ((APIException) ex).isHard() + "] " + ex.getMessage(), ex);

@@ -3,7 +3,6 @@ package me.egg82.antivpn.commands.internal;
 import co.aikar.commands.CommandIssuer;
 import co.aikar.taskchain.TaskChainFactory;
 import java.util.UUID;
-import java.util.concurrent.CompletionException;
 import me.egg82.antivpn.api.VPNAPIProvider;
 import me.egg82.antivpn.api.model.ip.AlgorithmMethod;
 import me.egg82.antivpn.api.model.ip.IPManager;
@@ -41,14 +40,14 @@ public class CheckCommand extends AbstractCommand {
                                     .exceptionally(this::handleException)
                                     .join() >= ipManager.getMinConsensusValue());
                             return;
-                        } catch (CompletionException ignored) { }
+                        } catch (Exception ignored) { }
                     } else {
                         try {
                             r.accept(ipManager.cascade(ip, true)
                                     .exceptionally(this::handleException)
                                     .join());
                             return;
-                        } catch (CompletionException ignored) { }
+                        } catch (Exception ignored) { }
                     }
 
                     r.accept(null);
@@ -70,7 +69,7 @@ public class CheckCommand extends AbstractCommand {
                                 .exceptionally(this::handleException)
                                 .join());
                         return;
-                    } catch (CompletionException ignored) { }
+                    } catch (Exception ignored) { }
 
                     r.accept(null);
                 })

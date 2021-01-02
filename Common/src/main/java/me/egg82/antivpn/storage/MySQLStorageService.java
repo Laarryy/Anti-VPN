@@ -96,6 +96,7 @@ public class MySQLStorageService extends AbstractStorageService {
             dbConfig.setName(service.name);
             dbConfig.setClasses(Arrays.asList(BaseModel.class, IPModel.class, PlayerModel.class));
             service.connection = DatabaseFactory.createWithContextClassLoader(dbConfig, getClass().getClassLoader());
+            // TODO: Generate tables
 
             return service;
         }

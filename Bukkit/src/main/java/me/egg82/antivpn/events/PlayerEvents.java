@@ -191,13 +191,13 @@ public class PlayerEvents extends EventHolder {
                     ipManager.consensus(ip, true)
                             .exceptionally(this::handleException)
                             .join(); // Calling this will cache the result internally, even if the value is unused
-                } catch (CompletionException ignored) { }
+                } catch (Exception ignored) { }
             } else {
                 try {
                     ipManager.cascade(ip, true)
                             .exceptionally(this::handleException)
                             .join(); // Calling this will cache the result internally, even if the value is unused
-                } catch (CompletionException ignored) { }
+                } catch (Exception ignored) { }
             }
         }
 
@@ -208,7 +208,7 @@ public class PlayerEvents extends EventHolder {
                 playerManager.checkMcLeaks(uuid, true)
                         .exceptionally(this::handleException)
                         .join(); // Calling this will cache the result internally, even if the value is unused
-            } catch (CompletionException ignored) { }
+            } catch (Exception ignored) { }
         }
     }
 
@@ -302,7 +302,7 @@ public class PlayerEvents extends EventHolder {
                     isVPN = ipManager.consensus(ip, true)
                             .exceptionally(this::handleException)
                             .join() >= cachedConfig.getVPNAlgorithmConsensus();
-                } catch (CompletionException ignored) {
+                } catch (Exception ignored) {
                     isVPN = false;
                 }
             } else {
@@ -310,7 +310,7 @@ public class PlayerEvents extends EventHolder {
                     isVPN = ipManager.cascade(ip, true)
                             .exceptionally(this::handleException)
                             .join();
-                } catch (CompletionException ignored) {
+                } catch (Exception ignored) {
                     isVPN = false;
                 }
             }
@@ -343,7 +343,7 @@ public class PlayerEvents extends EventHolder {
                 isMCLeaks = playerManager.checkMcLeaks(uuid, true)
                         .exceptionally(this::handleException)
                         .join();
-            } catch (CompletionException ignored) {
+            } catch (Exception ignored) {
                 isMCLeaks = false;
             }
 
@@ -425,6 +425,10 @@ public class PlayerEvents extends EventHolder {
     private boolean rangeContains(String range, String ip) { return new IPAddressString(range).contains(new IPAddressString(ip)); }
 
     private <T> @Nullable T handleException(@NonNull Throwable ex) {
+        if (ex instanceof CompletionException) {
+            ex = ex.getCause();
+        }
+
         if (ex instanceof APIException) {
             if (ConfigUtil.getDebugOrFalse()) {
                 logger.error("[Hard: " + ((APIException) ex).isHard() + "] " + ex.getMessage(), ex);

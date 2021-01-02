@@ -4,7 +4,6 @@ import co.aikar.commands.CommandIssuer;
 import co.aikar.taskchain.TaskChainFactory;
 import java.text.DecimalFormat;
 import java.util.Set;
-import java.util.concurrent.CompletionException;
 import java.util.concurrent.TimeUnit;
 import me.egg82.antivpn.api.APIException;
 import me.egg82.antivpn.api.VPNAPIProvider;
@@ -109,7 +108,7 @@ public class ScoreCommand extends AbstractCommand {
                 result = source.getResult(ip)
                         .exceptionally(this::handleException)
                         .join();
-            } catch (CompletionException ex) {
+            } catch (Exception ex) {
                 if (!(ex.getCause() instanceof APIException) || !((APIException) ex.getCause()).isHard()) {
                     error += 1;
                 }

@@ -348,11 +348,6 @@
         </dependency>
         <dependency>
             <groupId>io.ebean</groupId>
-            <artifactId>ebean-datasource</artifactId>
-            <version>${ebeandatasource.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.ebean</groupId>
             <artifactId>ebean-querybean</artifactId>
             <version>${ebean.version}</version>
         </dependency>

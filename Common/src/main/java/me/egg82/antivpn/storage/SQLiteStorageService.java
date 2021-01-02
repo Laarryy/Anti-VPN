@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.Arrays;
 import java.util.Properties;
+import java.util.UUID;
 import me.egg82.antivpn.storage.models.BaseModel;
 import me.egg82.antivpn.storage.models.IPModel;
 import me.egg82.antivpn.storage.models.PlayerModel;
@@ -64,6 +65,24 @@ public class SQLiteStorageService extends AbstractStorageService {
         }
 
         public @NonNull SQLiteStorageService build() {
+            boolean isAutoCommit = config.isAutoCommit();
+            if (isAutoCommit) {
+                config.setAutoCommit(false);
+                service.source = new HikariDataSource(config);
+                DatabaseConfig dbConfig = new DatabaseConfig();
+                dbConfig.setDataSource(service.source);
+                dbConfig.setDatabasePlatform(new SQLitePlatform());
+                dbConfig.setDefaultServer(false);
+                dbConfig.setRegister(false);
+                dbConfig.setName(UUID.randomUUID().toString());
+                dbConfig.setClasses(Arrays.asList(BaseModel.class, IPModel.class, PlayerModel.class));
+                service.connection = DatabaseFactory.createWithContextClassLoader(dbConfig, getClass().getClassLoader());
+                service.connection.script().run("/db/sqlite.sql");
+                service.connection.shutdown(false, false);
+                service.source.close();
+                config.setAutoCommit(true);
+            }
+
             service.source = new HikariDataSource(config);
             DatabaseConfig dbConfig = new DatabaseConfig();
             dbConfig.setDataSource(service.source);
@@ -73,6 +92,9 @@ public class SQLiteStorageService extends AbstractStorageService {
             dbConfig.setName(service.name);
             dbConfig.setClasses(Arrays.asList(BaseModel.class, IPModel.class, PlayerModel.class));
             service.connection = DatabaseFactory.createWithContextClassLoader(dbConfig, getClass().getClassLoader());
+            if (!isAutoCommit) {
+                service.connection.script().run("/db/sqlite.sql");
+            }
 
             return service;
         }

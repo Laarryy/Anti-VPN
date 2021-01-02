@@ -6,6 +6,7 @@ import co.aikar.taskchain.TaskChainAbortAction;
 import co.aikar.taskchain.TaskChainFactory;
 import java.io.IOException;
 import java.util.UUID;
+import java.util.concurrent.CompletionException;
 import me.egg82.antivpn.api.APIException;
 import me.egg82.antivpn.config.ConfigUtil;
 import me.egg82.antivpn.lang.Message;
@@ -28,6 +29,10 @@ public abstract class AbstractCommand implements Runnable {
     }
 
     protected final <T> @Nullable T handleException(@NonNull Throwable ex) {
+        if (ex instanceof CompletionException) {
+            ex = ex.getCause();
+        }
+
         if (ex instanceof APIException) {
             if (ConfigUtil.getDebugOrFalse()) {
                 logger.error("[Hard: " + ((APIException) ex).isHard() + "] " + ex.getMessage(), ex);

@@ -1,0 +1,21 @@
+CREATE TABLE IF NOT EXISTS "avpn_ip" (
+	"id"	INTEGER NOT NULL,
+	"version"	INTEGER NOT NULL,
+	"created"	INTEGER NOT NULL,
+	"modified"	INTEGER NOT NULL,
+	"ip"	TEXT NOT NULL UNIQUE,
+	"type"	INTEGER NOT NULL,
+	"cascade"	INTEGER,
+	"consensus"	INTEGER,
+	PRIMARY KEY("id" AUTOINCREMENT)
+);
+
+CREATE TABLE IF NOT EXISTS "avpn_player" (
+	"id"	INTEGER NOT NULL,
+	"version"	INTEGER NOT NULL,
+	"created"	INTEGER NOT NULL,
+	"modified"	INTEGER NOT NULL,
+	"uuid"	TEXT NOT NULL UNIQUE,
+	"mcleaks"	INTEGER NOT NULL,
+	PRIMARY KEY("id" AUTOINCREMENT)
+);

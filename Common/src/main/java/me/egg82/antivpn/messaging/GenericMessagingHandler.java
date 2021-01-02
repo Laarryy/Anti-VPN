@@ -5,10 +5,12 @@ import com.github.benmanes.caffeine.cache.LoadingCache;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import me.egg82.antivpn.api.APIUtil;
+import me.egg82.antivpn.api.model.ip.AlgorithmMethod;
 import me.egg82.antivpn.api.model.ip.GenericIPManager;
 import me.egg82.antivpn.api.model.player.AbstractPlayerManager;
 import me.egg82.antivpn.config.CachedConfig;
 import me.egg82.antivpn.config.ConfigUtil;
+import me.egg82.antivpn.core.Pair;
 import me.egg82.antivpn.messaging.packets.*;
 import me.egg82.antivpn.storage.StorageService;
 import me.egg82.antivpn.storage.models.IPModel;
@@ -50,7 +52,7 @@ public class GenericMessagingHandler implements MessagingHandler {
         m.setType(packet.getType());
         m.setCascade(packet.getCascade());
         m.setConsensus(packet.getConsensus());
-        ipManager.getIpCache().put(packet.getIp(), m);
+        ipManager.getIpCache().put(new Pair<>(packet.getIp(), AlgorithmMethod.values()[packet.getType()]), m);
 
         CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
         if (cachedConfig == null) {
@@ -81,7 +83,8 @@ public class GenericMessagingHandler implements MessagingHandler {
             return;
         }
 
-        ipManager.getIpCache().invalidate(packet.getIp());
+        ipManager.getIpCache().invalidate(new Pair<>(packet.getIp(), AlgorithmMethod.CASCADE));
+        ipManager.getIpCache().invalidate(new Pair<>(packet.getIp(), AlgorithmMethod.CONSESNSUS));
 
         CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
         if (cachedConfig == null) {
