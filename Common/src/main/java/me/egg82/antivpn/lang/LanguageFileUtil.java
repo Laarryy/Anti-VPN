@@ -69,13 +69,11 @@ public class LanguageFileUtil {
         if (!fileOnDisk.exists()) {
             try (InputStream inStream = LanguageFileUtil.class.getResourceAsStream("/lang/" + resourcePath)) {
                 if (inStream != null) {
-                    try (InputStreamReader reader = new InputStreamReader(inStream);
-                         BufferedReader in = new BufferedReader(reader);
-                         FileWriter writer = new FileWriter(fileOnDisk);
-                         BufferedWriter out = new BufferedWriter(writer)) {
-                        String line;
-                        while ((line = in.readLine()) != null) {
-                            out.write(line + System.lineSeparator());
+                    try (FileOutputStream outStream = new FileOutputStream(fileOnDisk)) {
+                        int read;
+                        byte[] buffer = new byte[4096];
+                        while ((read = inStream.read(buffer, 0, buffer.length)) > 0) {
+                            outStream.write(buffer, 0, read);
                         }
                     }
                 }

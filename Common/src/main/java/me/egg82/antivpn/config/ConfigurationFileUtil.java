@@ -1,7 +1,10 @@
 package me.egg82.antivpn.config;
 
 import co.aikar.commands.CommandIssuer;
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -495,13 +498,15 @@ public class ConfigurationFileUtil {
         }
 
         if (!fileOnDisk.exists()) {
-            try (InputStreamReader reader = new InputStreamReader(ConfigurationFileUtil.class.getResourceAsStream("/" + resourcePath));
-                 BufferedReader in = new BufferedReader(reader);
-                 FileWriter writer = new FileWriter(fileOnDisk);
-                 BufferedWriter out = new BufferedWriter(writer)) {
-                String line;
-                while ((line = in.readLine()) != null) {
-                    out.write(line + System.lineSeparator());
+            try (InputStream inStream = ConfigurationFileUtil.class.getResourceAsStream("/" + resourcePath)) {
+                if (inStream != null) {
+                    try (FileOutputStream outStream = new FileOutputStream(fileOnDisk)) {
+                        int read;
+                        byte[] buffer = new byte[4096];
+                        while ((read = inStream.read(buffer, 0, buffer.length)) > 0) {
+                            outStream.write(buffer, 0, read);
+                        }
+                    }
                 }
             }
         }
