@@ -63,7 +63,7 @@ public class SQLiteStorageService extends AbstractStorageService {
             DatabaseConfig dbConfig = new DatabaseConfig();
             dbConfig.setDataSource(source);
             dbConfig.setName(service.name);
-            service.connection = DatabaseFactory.create(dbConfig);
+            service.connection = DatabaseFactory.createWithContextClassLoader(dbConfig, getClass().getClassLoader());
 
             return service;
         }

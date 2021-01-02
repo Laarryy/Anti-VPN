@@ -53,10 +53,13 @@ public class BukkitBootstrap extends JavaPlugin {
 
     @Override
     public void onLoad() {
+        ClassLoader origClassLoader = Thread.currentThread().getContextClassLoader();
+
         try {
-            // TODO: "class jdk.internal.loader.ClassLoaders$AppClassLoader cannot be cast to class java.net.URLClassLoader" on JDK11 with getContextClassLoader()
-            loadJars(new File(getDataFolder(), "external"), (URLClassLoader) getClass().getClassLoader(), (URLClassLoader) Thread.currentThread().getContextClassLoader());
-        } catch (ClassCastException | IOException | IllegalAccessException | InvocationTargetException ex) {
+            Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
+            loadJars(new File(getDataFolder(), "external"), (URLClassLoader) getClass().getClassLoader());
+        } catch (ClassCastException | IOException ex) {
+            Thread.currentThread().setContextClassLoader(origClassLoader);
             logger.error(ex.getMessage(), ex);
             throw new RuntimeException("Could not load required dependencies.");
         }
@@ -74,15 +77,27 @@ public class BukkitBootstrap extends JavaPlugin {
 
         concrete = new AntiVPN(this);
         concrete.onLoad();
+
+        Thread.currentThread().setContextClassLoader(origClassLoader);
     }
 
     @Override
-    public void onEnable() { concrete.onEnable(); }
+    public void onEnable() {
+        ClassLoader origClassLoader = Thread.currentThread().getContextClassLoader();
+        Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
+        concrete.onEnable();
+        Thread.currentThread().setContextClassLoader(origClassLoader);
+    }
 
     @Override
-    public void onDisable() { concrete.onDisable(); }
+    public void onDisable() {
+        ClassLoader origClassLoader = Thread.currentThread().getContextClassLoader();
+        Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
+        concrete.onDisable();
+        Thread.currentThread().setContextClassLoader(origClassLoader);
+    }
 
-    private void loadJars(@NonNull File jarsDir, @NonNull URLClassLoader parentLoader, @NonNull URLClassLoader contextLoader) throws IOException, IllegalAccessException, InvocationTargetException {
+    private void loadJars(@NonNull File jarsDir, @NonNull URLClassLoader parentLoader) throws IOException {
         if (jarsDir.exists() && !jarsDir.isDirectory()) {
             Files.delete(jarsDir.toPath());
         }
@@ -91,9 +106,6 @@ public class BukkitBootstrap extends JavaPlugin {
                 throw new IOException("Could not create parent directory structure.");
             }
         }
-
-        // Inject self into context CL
-        InjectUtil.injectFile(getFile(), contextLoader);
 
         File cacheDir = new File(jarsDir, "cache");
 
@@ -109,11 +121,11 @@ public class BukkitBootstrap extends JavaPlugin {
 
         Artifact.Builder zstd = Artifact.builder("com.github.luben", "zstd-jni", "${zstd.version}", cacheDir)
                 .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
-        buildRelocateInject(zstd, jarsDir, Collections.singletonList(new Relocation(getZstdPackage(), "me.egg82.antivpn.external." + getZstdPackage())), contextLoader, "Zstd");
+        buildRelocateInject(zstd, jarsDir, Collections.singletonList(new Relocation(getZstdPackage(), "me.egg82.antivpn.external." + getZstdPackage())), parentLoader, "Zstd");
 
         Artifact.Builder fastutil = Artifact.builder("it.unimi.dsi", "fastutil", "${fastutil.version}", cacheDir)
                 .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
-        buildRelocateInject(fastutil, jarsDir, Collections.singletonList(new Relocation(getFastUtilPackage(), "me.egg82.antivpn.external." + getFastUtilPackage())), contextLoader, "FastUtil");
+        buildRelocateInject(fastutil, jarsDir, Collections.singletonList(new Relocation(getFastUtilPackage(), "me.egg82.antivpn.external." + getFastUtilPackage())), parentLoader, "FastUtil");
 
         Artifact.Builder mcleaks = Artifact.builder("me.gong", "mcleaks-api", "${mcleaks.version}", cacheDir)
                 .addRepository(Repository.builder("https://nexus.wesjd.net/repository/thirdparty/").addProxy("https://nexus.egg82.me/repository/wesjd/").build());
@@ -121,7 +133,7 @@ public class BukkitBootstrap extends JavaPlugin {
                 new Relocation(getMcLeaksPackage(), "me.egg82.antivpn.external." + getMcLeaksPackage()),
                 new Relocation(getOkhttp3Package(), "me.egg82.antivpn.external." + getOkhttp3Package()),
                 new Relocation(getOkioPackage(), "me.egg82.antivpn.external." + getOkioPackage())
-        ), contextLoader, "MC Leaks API");
+        ), parentLoader, "MC Leaks API");
     }
 
     // Prevent Maven from relocating these
