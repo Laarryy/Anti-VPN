@@ -12,8 +12,10 @@ import com.djrapitops.plan.extension.icon.Color;
 import com.djrapitops.plan.extension.icon.Family;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.util.Collection;
 import java.util.UUID;
-import java.util.concurrent.CompletionException;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicLong;
 import me.egg82.antivpn.api.APIException;
 import me.egg82.antivpn.api.VPNAPIProvider;
 import me.egg82.antivpn.api.model.ip.AlgorithmMethod;
@@ -99,47 +101,69 @@ public class PlayerAnalyticsHook implements PluginHook {
         public long getVpns() {
             IPManager ipManager = VPNAPIProvider.getInstance().getIpManager();
 
-            // TODO: multi-thread this
-            long retVal = 0L;
-            for (Player p : Bukkit.getOnlinePlayers()) {
-                String ip = getIp(p);
-                if (ip == null || ip.isEmpty()) {
-                    continue;
-                }
+            Collection<? extends Player> players = Bukkit.getOnlinePlayers();
+            ExecutorService pool = Executors.newWorkStealingPool(Math.min(players.size() / 2, Runtime.getRuntime().availableProcessors() / 2));
+            CountDownLatch latch = new CountDownLatch(players.size());
+            AtomicLong results = new AtomicLong(0L);
 
-                if (ipManager.getCurrentAlgorithmMethod() == AlgorithmMethod.CONSESNSUS) {
-                    try {
-                        if (ipManager.consensus(ip, true)
-                                .exceptionally(this::handleException)
-                                .join() >= ipManager.getMinConsensusValue()) {
-                            retVal += 1;
+            for (Player p : players) {
+                pool.submit(() -> {
+                    String ip = getIp(p);
+                    if (ip == null || ip.isEmpty()) {
+                        latch.countDown();
+                        return;
+                    }
+
+                    if (ipManager.getCurrentAlgorithmMethod() == AlgorithmMethod.CONSESNSUS) {
+                        try {
+                            if (ipManager.consensus(ip, true)
+                                    .exceptionally(this::handleException)
+                                    .join() >= ipManager.getMinConsensusValue()) {
+                                results.addAndGet(1L);
+                            }
+                        } catch (CompletionException ignored) {
+                        } catch (Exception ex) {
+                            if (ConfigUtil.getDebugOrFalse()) {
+                                logger.error(ex.getMessage(), ex);
+                            } else {
+                                logger.error(ex.getMessage());
+                            }
                         }
-                    } catch (CompletionException ignored) { }
-                    catch (Exception ex) {
-                        if (ConfigUtil.getDebugOrFalse()) {
-                            logger.error(ex.getMessage(), ex);
-                        } else {
-                            logger.error(ex.getMessage());
+                    } else {
+                        try {
+                            if (Boolean.TRUE.equals(ipManager.cascade(ip, true)
+                                    .exceptionally(this::handleException)
+                                    .join())) {
+                                results.addAndGet(1L);
+                            }
+                        } catch (CompletionException ignored) {
+                        } catch (Exception ex) {
+                            if (ConfigUtil.getDebugOrFalse()) {
+                                logger.error(ex.getMessage(), ex);
+                            } else {
+                                logger.error(ex.getMessage());
+                            }
                         }
                     }
-                } else {
-                    try {
-                        if (ipManager.cascade(ip, true)
-                                .exceptionally(this::handleException)
-                                .join()) {
-                            retVal += 1;
-                        }
-                    } catch (CompletionException ignored) { }
-                    catch (Exception ex) {
-                        if (ConfigUtil.getDebugOrFalse()) {
-                            logger.error(ex.getMessage(), ex);
-                        } else {
-                            logger.error(ex.getMessage());
-                        }
-                    }
-                }
+                    latch.countDown();
+                });
             }
-            return retVal;
+
+            try {
+                if (!latch.await(40L, TimeUnit.SECONDS)) {
+                    logger.warn("Plan hook timed out before all results could be obtained.");
+                }
+            } catch (InterruptedException ex) {
+                if (ConfigUtil.getDebugOrFalse()) {
+                    logger.error(ex.getMessage(), ex);
+                } else {
+                    logger.error(ex.getMessage());
+                }
+                Thread.currentThread().interrupt();
+            }
+            pool.shutdownNow(); // Kill it with fire
+
+            return results.get();
         }
 
         @NumberProvider(
@@ -154,25 +178,46 @@ public class PlayerAnalyticsHook implements PluginHook {
         public long getMcLeaks() {
             PlayerManager playerManager = VPNAPIProvider.getInstance().getPlayerManager();
 
-            // TODO: multi-thread this
-            long retVal = 0L;
-            for (Player p : Bukkit.getOnlinePlayers()) {
-                try {
-                    if (playerManager.checkMcLeaks(p.getUniqueId(), true)
-                            .exceptionally(this::handleException)
-                            .join()) {
-                        retVal += 1;
+            Collection<? extends Player> players = Bukkit.getOnlinePlayers();
+            ExecutorService pool = Executors.newWorkStealingPool(Math.min(players.size() / 2, Runtime.getRuntime().availableProcessors() / 2));
+            CountDownLatch latch = new CountDownLatch(players.size());
+            AtomicLong results = new AtomicLong(0L);
+
+            for (Player p : players) {
+                pool.submit(() -> {
+                    try {
+                        if (Boolean.TRUE.equals(playerManager.checkMcLeaks(p.getUniqueId(), true)
+                                .exceptionally(this::handleException)
+                                .join())) {
+                            results.addAndGet(1L);
+                        }
+                    } catch (CompletionException ignored) {
+                    } catch (Exception ex) {
+                        if (ConfigUtil.getDebugOrFalse()) {
+                            logger.error(ex.getMessage(), ex);
+                        } else {
+                            logger.error(ex.getMessage());
+                        }
                     }
-                } catch (CompletionException ignored) { }
-                catch (Exception ex) {
-                    if (ConfigUtil.getDebugOrFalse()) {
-                        logger.error(ex.getMessage(), ex);
-                    } else {
-                        logger.error(ex.getMessage());
-                    }
-                }
+                    latch.countDown();
+                });
             }
-            return retVal;
+
+            try {
+                if (!latch.await(40L, TimeUnit.SECONDS)) {
+                    logger.warn("Plan hook timed out before all results could be obtained.");
+                }
+            } catch (InterruptedException ex) {
+                if (ConfigUtil.getDebugOrFalse()) {
+                    logger.error(ex.getMessage(), ex);
+                } else {
+                    logger.error(ex.getMessage());
+                }
+                Thread.currentThread().interrupt();
+            }
+            pool.shutdownNow(); // Kill it with fire
+
+            return results.get();
         }
 
         @BooleanProvider(
