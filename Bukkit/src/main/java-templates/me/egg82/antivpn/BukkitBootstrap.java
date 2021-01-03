@@ -68,33 +68,43 @@ public class BukkitBootstrap extends JavaPlugin {
         try {
             if (!downloadPool.awaitTermination(1L, TimeUnit.HOURS)) {
                 logger.error("Could not download all dependencies. Please try again later.");
+                Thread.currentThread().setContextClassLoader(origClassLoader);
                 return;
             }
         } catch (InterruptedException ex) {
+            Thread.currentThread().setContextClassLoader(origClassLoader);
             logger.error(ex.getMessage(), ex);
             Thread.currentThread().interrupt();
         }
 
-        concrete = new AntiVPN(this);
-        concrete.onLoad();
-
-        Thread.currentThread().setContextClassLoader(origClassLoader);
+        try {
+            concrete = new AntiVPN(this);
+            concrete.onLoad();
+        } finally {
+            Thread.currentThread().setContextClassLoader(origClassLoader);
+        }
     }
 
     @Override
     public void onEnable() {
         ClassLoader origClassLoader = Thread.currentThread().getContextClassLoader();
         Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
-        concrete.onEnable();
-        Thread.currentThread().setContextClassLoader(origClassLoader);
+        try {
+            concrete.onEnable();
+        } finally {
+            Thread.currentThread().setContextClassLoader(origClassLoader);
+        }
     }
 
     @Override
     public void onDisable() {
         ClassLoader origClassLoader = Thread.currentThread().getContextClassLoader();
         Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
-        concrete.onDisable();
-        Thread.currentThread().setContextClassLoader(origClassLoader);
+        try {
+            concrete.onDisable();
+        } finally {
+            Thread.currentThread().setContextClassLoader(origClassLoader);
+        }
     }
 
     private void loadJars(@NonNull File jarsDir, @NonNull URLClassLoader parentLoader) throws IOException {
