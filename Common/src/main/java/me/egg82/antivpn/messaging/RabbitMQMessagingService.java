@@ -125,7 +125,7 @@ public class RabbitMQMessagingService extends AbstractMessagingService {
                 }
                 packet.read(data);
 
-                handler.handlePacket(UUID.fromString(properties.getMessageId()), packet);
+                handler.handlePacket(UUID.fromString(properties.getMessageId()), getName(), packet);
             }
         };
         channel.addShutdownListener(cause -> {

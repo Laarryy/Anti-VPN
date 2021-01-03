@@ -180,7 +180,7 @@ public class BukkitPlayerManager extends AbstractPlayerManager {
         PlayerPacket packet = new PlayerPacket();
         packet.setUuid(model.getUuid());
         packet.setValue(model.isMcleaks());
-        PacketUtil.queuePacket(packet);
+        PacketUtil.queuePacket(packet, null);
 
         if (cachedConfig.getDebug()) {
             logger.info("Queued packet for " + model.getUuid() + " in messaging.");

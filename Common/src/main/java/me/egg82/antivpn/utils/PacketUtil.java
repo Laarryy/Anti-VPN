@@ -4,6 +4,7 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import it.unimi.dsi.fastutil.bytes.Byte2ObjectArrayMap;
 import it.unimi.dsi.fastutil.bytes.Byte2ObjectMap;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
@@ -14,6 +15,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import me.egg82.antivpn.config.CachedConfig;
 import me.egg82.antivpn.config.ConfigUtil;
 import me.egg82.antivpn.core.DoubleBuffer;
+import me.egg82.antivpn.core.Pair;
 import me.egg82.antivpn.messaging.MessagingService;
 import me.egg82.antivpn.messaging.packets.MultiPacket;
 import me.egg82.antivpn.messaging.packets.Packet;
@@ -60,11 +62,11 @@ public class PacketUtil {
 
     public static @NonNull Byte2ObjectMap<Class<Packet>> getPacketCache() { return packetCache; }
 
-    private static final DoubleBuffer<Packet> packetQueue = new DoubleBuffer<>();
+    private static final DoubleBuffer<Pair<Packet, String>> packetQueue = new DoubleBuffer<>();
     private static final AtomicBoolean requiresSending = new AtomicBoolean(false);
 
-    public static void queuePacket(@NonNull Packet packet) {
-        packetQueue.getWriteBuffer().add(packet);
+    public static void queuePacket(@NonNull Packet packet, String fromService) {
+        packetQueue.getWriteBuffer().add(new Pair<>(packet, fromService));
         requiresSending.set(true);
     }
 
@@ -83,32 +85,42 @@ public class PacketUtil {
 
         UUID messageId = UUID.randomUUID();
 
-        // TODO: avoid sending packets back on the received messaging service
         if (packetQueue.getReadBuffer().size() > 1) {
-            MultiPacket multi = new MultiPacket();
-            Packet packet;
-            while ((packet = packetQueue.getReadBuffer().poll()) != null) {
-                multi.getPackets().add(packet);
+            List<Pair<Packet, String>> pairs = new ArrayList<>();
+            Pair<Packet, String> pair;
+            while ((pair = packetQueue.getReadBuffer().poll()) != null) {
+                pairs.add(pair);
             }
 
             for (MessagingService service : cachedConfig.getMessaging()) {
                 workPool.execute(() -> {
-                    try {
-                        service.sendPacket(messageId, multi);
-                    } catch (IOException | TimeoutException ex) {
-                        logger.warn("Could not broadcast packet " + multi.getClass().getSimpleName() + " through " + service.getName(), ex);
+                    MultiPacket multi = new MultiPacket();
+                    for (Pair<Packet, String> p : pairs) {
+                        if (!service.getName().equals(p.getT2())) {
+                            multi.getPackets().add(p.getT1());
+                        }
+                    }
+
+                    if (!multi.getPackets().isEmpty()) {
+                        try {
+                            service.sendPacket(messageId, multi);
+                        } catch (IOException | TimeoutException ex) {
+                            logger.warn("Could not broadcast packet " + multi.getClass().getSimpleName() + " through " + service.getName(), ex);
+                        }
                     }
                 });
             }
         } else {
-            Packet packet = packetQueue.getReadBuffer().poll();
-            if (packet != null) {
+            Pair<Packet, String> pair = packetQueue.getReadBuffer().poll();
+            if (pair != null) {
                 for (MessagingService service : cachedConfig.getMessaging()) {
                     workPool.execute(() -> {
-                        try {
-                            service.sendPacket(messageId, packet);
-                        } catch (IOException | TimeoutException ex) {
-                            logger.warn("Could not broadcast packet " + packet.getClass().getSimpleName() + " through " + service.getName(), ex);
+                        if (!service.getName().equals(pair.getT2())) {
+                            try {
+                                service.sendPacket(messageId, pair.getT1());
+                            } catch (IOException | TimeoutException ex) {
+                                logger.warn("Could not broadcast packet " + pair.getT1().getClass().getSimpleName() + " through " + service.getName(), ex);
+                            }
                         }
                     });
                 }

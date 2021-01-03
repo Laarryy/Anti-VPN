@@ -197,7 +197,7 @@ public class RedisMessagingService extends AbstractMessagingService {
             }
             packet.read(data);
 
-            service.handler.handlePacket(messageId, packet);
+            service.handler.handlePacket(messageId, service.getName(), packet);
         }
     }
 

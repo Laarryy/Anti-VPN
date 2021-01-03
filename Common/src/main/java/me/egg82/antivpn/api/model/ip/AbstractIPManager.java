@@ -76,7 +76,7 @@ public abstract class AbstractIPManager implements IPManager {
             packet.setType(ip.getType().ordinal());
             packet.setCascade(ip.getCascade());
             packet.setConsensus(ip.getConsensus());
-            PacketUtil.queuePacket(packet);
+            PacketUtil.queuePacket(packet, null);
         });
     }
 
@@ -96,7 +96,7 @@ public abstract class AbstractIPManager implements IPManager {
 
             DeleteIPPacket packet = new DeleteIPPacket();
             packet.setIp(ip);
-            PacketUtil.queuePacket(packet);
+            PacketUtil.queuePacket(packet, null);
         });
     }
 
@@ -349,7 +349,7 @@ public abstract class AbstractIPManager implements IPManager {
         packet.setType(model.getType());
         packet.setCascade(model.getCascade());
         packet.setConsensus(model.getConsensus());
-        PacketUtil.queuePacket(packet);
+        PacketUtil.queuePacket(packet, null);
 
         if (cachedConfig.getDebug()) {
             logger.info("Queued packet for " + model.getIp() + " in messaging.");
