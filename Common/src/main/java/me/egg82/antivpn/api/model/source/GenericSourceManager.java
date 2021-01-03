@@ -8,8 +8,6 @@ import me.egg82.antivpn.api.VPNAPI;
 import me.egg82.antivpn.api.VPNAPIProvider;
 import me.egg82.antivpn.api.event.source.GenericSourceDeregisterEvent;
 import me.egg82.antivpn.api.event.source.GenericSourceRegisterEvent;
-import me.egg82.antivpn.api.event.source.SourceDeregisterEvent;
-import me.egg82.antivpn.api.event.source.SourceRegisterEvent;
 import me.egg82.antivpn.api.event.type.Cancellable;
 import me.egg82.antivpn.api.model.source.models.SourceModel;
 import net.engio.mbassy.bus.IMessagePublication;
