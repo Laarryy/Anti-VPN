@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS `avpn_ip` (
+CREATE TABLE IF NOT EXISTS `avpn_6_ip` (
 	`id` INT NOT NULL AUTO_INCREMENT,
 	`version` INT,
 	`created` DATETIME,
@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS `avpn_ip` (
 	PRIMARY KEY( `id` )
 );
 
-CREATE TABLE IF NOT EXISTS `avpn_player` (
+CREATE TABLE IF NOT EXISTS `avpn_6_player` (
 	`id` INT NOT NULL AUTO_INCREMENT,
 	`version` INT,
 	`created` DATETIME,

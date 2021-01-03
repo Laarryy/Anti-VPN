@@ -8,7 +8,7 @@ import javax.persistence.Table;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 @Entity
-@Table(name = "avpn_player")
+@Table(name = "avpn_6_player")
 public class PlayerModel extends BaseModel {
     @Index(unique = true) @NotNull
     private UUID uuid;

@@ -9,7 +9,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 @Entity
-@Table(name = "avpn_ip")
+@Table(name = "avpn_6_ip")
 public class IPModel extends BaseModel {
     @Index(unique = true) @NotNull @Length(45)
     private String ip;
