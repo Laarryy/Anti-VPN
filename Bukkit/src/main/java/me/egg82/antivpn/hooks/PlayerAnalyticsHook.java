@@ -114,7 +114,14 @@ public class PlayerAnalyticsHook implements PluginHook {
                                 .join() >= ipManager.getMinConsensusValue()) {
                             retVal += 1;
                         }
-                    } catch (Exception ignored) { }
+                    } catch (CompletionException ignored) { }
+                    catch (Exception ex) {
+                        if (ConfigUtil.getDebugOrFalse()) {
+                            logger.error(ex.getMessage(), ex);
+                        } else {
+                            logger.error(ex.getMessage());
+                        }
+                    }
                 } else {
                     try {
                         if (ipManager.cascade(ip, true)
@@ -122,7 +129,14 @@ public class PlayerAnalyticsHook implements PluginHook {
                                 .join()) {
                             retVal += 1;
                         }
-                    } catch (Exception ignored) { }
+                    } catch (CompletionException ignored) { }
+                    catch (Exception ex) {
+                        if (ConfigUtil.getDebugOrFalse()) {
+                            logger.error(ex.getMessage(), ex);
+                        } else {
+                            logger.error(ex.getMessage());
+                        }
+                    }
                 }
             }
             return retVal;
@@ -149,7 +163,14 @@ public class PlayerAnalyticsHook implements PluginHook {
                             .join()) {
                         retVal += 1;
                     }
-                } catch (Exception ignored) { }
+                } catch (CompletionException ignored) { }
+                catch (Exception ex) {
+                    if (ConfigUtil.getDebugOrFalse()) {
+                        logger.error(ex.getMessage(), ex);
+                    } else {
+                        logger.error(ex.getMessage());
+                    }
+                }
             }
             return retVal;
         }
@@ -179,13 +200,27 @@ public class PlayerAnalyticsHook implements PluginHook {
                     return ipManager.consensus(ip, true)
                             .exceptionally(this::handleException)
                             .join() >= ipManager.getMinConsensusValue();
-                } catch (Exception ignored) { }
+                } catch (CompletionException ignored) { }
+                catch (Exception ex) {
+                    if (ConfigUtil.getDebugOrFalse()) {
+                        logger.error(ex.getMessage(), ex);
+                    } else {
+                        logger.error(ex.getMessage());
+                    }
+                }
             } else {
                 try {
                     return ipManager.cascade(ip, true)
                             .exceptionally(this::handleException)
                             .join();
-                } catch (Exception ignored) { }
+                } catch (CompletionException ignored) { }
+                catch (Exception ex) {
+                    if (ConfigUtil.getDebugOrFalse()) {
+                        logger.error(ex.getMessage(), ex);
+                    } else {
+                        logger.error(ex.getMessage());
+                    }
+                }
             }
 
             return false;
@@ -205,7 +240,14 @@ public class PlayerAnalyticsHook implements PluginHook {
                 return playerManager.checkMcLeaks(playerId, true)
                         .exceptionally(this::handleException)
                         .join();
-            } catch (Exception ignored) { }
+            } catch (CompletionException ignored) { }
+            catch (Exception ex) {
+                if (ConfigUtil.getDebugOrFalse()) {
+                    logger.error(ex.getMessage(), ex);
+                } else {
+                    logger.error(ex.getMessage());
+                }
+            }
 
             return false;
         }

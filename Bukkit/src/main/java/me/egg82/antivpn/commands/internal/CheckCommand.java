@@ -3,10 +3,12 @@ package me.egg82.antivpn.commands.internal;
 import co.aikar.commands.CommandIssuer;
 import co.aikar.taskchain.TaskChainFactory;
 import java.util.UUID;
+import java.util.concurrent.CompletionException;
 import me.egg82.antivpn.api.VPNAPIProvider;
 import me.egg82.antivpn.api.model.ip.AlgorithmMethod;
 import me.egg82.antivpn.api.model.ip.IPManager;
 import me.egg82.antivpn.api.model.player.PlayerManager;
+import me.egg82.antivpn.config.ConfigUtil;
 import me.egg82.antivpn.lang.Message;
 import me.egg82.antivpn.utils.ValidationUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -40,14 +42,28 @@ public class CheckCommand extends AbstractCommand {
                                     .exceptionally(this::handleException)
                                     .join() >= ipManager.getMinConsensusValue());
                             return;
-                        } catch (Exception ignored) { }
+                        } catch (CompletionException ignored) { }
+                        catch (Exception ex) {
+                            if (ConfigUtil.getDebugOrFalse()) {
+                                logger.error(ex.getMessage(), ex);
+                            } else {
+                                logger.error(ex.getMessage());
+                            }
+                        }
                     } else {
                         try {
                             r.accept(ipManager.cascade(ip, true)
                                     .exceptionally(this::handleException)
                                     .join());
                             return;
-                        } catch (Exception ignored) { }
+                        } catch (CompletionException ignored) { }
+                        catch (Exception ex) {
+                            if (ConfigUtil.getDebugOrFalse()) {
+                                logger.error(ex.getMessage(), ex);
+                            } else {
+                                logger.error(ex.getMessage());
+                            }
+                        }
                     }
 
                     r.accept(null);
@@ -69,7 +85,14 @@ public class CheckCommand extends AbstractCommand {
                                 .exceptionally(this::handleException)
                                 .join());
                         return;
-                    } catch (Exception ignored) { }
+                    } catch (CompletionException ignored) { }
+                    catch (Exception ex) {
+                        if (ConfigUtil.getDebugOrFalse()) {
+                            logger.error(ex.getMessage(), ex);
+                        } else {
+                            logger.error(ex.getMessage());
+                        }
+                    }
 
                     r.accept(null);
                 })

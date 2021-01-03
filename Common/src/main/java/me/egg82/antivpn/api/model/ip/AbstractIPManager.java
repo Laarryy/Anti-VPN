@@ -176,7 +176,7 @@ public abstract class AbstractIPManager implements IPManager {
         if (useCache) {
             for (StorageService service : cachedConfig.getStorage()) {
                 IPModel model = service.getIpModel(ip, cachedConfig.getSourceCacheTime());
-                if (model != null) {
+                if (model != null && model.getType() == method.ordinal()) {
                     if (cachedConfig.getDebug()) {
                         logger.info("Found database value for IP " + ip + ".");
                     }
@@ -224,7 +224,15 @@ public abstract class AbstractIPManager implements IPManager {
                             logger.error("Source " + source.getName() + " returned an error. Skipping.");
                             sourceInvalidationCache.put(source.getName(), Boolean.TRUE);
                         }
-                    } catch (Exception ignored) {
+                    } catch (CompletionException ignored) {
+                        logger.error("Source " + source.getName() + " returned an error. Skipping.");
+                        sourceInvalidationCache.put(source.getName(), Boolean.TRUE);
+                    } catch (Exception ex) {
+                        if (cachedConfig.getDebug()) {
+                            logger.error(ex.getMessage(), ex);
+                        } else {
+                            logger.error(ex.getMessage());
+                        }
                         logger.error("Source " + source.getName() + " returned an error. Skipping.");
                         sourceInvalidationCache.put(source.getName(), Boolean.TRUE);
                     }
@@ -275,7 +283,15 @@ public abstract class AbstractIPManager implements IPManager {
                         logger.error("Source " + source.getName() + " returned an error. Skipping.");
                         sourceInvalidationCache.put(source.getName(), Boolean.TRUE);
                     }
-                } catch (Exception ignored) {
+                } catch (CompletionException ignored) {
+                    logger.error("Source " + source.getName() + " returned an error. Skipping.");
+                    sourceInvalidationCache.put(source.getName(), Boolean.TRUE);
+                } catch (Exception ex) {
+                    if (cachedConfig.getDebug()) {
+                        logger.error(ex.getMessage(), ex);
+                    } else {
+                        logger.error(ex.getMessage());
+                    }
                     logger.error("Source " + source.getName() + " returned an error. Skipping.");
                     sourceInvalidationCache.put(source.getName(), Boolean.TRUE);
                 }

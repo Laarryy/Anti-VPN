@@ -196,13 +196,27 @@ public class PlayerEvents extends EventHolder {
                     ipManager.consensus(ip, true)
                             .exceptionally(this::handleException)
                             .join(); // Calling this will cache the result internally, even if the value is unused
-                } catch (Exception ignored) { }
+                } catch (CompletionException ignored) { }
+                catch (Exception ex) {
+                    if (cachedConfig.getDebug()) {
+                        logger.error(ex.getMessage(), ex);
+                    } else {
+                        logger.error(ex.getMessage());
+                    }
+                }
             } else {
                 try {
                     ipManager.cascade(ip, true)
                             .exceptionally(this::handleException)
                             .join(); // Calling this will cache the result internally, even if the value is unused
-                } catch (Exception ignored) { }
+                } catch (CompletionException ignored) { }
+                catch (Exception ex) {
+                    if (cachedConfig.getDebug()) {
+                        logger.error(ex.getMessage(), ex);
+                    } else {
+                        logger.error(ex.getMessage());
+                    }
+                }
             }
         }
 
@@ -213,7 +227,14 @@ public class PlayerEvents extends EventHolder {
                 playerManager.checkMcLeaks(uuid, true)
                         .exceptionally(this::handleException)
                         .join(); // Calling this will cache the result internally, even if the value is unused
-            } catch (Exception ignored) { }
+            } catch (CompletionException ignored) { }
+            catch (Exception ex) {
+                if (cachedConfig.getDebug()) {
+                    logger.error(ex.getMessage(), ex);
+                } else {
+                    logger.error(ex.getMessage());
+                }
+            }
         }
     }
 
@@ -313,7 +334,14 @@ public class PlayerEvents extends EventHolder {
                     isVPN = ipManager.consensus(ip, true)
                             .exceptionally(this::handleException)
                             .join() >= cachedConfig.getVPNAlgorithmConsensus();
-                } catch (Exception ignored) {
+                } catch (CompletionException ignored) {
+                    isVPN = false;
+                } catch (Exception ex) {
+                    if (cachedConfig.getDebug()) {
+                        logger.error(ex.getMessage(), ex);
+                    } else {
+                        logger.error(ex.getMessage());
+                    }
                     isVPN = false;
                 }
             } else {
@@ -321,7 +349,14 @@ public class PlayerEvents extends EventHolder {
                     isVPN = ipManager.cascade(ip, true)
                             .exceptionally(this::handleException)
                             .join();
-                } catch (Exception ignored) {
+                } catch (CompletionException ignored) {
+                    isVPN = false;
+                } catch (Exception ex) {
+                    if (cachedConfig.getDebug()) {
+                        logger.error(ex.getMessage(), ex);
+                    } else {
+                        logger.error(ex.getMessage());
+                    }
                     isVPN = false;
                 }
             }
@@ -354,7 +389,14 @@ public class PlayerEvents extends EventHolder {
                 isMCLeaks = playerManager.checkMcLeaks(uuid, true)
                         .exceptionally(this::handleException)
                         .join();
-            } catch (Exception ignored) {
+            } catch (CompletionException ignored) {
+                isMCLeaks = false;
+            } catch (Exception ex) {
+                if (cachedConfig.getDebug()) {
+                    logger.error(ex.getMessage(), ex);
+                } else {
+                    logger.error(ex.getMessage());
+                }
                 isMCLeaks = false;
             }
 

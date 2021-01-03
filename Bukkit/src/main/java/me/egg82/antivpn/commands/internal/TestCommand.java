@@ -6,10 +6,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CompletionException;
 import me.egg82.antivpn.api.VPNAPIProvider;
 import me.egg82.antivpn.api.model.source.Source;
 import me.egg82.antivpn.api.model.source.SourceManager;
 import me.egg82.antivpn.api.model.source.models.SourceModel;
+import me.egg82.antivpn.config.ConfigUtil;
 import me.egg82.antivpn.lang.Message;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -37,7 +39,14 @@ public class TestCommand extends AbstractCommand {
                             retVal.put(source.getName(), Optional.ofNullable(source.getResult(ip)
                                     .exceptionally(this::handleException)
                                     .join()));
-                        } catch (Exception ignored) { }
+                        } catch (CompletionException ignored) { }
+                        catch (Exception ex) {
+                            if (ConfigUtil.getDebugOrFalse()) {
+                                logger.error(ex.getMessage(), ex);
+                            } else {
+                                logger.error(ex.getMessage());
+                            }
+                        }
                     }
 
                     r.accept(retVal);
