@@ -56,14 +56,15 @@ public interface SourceManager {
     default boolean replaceSource(@NonNull Source<? extends SourceModel> newSource) {
         List<Source<? extends SourceModel>> sources = getSources();
         int index = -1;
+        Source<? extends SourceModel> removedSource = null;
         for (int i = 0; i < sources.size(); i++) {
             if (sources.get(i).getName().equals(newSource.getName())) {
                 index = i;
-                deregisterSource(sources.get(i).getName());
+                removedSource = sources.get(i);
                 break;
             }
         }
-        if (index == -1) {
+        if (index == -1 || removedSource == null || !deregisterSource(removedSource)) {
             return false;
         }
         return registerSource(newSource, index);
@@ -108,7 +109,7 @@ public interface SourceManager {
      * @return true if the removal was successful, false if not
      * @throws NullPointerException if the source is null
      */
-    default boolean deregisterSource(@NonNull Source<? extends SourceModel> source) { return deregisterSource(source.getName()); }
+    boolean deregisterSource(@NonNull Source<? extends SourceModel> source);
 
     /**
      * Deregisters, disables, and removes an existing source from
@@ -121,7 +122,20 @@ public interface SourceManager {
      * @return true if the removal was successful, false if not
      * @throws NullPointerException if the source name is null
      */
-    boolean deregisterSource(@NonNull String sourceName);
+    default boolean deregisterSource(@NonNull String sourceName) {
+        List<Source<? extends SourceModel>> sources = getSources();
+        Source<? extends SourceModel> removedSource = null;
+        for (Source<? extends SourceModel> source : sources) {
+            if (source.getName().equals(sourceName)) {
+                removedSource = source;
+                break;
+            }
+        }
+        if (removedSource != null) {
+            return deregisterSource(removedSource);
+        }
+        return false;
+    }
 
     /**
      * Gets a list of all enabled {@link Source}s, in the order

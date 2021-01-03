@@ -2,6 +2,7 @@ package me.egg82.antivpn.api;
 
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import me.egg82.antivpn.api.event.VPNEvent;
 import me.egg82.antivpn.api.model.ip.IP;
 import me.egg82.antivpn.api.model.ip.IPManager;
 import me.egg82.antivpn.api.model.player.Player;
@@ -10,6 +11,7 @@ import me.egg82.antivpn.api.model.source.Source;
 import me.egg82.antivpn.api.model.source.SourceManager;
 import me.egg82.antivpn.api.platform.Platform;
 import me.egg82.antivpn.api.platform.PluginMetadata;
+import net.engio.mbassy.bus.MBassador;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -27,6 +29,9 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  *
  * <p>An instance can be obtained from the static singleton accessor in
  * {@link VPNAPIProvider}.</p>
+ *
+ * <p>A good portion of this API was taken from LuckPerms, if not at least inspired by it.
+ * License available here: https://github.com/lucko/LuckPerms/blob/master/LICENSE.txt</p>
  */
 public interface VPNAPI {
     /**
@@ -103,5 +108,11 @@ public interface VPNAPI {
      */
     @NonNull CompletableFuture<Void> runUpdateTask();
 
-    // TODO: event system to detect things like changed sources, etc so plugin reloads don't screw with anything replacing sources in the API and the like
+    /**
+     * Gets the {@link MBassador} event bus, used for subscribing to internal Anti-VPN
+     * events.
+     *
+     * @return the event bus
+     */
+    @NonNull MBassador<VPNEvent> getEventBus();
 }

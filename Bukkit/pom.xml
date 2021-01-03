@@ -451,6 +451,11 @@
             <artifactId>flexjson</artifactId>
             <version>${flexjson.version}</version>
         </dependency>
+        <dependency>
+            <groupId>net.engio</groupId>
+            <artifactId>mbassador</artifactId>
+            <version>${mbassador.version}</version>
+        </dependency>
 
         <!-- testing -->
         <dependency>

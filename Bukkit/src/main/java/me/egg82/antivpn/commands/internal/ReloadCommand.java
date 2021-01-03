@@ -4,6 +4,8 @@ import co.aikar.commands.CommandIssuer;
 import co.aikar.taskchain.TaskChainFactory;
 import java.io.File;
 import me.egg82.antivpn.api.*;
+import me.egg82.antivpn.api.event.api.GenericAPIReloadEvent;
+import me.egg82.antivpn.api.event.api.GenericAPILoadedEvent;
 import me.egg82.antivpn.api.model.ip.BukkitIPManager;
 import me.egg82.antivpn.api.model.player.BukkitPlayerManager;
 import me.egg82.antivpn.api.model.source.GenericSourceManager;
@@ -42,11 +44,15 @@ public class ReloadCommand extends AbstractCommand {
 
                     BukkitIPManager ipManager = new BukkitIPManager(sourceManager, cachedConfig.getCacheTime().getTime(), cachedConfig.getCacheTime().getUnit());
                     BukkitPlayerManager playerManager = new BukkitPlayerManager(cachedConfig.getThreads(), cachedConfig.getMcLeaksKey(), cachedConfig.getCacheTime().getTime(), cachedConfig.getCacheTime().getUnit());
-                    VPNAPI api = new GenericVPNAPI(VPNAPIProvider.getInstance().getPlatform(), VPNAPIProvider.getInstance().getPluginMetadata(), ipManager, playerManager, sourceManager, cachedConfig);
+                    VPNAPI api = VPNAPIProvider.getInstance();
+                    api.getEventBus().post(new GenericAPIReloadEvent(api, ipManager, playerManager, sourceManager)).now();
+                    api = new GenericVPNAPI(api.getPlatform(), api.getPluginMetadata(), ipManager, playerManager, sourceManager, cachedConfig, api.getEventBus());
 
                     APIUtil.setManagers(ipManager, playerManager, sourceManager);
 
                     APIRegistrationUtil.register(api);
+
+                    api.getEventBus().post(new GenericAPILoadedEvent(api)).now();
                 })
                 .syncLast(v -> issuer.sendInfo(Message.RELOAD__END))
                 .execute();

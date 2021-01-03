@@ -15,6 +15,8 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Level;
 import me.egg82.antivpn.api.*;
+import me.egg82.antivpn.api.event.api.GenericAPIDisableEvent;
+import me.egg82.antivpn.api.event.api.GenericAPILoadedEvent;
 import me.egg82.antivpn.api.model.ip.BukkitIPManager;
 import me.egg82.antivpn.api.model.player.BukkitPlayerManager;
 import me.egg82.antivpn.api.model.source.GenericSourceManager;
@@ -44,6 +46,7 @@ import me.egg82.antivpn.messaging.ServerIDUtil;
 import me.egg82.antivpn.services.GameAnalyticsErrorHandler;
 import me.egg82.antivpn.storage.StorageService;
 import me.egg82.antivpn.utils.ValidationUtil;
+import net.engio.mbassy.bus.MBassador;
 import ninja.egg82.events.BukkitEventSubscriber;
 import ninja.egg82.events.BukkitEvents;
 import ninja.egg82.service.ServiceLocator;
@@ -227,13 +230,15 @@ public class AntiVPN {
         BukkitPlayerManager playerManager = new BukkitPlayerManager(cachedConfig.getThreads(), cachedConfig.getMcLeaksKey(), cachedConfig.getCacheTime().getTime(), cachedConfig.getCacheTime().getUnit());
         Platform platform = new BukkitPlatform(System.currentTimeMillis());
         PluginMetadata metadata = new BukkitPluginMetadata(plugin.getDescription().getVersion());
-        VPNAPI api = new GenericVPNAPI(platform, metadata, ipManager, playerManager, sourceManager, cachedConfig);
+        VPNAPI api = new GenericVPNAPI(platform, metadata, ipManager, playerManager, sourceManager, cachedConfig, new MBassador<>());
 
         APIUtil.setManagers(ipManager, playerManager, sourceManager);
 
         ServiceLocator.register(new SpigotUpdater(plugin, 58291));
 
         APIRegistrationUtil.register(api);
+
+        api.getEventBus().post(new GenericAPILoadedEvent(api)).now();
     }
 
     private void loadCommands() {
@@ -604,6 +609,8 @@ public class AntiVPN {
     }
 
     public void unloadServices() {
+        VPNAPI api = VPNAPIProvider.getInstance();
+        api.getEventBus().post(new GenericAPIDisableEvent(api)).now();
         APIRegistrationUtil.deregister();
 
         Set<? extends MessagingHandler> messagingHandlers = ServiceLocator.remove(MessagingHandler.class);
