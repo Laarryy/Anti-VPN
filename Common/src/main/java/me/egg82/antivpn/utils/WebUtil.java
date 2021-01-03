@@ -43,8 +43,9 @@ public class WebUtil {
         if (headers == null) {
             headers = new HashMap<>();
         }
-        headers.put("Connection", "close");
-        headers.put("Accept-Language", "en-US,en;q=0.8");
+        if (!hasKey(headers, "Accept-Language")) {
+            headers.put("Accept-Language", "en-US,en;q=0.8");
+        }
 
         try (InputStream in = getInputStream(url, method, timeout, userAgent, headers, postData); InputStreamReader reader = new InputStreamReader(in); BufferedReader buffer = new BufferedReader(reader)) {
             StringBuilder builder = new StringBuilder();
@@ -81,8 +82,9 @@ public class WebUtil {
         if (headers == null) {
             headers = new HashMap<>();
         }
-        headers.put("Connection", "close");
-        headers.put("Accept-Language", "en-US,en;q=0.8");
+        if (!hasKey(headers, "Accept-Language")) {
+            headers.put("Accept-Language", "en-US,en;q=0.8");
+        }
 
         try (InputStream in = getInputStream(url, method, timeout, userAgent, headers, postData); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             int read;
@@ -117,7 +119,6 @@ public class WebUtil {
 
     public static @NonNull HttpURLConnection getConnection(URL url, String method, int timeout, String userAgent, Map<String, String> headers) throws IOException { return getConnection(url, method, timeout, userAgent, headers, null); }
 
-    // TODO: Re-use connections? https://docs.oracle.com/javase/7/docs/technotes/guides/net/http-keepalive.html or https://stackoverflow.com/questions/34748479/reusing-tcp-connections-with-httpsurlconnection
     public static @NonNull HttpURLConnection getConnection(URL url, String method, int timeout, String userAgent, Map<String, String> headers, Map<String, String> postData) throws IOException {
         if (url == null) {
             throw new IllegalArgumentException("url cannot be null.");
@@ -212,5 +213,14 @@ public class WebUtil {
         }
 
         return conn.getInputStream();
+    }
+
+    private static boolean hasKey(@NonNull Map<String, String> map, @NonNull String key) {
+        for (String k : map.keySet()) {
+            if (k.equalsIgnoreCase(key)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

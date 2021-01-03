@@ -25,7 +25,6 @@ public abstract class AbstractSource<T extends SourceModel> implements Source<T>
     protected static final Map<String, String> headers = new HashMap<>();
     static {
         headers.put("Accept", "application/json");
-        headers.put("Connection", "close");
         headers.put("Accept-Language", "en-US,en;q=0.8");
     }
 
