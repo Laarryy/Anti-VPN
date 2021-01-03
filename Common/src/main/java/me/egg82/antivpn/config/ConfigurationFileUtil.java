@@ -173,8 +173,8 @@ public class ConfigurationFileUtil {
                             .poolSize(poolSettings.minPoolSize, poolSettings.maxPoolSize)
                             .life(poolSettings.maxLifetime, poolSettings.timeout)
                             .build();
-                } catch (IOException ex) {
-                    logger.error("Could not create engine \"" + name + "\".", ex);
+                } catch (Exception ex) {
+                    logger.error("Could not create engine \"" + name + "\".");
                 }
                 break;
             }
@@ -198,8 +198,8 @@ public class ConfigurationFileUtil {
                             .poolSize(poolSettings.minPoolSize, poolSettings.maxPoolSize)
                             .life(poolSettings.maxLifetime, poolSettings.timeout)
                             .build();
-                } catch (IOException ex) {
-                    logger.error("Could not create engine \"" + name + "\".", ex);
+                } catch (Exception ex) {
+                    logger.error("Could not create engine \"" + name + "\".");
                 }
                 break;
             }
@@ -223,15 +223,14 @@ public class ConfigurationFileUtil {
                             .poolSize(poolSettings.minPoolSize, poolSettings.maxPoolSize)
                             .life(poolSettings.maxLifetime, poolSettings.timeout)
                             .build();
-                } catch (IOException ex) {
-                    logger.error("Could not create engine \"" + name + "\".", ex);
+                } catch (Exception ex) {
+                    logger.error("Could not create engine \"" + name + "\".");
                 }
                 break;
             }
             case "sqlite": {
-                AddressPort url = new AddressPort(connectionNode.key() + ".address", connectionNode.node("address").getString("127.0.0.1:6379"), 6379);
                 if (debug) {
-                    console.sendMessage(LogUtil.HEADING + "<c2>Creating engine</c2> <c1>" + name + "</c1> <c2>of type redis with address</c2> <c1>" + url.getAddress() + ":" + url.getPort() + "</c1>");
+                    console.sendMessage(LogUtil.HEADING + "<c2>Creating engine</c2> <c1>" + name + "</c1> <c2>of type sqlite with file</c2> <c1>" + connectionNode.node("file").getString("anti_vpn.db") + "</c1>");
                 }
                 String options = connectionNode.node("options").getString("useUnicode=true&characterEncoding=utf8");
                 if (options.length() > 0 && options.charAt(0) == '?') {
@@ -247,8 +246,8 @@ public class ConfigurationFileUtil {
                             .poolSize(poolSettings.minPoolSize, poolSettings.maxPoolSize)
                             .life(poolSettings.maxLifetime, poolSettings.timeout)
                             .build();
-                } catch (IOException ex) {
-                    logger.error("Could not create engine \"" + name + "\".", ex);
+                } catch (Exception ex) {
+                    logger.error("Could not create engine \"" + name + "\".");
                 }
                 break;
             }

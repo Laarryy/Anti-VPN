@@ -141,9 +141,22 @@ public class BukkitBootstrap extends JavaPlugin {
                 .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
         buildRelocateInject(ipaddr, jarsDir, Collections.singletonList(new Relocation(getInetIpaddrPackage(), "me.egg82.antivpn.external." + getInetIpaddrPackage())), parentLoader, "IP Address");
 
-        Artifact.Builder ebeanCore = Artifact.builder("io.ebean", "ebean-core", "${ebean.version}", cacheDir)
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+        } catch (ClassNotFoundException ignored) {
+            Artifact.Builder mysql = Artifact.builder("mysql", "mysql-connector-java", "${mysql.version}", cacheDir)
+                    .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
+            buildRelocateInject(mysql, jarsDir, Collections.emptyList(), parentLoader, "MySQL");
+        }
+
+        Artifact.Builder rabbitmq = Artifact.builder(getRabbitMqPackage(), "amqp-client", "${rabbitmq.version}", cacheDir)
+                .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
+        buildRelocateInject(rabbitmq, jarsDir, Collections.singletonList(new Relocation(getRabbitMqPackage(), "me.egg82.antivpn.external." + getRabbitMqPackage())), parentLoader, "RabbitMQ");
+
+        Artifact.Builder ebeanCore = Artifact.builder(getEbeanPackage(), "ebean-core", "${ebean.version}", cacheDir)
                 .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
         buildRelocateInject(ebeanCore, jarsDir, Arrays.asList(
+                new Relocation(getEbeanPackage(), "me.egg82.antivpn.external." + getEbeanPackage()),
                 new Relocation(getEbeanInternalPackage(), "me.egg82.antivpn.external." + getEbeanInternalPackage()),
                 new Relocation(getEbeanServicePackage(), "me.egg82.antivpn.external." + getEbeanServicePackage())
         ), parentLoader, "Ebean Core");
@@ -159,6 +172,18 @@ public class BukkitBootstrap extends JavaPlugin {
                 new Relocation(getOkhttp3Package(), "me.egg82.antivpn.external." + getOkhttp3Package()),
                 new Relocation(getOkioPackage(), "me.egg82.antivpn.external." + getOkioPackage())
         ), parentLoader, "MC Leaks API");
+
+        try {
+            Class.forName("org.sqlite.JDBC");
+        } catch (ClassNotFoundException ignored) {
+            Artifact.Builder sqlite = Artifact.builder("org.xerial", "sqlite-jdbc", "${sqlite.version}", cacheDir)
+                    .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
+            buildRelocateInject(sqlite, jarsDir, Collections.emptyList(), parentLoader, "SQLite");
+        }
+
+        Artifact.Builder sqlite = Artifact.builder("redis.clients", "jedis", "${jedis.version}", cacheDir)
+                .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
+        buildRelocateInject(sqlite, jarsDir, Collections.singletonList(new Relocation(getJedisPackage(), "me.egg82.antivpn.external." + getJedisPackage())), parentLoader, "Jedis");
     }
 
     // Prevent Maven from relocating these
@@ -178,6 +203,10 @@ public class BukkitBootstrap extends JavaPlugin {
 
     private @NonNull String getInetIpaddrPackage() { return new String(new byte[] {'i', 'n', 'e', 't', '.', 'i', 'p', 'a', 'd', 'd', 'r'}); }
 
+    private @NonNull String getRabbitMqPackage() { return new String(new byte[] {'c', 'o', 'm', '.', 'r', 'a', 'b', 'b', 'i', 't', 'm', 'q'}); }
+
+    private @NonNull String getEbeanPackage() { return new String(new byte[] {'i', 'o', '.', 'e', 'b', 'e', 'a', 'n'}); }
+
     private @NonNull String getEbeanInternalPackage() { return new String(new byte[] {'i', 'o', '.', 'e', 'b', 'e', 'a', 'n', 'i', 'n', 't', 'e', 'r', 'n', 'a', 'l'}); }
 
     private @NonNull String getEbeanServicePackage() { return new String(new byte[] {'i', 'o', '.', 'e', 'b', 'e', 'a', 'n', 's', 'e', 'r', 'v', 'i', 'c', 'e'}); }
@@ -189,6 +218,8 @@ public class BukkitBootstrap extends JavaPlugin {
     private @NonNull String getOkhttp3Package() { return new String(new byte[] {'o', 'k', 'h', 't', 't', 'p'}); }
 
     private @NonNull String getOkioPackage() { return new String(new byte[] {'o', 'k', 'i', 'o'}); }
+
+    private @NonNull String getJedisPackage() { return new String(new byte[] {'r', 'e', 'd', 'i', 's', '.', 'c', 'l', 'i', 'e', 'n', 't', 's', '.', 'j', 'e', 'd', 'i', 's'}); }
 
     private void printLatest(@NonNull String friendlyName) {
         log(Level.INFO, BukkitLogUtil.HEADING + ChatColor.YELLOW + "Checking version of " + ChatColor.WHITE + friendlyName);

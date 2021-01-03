@@ -22,7 +22,7 @@ public class MySQL55StorageService extends AbstractStorageService {
             service = new MySQL55StorageService(name);
 
             // Baseline
-            config.setPoolName("AntiVPN-MySQL");
+            config.setPoolName("AntiVPN-MySQL55");
             config.setDriverClassName("com.mysql.cj.jdbc.Driver");
             config.setConnectionTestQuery("SELECT 1;");
             config.setAutoCommit(true);

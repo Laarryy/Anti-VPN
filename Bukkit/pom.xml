@@ -72,8 +72,16 @@
                             <shadedPattern>me.egg82.antivpn.external.com.github.luben.zstd</shadedPattern>
                         </relocation>
                         <relocation>
+                            <pattern>com.rabbitmq</pattern>
+                            <shadedPattern>me.egg82.antivpn.external.com.rabbitmq</shadedPattern>
+                        </relocation>
+                        <relocation>
                             <pattern>inet.ipaddr</pattern>
                             <shadedPattern>me.egg82.antivpn.external.inet.ipaddr</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>io.ebean</pattern>
+                            <shadedPattern>me.egg82.antivpn.external.io.ebean</shadedPattern>
                         </relocation>
                         <relocation>
                             <pattern>io.ebeaninternal</pattern>
@@ -86,6 +94,10 @@
                         <relocation>
                             <pattern>it.unimi.dsi.fastutil</pattern>
                             <shadedPattern>me.egg82.antivpn.external.it.unimi.dsi.fastutil</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>javassist</pattern>
+                            <shadedPattern>me.egg82.antivpn.external.javassist</shadedPattern>
                         </relocation>
                         <relocation>
                             <pattern>me.lucko.jarrelocator</pattern>
@@ -139,6 +151,14 @@
                             </includes>
                         </relocation>
                         <relocation>
+                            <pattern>org.spongepowered.configurate</pattern>
+                            <shadedPattern>me.egg82.antivpn.external.org.spongepowered.configurate</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>redis.clients.jedis</pattern>
+                            <shadedPattern>me.egg82.antivpn.external.redis.clients.jedis</shadedPattern>
+                        </relocation>
+                        <relocation>
                             <pattern>scenelib</pattern>
                             <shadedPattern>me.egg82.antivpn.external.scenelib</shadedPattern>
                         </relocation>
@@ -183,6 +203,8 @@
                                         <exclude>io/ebeaninternal/server/**</exclude>
                                         <exclude>io/ebeaninternal/util/**</exclude>
                                         <exclude>io/ebeanservice/**</exclude>
+
+                                        <axclude>redis/clients/jedis/**</axclude>
                                     </excludes>
                                 </filter>
                                 <filter>
@@ -389,6 +411,7 @@
             <groupId>com.rabbitmq</groupId>
             <artifactId>amqp-client</artifactId>
             <version>${rabbitmq.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.github.luben</groupId>
