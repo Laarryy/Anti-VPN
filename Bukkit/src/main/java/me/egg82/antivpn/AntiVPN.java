@@ -352,7 +352,7 @@ public class AntiVPN {
     }
 
     private void loadTasks() {
-        tasks.add(Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> VPNAPIProvider.getInstance().runUpdateTask(), 1L, 10L).getTaskId());
+        tasks.add(Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> VPNAPIProvider.getInstance().runUpdateTask(), 1L, 20L).getTaskId());
     }
 
     private void loadHooks() {

@@ -68,10 +68,6 @@
                             <shadedPattern>me.egg82.antivpn.external.com.github.benmanes.caffeine</shadedPattern>
                         </relocation>
                         <relocation>
-                            <pattern>com.github.luben.zstd</pattern>
-                            <shadedPattern>me.egg82.antivpn.external.com.github.luben.zstd</shadedPattern>
-                        </relocation>
-                        <relocation>
                             <pattern>com.rabbitmq</pattern>
                             <shadedPattern>me.egg82.antivpn.external.com.rabbitmq</shadedPattern>
                         </relocation>
