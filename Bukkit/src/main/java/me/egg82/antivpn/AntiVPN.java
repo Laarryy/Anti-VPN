@@ -17,6 +17,7 @@ import java.util.logging.Level;
 import me.egg82.antivpn.api.*;
 import me.egg82.antivpn.api.event.api.GenericAPIDisableEvent;
 import me.egg82.antivpn.api.event.api.GenericAPILoadedEvent;
+import me.egg82.antivpn.api.event.api.GenericPublicationErrorHandler;
 import me.egg82.antivpn.api.model.ip.BukkitIPManager;
 import me.egg82.antivpn.api.model.player.BukkitPlayerManager;
 import me.egg82.antivpn.api.model.source.GenericSourceManager;
@@ -230,7 +231,7 @@ public class AntiVPN {
         BukkitPlayerManager playerManager = new BukkitPlayerManager(cachedConfig.getThreads(), cachedConfig.getMcLeaksKey(), cachedConfig.getCacheTime().getTime(), cachedConfig.getCacheTime().getUnit());
         Platform platform = new BukkitPlatform(System.currentTimeMillis());
         PluginMetadata metadata = new BukkitPluginMetadata(plugin.getDescription().getVersion());
-        VPNAPI api = new GenericVPNAPI(platform, metadata, ipManager, playerManager, sourceManager, cachedConfig, new MBassador<>());
+        VPNAPI api = new GenericVPNAPI(platform, metadata, ipManager, playerManager, sourceManager, cachedConfig, new MBassador<>(new GenericPublicationErrorHandler()));
 
         APIUtil.setManagers(ipManager, playerManager, sourceManager);
 
@@ -281,7 +282,7 @@ public class AntiVPN {
                 return;
             }
             for (StorageService service : cachedConfig.getStorage()) {
-                if (service.getClass().getSimpleName().equalsIgnoreCase(v)) {
+                if (service.getName().equalsIgnoreCase(v)) {
                     return;
                 }
             }
@@ -297,7 +298,7 @@ public class AntiVPN {
                 return ImmutableList.copyOf(retVal);
             }
             for (StorageService service : cachedConfig.getStorage()) {
-                String ss = service.getClass().getSimpleName();
+                String ss = service.getName();
                 if (ss.toLowerCase().startsWith(lower)) {
                     retVal.add(ss);
                 }
@@ -612,6 +613,16 @@ public class AntiVPN {
         VPNAPI api = VPNAPIProvider.getInstance();
         api.getEventBus().post(new GenericAPIDisableEvent(api)).now();
         APIRegistrationUtil.deregister();
+
+        CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
+        if (cachedConfig != null) {
+            for (MessagingService service : cachedConfig.getMessaging()) {
+                service.close();
+            }
+            for (StorageService service : cachedConfig.getStorage()) {
+                service.close();
+            }
+        }
 
         Set<? extends MessagingHandler> messagingHandlers = ServiceLocator.remove(MessagingHandler.class);
         for (MessagingHandler handler : messagingHandlers) {

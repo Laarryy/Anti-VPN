@@ -4,14 +4,11 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import io.ebean.Database;
 import io.ebean.DatabaseFactory;
+import io.ebean.Transaction;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
-import io.ebean.config.dbplatform.sqlite.SQLitePlatform;
 import java.time.Instant;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import javax.persistence.PersistenceException;
@@ -52,33 +49,49 @@ public abstract class AbstractStorageService implements StorageService {
     public boolean isClosed() { return closed; }
 
     public void storeModel(@NonNull BaseModel model) {
-        model.setModified(null);
+        BaseModel newModel = duplicateModel(model);
+        if (newModel == null) {
+            return;
+        }
 
         queueLock.readLock().lock();
         try {
-            connection.save(model);
+            connection.save(newModel);
         } finally {
             queueLock.readLock().unlock();
         }
     }
 
     public void storeModels(@NonNull Collection<? extends BaseModel> models) {
+        List<BaseModel> newModels = new ArrayList<>();
         for (BaseModel model : models) {
-            model.setModified(null);
+            BaseModel newModel = duplicateModel(model);
+            if (newModel != null) {
+                newModels.add(newModel);
+            }
         }
 
         queueLock.readLock().lock();
-        try {
-            connection.saveAll(models);
+        try (Transaction transaction = connection.beginTransaction()) {
+            transaction.setBatchMode(true);
+            transaction.setBatchSize(newModels.size());
+            transaction.setGetGeneratedKeys(false);
+            connection.saveAll(newModels);
+            transaction.commit();
         } finally {
             queueLock.readLock().unlock();
         }
     }
 
     public void deleteModel(@NonNull BaseModel model) {
+        BaseModel newModel = duplicateModel(model);
+        if (newModel == null) {
+            return;
+        }
+
         queueLock.readLock().lock();
         try {
-            connection.delete(model);
+            connection.delete(newModel);
         } finally {
             queueLock.readLock().unlock();
         }
@@ -242,6 +255,7 @@ public abstract class AbstractStorageService implements StorageService {
             DatabaseConfig dbConfig = new DatabaseConfig();
             dbConfig.setDataSource(source);
             dbConfig.setDatabasePlatform(platform);
+            dbConfig.setAllQuotedIdentifiers(true);
             dbConfig.setDefaultServer(false);
             dbConfig.setRegister(false);
             dbConfig.setName(UUID.randomUUID().toString());
@@ -256,7 +270,8 @@ public abstract class AbstractStorageService implements StorageService {
         source = new HikariDataSource(config);
         DatabaseConfig dbConfig = new DatabaseConfig();
         dbConfig.setDataSource(source);
-        dbConfig.setDatabasePlatform(new SQLitePlatform());
+        dbConfig.setDatabasePlatform(platform);
+        dbConfig.setAllQuotedIdentifiers(true);
         dbConfig.setDefaultServer(false);
         dbConfig.setRegister(false);
         dbConfig.setName(name);
@@ -265,5 +280,33 @@ public abstract class AbstractStorageService implements StorageService {
         if (!isAutoCommit) {
             connection.script().run(scriptPath);
         }
+    }
+
+    private @Nullable BaseModel duplicateModel(@NonNull BaseModel model) {
+        BaseModel retVal = null;
+        if (model instanceof IPModel) {
+            IPModel m = new IPModel();
+            m.setIp(((IPModel) model).getIp());
+            m.setType(((IPModel) model).getType());
+            m.setCascade(((IPModel) model).getCascade());
+            m.setConsensus(((IPModel) model).getConsensus());
+            retVal = m;
+        } else if (model instanceof PlayerModel) {
+            PlayerModel m = new PlayerModel();
+            m.setUuid(((PlayerModel) model).getUuid());
+            m.setMcleaks(((PlayerModel) model).isMcleaks());
+            retVal = m;
+        }
+
+        if (retVal != null) {
+            retVal.setId(model.getId());
+            retVal.setCreated(model.getCreated());
+            retVal.setModified(model.getModified());
+            retVal.setVersion(model.getVersion());
+        } else {
+            logger.error("duplicateModel is returning null.");
+        }
+
+        return retVal;
     }
 }

@@ -15,6 +15,8 @@ import me.egg82.antivpn.config.ConfigurationFileUtil;
 import me.egg82.antivpn.lang.Message;
 import me.egg82.antivpn.messaging.GenericMessagingHandler;
 import me.egg82.antivpn.messaging.MessagingHandler;
+import me.egg82.antivpn.messaging.MessagingService;
+import me.egg82.antivpn.storage.StorageService;
 import ninja.egg82.service.ServiceLocator;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -33,6 +35,19 @@ public class ReloadCommand extends AbstractCommand {
 
         taskFactory.<Void>newChain()
                 .async(() -> {
+                    CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
+                    if (cachedConfig == null) {
+                        logger.error("Could not get cached config.");
+                        return;
+                    }
+
+                    for (MessagingService service : cachedConfig.getMessaging()) {
+                        service.close();
+                    }
+                    for (StorageService service : cachedConfig.getStorage()) {
+                        service.close();
+                    }
+
                     GenericSourceManager sourceManager = new GenericSourceManager();
 
                     MessagingHandler messagingHandler = new GenericMessagingHandler();
@@ -40,7 +55,7 @@ public class ReloadCommand extends AbstractCommand {
 
                     ConfigurationFileUtil.reloadConfig(dataFolder, console, messagingHandler, sourceManager);
 
-                    CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
+                    cachedConfig = ConfigUtil.getCachedConfig();
 
                     BukkitIPManager ipManager = new BukkitIPManager(sourceManager, cachedConfig.getCacheTime().getTime(), cachedConfig.getCacheTime().getUnit());
                     BukkitPlayerManager playerManager = new BukkitPlayerManager(cachedConfig.getThreads(), cachedConfig.getMcLeaksKey(), cachedConfig.getCacheTime().getTime(), cachedConfig.getCacheTime().getUnit());
