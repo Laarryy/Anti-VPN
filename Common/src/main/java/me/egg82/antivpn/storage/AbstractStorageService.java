@@ -4,7 +4,6 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import io.ebean.Database;
 import io.ebean.DatabaseFactory;
-import io.ebean.Transaction;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import java.time.Instant;
@@ -49,14 +48,9 @@ public abstract class AbstractStorageService implements StorageService {
     public boolean isClosed() { return closed; }
 
     public void storeModel(@NonNull BaseModel model) {
-        BaseModel newModel = duplicateModel(model);
-        if (newModel == null) {
-            return;
-        }
-
         queueLock.readLock().lock();
         try {
-            connection.save(newModel);
+            createOrUpdate(model);
         } finally {
             queueLock.readLock().unlock();
         }
@@ -72,12 +66,10 @@ public abstract class AbstractStorageService implements StorageService {
         }
 
         queueLock.readLock().lock();
-        try (Transaction transaction = connection.beginTransaction()) {
-            transaction.setBatchMode(true);
-            transaction.setBatchSize(newModels.size());
-            transaction.setGetGeneratedKeys(false);
-            connection.saveAll(newModels);
-            transaction.commit();
+        try {
+            for (BaseModel model : newModels) {
+                createOrUpdate(model);
+            }
         } finally {
             queueLock.readLock().unlock();
         }
@@ -299,14 +291,50 @@ public abstract class AbstractStorageService implements StorageService {
         }
 
         if (retVal != null) {
-            retVal.setId(model.getId());
             retVal.setCreated(model.getCreated());
             retVal.setModified(model.getModified());
-            retVal.setVersion(model.getVersion());
         } else {
             logger.error("duplicateModel is returning null.");
         }
 
         return retVal;
+    }
+
+    private void createOrUpdate(@NonNull BaseModel model) {
+        if (model instanceof IPModel) {
+            IPModel m = new QIPModel(connection)
+                    .ip.equalTo(((IPModel) model).getIp())
+                    .findOne();
+            if (m == null) {
+                m = (IPModel) duplicateModel(model);
+                if (m == null) {
+                    return;
+                }
+                connection.save(m);
+            } else {
+                m.setType(((IPModel) model).getType());
+                m.setCascade(((IPModel) model).getCascade());
+                m.setConsensus(((IPModel) model).getConsensus());
+                m.setCreated(model.getCreated());
+                m.setModified(model.getModified());
+                connection.update(m);
+            }
+        } else if (model instanceof PlayerModel) {
+            PlayerModel m = new QPlayerModel(connection)
+                    .uuid.equalTo(((PlayerModel) model).getUuid())
+                    .findOne();
+            if (m == null) {
+                m = (PlayerModel) duplicateModel(model);
+                if (m == null) {
+                    return;
+                }
+                connection.save(m);
+            } else {
+                m.setMcleaks(((PlayerModel) model).isMcleaks());
+                m.setCreated(model.getCreated());
+                m.setModified(model.getModified());
+                connection.update(m);
+            }
+        }
     }
 }

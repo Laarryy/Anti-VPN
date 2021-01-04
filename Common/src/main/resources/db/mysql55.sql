@@ -1,21 +1,21 @@
 CREATE TABLE IF NOT EXISTS `avpn_6_ip` (
 	`id` INT NOT NULL AUTO_INCREMENT,
-	`version` INT,
-	`created` DATETIME,
-	`modified` DATETIME,
-	`ip` VARCHAR(45),
-	`type` INT,
-	`cascade` INT,
-	`consensus` INT,
+	`version` INT NOT NULL,
+	`created` DATETIME NOT NULL,
+	`modified` DATETIME NOT NULL,
+	`ip` VARCHAR(45) NOT NULL UNIQUE,
+	`type` INT NOT NULL,
+	`cascade` BOOLEAN,
+	`consensus` BOOLEAN,
 	PRIMARY KEY( `id` )
 );
 
 CREATE TABLE IF NOT EXISTS `avpn_6_player` (
 	`id` INT NOT NULL AUTO_INCREMENT,
-	`version` INT,
-	`created` DATETIME,
-	`modified` DATETIME,
-	`uuid` VARCHAR(36),
-	`mcleaks` INT,
+	`version` INT NOT NULL,
+	`created` DATETIME NOT NULL,
+	`modified` DATETIME NOT NULL,
+	`uuid` VARCHAR(36) NOT NULL UNIQUE,
+	`mcleaks` BOOLEAN NOT NULL,
 	PRIMARY KEY( `id` )
 );
