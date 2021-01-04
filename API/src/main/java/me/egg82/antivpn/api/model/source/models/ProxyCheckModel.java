@@ -6,10 +6,12 @@ import java.util.Objects;
 public class ProxyCheckModel implements SourceModel {
     private String status;
     private String message;
+    private ProxyCheckModel.IP ip;
 
     public ProxyCheckModel() {
         this.status = null;
         this.message = null;
+        this.ip = null;
     }
 
     public String getStatus() { return status; }
@@ -20,19 +22,24 @@ public class ProxyCheckModel implements SourceModel {
 
     public void setMessage(String message) { this.message = message; }
 
+    public IP getIp() { return ip; }
+
+    public void setIp(IP ip) { this.ip = ip; }
+
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof ProxyCheckModel)) return false;
         ProxyCheckModel that = (ProxyCheckModel) o;
-        return Objects.equals(status, that.status) && Objects.equals(message, that.message);
+        return Objects.equals(status, that.status) && Objects.equals(message, that.message) && Objects.equals(ip, that.ip);
     }
 
-    public int hashCode() { return Objects.hash(status, message); }
+    public int hashCode() { return Objects.hash(status, message, ip); }
 
     public String toString() {
         return "ProxyCheckModel{" +
                 "status='" + status + '\'' +
                 ", message='" + message + '\'' +
+                ", ip=" + ip +
                 '}';
     }
 

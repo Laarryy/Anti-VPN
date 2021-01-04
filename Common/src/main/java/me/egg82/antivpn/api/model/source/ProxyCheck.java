@@ -1,7 +1,9 @@
 package me.egg82.antivpn.api.model.source;
 
 import flexjson.JSONDeserializer;
+import flexjson.JSONSerializer;
 import java.net.HttpURLConnection;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import me.egg82.antivpn.api.APIException;
 import me.egg82.antivpn.api.model.source.models.ProxyCheckModel;
@@ -24,14 +26,7 @@ public class ProxyCheck extends AbstractSource<ProxyCheckModel> {
                 throw new APIException(model.getMessage().contains("Key"), "Could not get result from " + getName() + " (" + model.getMessage() + ")");
             }
 
-            ProxyCheckModel.IP ipModel;
-            try {
-                ipModel = (ProxyCheckModel.IP) model.getClass().getField(ip).get(model);
-            } catch (NoSuchFieldException | IllegalAccessException ex) {
-                throw new APIException(true, "Could not get field " + ip + " from " + model);
-            }
-
-            return "yes".equalsIgnoreCase(ipModel.getProxy());
+            return "yes".equalsIgnoreCase(model.getIp().getProxy());
         });
     }
 
@@ -46,9 +41,20 @@ public class ProxyCheck extends AbstractSource<ProxyCheckModel> {
             String key = sourceConfigNode.node("key").getString();
 
             HttpURLConnection conn = getConnection("https://proxycheck.io/v2/" + ip + "?vpn=1" + ((key != null && !key.isEmpty()) ? "&key=" + key : ""), "GET", (int) getCachedConfig().getTimeout(), "egg82/AntiVPN", headers);
+            String str = getString(conn);
+
+            JSONDeserializer<Map<String, Object>> mapDeserializer = new JSONDeserializer<>();
+            Map<String, Object> map = mapDeserializer.deserialize(str);
+            ProxyCheckModel.IP ipModel = null;
+            if (map.containsKey(ip)) {
+                JSONDeserializer<ProxyCheckModel.IP> ipModelDeserializer = new JSONDeserializer<>();
+                ipModel = ipModelDeserializer.deserialize(new JSONSerializer().exclude("*.class").deepSerialize(map.get(ip)), ProxyCheckModel.IP.class);
+            }
+
             JSONDeserializer<ProxyCheckModel> modelDeserializer = new JSONDeserializer<>();
-            modelDeserializer.use(ip, ProxyCheckModel.IP.class);
-            return modelDeserializer.deserialize(getString(conn), ProxyCheckModel.class);
+            ProxyCheckModel model = modelDeserializer.deserialize(str, ProxyCheckModel.class);
+            model.setIp(ipModel);
+            return model;
         });
     }
 }
