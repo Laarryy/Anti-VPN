@@ -122,7 +122,6 @@ sources:
   - 'shodan'
   - 'ipinfo'
   - 'teoh'
-  - 'ipwarner'
 
   # https://proxycheck.io
   # Results updated Jan 19, 2020
@@ -263,12 +262,6 @@ sources:
   # False-flagged homes: 0%
   teoh:
     enabled: true
-
-  # https://ipwarner.com/
-  ipwarner:
-    enabled: false
-    # API key to use (Required for this service, free one available at https://ipwarner.com/register )
-    key: ''
 
 mcleaks:
   # The amount of time to globally cache results

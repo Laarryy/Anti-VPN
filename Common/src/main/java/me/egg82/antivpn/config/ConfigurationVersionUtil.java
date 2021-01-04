@@ -633,6 +633,21 @@ public class ConfigurationVersionUtil {
         }
         config.node("sources", "order").setList(String.class, sources);
 
+        // Remove ipwarner
+        List<String> order = !config.node("sources", "order").empty() ? new ArrayList<>(config.node("sources", "order").getList(String.class)) : new ArrayList<>();
+
+        List<String> removed = new ArrayList<>();
+        for (String source : order) {
+            if (source.equalsIgnoreCase("ipwarner")) { // sources are case-insensitive when loaded
+                removed.add(source);
+            }
+        }
+
+        order.removeAll(removed);
+        config.node("sources", "order").setList(String.class, order);
+
+        config.node("sources").removeChild("ipwarner");
+
         // Add "subdomain" to sources->getipintel
         config.node("sources", "getipintel", "subdomain").set("check");
 
