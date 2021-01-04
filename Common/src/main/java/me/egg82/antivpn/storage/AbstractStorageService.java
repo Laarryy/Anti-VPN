@@ -57,17 +57,9 @@ public abstract class AbstractStorageService implements StorageService {
     }
 
     public void storeModels(@NonNull Collection<? extends BaseModel> models) {
-        List<BaseModel> newModels = new ArrayList<>();
-        for (BaseModel model : models) {
-            BaseModel newModel = duplicateModel(model);
-            if (newModel != null) {
-                newModels.add(newModel);
-            }
-        }
-
         queueLock.readLock().lock();
         try {
-            for (BaseModel model : newModels) {
+            for (BaseModel model : models) {
                 createOrUpdate(model);
             }
         } finally {
