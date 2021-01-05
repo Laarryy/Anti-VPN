@@ -8,6 +8,7 @@ import me.egg82.antivpn.hooks.PlaceholderAPIHook;
 import ninja.egg82.service.ServiceLocator;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +36,8 @@ public class BukkitTailorUtil {
             }
 
             if (placeholderapi.isPresent()) {
-                retVal.add(placeholderapi.get().withPlaceholders(Bukkit.getOfflinePlayer(uuid), command));
+                Player p = Bukkit.getPlayer(uuid);
+                retVal.add(placeholderapi.get().withPlaceholders(p != null ? p : Bukkit.getOfflinePlayer(uuid), command));
             } else {
                 retVal.add(command);
             }
@@ -55,7 +57,8 @@ public class BukkitTailorUtil {
 
         message = message.replace("%player%", name).replace("%uuid%", uuid.toString()).replace("%ip%", ip);
         if (placeholderapi.isPresent()) {
-            message = placeholderapi.get().withPlaceholders(Bukkit.getOfflinePlayer(uuid), message);
+            Player p = Bukkit.getPlayer(uuid);
+            message = placeholderapi.get().withPlaceholders(p != null ? p : Bukkit.getOfflinePlayer(uuid), message);
         }
         return ChatColor.translateAlternateColorCodes('&', message.replace("\\r", "").replace("\r", "").replace("\\n", "\n"));
     }

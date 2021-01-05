@@ -12,15 +12,20 @@ import com.djrapitops.plan.extension.icon.Color;
 import com.djrapitops.plan.extension.icon.Family;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.util.Optional;
+import java.util.Collection;
 import java.util.UUID;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicLong;
 import me.egg82.antivpn.api.APIException;
 import me.egg82.antivpn.api.VPNAPIProvider;
 import me.egg82.antivpn.api.model.ip.AlgorithmMethod;
-import me.egg82.antivpn.config.CachedConfig;
+import me.egg82.antivpn.api.model.ip.IPManager;
+import me.egg82.antivpn.api.model.player.PlayerManager;
 import me.egg82.antivpn.config.ConfigUtil;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,7 +69,6 @@ public class PlayerAnalyticsHook implements PluginHook {
             color = Color.BLUE
     )
     class Data implements DataExtension {
-        private final VPNAPI api = VPNAPIProvider.getInstance();
         private final CallEvents[] events = new CallEvents[] { CallEvents.SERVER_PERIODICAL, CallEvents.SERVER_EXTENSION_REGISTER, CallEvents.PLAYER_JOIN };
 
         private Data() { }
@@ -78,39 +82,72 @@ public class PlayerAnalyticsHook implements PluginHook {
                 iconColor = Color.NONE,
                 format = FormatType.NONE
         )
-        public long getVPNs() {
-            Optional<CachedConfig> cachedConfig = ConfigUtil.getCachedConfig();
-            if (!cachedConfig.isPresent()) {
-                logger.error("Cached config could not be fetched.");
-                return 0L;
+        public long getVpns() {
+            IPManager ipManager = VPNAPIProvider.getInstance().getIpManager();
+
+            Collection<ProxiedPlayer> players = ProxyServer.getInstance().getPlayers();
+            ExecutorService pool = Executors.newWorkStealingPool(Math.min(players.size() / 2, Runtime.getRuntime().availableProcessors() / 2));
+            CountDownLatch latch = new CountDownLatch(players.size());
+            AtomicLong results = new AtomicLong(0L);
+
+            for (ProxiedPlayer p : players) {
+                pool.submit(() -> {
+                    String ip = getIp(p);
+                    if (ip == null || ip.isEmpty()) {
+                        latch.countDown();
+                        return;
+                    }
+
+                    if (ipManager.getCurrentAlgorithmMethod() == AlgorithmMethod.CONSESNSUS) {
+                        try {
+                            if (ipManager.consensus(ip, true)
+                                    .exceptionally(this::handleException)
+                                    .join() >= ipManager.getMinConsensusValue()) {
+                                results.addAndGet(1L);
+                            }
+                        } catch (CompletionException ignored) {
+                        } catch (Exception ex) {
+                            if (ConfigUtil.getDebugOrFalse()) {
+                                logger.error(ex.getMessage(), ex);
+                            } else {
+                                logger.error(ex.getMessage());
+                            }
+                        }
+                    } else {
+                        try {
+                            if (Boolean.TRUE.equals(ipManager.cascade(ip, true)
+                                    .exceptionally(this::handleException)
+                                    .join())) {
+                                results.addAndGet(1L);
+                            }
+                        } catch (CompletionException ignored) {
+                        } catch (Exception ex) {
+                            if (ConfigUtil.getDebugOrFalse()) {
+                                logger.error(ex.getMessage(), ex);
+                            } else {
+                                logger.error(ex.getMessage());
+                            }
+                        }
+                    }
+                    latch.countDown();
+                });
             }
 
-            long retVal = 0L;
-            for (ProxiedPlayer p : ProxyServer.getInstance().getPlayers()) {
-                String ip = getIp(p);
-                if (ip == null || ip.isEmpty()) {
-                    continue;
+            try {
+                if (!latch.await(40L, TimeUnit.SECONDS)) {
+                    logger.warn("Plan hook timed out before all results could be obtained.");
                 }
-
-                if (cachedConfig.get().getVPNAlgorithmMethod() == AlgorithmMethod.CONSESNSUS) {
-                    try {
-                        if (api.consensus(ip) >= cachedConfig.get().getVPNAlgorithmConsensus()) {
-                            retVal++;
-                        }
-                    } catch (APIException ex) {
-                        logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
-                    }
+            } catch (InterruptedException ex) {
+                if (ConfigUtil.getDebugOrFalse()) {
+                    logger.error(ex.getMessage(), ex);
                 } else {
-                    try {
-                        if (api.cascade(ip)) {
-                            retVal++;
-                        }
-                    } catch (APIException ex) {
-                        logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
-                    }
+                    logger.error(ex.getMessage());
                 }
+                Thread.currentThread().interrupt();
             }
-            return retVal;
+            pool.shutdownNow(); // Kill it with fire
+
+            return results.get();
         }
 
         @NumberProvider(
@@ -122,24 +159,49 @@ public class PlayerAnalyticsHook implements PluginHook {
                 iconColor = Color.NONE,
                 format = FormatType.NONE
         )
-        public long getMCLeaks() {
-            Optional<CachedConfig> cachedConfig = ConfigUtil.getCachedConfig();
-            if (!cachedConfig.isPresent()) {
-                logger.error("Cached config could not be fetched.");
-                return 0L;
+        public long getMcLeaks() {
+            PlayerManager playerManager = VPNAPIProvider.getInstance().getPlayerManager();
+
+            Collection<ProxiedPlayer> players = ProxyServer.getInstance().getPlayers();
+            ExecutorService pool = Executors.newWorkStealingPool(Math.min(players.size() / 2, Runtime.getRuntime().availableProcessors() / 2));
+            CountDownLatch latch = new CountDownLatch(players.size());
+            AtomicLong results = new AtomicLong(0L);
+
+            for (ProxiedPlayer p : players) {
+                pool.submit(() -> {
+                    try {
+                        if (Boolean.TRUE.equals(playerManager.checkMcLeaks(p.getUniqueId(), true)
+                                .exceptionally(this::handleException)
+                                .join())) {
+                            results.addAndGet(1L);
+                        }
+                    } catch (CompletionException ignored) {
+                    } catch (Exception ex) {
+                        if (ConfigUtil.getDebugOrFalse()) {
+                            logger.error(ex.getMessage(), ex);
+                        } else {
+                            logger.error(ex.getMessage());
+                        }
+                    }
+                    latch.countDown();
+                });
             }
 
-            long retVal = 0L;
-            for (ProxiedPlayer p : ProxyServer.getInstance().getPlayers()) {
-                try {
-                    if (api.isMCLeaks(p.getUniqueId())) {
-                        retVal++;
-                    }
-                } catch (APIException ex) {
-                    logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
+            try {
+                if (!latch.await(40L, TimeUnit.SECONDS)) {
+                    logger.warn("Plan hook timed out before all results could be obtained.");
                 }
+            } catch (InterruptedException ex) {
+                if (ConfigUtil.getDebugOrFalse()) {
+                    logger.error(ex.getMessage(), ex);
+                } else {
+                    logger.error(ex.getMessage());
+                }
+                Thread.currentThread().interrupt();
             }
-            return retVal;
+            pool.shutdownNow(); // Kill it with fire
+
+            return results.get();
         }
 
         @BooleanProvider(
@@ -149,7 +211,7 @@ public class PlayerAnalyticsHook implements PluginHook {
                 iconFamily = Family.SOLID,
                 iconColor = Color.NONE
         )
-        public boolean getUsingVPN(UUID playerID) {
+        public boolean getUsingVpn(@NonNull UUID playerID) {
             ProxiedPlayer player = ProxyServer.getInstance().getPlayer(playerID);
             if (player == null) {
                 return false;
@@ -160,25 +222,36 @@ public class PlayerAnalyticsHook implements PluginHook {
                 return false;
             }
 
-            Optional<CachedConfig> cachedConfig = ConfigUtil.getCachedConfig();
-            if (!cachedConfig.isPresent()) {
-                logger.error("Cached config could not be fetched.");
-                return false;
-            }
+            IPManager ipManager = VPNAPIProvider.getInstance().getIpManager();
 
-            if (cachedConfig.get().getVPNAlgorithmMethod() == AlgorithmMethod.CONSESNSUS) {
+            if (ipManager.getCurrentAlgorithmMethod() == AlgorithmMethod.CONSESNSUS) {
                 try {
-                    return api.consensus(ip) >= cachedConfig.get().getVPNAlgorithmConsensus();
-                } catch (APIException ex) {
-                    logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
+                    return ipManager.consensus(ip, true)
+                            .exceptionally(this::handleException)
+                            .join() >= ipManager.getMinConsensusValue();
+                } catch (CompletionException ignored) { }
+                catch (Exception ex) {
+                    if (ConfigUtil.getDebugOrFalse()) {
+                        logger.error(ex.getMessage(), ex);
+                    } else {
+                        logger.error(ex.getMessage());
+                    }
                 }
             } else {
                 try {
-                    return api.cascade(ip);
-                } catch (APIException ex) {
-                    logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
+                    return ipManager.cascade(ip, true)
+                            .exceptionally(this::handleException)
+                            .join();
+                } catch (CompletionException ignored) { }
+                catch (Exception ex) {
+                    if (ConfigUtil.getDebugOrFalse()) {
+                        logger.error(ex.getMessage(), ex);
+                    } else {
+                        logger.error(ex.getMessage());
+                    }
                 }
             }
+
             return false;
         }
 
@@ -189,22 +262,26 @@ public class PlayerAnalyticsHook implements PluginHook {
                 iconFamily = Family.SOLID,
                 iconColor = Color.NONE
         )
-        public boolean getMCLeaks(UUID playerID) {
-            Optional<CachedConfig> cachedConfig = ConfigUtil.getCachedConfig();
-            if (!cachedConfig.isPresent()) {
-                logger.error("Cached config could not be fetched.");
-                return false;
-            }
+        public boolean getMcLeaks(@NonNull UUID playerId) {
+            PlayerManager playerManager = VPNAPIProvider.getInstance().getPlayerManager();
 
             try {
-                return api.isMCLeaks(playerID);
-            } catch (APIException ex) {
-                logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
+                return playerManager.checkMcLeaks(playerId, true)
+                        .exceptionally(this::handleException)
+                        .join();
+            } catch (CompletionException ignored) { }
+            catch (Exception ex) {
+                if (ConfigUtil.getDebugOrFalse()) {
+                    logger.error(ex.getMessage(), ex);
+                } else {
+                    logger.error(ex.getMessage());
+                }
             }
+
             return false;
         }
 
-        private String getIp(ProxiedPlayer player) {
+        private @Nullable String getIp(@NonNull ProxiedPlayer player) {
             InetSocketAddress address = player.getAddress();
             if (address == null) {
                 return null;
@@ -216,6 +293,29 @@ public class PlayerAnalyticsHook implements PluginHook {
             return host.getHostAddress();
         }
 
-        public CallEvents[] callExtensionMethodsOn() { return events; }
+        private <T> @Nullable T handleException(@NonNull Throwable ex) {
+            Throwable oldEx = null;
+            if (ex instanceof CompletionException) {
+                oldEx = ex;
+                ex = ex.getCause();
+            }
+
+            if (ex instanceof APIException) {
+                if (ConfigUtil.getDebugOrFalse()) {
+                    logger.error("[Hard: " + ((APIException) ex).isHard() + "] " + ex.getMessage(), oldEx != null ? oldEx : ex);
+                } else {
+                    logger.error("[Hard: " + ((APIException) ex).isHard() + "] " + ex.getMessage());
+                }
+            } else {
+                if (ConfigUtil.getDebugOrFalse()) {
+                    logger.error(ex.getMessage(), oldEx != null ? oldEx : ex);
+                } else {
+                    logger.error(ex.getMessage());
+                }
+            }
+            return null;
+        }
+
+        public @NonNull CallEvents[] callExtensionMethodsOn() { return events; }
     }
 }

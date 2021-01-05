@@ -1,221 +1,394 @@
 package me.egg82.antivpn.events;
 
+import co.aikar.commands.CommandIssuer;
 import inet.ipaddr.IPAddressString;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.CompletionException;
+import me.egg82.antivpn.AntiVPN;
 import me.egg82.antivpn.api.APIException;
+import me.egg82.antivpn.api.VPNAPIProvider;
 import me.egg82.antivpn.api.model.ip.AlgorithmMethod;
+import me.egg82.antivpn.api.model.ip.IPManager;
+import me.egg82.antivpn.api.model.player.PlayerManager;
+import me.egg82.antivpn.api.platform.BungeePlatform;
 import me.egg82.antivpn.config.CachedConfig;
 import me.egg82.antivpn.config.ConfigUtil;
-import me.egg82.antivpn.services.AnalyticsHelper;
-import me.egg82.antivpn.utils.LogUtil;
+import me.egg82.antivpn.hooks.LuckPermsHook;
 import me.egg82.antivpn.utils.ValidationUtil;
-import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PostLoginEvent;
 import net.md_5.bungee.api.event.PreLoginEvent;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.event.EventPriority;
 import ninja.egg82.events.BungeeEvents;
+import ninja.egg82.service.ServiceLocator;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class PlayerEvents extends EventHolder {
-    public PlayerEvents(Plugin plugin) {
+    private final CommandIssuer console;
+
+    public PlayerEvents(@NonNull Plugin plugin, @NonNull CommandIssuer console) {
+        this.console = console;
+
         events.add(
                 BungeeEvents.subscribe(plugin, PreLoginEvent.class, EventPriority.HIGH)
-                        .handler(this::cachePlayer)
+                        .handler(this::checkPerms)
         );
 
         events.add(
                 BungeeEvents.subscribe(plugin, PostLoginEvent.class, EventPriority.LOWEST)
                         .handler(this::checkPlayer)
         );
+
+        events.add(
+                BungeeEvents.subscribe(plugin, PostLoginEvent.class, EventPriority.HIGHEST)
+                        .handler(e -> {
+                            BungeePlatform.addUniquePlayer(e.getPlayer().getUniqueId());
+                            BungeePlatform.addUniqueIp(getIp(e.getPlayer().getAddress()));
+                        })
+        );
     }
 
-    private void cachePlayer(PreLoginEvent event) {
+    private void checkPerms(@NonNull PreLoginEvent event) {
+        Optional<LuckPermsHook> luckPermsHook;
+        try {
+            luckPermsHook = ServiceLocator.getOptional(LuckPermsHook.class);
+        } catch (InstantiationException | IllegalAccessException ex) {
+            logger.error(ex.getMessage(), ex);
+            luckPermsHook = Optional.empty();
+        }
+
+        if (luckPermsHook.isPresent()) {
+            // LuckPerms is available, run through entire check gambit
+            // TODO: event.getConnection().getUniqueId() is null here - maybe use PlayerLookup?
+            checkPermsPlayer(event, luckPermsHook.get().hasPermission(event.getConnection().getUniqueId(), "avpn.bypass"));
+        } else {
+            // LuckPerms is not available, only cache data
+            cachePlayer(event);
+        }
+    }
+
+    private void checkPermsPlayer(@NonNull PreLoginEvent event, boolean hasBypass) {
+        if (hasBypass) {
+            if (ConfigUtil.getDebugOrFalse()) {
+                console.sendMessage("<c1>" + event.getConnection().getName() + "</c1> <c2>bypasses pre-check. Ignoring.</c2>");
+            }
+            return;
+        }
+
         String ip = getIp(event.getConnection().getAddress());
         if (ip == null || ip.isEmpty()) {
             return;
         }
 
-        Optional<CachedConfig> cachedConfig = ConfigUtil.getCachedConfig();
-        if (!cachedConfig.isPresent()) {
+        CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
+        if (cachedConfig == null) {
+            logger.error("Cached config could not be fetched.");
             return;
         }
 
-        for (String testAddress : cachedConfig.get().getIgnoredIps()) {
+        // Check ignored IP addresses/ranges
+        for (String testAddress : cachedConfig.getIgnoredIps()) {
+            if (ValidationUtil.isValidIp(testAddress) && ip.equalsIgnoreCase(testAddress)) {
+                if (ConfigUtil.getDebugOrFalse()) {
+                    console.sendMessage("<c1>" + event.getConnection().getName() + "</c1> <c2>is using an ignored IP</c2> <c1>" + ip + "</c1><c2>. Ignoring.</c2>");
+                }
+                return;
+            } else if (ValidationUtil.isValidIpRange(testAddress) && rangeContains(testAddress, ip)) {
+                if (ConfigUtil.getDebugOrFalse()) {
+                    console.sendMessage("<c1>" + event.getConnection().getName() + "</c1> <c2>is under an ignored range</c2> <c1>" + testAddress + " (" + ip + ")" + "</c1><c2>. Ignoring.</c2>");
+                }
+                return;
+            }
+        }
+
+        // TODO: event.getConnection().getUniqueId() is null here - maybe use PlayerLookup?
+        cacheData(ip, event.getConnection().getUniqueId(), cachedConfig);
+
+        if (isVpn(ip, event.getConnection().getName(), cachedConfig)) {
+            AntiVPN.incrementBlockedVPNs();
+            IPManager ipManager = VPNAPIProvider.getInstance().getIpManager();
+            // TODO: event.getConnection().getUniqueId() is null here - maybe use PlayerLookup?
+            List<String> commands = ipManager.getVpnCommands(event.getConnection().getName(), event.getConnection().getUniqueId(), ip);
+            for (String command : commands) {
+                ProxyServer.getInstance().getPluginManager().dispatchCommand(ProxyServer.getInstance().getConsole(), command);
+            }
+            // TODO: event.getConnection().getUniqueId() is null here - maybe use PlayerLookup?
+            String kickMessage = ipManager.getVpnKickMessage(event.getConnection().getName(), event.getConnection().getUniqueId(), ip);
+            if (kickMessage != null) {
+                event.setCancelled(true);
+                event.setCancelReason(TextComponent.fromLegacyText(kickMessage));
+            }
+        }
+
+        if (isMcLeaks(event.getConnection().getName(), event.getConnection().getUniqueId(), cachedConfig)) {
+            AntiVPN.incrementBlockedMCLeaks();
+            PlayerManager playerManager = VPNAPIProvider.getInstance().getPlayerManager();
+            // TODO: event.getConnection().getUniqueId() is null here - maybe use PlayerLookup?
+            List<String> commands = playerManager.getMcLeaksCommands(event.getConnection().getName(), event.getConnection().getUniqueId(), ip);
+            for (String command : commands) {
+                ProxyServer.getInstance().getPluginManager().dispatchCommand(ProxyServer.getInstance().getConsole(), command);
+            }
+            // TODO: event.getConnection().getUniqueId() is null here - maybe use PlayerLookup?
+            String kickMessage = playerManager.getMcLeaksKickMessage(event.getConnection().getName(), event.getConnection().getUniqueId(), ip);
+            if (kickMessage != null) {
+                event.setCancelled(true);
+                event.setCancelReason(TextComponent.fromLegacyText(kickMessage));
+            }
+        }
+    }
+
+    private void cachePlayer(@NonNull PreLoginEvent event) {
+        String ip = getIp(event.getConnection().getAddress());
+        if (ip == null || ip.isEmpty()) {
+            return;
+        }
+
+        CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
+        if (cachedConfig == null) {
+            logger.error("Cached config could not be fetched.");
+            return;
+        }
+
+        // Check ignored IP addresses/ranges
+        for (String testAddress : cachedConfig.getIgnoredIps()) {
             if (
                     ValidationUtil.isValidIp(testAddress) && ip.equalsIgnoreCase(testAddress)
-                    || ValidationUtil.isValidIPRange(testAddress) && rangeContains(testAddress, ip)
+                    || ValidationUtil.isValidIpRange(testAddress) && rangeContains(testAddress, ip)
             ) {
                 return;
             }
         }
 
-        if ((!cachedConfig.get().getVPNKickMessage().isEmpty() || !cachedConfig.get().getVPNActionCommands().isEmpty())) {
-            if (cachedConfig.get().getVPNAlgorithmMethod() == AlgorithmMethod.CONSESNSUS) {
+        // TODO: event.getConnection().getUniqueId() is null here - maybe use PlayerLookup?
+        cacheData(ip, event.getConnection().getUniqueId(), cachedConfig);
+    }
+
+    private void cacheData(@NonNull String ip, @NonNull UUID uuid, @NonNull CachedConfig cachedConfig) {
+        // Cache IP data
+        if ((!cachedConfig.getVPNKickMessage().isEmpty() || !cachedConfig.getVPNActionCommands().isEmpty())) {
+            IPManager ipManager = VPNAPIProvider.getInstance().getIpManager();
+            if (cachedConfig.getVPNAlgorithmMethod() == AlgorithmMethod.CONSESNSUS) {
                 try {
-                    api.consensus(ip); // Calling this will cache the result internally, even if the value is unused
-                } catch (APIException ex) {
-                    if (cachedConfig.get().getDebug()) {
-                        logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
+                    ipManager.consensus(ip, true)
+                            .exceptionally(this::handleException)
+                            .join(); // Calling this will cache the result internally, even if the value is unused
+                } catch (CompletionException ignored) { }
+                catch (Exception ex) {
+                    if (cachedConfig.getDebug()) {
+                        logger.error(ex.getMessage(), ex);
                     } else {
-                        logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage());
+                        logger.error(ex.getMessage());
                     }
                 }
             } else {
                 try {
-                    api.cascade(ip); // Calling this will cache the result internally, even if the value is unused
-                } catch (APIException ex) {
-                    if (cachedConfig.get().getDebug()) {
-                        logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
+                    ipManager.cascade(ip, true)
+                            .exceptionally(this::handleException)
+                            .join(); // Calling this will cache the result internally, even if the value is unused
+                } catch (CompletionException ignored) { }
+                catch (Exception ex) {
+                    if (cachedConfig.getDebug()) {
+                        logger.error(ex.getMessage(), ex);
                     } else {
-                        logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage());
+                        logger.error(ex.getMessage());
                     }
                 }
             }
         }
 
-        // Can't cache MCleaks - event.getConnection().getUniqueId() is null here
+        // Cache MCLeaks data
+        if (!cachedConfig.getMCLeaksKickMessage().isEmpty() || !cachedConfig.getMCLeaksActionCommands().isEmpty()) {
+            PlayerManager playerManager = VPNAPIProvider.getInstance().getPlayerManager();
+            try {
+                playerManager.checkMcLeaks(uuid, true)
+                        .exceptionally(this::handleException)
+                        .join(); // Calling this will cache the result internally, even if the value is unused
+            } catch (CompletionException ignored) { }
+            catch (Exception ex) {
+                if (cachedConfig.getDebug()) {
+                    logger.error(ex.getMessage(), ex);
+                } else {
+                    logger.error(ex.getMessage());
+                }
+            }
+        }
     }
 
-    private void checkPlayer(PostLoginEvent event) {
+    private void checkPlayer(@NonNull PostLoginEvent event) {
+        Optional<LuckPermsHook> luckPermsHook;
+        try {
+            luckPermsHook = ServiceLocator.getOptional(LuckPermsHook.class);
+        } catch (InstantiationException | IllegalAccessException ex) {
+            logger.error(ex.getMessage(), ex);
+            luckPermsHook = Optional.empty();
+        }
+
+        if (luckPermsHook.isPresent()) {
+            return;
+        }
+
         String ip = getIp(event.getPlayer().getAddress());
         if (ip == null || ip.isEmpty()) {
             return;
         }
 
-        Optional<CachedConfig> cachedConfig = ConfigUtil.getCachedConfig();
-        if (!cachedConfig.isPresent()) {
+        CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
+        if (cachedConfig == null) {
+            logger.error("Cached config could not be fetched.");
             return;
         }
 
         if (event.getPlayer().hasPermission("avpn.bypass")) {
             if (ConfigUtil.getDebugOrFalse()) {
-                logger.info(LogUtil.getHeading() + ChatColor.WHITE + event.getPlayer().getName() + ChatColor.YELLOW + " bypasses check. Ignoring.");
+                console.sendMessage("<c1>" + event.getPlayer().getName() + "</c1> <c2>bypasses actions. Ignoring.</c2>");
             }
             return;
         }
 
-        for (String testAddress : cachedConfig.get().getIgnoredIps()) {
+        for (String testAddress : cachedConfig.getIgnoredIps()) {
             if (ValidationUtil.isValidIp(testAddress) && ip.equalsIgnoreCase(testAddress)) {
                 if (ConfigUtil.getDebugOrFalse()) {
-                    logger.info(LogUtil.getHeading() + ChatColor.WHITE + event.getPlayer().getName() + ChatColor.YELLOW + " is using an ignored IP " + ChatColor.WHITE + ip + ChatColor.YELLOW + ". Ignoring.");
+                    console.sendMessage("<c1>" + event.getPlayer().getName() + "</c1> <c2>is using an ignored IP</c2> <c1>" + ip + "</c1><c2>. Ignoring.</c2>");
                 }
                 return;
-            } else if (ValidationUtil.isValidIPRange(testAddress) && rangeContains(testAddress, ip)) {
+            } else if (ValidationUtil.isValidIpRange(testAddress) && rangeContains(testAddress, ip)) {
                 if (ConfigUtil.getDebugOrFalse()) {
-                    logger.info(LogUtil.getHeading() + ChatColor.WHITE + event.getPlayer().getName() + ChatColor.YELLOW + " is under an ignored range " + ChatColor.WHITE + testAddress + " (" + ip + ")" + ChatColor.YELLOW + ". Ignoring.");
+                    console.sendMessage("<c1>" + event.getPlayer().getName() + "</c1> <c2>is under an ignored range</c2> <c1>" + testAddress + " (" + ip + ")" + "</c1><c2>. Ignoring.</c2>");
                 }
                 return;
             }
         }
 
-        if (!cachedConfig.get().getVPNKickMessage().isEmpty() || !cachedConfig.get().getVPNActionCommands().isEmpty()) {
+        if (isVpn(ip, event.getPlayer().getName(), cachedConfig)) {
+            AntiVPN.incrementBlockedVPNs();
+            IPManager ipManager = VPNAPIProvider.getInstance().getIpManager();
+            List<String> commands = ipManager.getVpnCommands(event.getPlayer().getName(), event.getPlayer().getUniqueId(), ip);
+            for (String command : commands) {
+                ProxyServer.getInstance().getPluginManager().dispatchCommand(ProxyServer.getInstance().getConsole(), command);
+            }
+            String kickMessage = ipManager.getVpnKickMessage(event.getPlayer().getName(), event.getPlayer().getUniqueId(), ip);
+            if (kickMessage != null) {
+                event.getPlayer().disconnect(TextComponent.fromLegacyText(kickMessage));
+            }
+        }
+
+        if (isMcLeaks(event.getPlayer().getName(), event.getPlayer().getUniqueId(), cachedConfig)) {
+            AntiVPN.incrementBlockedMCLeaks();
+            PlayerManager playerManager = VPNAPIProvider.getInstance().getPlayerManager();
+            List<String> commands = playerManager.getMcLeaksCommands(event.getPlayer().getName(), event.getPlayer().getUniqueId(), ip);
+            for (String command : commands) {
+                ProxyServer.getInstance().getPluginManager().dispatchCommand(ProxyServer.getInstance().getConsole(), command);
+            }
+            String kickMessage = playerManager.getMcLeaksKickMessage(event.getPlayer().getName(), event.getPlayer().getUniqueId(), ip);
+            if (kickMessage != null) {
+                event.getPlayer().disconnect(TextComponent.fromLegacyText(kickMessage));
+            }
+        }
+    }
+
+    private boolean isVpn(@NonNull String ip, @NonNull String name, @NonNull CachedConfig cachedConfig) {
+        if (!cachedConfig.getVPNKickMessage().isEmpty() || !cachedConfig.getVPNActionCommands().isEmpty()) {
             boolean isVPN;
 
-            if (cachedConfig.get().getVPNAlgorithmMethod() == AlgorithmMethod.CONSESNSUS) {
+            IPManager ipManager = VPNAPIProvider.getInstance().getIpManager();
+            if (cachedConfig.getVPNAlgorithmMethod() == AlgorithmMethod.CONSESNSUS) {
                 try {
-                    isVPN = api.consensus(ip) >= cachedConfig.get().getVPNAlgorithmConsensus();
-                } catch (APIException ex) {
-                    if (cachedConfig.get().getDebug()) {
-                        logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
+                    isVPN = ipManager.consensus(ip, true)
+                            .exceptionally(this::handleException)
+                            .join() >= cachedConfig.getVPNAlgorithmConsensus();
+                } catch (CompletionException ignored) {
+                    isVPN = false;
+                } catch (Exception ex) {
+                    if (cachedConfig.getDebug()) {
+                        logger.error(ex.getMessage(), ex);
                     } else {
-                        logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage());
+                        logger.error(ex.getMessage());
                     }
                     isVPN = false;
                 }
             } else {
                 try {
-                    isVPN = api.cascade(ip);
-                } catch (APIException ex) {
-                    if (cachedConfig.get().getDebug()) {
-                        logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
+                    isVPN = ipManager.cascade(ip, true)
+                            .exceptionally(this::handleException)
+                            .join();
+                } catch (CompletionException ignored) {
+                    isVPN = false;
+                } catch (Exception ex) {
+                    if (cachedConfig.getDebug()) {
+                        logger.error(ex.getMessage(), ex);
                     } else {
-                        logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage());
+                        logger.error(ex.getMessage());
                     }
                     isVPN = false;
                 }
             }
 
             if (isVPN) {
-                AnalyticsHelper.incrementBlockedVPNs();
-                if (ConfigUtil.getDebugOrFalse()) {
-                    logger.info(LogUtil.getHeading() + ChatColor.WHITE + event.getPlayer().getName() + ChatColor.DARK_RED + " found using a VPN. Running required actions.");
-                }
-                if (!cachedConfig.get().getVPNActionCommands().isEmpty()) {
-                    tryRunCommands(cachedConfig.get().getVPNActionCommands(), event.getPlayer(), ip);
-                }
-                if (!cachedConfig.get().getVPNKickMessage().isEmpty()) {
-                    tryKickPlayer(cachedConfig.get().getVPNKickMessage(), event.getPlayer(), event);
+                if (cachedConfig.getDebug()) {
+                    console.sendMessage("<c1>" + name + "</c1> <c9>found using a VPN. Running required actions.</c9>");
                 }
             } else {
-                if (ConfigUtil.getDebugOrFalse()) {
-                    logger.info(LogUtil.getHeading() + ChatColor.WHITE + event.getPlayer().getName() + ChatColor.GREEN + " passed VPN check.");
+                if (cachedConfig.getDebug()) {
+                    console.sendMessage("<c1>" + name + "</c1> <c4>passed VPN check.</c4>");
                 }
             }
+            return isVPN;
         } else {
-            if (ConfigUtil.getDebugOrFalse()) {
-                logger.info(LogUtil.getHeading() + ChatColor.YELLOW + "VPN set to API-only. Ignoring VPN check for " + ChatColor.WHITE + event.getPlayer().getName());
+            if (cachedConfig.getDebug()) {
+                console.sendMessage("<c2>Plugin set to API-only. Ignoring VPN check for</c2> <c1>" + name + "</c1>");
             }
         }
 
-        if (!cachedConfig.get().getMCLeaksKickMessage().isEmpty() || !cachedConfig.get().getMCLeaksActionCommands().isEmpty()) {
+        return false;
+    }
+
+    private boolean isMcLeaks(@NonNull String name, @NonNull UUID uuid, @NonNull CachedConfig cachedConfig) {
+        if (!cachedConfig.getMCLeaksKickMessage().isEmpty() || !cachedConfig.getMCLeaksActionCommands().isEmpty()) {
             boolean isMCLeaks;
 
+            PlayerManager playerManager = VPNAPIProvider.getInstance().getPlayerManager();
             try {
-                isMCLeaks = api.isMCLeaks(event.getPlayer().getUniqueId());
-            } catch (APIException ex) {
-                if (cachedConfig.get().getDebug()) {
-                    logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
+                isMCLeaks = playerManager.checkMcLeaks(uuid, true)
+                        .exceptionally(this::handleException)
+                        .join();
+            } catch (CompletionException ignored) {
+                isMCLeaks = false;
+            } catch (Exception ex) {
+                if (cachedConfig.getDebug()) {
+                    logger.error(ex.getMessage(), ex);
                 } else {
-                    logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage());
+                    logger.error(ex.getMessage());
                 }
                 isMCLeaks = false;
             }
 
             if (isMCLeaks) {
-                AnalyticsHelper.incrementBlockedMCLeaks();
-                if (ConfigUtil.getDebugOrFalse()) {
-                    logger.info(LogUtil.getHeading() + ChatColor.WHITE + event.getPlayer().getName() + ChatColor.DARK_RED + " found using an MCLeaks account. Running required actions.");
-                }
-                if (!cachedConfig.get().getMCLeaksActionCommands().isEmpty()) {
-                    tryRunCommands(cachedConfig.get().getMCLeaksActionCommands(), event.getPlayer(), ip);
-                }
-                if (!cachedConfig.get().getMCLeaksKickMessage().isEmpty()) {
-                    tryKickPlayer(cachedConfig.get().getMCLeaksKickMessage(), event.getPlayer(), event);
+                if (cachedConfig.getDebug()) {
+                    console.sendMessage("<c1>" + name + "</c1> <c9>found using an MCLeaks account. Running required actions.</c9>");
                 }
             } else {
-                if (ConfigUtil.getDebugOrFalse()) {
-                    logger.info(LogUtil.getHeading() + ChatColor.WHITE + event.getPlayer().getName() + ChatColor.GREEN + " passed MCLeaks check.");
+                if (cachedConfig.getDebug()) {
+                    console.sendMessage("<c1>" + name + "</c1> <c4>passed MCLeaks check.</c4>");
                 }
             }
+            return isMCLeaks;
         } else {
-            if (ConfigUtil.getDebugOrFalse()) {
-                logger.info(LogUtil.getHeading() + ChatColor.YELLOW + "MCLeaks set to API-only. Ignoring MCLeaks check for " + ChatColor.WHITE + event.getPlayer().getName());
+            if (cachedConfig.getDebug()) {
+                console.sendMessage("<c2>Plugin set to API-only. Ignoring MCLeaks check for</c2> <c1>" + name + "</c1>");
             }
         }
+
+        return false;
     }
 
-    private void tryRunCommands(List<String> commands, ProxiedPlayer player, String ip) {
-        for (String command : commands) {
-            command = command.replace("%player%", player.getName()).replace("%uuid%", player.getUniqueId().toString()).replace("%ip%", ip);
-            if (command.charAt(0) == '/') {
-                command = command.substring(1);
-            }
-
-            ProxyServer.getInstance().getPluginManager().dispatchCommand(ProxyServer.getInstance().getConsole(), command);
-        }
-    }
-
-    private void tryKickPlayer(String message, ProxiedPlayer player, PostLoginEvent event) {
-        player.disconnect(TextComponent.fromLegacyText(message.replace('&', ChatColor.COLOR_CHAR)));
-    }
-
-    private String getIp(InetSocketAddress address) {
+    private @Nullable String getIp(InetSocketAddress address) {
         if (address == null) {
             return null;
         }
@@ -226,5 +399,28 @@ public class PlayerEvents extends EventHolder {
         return host.getHostAddress();
     }
 
-    private boolean rangeContains(String range, String ip) { return new IPAddressString(range).contains(new IPAddressString(ip)); }
+    private boolean rangeContains(@NonNull String range, @NonNull String ip) { return new IPAddressString(range).contains(new IPAddressString(ip)); }
+
+    private <T> @Nullable T handleException(@NonNull Throwable ex) {
+        Throwable oldEx = null;
+        if (ex instanceof CompletionException) {
+            oldEx = ex;
+            ex = ex.getCause();
+        }
+
+        if (ex instanceof APIException) {
+            if (ConfigUtil.getDebugOrFalse()) {
+                logger.error("[Hard: " + ((APIException) ex).isHard() + "] " + ex.getMessage(), oldEx != null ? oldEx : ex);
+            } else {
+                logger.error("[Hard: " + ((APIException) ex).isHard() + "] " + ex.getMessage());
+            }
+        } else {
+            if (ConfigUtil.getDebugOrFalse()) {
+                logger.error(ex.getMessage(), oldEx != null ? oldEx : ex);
+            } else {
+                logger.error(ex.getMessage());
+            }
+        }
+        return null;
+    }
 }

@@ -1,19 +1,19 @@
 package me.egg82.antivpn.events;
 
 import co.aikar.commands.CommandManager;
-import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 import me.egg82.antivpn.config.ConfigUtil;
-import me.egg82.antivpn.extended.Configuration;
 import me.egg82.antivpn.lang.Message;
 import net.md_5.bungee.api.event.PostLoginEvent;
 import net.md_5.bungee.api.plugin.Plugin;
 import ninja.egg82.service.ServiceLocator;
 import ninja.egg82.service.ServiceNotFoundException;
 import ninja.egg82.updater.BungeeUpdater;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.spongepowered.configurate.ConfigurationNode;
 
 public class PostLoginUpdateNotifyHandler implements Consumer<PostLoginEvent> {
     private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -21,18 +21,18 @@ public class PostLoginUpdateNotifyHandler implements Consumer<PostLoginEvent> {
     private final Plugin plugin;
     private final CommandManager commandManager;
 
-    public PostLoginUpdateNotifyHandler(Plugin plugin, CommandManager commandManager) {
+    public PostLoginUpdateNotifyHandler(@NonNull Plugin plugin, @NonNull CommandManager commandManager) {
         this.plugin = plugin;
         this.commandManager = commandManager;
     }
 
-    public void accept(PostLoginEvent event) {
+    public void accept(@NonNull PostLoginEvent event) {
         if (!event.getPlayer().hasPermission("avpn.admin")) {
             return;
         }
 
-        Optional<Configuration> config = ConfigUtil.getConfig();
-        if (!config.isPresent()) {
+        ConfigurationNode config = ConfigUtil.getConfig();
+        if (config == null) {
             return;
         }
 
@@ -45,7 +45,7 @@ public class PostLoginUpdateNotifyHandler implements Consumer<PostLoginEvent> {
             return;
         }
 
-        if (!config.get().getNode("update", "check").getBoolean(true)) {
+        if (!config.node("update", "check").getBoolean(true)) {
             return;
         }
 
@@ -54,7 +54,7 @@ public class PostLoginUpdateNotifyHandler implements Consumer<PostLoginEvent> {
                 return;
             }
 
-            if (config.get().getNode("update", "notify").getBoolean(true)) {
+            if (config.node("update", "notify").getBoolean(true)) {
                 try {
                     String version = updater.getLatestVersion().get();
                     commandManager.getCommandIssuer(event.getPlayer()).sendInfo(Message.GENERAL__UPDATE, "{version}", version);

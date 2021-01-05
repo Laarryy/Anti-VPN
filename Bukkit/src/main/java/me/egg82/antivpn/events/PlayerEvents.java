@@ -436,7 +436,7 @@ public class PlayerEvents extends EventHolder {
         return false;
     }
 
-    private boolean rangeContains(String range, String ip) { return new IPAddressString(range).contains(new IPAddressString(ip)); }
+    private boolean rangeContains(@NonNull String range, @NonNull String ip) { return new IPAddressString(range).contains(new IPAddressString(ip)); }
 
     private <T> @Nullable T handleException(@NonNull Throwable ex) {
         Throwable oldEx = null;

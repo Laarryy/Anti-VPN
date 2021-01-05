@@ -7,7 +7,7 @@ import java.util.Set;
 import java.util.UUID;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-public class BukkitPlatform implements Platform {
+public class BungeePlatform implements Platform {
     private static final Set<UUID> uniquePlayers = new HashSet<>();
     private static final Set<String> uniqueIps = new HashSet<>();
 
@@ -17,11 +17,11 @@ public class BukkitPlatform implements Platform {
 
     private final Instant startTime;
 
-    public BukkitPlatform(long startTime) {
+    public BungeePlatform(long startTime) {
         this.startTime = Instant.ofEpochMilli(startTime);
     }
 
-    public @NonNull Type getType() { return Type.BUKKIT; }
+    public @NonNull Type getType() { return Type.BUNGEECORD; }
 
     public @NonNull Set<UUID> getUniquePlayers() { return ImmutableSet.copyOf(uniquePlayers); }
 

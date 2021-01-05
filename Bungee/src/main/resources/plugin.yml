@@ -4,6 +4,6 @@ version: ${plugin.version}
 author: egg82
 api-version: 1.13
 description: Get the best; save money on overpriced plugins and block VPN users!
-softdepend: [Plan, PlaceholderAPI]
+softdepend: [Plan, PlaceholderAPI, LuckPerms]
 # loadbefore AdvancedBan fixes false classloader warn issue for hsqldb - https://github.com/egg82/AntiVPN/issues/65
 loadbefore: [AdvancedBan]

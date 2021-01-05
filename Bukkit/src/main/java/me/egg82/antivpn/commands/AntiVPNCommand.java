@@ -10,13 +10,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.Plugin;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @CommandAlias("antivpn|avpn")
 public class AntiVPNCommand extends BaseCommand {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
-
     private final Plugin plugin;
     private final TaskChainFactory taskFactory;
     private final CommandIssuer console;
