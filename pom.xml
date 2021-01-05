@@ -15,22 +15,22 @@
         <plugin.version>6.0.0</plugin.version>
         <api.version>2.0.0</api.version>
 
-        <paper.version>1.16.1-R0.1-SNAPSHOT</paper.version>
-        <waterfall.version>1.15-SNAPSHOT</waterfall.version>
+        <paper.version>1.16.4-R0.1-SNAPSHOT</paper.version>
+        <waterfall.version>1.16-R0.4-SNAPSHOT</waterfall.version>
         <velocity.version>1.1.2</velocity.version>
         <bstats.version>1.8</bstats.version>
-        <mockbukkit.version>0.5.0</mockbukkit.version>
+        <mockbukkit.version>0.20.0</mockbukkit.version>
 
-        <checkerframework.version>3.8.0</checkerframework.version>
+        <checkerframework.version>3.9.0</checkerframework.version>
         <servicelocator.version>1.0.2</servicelocator.version>
         <configurate.version>4.0.0</configurate.version>
-        <ebean.version>12.6.4</ebean.version>
+        <ebean.version>12.6.5</ebean.version>
         <hikari.version>3.4.5</hikari.version>
         <flexjson.version>3.3</flexjson.version>
-        <mbassador.version>1.3.1</mbassador.version>
+        <mbassador.version>1.3.2</mbassador.version>
         <jedis.version>3.4.1</jedis.version>
         <rabbitmq.version>5.10.0</rabbitmq.version>
-        <zstd.version>1.4.5-12</zstd.version>
+        <zstd.version>1.4.8-1</zstd.version>
         <guava.version>30.1-jre</guava.version>
         <fastutil.version>8.4.4</fastutil.version>
         <caffeine.version>2.8.8</caffeine.version>

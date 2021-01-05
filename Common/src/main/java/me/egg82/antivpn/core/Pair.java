@@ -1,6 +1,7 @@
 package me.egg82.antivpn.core;
 
 import java.util.Objects;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * This class should be used sparingly, only when needed.
@@ -21,9 +22,9 @@ public class Pair<T1, T2> {
         this.hc = Objects.hash(t1, t2);
     }
 
-    public T1 getT1() { return t1; }
+    public @Nullable T1 getT1() { return t1; }
 
-    public T2 getT2() { return t2; }
+    public @Nullable T2 getT2() { return t2; }
 
     public boolean equals(Object o) {
         if (this == o) return true;

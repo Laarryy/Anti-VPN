@@ -100,7 +100,7 @@ public class AntiVPN {
 
         if (!BukkitVersionUtil.isAtLeast("1.8")) {
             log(Level.INFO, ChatColor.GOLD + "====================================");
-            log(Level.INFO, ChatColor.DARK_RED + "This plugin will likely not work on servers < 1.8");
+            log(Level.INFO, ChatColor.DARK_RED + "Anti-VPN will likely not work on servers < 1.8");
             log(Level.INFO, ChatColor.GOLD + "====================================");
         }
 
