@@ -22,7 +22,7 @@ public class ShodanModel implements SourceModel {
     @JSON(name = "postal_code")
     private String postalCode;
     @JSON(name = "dma_code")
-    private long dmaCode;
+    private String dmaCode;
     private String asn;
     private String org;
     private String isp;
@@ -45,7 +45,7 @@ public class ShodanModel implements SourceModel {
         this.countryCode3 = null;
         this.country = null;
         this.postalCode = null;
-        this.dmaCode = -1L;
+        this.dmaCode = null;
         this.asn = null;
         this.org = null;
         this.isp = null;
@@ -110,10 +110,10 @@ public class ShodanModel implements SourceModel {
     public void setPostalCode(String postalCode) { this.postalCode = postalCode; }
 
     @JSON(name = "dma_code")
-    public long getDmaCode() { return dmaCode; }
+    public String getDmaCode() { return dmaCode; }
 
     @JSON(name = "dma_code")
-    public void setDmaCode(long dmaCode) { this.dmaCode = dmaCode; }
+    public void setDmaCode(String dmaCode) { this.dmaCode = dmaCode; }
 
     public String getAsn() { return asn; }
 
