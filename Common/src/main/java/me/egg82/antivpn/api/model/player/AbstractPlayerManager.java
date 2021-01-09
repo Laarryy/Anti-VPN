@@ -45,7 +45,7 @@ public abstract class AbstractPlayerManager implements PlayerManager {
             PlayerPacket packet = new PlayerPacket();
             packet.setUuid(player.getUuid());
             packet.setValue(player.isMcLeaks());
-            PacketUtil.queuePacket(packet, null);
+            PacketUtil.queuePacket(packet);
         });
     }
 
@@ -65,7 +65,7 @@ public abstract class AbstractPlayerManager implements PlayerManager {
 
             DeletePlayerPacket packet = new DeletePlayerPacket();
             packet.setUuid(uniqueId);
-            PacketUtil.queuePacket(packet, null);
+            PacketUtil.queuePacket(packet);
         });
     }
 

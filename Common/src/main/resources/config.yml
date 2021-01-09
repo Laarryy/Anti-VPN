@@ -1,5 +1,5 @@
 # How the plugin stores long-term data
-# "external" data sources will also be used as messaging
+# Note that you must configure at least one storage engine
 storage:
   engines:
     # Engine name. Can be anything
@@ -314,7 +314,7 @@ action:
     commands:
       - ''
 
-  # IPs and ranges to ignore when checking for VPNs and/or MCLeaks accounts
+  # IP addresses and ranges to ignore when checking for VPNs and/or MCLeaks accounts
   ignore:
   - '127.0.0.0/8'
   - '10.0.0.0/8'

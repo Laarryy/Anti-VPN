@@ -53,7 +53,10 @@ public class PlayerEvents extends EventHolder {
                         .filter(e -> !Bukkit.hasWhitelist() || e.getPlayer().isWhitelisted())
                         .handler(e -> {
                             BukkitPlatform.addUniquePlayer(e.getPlayer().getUniqueId());
-                            BukkitPlatform.addUniqueIp(getIp(e.getAddress()));
+                            String ip = getIp(e.getAddress());
+                            if (ip != null) {
+                                BukkitPlatform.addUniqueIp(ip);
+                            }
                         })
         );
     }

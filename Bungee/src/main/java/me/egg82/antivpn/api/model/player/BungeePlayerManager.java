@@ -182,7 +182,7 @@ public class BungeePlayerManager extends AbstractPlayerManager {
         PlayerPacket packet = new PlayerPacket();
         packet.setUuid(model.getUuid());
         packet.setValue(model.isMcleaks());
-        PacketUtil.queuePacket(packet, null);
+        PacketUtil.queuePacket(packet);
 
         if (cachedConfig.getDebug()) {
             logger.info("Queued packet for " + model.getUuid() + " in messaging.");

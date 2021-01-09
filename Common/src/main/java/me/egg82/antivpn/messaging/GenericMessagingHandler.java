@@ -23,8 +23,8 @@ import org.slf4j.LoggerFactory;
 public class GenericMessagingHandler implements MessagingHandler {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private final LoadingCache<UUID, Boolean> messageCache = Caffeine.newBuilder().expireAfterWrite(2L, TimeUnit.MINUTES).expireAfterAccess(30L, TimeUnit.SECONDS).build(k -> Boolean.FALSE);
-    private final Object cacheLock = new Object();
+    public static final LoadingCache<UUID, Boolean> messageCache = Caffeine.newBuilder().expireAfterWrite(2L, TimeUnit.MINUTES).expireAfterAccess(30L, TimeUnit.SECONDS).build(k -> Boolean.FALSE);
+    private final Object messageCacheLock = new Object();
 
     public GenericMessagingHandler() { }
 
@@ -33,10 +33,14 @@ public class GenericMessagingHandler implements MessagingHandler {
             return;
         }
 
-        handleGenericPacket(packet, fromService);
+        try {
+            handleGenericPacket(packet);
+        } finally {
+            PacketUtil.repeatPacket(messageId, packet, fromService);
+        }
     }
 
-    private void handleIp(@NonNull IPPacket packet, @NonNull String fromService) {
+    private void handleIp(@NonNull IPPacket packet) {
         if (ConfigUtil.getDebugOrFalse()) {
             logger.info("Handling packet for " + packet.getIp() + ".");
         }
@@ -66,11 +70,9 @@ public class GenericMessagingHandler implements MessagingHandler {
             model.setConsensus(packet.getConsensus());
             service.storeModel(model);
         }
-
-        PacketUtil.queuePacket(packet, fromService);
     }
 
-    private void handleDeleteIp(@NonNull DeleteIPPacket packet, @NonNull String fromService) {
+    private void handleDeleteIp(@NonNull DeleteIPPacket packet) {
         if (ConfigUtil.getDebugOrFalse()) {
             logger.info("Handling deletion packet for " + packet.getIp() + ".");
         }
@@ -95,11 +97,9 @@ public class GenericMessagingHandler implements MessagingHandler {
             model.setIp(packet.getIp());
             service.deleteModel(model);
         }
-
-        PacketUtil.queuePacket(packet, fromService);
     }
 
-    private void handlePlayer(@NonNull PlayerPacket packet, @NonNull String fromService) {
+    private void handlePlayer(@NonNull PlayerPacket packet) {
         if (ConfigUtil.getDebugOrFalse()) {
             logger.info("Handling packet for " + packet.getUuid() + ".");
         }
@@ -125,11 +125,9 @@ public class GenericMessagingHandler implements MessagingHandler {
             PlayerModel model = service.getOrCreatePlayerModel(packet.getUuid(), packet.getValue());
             service.storeModel(model);
         }
-
-        PacketUtil.queuePacket(packet, fromService);
     }
 
-    private void handleDeletePlayer(@NonNull DeletePlayerPacket packet, @NonNull String fromService) {
+    private void handleDeletePlayer(@NonNull DeletePlayerPacket packet) {
         if (ConfigUtil.getDebugOrFalse()) {
             logger.info("Handling deletion packet for " + packet.getUuid() + ".");
         }
@@ -153,31 +151,29 @@ public class GenericMessagingHandler implements MessagingHandler {
             model.setUuid(packet.getUuid());
             service.deleteModel(model);
         }
-
-        PacketUtil.queuePacket(packet, fromService);
     }
 
-    private void handleMulti(@NonNull MultiPacket packet, @NonNull String fromService) {
+    private void handleMulti(@NonNull MultiPacket packet) {
         if (ConfigUtil.getDebugOrFalse()) {
             logger.info("Handling multi-packet.");
         }
 
         for (Packet p : packet.getPackets()) {
-            handleGenericPacket(p, fromService);
+            handleGenericPacket(p);
         }
     }
 
-    private void handleGenericPacket(@NonNull Packet packet, @NonNull String fromService) {
+    private void handleGenericPacket(@NonNull Packet packet) {
         if (packet instanceof IPPacket) {
-            handleIp((IPPacket) packet, fromService);
+            handleIp((IPPacket) packet);
         } else if (packet instanceof PlayerPacket) {
-            handlePlayer((PlayerPacket) packet, fromService);
+            handlePlayer((PlayerPacket) packet);
         } else if (packet instanceof DeleteIPPacket) {
-            handleDeleteIp((DeleteIPPacket) packet, fromService);
+            handleDeleteIp((DeleteIPPacket) packet);
         } else if (packet instanceof DeletePlayerPacket) {
-            handleDeletePlayer((DeletePlayerPacket) packet, fromService);
+            handleDeletePlayer((DeletePlayerPacket) packet);
         } else if (packet instanceof MultiPacket) {
-            handleMulti((MultiPacket) packet, fromService);
+            handleMulti((MultiPacket) packet);
         }
     }
 
@@ -188,7 +184,7 @@ public class GenericMessagingHandler implements MessagingHandler {
             return true;
         }
         // Double-checked locking
-        synchronized (cacheLock) {
+        synchronized (messageCacheLock) {
             if (Boolean.TRUE.equals(messageCache.getIfPresent(messageId))) {
                 return true;
             }
