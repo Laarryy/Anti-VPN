@@ -7,7 +7,7 @@ import java.io.StringReader;
 import java.util.Properties;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-public class MySQL55StorageService extends AbstractStorageService {
+public class MySQL55StorageService extends AbstractJDBCStorageService {
     private MySQL55StorageService(@NonNull String name) {
         super(name);
     }

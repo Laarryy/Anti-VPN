@@ -7,7 +7,7 @@ import java.io.StringReader;
 import java.util.Properties;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-public class MariaDBStorageService extends AbstractStorageService {
+public class MariaDBStorageService extends AbstractJDBCStorageService {
     private MariaDBStorageService(@NonNull String name) {
         super(name);
     }

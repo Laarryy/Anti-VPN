@@ -8,7 +8,7 @@ import java.io.StringReader;
 import java.util.Properties;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-public class SQLiteStorageService extends AbstractStorageService {
+public class SQLiteStorageService extends AbstractJDBCStorageService {
     private SQLiteStorageService(@NonNull String name) {
         super(name);
     }
