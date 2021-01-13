@@ -2,6 +2,8 @@ package me.egg82.antivpn.events;
 
 import co.aikar.commands.CommandIssuer;
 import inet.ipaddr.IPAddressString;
+
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.List;
@@ -18,6 +20,8 @@ import me.egg82.antivpn.api.platform.BungeePlatform;
 import me.egg82.antivpn.config.CachedConfig;
 import me.egg82.antivpn.config.ConfigUtil;
 import me.egg82.antivpn.hooks.LuckPermsHook;
+import me.egg82.antivpn.services.lookup.PlayerInfo;
+import me.egg82.antivpn.services.lookup.PlayerLookup;
 import me.egg82.antivpn.utils.ValidationUtil;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -65,16 +69,21 @@ public class PlayerEvents extends EventHolder {
         }
 
         if (luckPermsHook.isPresent()) {
-            // LuckPerms is available, run through entire check gambit
-            // TODO: event.getConnection().getUniqueId() is null here - maybe use PlayerLookup?
-            checkPermsPlayer(event, luckPermsHook.get().hasPermission(event.getConnection().getUniqueId(), "avpn.bypass"));
+            UUID uuid = fetchUuid(event.getConnection().getName());
+            if (uuid != null) {
+                // LuckPerms + UUID is available, run through entire check gambit
+                checkPermsPlayer(event, uuid, luckPermsHook.get().hasPermission(uuid, "avpn.bypass"));
+            } else {
+                // LuckPerms is available but UUID is not, only cache data
+                cachePlayer(event, null);
+            }
         } else {
             // LuckPerms is not available, only cache data
-            cachePlayer(event);
+            cachePlayer(event, fetchUuid(event.getConnection().getName()));
         }
     }
 
-    private void checkPermsPlayer(@NonNull PreLoginEvent event, boolean hasBypass) {
+    private void checkPermsPlayer(@NonNull PreLoginEvent event, @NonNull UUID uuid,  boolean hasBypass) {
         if (hasBypass) {
             if (ConfigUtil.getDebugOrFalse()) {
                 console.sendMessage("<c1>" + event.getConnection().getName() + "</c1> <c2>bypasses pre-check. Ignoring.</c2>");
@@ -108,19 +117,16 @@ public class PlayerEvents extends EventHolder {
             }
         }
 
-        // TODO: event.getConnection().getUniqueId() is null here - maybe use PlayerLookup?
-        cacheData(ip, event.getConnection().getUniqueId(), cachedConfig);
+        cacheData(ip, uuid, cachedConfig);
 
         if (isVpn(ip, event.getConnection().getName(), cachedConfig)) {
             AntiVPN.incrementBlockedVPNs();
             IPManager ipManager = VPNAPIProvider.getInstance().getIpManager();
-            // TODO: event.getConnection().getUniqueId() is null here - maybe use PlayerLookup?
-            List<String> commands = ipManager.getVpnCommands(event.getConnection().getName(), event.getConnection().getUniqueId(), ip);
+            List<String> commands = ipManager.getVpnCommands(event.getConnection().getName(), uuid, ip);
             for (String command : commands) {
                 ProxyServer.getInstance().getPluginManager().dispatchCommand(ProxyServer.getInstance().getConsole(), command);
             }
-            // TODO: event.getConnection().getUniqueId() is null here - maybe use PlayerLookup?
-            String kickMessage = ipManager.getVpnKickMessage(event.getConnection().getName(), event.getConnection().getUniqueId(), ip);
+            String kickMessage = ipManager.getVpnKickMessage(event.getConnection().getName(), uuid, ip);
             if (kickMessage != null) {
                 event.setCancelled(true);
                 event.setCancelReason(TextComponent.fromLegacyText(kickMessage));
@@ -130,13 +136,11 @@ public class PlayerEvents extends EventHolder {
         if (isMcLeaks(event.getConnection().getName(), event.getConnection().getUniqueId(), cachedConfig)) {
             AntiVPN.incrementBlockedMCLeaks();
             PlayerManager playerManager = VPNAPIProvider.getInstance().getPlayerManager();
-            // TODO: event.getConnection().getUniqueId() is null here - maybe use PlayerLookup?
-            List<String> commands = playerManager.getMcLeaksCommands(event.getConnection().getName(), event.getConnection().getUniqueId(), ip);
+            List<String> commands = playerManager.getMcLeaksCommands(event.getConnection().getName(), uuid, ip);
             for (String command : commands) {
                 ProxyServer.getInstance().getPluginManager().dispatchCommand(ProxyServer.getInstance().getConsole(), command);
             }
-            // TODO: event.getConnection().getUniqueId() is null here - maybe use PlayerLookup?
-            String kickMessage = playerManager.getMcLeaksKickMessage(event.getConnection().getName(), event.getConnection().getUniqueId(), ip);
+            String kickMessage = playerManager.getMcLeaksKickMessage(event.getConnection().getName(), uuid, ip);
             if (kickMessage != null) {
                 event.setCancelled(true);
                 event.setCancelReason(TextComponent.fromLegacyText(kickMessage));
@@ -144,7 +148,11 @@ public class PlayerEvents extends EventHolder {
         }
     }
 
-    private void cachePlayer(@NonNull PreLoginEvent event) {
+    private void cachePlayer(@NonNull PreLoginEvent event, UUID uuid) {
+        if (uuid == null) {
+            return;
+        }
+
         String ip = getIp(event.getConnection().getAddress());
         if (ip == null || ip.isEmpty()) {
             return;
@@ -166,8 +174,7 @@ public class PlayerEvents extends EventHolder {
             }
         }
 
-        // TODO: event.getConnection().getUniqueId() is null here - maybe use PlayerLookup?
-        cacheData(ip, event.getConnection().getUniqueId(), cachedConfig);
+        cacheData(ip, uuid, cachedConfig);
     }
 
     private void cacheData(@NonNull String ip, @NonNull UUID uuid, @NonNull CachedConfig cachedConfig) {
@@ -397,6 +404,17 @@ public class PlayerEvents extends EventHolder {
             return null;
         }
         return host.getHostAddress();
+    }
+
+    private @Nullable UUID fetchUuid(@NonNull String name) {
+        PlayerInfo info;
+        try {
+            info = PlayerLookup.get(name);
+        } catch (IOException ex) {
+            logger.warn("Could not fetch player UUID. (rate-limited?)", ex);
+            return null;
+        }
+        return info.getUUID();
     }
 
     private boolean rangeContains(@NonNull String range, @NonNull String ip) { return new IPAddressString(range).contains(new IPAddressString(ip)); }
