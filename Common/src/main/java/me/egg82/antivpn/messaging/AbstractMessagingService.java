@@ -163,6 +163,9 @@ public abstract class AbstractMessagingService implements MessagingService {
             capacityLock.writeLock().lock();
             if (capacities.size() >= 50) {
                 this.capacity = MathUtil.percentile(capacities, 80.0d);
+                if (ConfigUtil.getDebugOrFalse()) {
+                    logger.info("Set initial capacity to " + this.capacity + " bytes");
+                }
                 capacities.clear();
             }
             capacityLock.writeLock().unlock();
