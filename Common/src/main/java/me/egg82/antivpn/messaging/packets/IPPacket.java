@@ -1,7 +1,8 @@
 package me.egg82.antivpn.messaging.packets;
 
-import java.nio.ByteBuffer;
 import java.util.Objects;
+
+import io.netty.buffer.ByteBuf;
 import me.egg82.antivpn.api.model.ip.AlgorithmMethod;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -14,7 +15,7 @@ public class IPPacket extends AbstractPacket {
 
     public byte getPacketId() { return 0x01; }
 
-    public IPPacket(@NonNull ByteBuffer data) { read(data); }
+    public IPPacket(@NonNull ByteBuf data) { read(data); }
 
     public IPPacket() {
         this.ip = "";
@@ -23,39 +24,39 @@ public class IPPacket extends AbstractPacket {
         this.consensus = null;
     }
 
-    public void read(@NonNull ByteBuffer buffer) {
+    public void read(@NonNull ByteBuf buffer) {
         if (!checkVersion(buffer)) {
             return;
         }
 
-        this.ip = getString(buffer);
-        this.type = getVarInt(buffer);
+        this.ip = readString(buffer);
+        this.type = readVarInt(buffer);
         AlgorithmMethod method = AlgorithmMethod.values()[type];
         if (method == AlgorithmMethod.CASCADE) {
-            this.cascade = getBoolean(buffer);
+            this.cascade = buffer.readBoolean();
         } else {
-            this.consensus = buffer.getDouble();
+            this.consensus = buffer.readDouble();
         }
 
         checkReadPacket(buffer);
     }
 
-    public void write(@NonNull ByteBuffer buffer) {
-        buffer.put(VERSION);
+    public void write(@NonNull ByteBuf buffer) {
+        buffer.writeByte(VERSION);
 
-        putString(this.ip, buffer);
-        putVarInt(this.type, buffer);
+        writeString(this.ip, buffer);
+        writeVarInt(this.type, buffer);
         AlgorithmMethod method = AlgorithmMethod.values()[type];
         if (method == AlgorithmMethod.CASCADE) {
             if (this.cascade == null) {
                 throw new RuntimeException("cascade was selected as type but value is null.");
             }
-            putBoolean(this.cascade, buffer);
+            buffer.writeBoolean(this.cascade);
         } else {
             if (this.consensus == null) {
                 throw new RuntimeException("consensus was selected as type but value is null.");
             }
-            buffer.putDouble(this.consensus);
+            buffer.writeDouble(this.consensus);
         }
     }
 

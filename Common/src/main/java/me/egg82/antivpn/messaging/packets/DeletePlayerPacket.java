@@ -1,8 +1,9 @@
 package me.egg82.antivpn.messaging.packets;
 
-import java.nio.ByteBuffer;
 import java.util.Objects;
 import java.util.UUID;
+
+import io.netty.buffer.ByteBuf;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 public class DeletePlayerPacket extends AbstractPacket {
@@ -10,26 +11,26 @@ public class DeletePlayerPacket extends AbstractPacket {
 
     public byte getPacketId() { return 0x04; }
 
-    public DeletePlayerPacket(@NonNull ByteBuffer data) { read(data); }
+    public DeletePlayerPacket(@NonNull ByteBuf data) { read(data); }
 
     public DeletePlayerPacket() {
         this.uuid = new UUID(0L, 0L);
     }
 
-    public void read(@NonNull ByteBuffer buffer) {
+    public void read(@NonNull ByteBuf buffer) {
         if (!checkVersion(buffer)) {
             return;
         }
 
-        this.uuid = getUUID(buffer);
+        this.uuid = readUUID(buffer);
 
         checkReadPacket(buffer);
     }
 
-    public void write(@NonNull ByteBuffer buffer) {
-        buffer.put(VERSION);
+    public void write(@NonNull ByteBuf buffer) {
+        buffer.writeByte(VERSION);
 
-        putUUID(this.uuid, buffer);
+        writeUUID(this.uuid, buffer);
     }
 
     public @NonNull UUID getUuid() { return uuid; }

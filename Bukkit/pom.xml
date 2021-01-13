@@ -440,6 +440,11 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-buffer</artifactId>
+            <version>${netty.version}</version>
+        </dependency>
+        <dependency>
             <groupId>ninja.egg82</groupId>
             <artifactId>gameanalytics-api</artifactId>
             <version>${gameanalytics.version}</version>

@@ -2,13 +2,14 @@ package me.egg82.antivpn.messaging;
 
 import com.rabbitmq.client.*;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+
+import io.netty.buffer.ByteBuf;
 import me.egg82.antivpn.config.ConfigUtil;
 import me.egg82.antivpn.messaging.packets.Packet;
 import me.egg82.antivpn.utils.PacketUtil;
@@ -26,7 +27,7 @@ public class RabbitMQMessagingService extends AbstractMessagingService {
     private volatile boolean closed = false;
     private final ReadWriteLock queueLock = new ReentrantReadWriteLock();
 
-    private static final String EXCHANGE_NAME = "avpn-data";
+    private static final String EXCHANGE_NAME = "pemu-data";
 
     private RabbitMQMessagingService(@NonNull String name) {
         super(name);
@@ -53,11 +54,14 @@ public class RabbitMQMessagingService extends AbstractMessagingService {
             service = new RabbitMQMessagingService(name);
             service.serverId = serverId;
             service.serverIdString = serverId.toString();
-            byte[] bytes = new byte[16];
-            ByteBuffer buffer = ByteBuffer.wrap(bytes);
-            buffer.putLong(serverId.getMostSignificantBits());
-            service.serverIdBytes = bytes;
-            buffer.putLong(serverId.getLeastSignificantBits());
+            ByteBuf buffer = alloc.buffer(16, 16);
+            try {
+                buffer.writeLong(serverId.getMostSignificantBits());
+                buffer.writeLong(serverId.getLeastSignificantBits());
+                service.serverIdBytes = buffer.array();
+            } finally {
+                buffer.release();
+            }
 
             service.handler = handler;
 
@@ -105,27 +109,35 @@ public class RabbitMQMessagingService extends AbstractMessagingService {
                     return;
                 }
 
-                ByteBuffer b = ByteBuffer.allocateDirect(body.length);
-                b.put(body);
-                ByteBuffer data = decompressData(b);
-
-                byte packetId = data.get();
-                Class<Packet> packetClass = PacketUtil.getPacketCache().get(packetId);
-                if (packetClass == null) {
-                    logger.warn("Got packet ID that doesn't exist: " + packetId);
-                    return;
-                }
-
-                Packet packet;
+                ByteBuf b = alloc.buffer(body.length, body.length);
+                ByteBuf data = null;
                 try {
-                    packet = packetClass.newInstance();
-                } catch (IllegalAccessException | InstantiationException | ExceptionInInitializerError | SecurityException ex) {
-                    logger.error("Could not instantiate packet.", ex);
-                    return;
-                }
-                packet.read(data);
+                    b.writeBytes(body);
+                    data = decompressData(b);
 
-                handler.handlePacket(UUID.fromString(properties.getMessageId()), getName(), packet);
+                    byte packetId = data.readByte();
+                    Class<Packet> packetClass = PacketUtil.getPacketCache().get(packetId);
+                    if (packetClass == null) {
+                        logger.warn("Got packet ID that doesn't exist: " + packetId);
+                        return;
+                    }
+
+                    Packet packet;
+                    try {
+                        packet = packetClass.newInstance();
+                    } catch (IllegalAccessException | InstantiationException | ExceptionInInitializerError | SecurityException ex) {
+                        logger.error("Could not instantiate packet.", ex);
+                        return;
+                    }
+                    packet.read(data);
+
+                    handler.handlePacket(UUID.fromString(properties.getMessageId()), getName(), packet);
+                } finally {
+                    b.release();
+                    if (data != null) {
+                        data.release();
+                    }
+                }
             }
         };
         channel.addShutdownListener(cause -> {
@@ -141,13 +153,18 @@ public class RabbitMQMessagingService extends AbstractMessagingService {
     public void sendPacket(@NonNull UUID messageId, @NonNull Packet packet) throws IOException, TimeoutException {
         queueLock.readLock().lock();
         try (RecoverableChannel channel = getChannel()) {
-            ByteBuffer buffer = ByteBuffer.allocateDirect(8 * 1024); // 8 KB
-            buffer.put(packet.getPacketId());
-            packet.write(buffer);
+            ByteBuf buffer = alloc.buffer(getInitialCapacity());
+            try {
+                buffer.writeByte(packet.getPacketId());
+                packet.write(buffer);
+                addCapacity(buffer.writerIndex());
 
-            AMQP.BasicProperties properties = getProperties(DeliveryMode.PERSISTENT, messageId);
-            channel.exchangeDeclare(EXCHANGE_NAME, ExchangeType.FANOUT.getType(), true);
-            channel.basicPublish(EXCHANGE_NAME, "", properties, compressData(buffer));
+                AMQP.BasicProperties properties = getProperties(DeliveryMode.PERSISTENT, messageId);
+                channel.exchangeDeclare(EXCHANGE_NAME, ExchangeType.FANOUT.getType(), true);
+                channel.basicPublish(EXCHANGE_NAME, "", properties, compressData(buffer));
+            } finally {
+                buffer.release();
+            }
         } catch (IOException | TimeoutException ex) {
             queueLock.readLock().unlock();
             throw ex;
@@ -168,8 +185,15 @@ public class RabbitMQMessagingService extends AbstractMessagingService {
     }
 
     private boolean validateProperties(AMQP.BasicProperties properties) {
-        ByteBuffer buffer = ByteBuffer.wrap((byte[]) properties.getHeaders().get("sender"));
-        UUID sender = new UUID(buffer.getLong(), buffer.getLong());
+        byte[] data = (byte[]) properties.getHeaders().get("sender");
+        ByteBuf buffer = alloc.buffer(16, 16);
+        UUID sender;
+        try {
+            buffer.writeBytes(data);
+            sender = new UUID(buffer.readLong(), buffer.readLong());
+        } finally {
+            buffer.release();
+        }
         if (serverId.equals(sender)) {
             return false;
         }

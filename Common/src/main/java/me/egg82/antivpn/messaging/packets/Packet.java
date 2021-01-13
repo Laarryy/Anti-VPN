@@ -1,7 +1,8 @@
 package me.egg82.antivpn.messaging.packets;
 
 import java.io.Serializable;
-import java.nio.ByteBuffer;
+
+import io.netty.buffer.ByteBuf;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 public interface Packet extends Serializable {
@@ -9,6 +10,6 @@ public interface Packet extends Serializable {
 
     byte getPacketId();
 
-    void read(@NonNull ByteBuffer buffer);
-    void write(@NonNull ByteBuffer buffer);
+    void read(@NonNull ByteBuf buffer);
+    void write(@NonNull ByteBuf buffer);
 }

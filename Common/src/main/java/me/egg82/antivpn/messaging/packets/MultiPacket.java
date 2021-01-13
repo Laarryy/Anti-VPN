@@ -1,24 +1,29 @@
 package me.egg82.antivpn.messaging.packets;
 
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufAllocator;
+import io.netty.buffer.PooledByteBufAllocator;
 import me.egg82.antivpn.utils.PacketUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 public class MultiPacket extends AbstractPacket {
+    private static final ByteBufAllocator alloc = PooledByteBufAllocator.DEFAULT;
+
     private List<Packet> packets;
 
     public byte getPacketId() { return 0x21; }
 
-    public MultiPacket(@NonNull ByteBuffer data) { read(data); }
+    public MultiPacket(@NonNull ByteBuf data) { read(data); }
 
     public MultiPacket() {
         this.packets = new ArrayList<>();
     }
 
-    public void read(@NonNull ByteBuffer buffer) {
+    public void read(@NonNull ByteBuf buffer) {
         if (!checkVersion(buffer)) {
             return;
         }
@@ -26,15 +31,15 @@ public class MultiPacket extends AbstractPacket {
         this.packets.clear();
 
         byte nextPacket;
-        while (buffer.remaining() > 0 && (nextPacket = buffer.get()) != 0x00) { // Seek end of multi-packet or end of buffer
+        while (buffer.readableBytes() > 0 && (nextPacket = buffer.readByte()) != 0x00) { // Seek end of multi-packet or end of buffer
             Class<Packet> packetClass = PacketUtil.getPacketCache().get(nextPacket);
             if (packetClass == null) {
                 logger.warn("Got packet ID that doesn't exist: " + nextPacket);
                 continue;
             }
 
-            byte[] packetData = new byte[buffer.getInt()]; // Create packet data array with packet length given
-            buffer.get(packetData);
+            byte[] packetData = new byte[buffer.readInt()]; // Create packet data array with packet length given
+            buffer.readBytes(packetData);
 
             Packet packet;
             try {
@@ -43,7 +48,13 @@ public class MultiPacket extends AbstractPacket {
                 logger.error("Could not instantiate packet " + packetClass.getSimpleName() + ".", ex);
                 continue;
             }
-            packet.read(ByteBuffer.wrap(packetData));
+            ByteBuf packetBuf = alloc.buffer(packetData.length, packetData.length);
+            try {
+                packetBuf.writeBytes(packetData);
+                packet.read(packetBuf);
+            } finally {
+                packetBuf.release();
+            }
 
             packets.add(packet);
         }
@@ -51,11 +62,11 @@ public class MultiPacket extends AbstractPacket {
         checkReadPacket(buffer);
     }
 
-    public void write(@NonNull ByteBuffer buffer) {
-        buffer.put(VERSION);
+    public void write(@NonNull ByteBuf buffer) {
+        buffer.writeByte(VERSION);
 
         if (packets.isEmpty()) {
-            buffer.put((byte) 0x00); // End of multi-packet
+            buffer.writeByte((byte) 0x00); // End of multi-packet
             return;
         }
 
@@ -64,14 +75,14 @@ public class MultiPacket extends AbstractPacket {
                 continue;
             }
 
-            buffer.put(packet.getPacketId()); // Write packet ID
-            int start = buffer.position();
-            buffer.position(start + 4); // Make room for an int at the head
+            buffer.writeByte(packet.getPacketId()); // Write packet ID
+            int start = buffer.writerIndex();
+            buffer.writeInt(0); // Make room for an int at the head
             packet.write(buffer);
-            buffer.putInt(start, buffer.position() - start - 4); // Write the packet length to the int at the head
+            buffer.setInt(start, buffer.writerIndex() - start - 4); // Write the packet length to the int at the head
         }
 
-        buffer.put((byte) 0x00); // End of multi-packet
+        buffer.writeByte((byte) 0x00); // End of multi-packet
     }
 
     public @NonNull List<Packet> getPackets() { return packets; }
@@ -89,7 +100,7 @@ public class MultiPacket extends AbstractPacket {
 
     public String toString() {
         return "MultiPacket{" +
-                "packets=" + packets +
-                '}';
+            "packets=" + packets +
+            '}';
     }
 }
