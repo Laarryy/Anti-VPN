@@ -156,6 +156,6 @@
         <module>Common</module>
         <module>Bukkit</module>
         <module>Bungee</module>
-        <!--<module>Velocity</module>-->
+        <module>Velocity</module>
     </modules>
 </project>

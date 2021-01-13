@@ -220,7 +220,7 @@ public class BungeeBootstrap extends Plugin {
     }
 
     private void buildInjectWait(Artifact.Builder builder, @NonNull File jarsDir, @NonNull URLClassLoader classLoader, @NonNull String friendlyName, int depth) {
-        Exception lastEx = null;
+        Exception lastEx;
         try {
             injectArtifact(builder.build(), jarsDir, classLoader, friendlyName, depth, null);
             return;

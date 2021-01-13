@@ -56,16 +56,72 @@
                 <configuration>
                     <relocations>
                         <relocation>
+                            <pattern>annotated-jdk</pattern>
+                            <shadedPattern>me.egg82.antivpn.external.annotated-jdk</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>annotator</pattern>
+                            <shadedPattern>me.egg82.antivpn.external.annotator</shadedPattern>
+                        </relocation>
+                        <relocation>
                             <pattern>com.github.benmanes.caffeine</pattern>
                             <shadedPattern>me.egg82.antivpn.external.com.github.benmanes.caffeine</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>com.rabbitmq</pattern>
+                            <shadedPattern>me.egg82.antivpn.external.com.rabbitmq</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>inet.ipaddr</pattern>
+                            <shadedPattern>me.egg82.antivpn.external.inet.ipaddr</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>io.ebean</pattern>
+                            <shadedPattern>me.egg82.antivpn.external.io.ebean</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>io.ebeaninternal</pattern>
+                            <shadedPattern>me.egg82.antivpn.external.io.ebeaninternal</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>io.ebeanservice</pattern>
+                            <shadedPattern>me.egg82.antivpn.external.io.ebeanservice</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>it.unimi.dsi.fastutil</pattern>
+                            <shadedPattern>me.egg82.antivpn.external.it.unimi.dsi.fastutil</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>javassist</pattern>
+                            <shadedPattern>me.egg82.antivpn.external.javassist</shadedPattern>
                         </relocation>
                         <relocation>
                             <pattern>me.lucko.jarrelocator</pattern>
                             <shadedPattern>me.egg82.antivpn.external.me.lucko.jarrelocator</shadedPattern>
                         </relocation>
                         <relocation>
+                            <pattern>me.gong.mcleaks</pattern>
+                            <shadedPattern>me.egg82.antivpn.external.me.gong.mcleaks</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>okhttp</pattern>
+                            <shadedPattern>me.egg82.antivpn.external.okhttp</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>okio</pattern>
+                            <shadedPattern>me.egg82.antivpn.external.okio</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>org.checkerframework</pattern>
+                            <shadedPattern>me.egg82.antivpn.external.org.checkerframework</shadedPattern>
+                        </relocation>
+                        <relocation>
                             <pattern>org.bstats</pattern>
                             <shadedPattern>me.egg82.antivpn.external.org.bstats</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>org.jmlspecs</pattern>
+                            <shadedPattern>me.egg82.antivpn.external.org.jmlspecs</shadedPattern>
                         </relocation>
                         <relocation>
                             <pattern>ninja.egg82.maven</pattern>
@@ -90,6 +146,18 @@
                                 <include>ninja.egg82.utils.XMLUtil</include>
                             </includes>
                         </relocation>
+                        <relocation>
+                            <pattern>org.spongepowered.configurate</pattern>
+                            <shadedPattern>me.egg82.antivpn.external.org.spongepowered.configurate</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>redis.clients.jedis</pattern>
+                            <shadedPattern>me.egg82.antivpn.external.redis.clients.jedis</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>scenelib</pattern>
+                            <shadedPattern>me.egg82.antivpn.external.scenelib</shadedPattern>
+                        </relocation>
                     </relocations>
                 </configuration>
                 <executions>
@@ -110,42 +178,28 @@
                                     <excludes>
                                         <!-- included or useless -->
                                         <exclude>LICENSE*</exclude>
+                                        <exclude>NOTICE*</exclude>
+                                        <exclude>README*</exclude>
+                                        <exclude>META-INF/LICENSE*</exclude>
+                                        <exclude>META-INF/NOTICE*</exclude>
+                                        <exclude>META-INF/README*</exclude>
+                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>META-INF/*.DSA</exclude>
+                                        <exclude>META-INF/*.RSA</exclude>
                                         <exclude>junit/**</exclude>
                                         <exclude>org/intellij/**</exclude>
                                         <exclude>org/junit/**</exclude>
                                         <exclude>org/hamcrest/**</exclude>
+                                        <exclude>ebean.mf</exclude>
 
-                                        <!-- dep-injected -->
-                                        <!-- mvn dependency:tree -->
-                                        <exclude>com/github/benmanes/caffeine/**</exclude>
-                                        <exclude>com/google/common/**</exclude> <!-- included with many things -->
-                                        <exclude>com/google/errorprone/annotations/**</exclude> <!-- included with guava -->
-                                        <exclude>com/google/j2objc/annotations/**</exclude> <!-- included with guava -->
-                                        <exclude>com/google/thirdparty/publicsuffix/**</exclude> <!-- included with guava -->
-                                        <exclude>com/rabbitmq/**</exclude>
-                                        <exclude>com/zaxxer/hikari/**</exclude> <!-- included with easy-sql -->
-                                        <exclude>me/gong/mcleaks/**</exclude>
-                                        <exclude>inet/ipaddr/**</exclude>
-                                        <exclude>javassist/**</exclude>
-                                        <exclude>javax/annotation/**</exclude>
-                                        <exclude>ninja/egg82/analytics/**</exclude>
-                                        <exclude>ninja/egg82/configuration/**</exclude>
-                                        <exclude>ninja/egg82/core/**</exclude> <!-- included with easy-sql -->
-                                        <exclude>ninja/egg82/json/**</exclude>
-                                        <exclude>ninja/egg82/reflect/**</exclude>
-                                        <exclude>ninja/egg82/service/**</exclude>
-                                        <exclude>ninja/egg82/sql/**</exclude>
-                                        <exclude>ninja/leaping/configurate/**</exclude>
-                                        <exclude>okio/**</exclude> <!-- included with mcleaks-api -->
-                                        <exclude>okhttp3/**</exclude> <!-- included with mcleaks-api -->
-                                        <exclude>org/apache/commons/pool2/**</exclude> <!-- included with jedis -->
-                                        <exclude>org/checkerframework/**</exclude> <!-- included with configurate-core -->
-                                        <exclude>org/codehaus/mojo/animal_sniffer/**</exclude> <!-- included with guava -->
-                                        <exclude>org/json/simple/**</exclude> <!-- included with gameanalytics-api/json-web -->
-                                        <exclude>org/reflections/**</exclude> <!-- included with reflection-utils -->
-                                        <exclude>redis/clients/jedis/**</exclude>
-                                        <exclude>rabbitmq-amqp-client.properties</exclude> <!-- included with rabbitmq -->
-                                        <exclude>version.properties</exclude> <!-- included with rabbitmq -->
+                                        <!-- dep injected (keep this to as few as possible) -->
+                                        <exclude>io/ebeaninternal/api/**</exclude>
+                                        <exclude>io/ebeaninternal/json/**</exclude>
+                                        <exclude>io/ebeaninternal/server/**</exclude>
+                                        <exclude>io/ebeaninternal/util/**</exclude>
+                                        <exclude>io/ebeanservice/**</exclude>
+
+                                        <axclude>redis/clients/jedis/**</axclude>
                                     </excludes>
                                 </filter>
                                 <filter>
@@ -194,6 +248,16 @@
             <id>CodeMC</id>
             <url>https://repo.codemc.org/repository/maven-public</url>
         </repository>
+
+        <repository>
+            <id>mcleaks</id>
+            <url>https://nexus.wesjd.net/repository/thirdparty/</url>
+        </repository>
+
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -208,19 +272,17 @@
             <groupId>co.aikar</groupId>
             <artifactId>acf-velocity</artifactId>
             <version>${acf.version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>ninja.egg82</groupId>
             <artifactId>event-chain-velocity</artifactId>
             <version>${eventchain.version}</version>
-            <scope>provided</scope>
         </dependency>
+
         <dependency>
             <groupId>ninja.egg82</groupId>
             <artifactId>service-locator</artifactId>
             <version>${servicelocator.version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>ninja.egg82</groupId>
@@ -239,12 +301,140 @@
             <version>${plan.version}</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>net.luckperms</groupId>
+            <artifactId>api</artifactId>
+            <version>${luckperms.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>me.gong</groupId>
+            <artifactId>mcleaks-api</artifactId>
+            <version>${mcleaks.version}</version>
+            <scope>provided</scope>
+        </dependency>
 
         <dependency>
             <groupId>me.egg82</groupId>
             <artifactId>antivpn-common</artifactId>
         </dependency>
+        <dependency>
+            <groupId>me.egg82</groupId>
+            <artifactId>antivpn-api</artifactId>
+        </dependency>
 
+        <!-- common -->
+        <dependency>
+            <groupId>ninja.egg82</groupId>
+            <artifactId>reflection-utils</artifactId>
+            <version>${reflectionutils.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.spongepowered</groupId>
+            <artifactId>configurate-yaml</artifactId>
+            <version>${configurate.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.ebean</groupId>
+            <artifactId>ebean-core</artifactId>
+            <version>${ebean.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.ebean</groupId>
+            <artifactId>ebean-querybean</artifactId>
+            <version>${ebean.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.ebean</groupId>
+            <artifactId>querybean-generator</artifactId>
+            <version>${ebean.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+            <version>${hikari.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>redis.clients</groupId>
+            <artifactId>jedis</artifactId>
+            <version>${jedis.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.rabbitmq</groupId>
+            <artifactId>amqp-client</artifactId>
+            <version>${rabbitmq.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.luben</groupId>
+            <artifactId>zstd-jni</artifactId>
+            <version>${zstd.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${guava.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>it.unimi.dsi</groupId>
+            <artifactId>fastutil</artifactId>
+            <version>${fastutil.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.ben-manes.caffeine</groupId>
+            <artifactId>caffeine</artifactId>
+            <version>${caffeine.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.seancfoley</groupId>
+            <artifactId>ipaddress</artifactId>
+            <version>${ipaddress.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>ninja.egg82</groupId>
+            <artifactId>gameanalytics-api</artifactId>
+            <version>${gameanalytics.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.xerial</groupId>
+            <artifactId>sqlite-jdbc</artifactId>
+            <version>${sqlite.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>${mysql.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- API -->
+        <dependency>
+            <groupId>org.checkerframework</groupId>
+            <artifactId>checker</artifactId>
+            <version>${checkerframework.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.sf.flexjson</groupId>
+            <artifactId>flexjson</artifactId>
+            <version>${flexjson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>net.engio</groupId>
+            <artifactId>mbassador</artifactId>
+            <version>${mbassador.version}</version>
+        </dependency>
+
+        <!-- testing -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
