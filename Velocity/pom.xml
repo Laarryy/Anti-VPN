@@ -171,6 +171,7 @@
                             <minimizeJar>false</minimizeJar>
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
                             </transformers>
                             <filters>
                                 <filter>
@@ -191,6 +192,9 @@
                                         <exclude>org/junit/**</exclude>
                                         <exclude>org/hamcrest/**</exclude>
                                         <exclude>ebean.mf</exclude>
+
+                                        <exclude>org/yaml/snakeyaml/**</exclude>
+                                        <exclude>org/slf4j/**</exclude>
 
                                         <!-- dep injected (keep this to as few as possible) -->
                                         <exclude>io/ebeaninternal/api/**</exclude>
