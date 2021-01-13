@@ -2,33 +2,23 @@ package me.egg82.antivpn.commands.internal;
 
 import co.aikar.commands.CommandIssuer;
 import com.velocitypowered.api.proxy.ProxyServer;
-import java.io.IOException;
-import java.util.Optional;
 import java.util.UUID;
-import me.egg82.antivpn.api.APIException;
+import java.util.concurrent.CompletionException;
+
 import me.egg82.antivpn.api.VPNAPIProvider;
 import me.egg82.antivpn.api.model.ip.AlgorithmMethod;
-import me.egg82.antivpn.config.CachedConfig;
+import me.egg82.antivpn.api.model.ip.IPManager;
+import me.egg82.antivpn.api.model.player.PlayerManager;
 import me.egg82.antivpn.config.ConfigUtil;
 import me.egg82.antivpn.lang.Message;
-import me.egg82.antivpn.services.lookup.PlayerInfo;
-import me.egg82.antivpn.services.lookup.PlayerLookup;
 import me.egg82.antivpn.utils.ValidationUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
-public class CheckCommand implements Runnable {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
-
-    private final CommandIssuer issuer;
-    private final ProxyServer proxy;
+public class CheckCommand extends AbstractCommand {
     private final String type;
 
-    private final VPNAPI api = VPNAPIProvider.getInstance();
-
-    public CheckCommand(CommandIssuer issuer, ProxyServer proxy, String type) {
-        this.issuer = issuer;
-        this.proxy = proxy;
+    public CheckCommand(@NonNull ProxyServer proxy, @NonNull CommandIssuer issuer, @NonNull String type) {
+        super(proxy, issuer);
         this.type = type;
     }
 
@@ -36,73 +26,71 @@ public class CheckCommand implements Runnable {
         issuer.sendInfo(Message.CHECK__BEGIN, "{type}", type);
 
         if (ValidationUtil.isValidIp(type)) {
-            Optional<CachedConfig> cachedConfig = ConfigUtil.getCachedConfig();
-            if (!cachedConfig.isPresent()) {
-                logger.error("Cached config could not be fetched.");
-                issuer.sendError(Message.ERROR__INTERNAL);
-                return;
-            }
-
-            if (cachedConfig.get().getVPNAlgorithmMethod() == AlgorithmMethod.CONSESNSUS) {
-                try {
-                    issuer.sendInfo(api.consensus(type) >= cachedConfig.get().getVPNAlgorithmConsensus() ? Message.CHECK__VPN_DETECTED : Message.CHECK__NO_VPN_DETECTED);
-                    return;
-                } catch (APIException ex) {
-                    if (cachedConfig.get().getDebug()) {
-                        logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
-                    } else {
-                        logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage());
-                    }
-                }
-            } else {
-                try {
-                    issuer.sendInfo(api.cascade(type) ? Message.CHECK__VPN_DETECTED : Message.CHECK__NO_VPN_DETECTED);
-                    return;
-                } catch (APIException ex) {
-                    if (cachedConfig.get().getDebug()) {
-                        logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
-                    } else {
-                        logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage());
-                    }
-                }
-            }
-            issuer.sendError(Message.ERROR__INTERNAL);
+            checkIp(type);
         } else {
-            UUID playerID = getPlayerUUID(type, proxy);
-            if (playerID == null) {
-                issuer.sendError(Message.ERROR__INTERNAL);
-                return;
-            }
-
-            Optional<CachedConfig> cachedConfig = ConfigUtil.getCachedConfig();
-            if (!cachedConfig.isPresent()) {
-                logger.error("Cached config could not be fetched.");
-                issuer.sendError(Message.ERROR__INTERNAL);
-                return;
-            }
-
-            try {
-                issuer.sendInfo(api.isMCLeaks(playerID) ? Message.CHECK__MCLEAKS_DETECTED : Message.CHECK__NO_MCLEAKS_DETECTED);
-                return;
-            } catch (APIException ex) {
-                if (cachedConfig.get().getDebug()) {
-                    logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage(), ex);
-                } else {
-                    logger.error("[Hard: " + ex.isHard() + "] " + ex.getMessage());
-                }
-            }
-            issuer.sendError(Message.ERROR__INTERNAL);
+            checkPlayer(type);
         }
     }
 
-    private UUID getPlayerUUID(String name, ProxyServer proxy) {
-        PlayerInfo info;
-        try {
-            info = PlayerLookup.get(name, proxy);
-        } catch (IOException ex) {
-            logger.warn("Could not fetch player UUID. (rate-limited?)", ex);
-            return null;
+    private void checkIp(@NonNull String ip) {
+        IPManager ipManager = VPNAPIProvider.getInstance().getIpManager();
+
+        if (ipManager.getCurrentAlgorithmMethod() == AlgorithmMethod.CONSESNSUS) {
+            try {
+                issuer.sendInfo(ipManager.consensus(ip, true)
+                    .exceptionally(this::handleException)
+                    .join() >= ipManager.getMinConsensusValue() ? Message.CHECK__VPN_DETECTED : Message.CHECK__NO_VPN_DETECTED);
+                return;
+            } catch (CompletionException ignored) { }
+            catch (Exception ex) {
+                if (ConfigUtil.getDebugOrFalse()) {
+                    logger.error(ex.getMessage(), ex);
+                } else {
+                    logger.error(ex.getMessage());
+                }
+            }
+        } else {
+            try {
+                issuer.sendInfo(ipManager.cascade(ip, true)
+                    .exceptionally(this::handleException)
+                    .join() ? Message.CHECK__VPN_DETECTED : Message.CHECK__NO_VPN_DETECTED);
+                return;
+            } catch (CompletionException ignored) { }
+            catch (Exception ex) {
+                if (ConfigUtil.getDebugOrFalse()) {
+                    logger.error(ex.getMessage(), ex);
+                } else {
+                    logger.error(ex.getMessage());
+                }
+            }
         }
-        return info.getUUID();
+
+        issuer.sendError(Message.ERROR__INTERNAL);
+    }
+
+    private void checkPlayer(@NonNull String playerName) {
+        PlayerManager playerManager = VPNAPIProvider.getInstance().getPlayerManager();
+
+        UUID uuid = fetchUuid(playerName);
+        if (uuid == null) {
+            issuer.sendError(Message.ERROR__INTERNAL);
+            return;
+        }
+
+        try {
+            issuer.sendInfo(playerManager.checkMcLeaks(uuid, true)
+                .exceptionally(this::handleException)
+                .join() ? Message.CHECK__MCLEAKS_DETECTED : Message.CHECK__NO_MCLEAKS_DETECTED);
+            return;
+        } catch (CompletionException ignored) { }
+        catch (Exception ex) {
+            if (ConfigUtil.getDebugOrFalse()) {
+                logger.error(ex.getMessage(), ex);
+            } else {
+                logger.error(ex.getMessage());
+            }
+        }
+
+        issuer.sendError(Message.ERROR__INTERNAL);
     }
 }

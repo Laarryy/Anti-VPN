@@ -8,38 +8,27 @@ import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.plugin.PluginDescription;
 import com.velocitypowered.api.proxy.ProxyServer;
 import me.egg82.antivpn.commands.internal.*;
-import me.egg82.antivpn.services.StorageMessagingHandler;
-import ninja.egg82.service.ServiceLocator;
-import ninja.egg82.service.ServiceNotFoundException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.checkerframework.checker.nullness.qual.NonNull;
+
+import java.io.File;
 
 @CommandAlias("antivpn|avpn")
 public class AntiVPNCommand extends BaseCommand {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
-
-    private final Object plugin;
     private final ProxyServer proxy;
-    private final PluginDescription pluginDescription;
+    private final PluginDescription description;
+    private final CommandIssuer console;
 
-    public AntiVPNCommand(Object plugin, ProxyServer proxy, PluginDescription description) {
-        this.plugin = plugin;
+    public AntiVPNCommand(@NonNull ProxyServer proxy, @NonNull PluginDescription description, @NonNull CommandIssuer console) {
         this.proxy = proxy;
-        this.pluginDescription = description;
+        this.description = description;
+        this.console = console;
     }
 
     @Subcommand("reload")
     @CommandPermission("avpn.admin")
     @Description("{@@description.reload}")
-    public void onReload(CommandIssuer issuer) {
-        StorageMessagingHandler handler;
-        try {
-            handler = ServiceLocator.get(StorageMessagingHandler.class);
-        } catch (InstantiationException | IllegalAccessException | ServiceNotFoundException ex) {
-            logger.error(ex.getMessage(), ex);
-            return;
-        }
-        new ReloadCommand(plugin, proxy, pluginDescription, handler, issuer).run();
+    public void onReload(@NonNull CommandIssuer issuer) {
+        new ReloadCommand(proxy, issuer, new File(description.getSource().get().getParent().toFile(), description.getName().get()), console).run();
     }
 
     @Subcommand("import")
@@ -47,8 +36,17 @@ public class AntiVPNCommand extends BaseCommand {
     @Description("{@@description.import}")
     @Syntax("<master> <slave> [batchSize]")
     @CommandCompletion("@storage @storage @nothing")
-    public void onImport(CommandIssuer issuer, @Conditions("storage") String master, @Conditions("storage") String slave, @Default("50") String batchSize) {
-        new ImportCommand(issuer, master, slave, batchSize).run();
+    public void onImport(@NonNull CommandIssuer issuer, @NonNull @Conditions("storage") String master, @NonNull @Conditions("storage") String slave, @Default("50") String batchSize) {
+        new ImportCommand(proxy, issuer, master, slave, batchSize).run();
+    }
+
+    @Subcommand("kick")
+    @CommandPermission("avpn.admin")
+    @Description("{@@description.kick}")
+    @Syntax("<player> [type]")
+    @CommandCompletion("@player @type")
+    public void onKick(@NonNull CommandIssuer issuer, @NonNull String player, @Default("vpn") String type) {
+        new KickCommand(proxy, issuer, player, type).run();
     }
 
     @Subcommand("test")
@@ -56,8 +54,8 @@ public class AntiVPNCommand extends BaseCommand {
     @Description("{@@description.test}")
     @Syntax("<ip>")
     @CommandCompletion("@nothing")
-    public void onTest(CommandIssuer issuer, @Conditions("ip") String ip) {
-        new TestCommand(issuer, ip).run();
+    public void onTest(@NonNull CommandIssuer issuer, @NonNull @Conditions("ip") String ip) {
+        new TestCommand(proxy, issuer, ip).run();
     }
 
     @Subcommand("score")
@@ -65,8 +63,8 @@ public class AntiVPNCommand extends BaseCommand {
     @Description("{@@description.score}")
     @Syntax("<source>")
     @CommandCompletion("@source @nothing")
-    public void onScore(CommandIssuer issuer, @Conditions("source") String source) {
-        new ScoreCommand(issuer, source).run();
+    public void onScore(@NonNull CommandIssuer issuer, @NonNull @Conditions("source") String source) {
+        new ScoreCommand(proxy, issuer, source).run();
     }
 
     @Subcommand("check")
@@ -74,17 +72,17 @@ public class AntiVPNCommand extends BaseCommand {
     @Description("{@@description.check}")
     @Syntax("<ip|player>")
     @CommandCompletion("@player @nothing")
-    public void onCheck(CommandIssuer issuer, String type) {
-        new CheckCommand(issuer, proxy, type).run();
+    public void onCheck(@NonNull CommandIssuer issuer, @NonNull String type) {
+        new CheckCommand(proxy, issuer, type).run();
     }
 
     @CatchUnknown @Default
     @CommandCompletion("@subcommand")
-    public void onDefault(CommandSource source, String[] args) {
-        proxy.getCommandManager().execute(source, "antivpn help");
+    public void onDefault(@NonNull CommandSource source, String[] args) {
+        proxy.getCommandManager().executeImmediatelyAsync(source, "antivpn help");
     }
 
     @HelpCommand
     @Syntax("[command]")
-    public void onHelp(CommandSource source, CommandHelp help) { help.showHelp(); }
+    public void onHelp(@NonNull CommandSource source, @NonNull CommandHelp help) { help.showHelp(); }
 }
