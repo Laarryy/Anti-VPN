@@ -5,6 +5,8 @@ import com.velocitypowered.api.proxy.ProxyServer;
 import me.egg82.antivpn.api.*;
 import me.egg82.antivpn.api.event.api.GenericAPILoadedEvent;
 import me.egg82.antivpn.api.event.api.GenericAPIReloadEvent;
+import me.egg82.antivpn.api.model.ip.VelocityIPManager;
+import me.egg82.antivpn.api.model.player.VelocityPlayerManager;
 import me.egg82.antivpn.api.model.source.GenericSourceManager;
 import me.egg82.antivpn.config.CachedConfig;
 import me.egg82.antivpn.config.ConfigUtil;
@@ -54,8 +56,8 @@ public class ReloadCommand extends AbstractCommand {
 
         cachedConfig = ConfigUtil.getCachedConfig();
 
-        VelocityIPManager ipManager = new VelocityIPManager(sourceManager, cachedConfig.getCacheTime().getTime(), cachedConfig.getCacheTime().getUnit());
-        VelocityPlayerManager playerManager = new VelocityPlayerManager(cachedConfig.getThreads(), cachedConfig.getMcLeaksKey(), cachedConfig.getCacheTime().getTime(), cachedConfig.getCacheTime().getUnit());
+        VelocityIPManager ipManager = new VelocityIPManager(proxy, sourceManager, cachedConfig.getCacheTime().getTime(), cachedConfig.getCacheTime().getUnit());
+        VelocityPlayerManager playerManager = new VelocityPlayerManager(proxy, cachedConfig.getThreads(), cachedConfig.getMcLeaksKey(), cachedConfig.getCacheTime().getTime(), cachedConfig.getCacheTime().getUnit());
         VPNAPI api = VPNAPIProvider.getInstance();
         api.getEventBus().post(new GenericAPIReloadEvent(api, ipManager, playerManager, sourceManager)).now();
         api = new GenericVPNAPI(api.getPlatform(), api.getPluginMetadata(), ipManager, playerManager, sourceManager, cachedConfig, api.getEventBus());

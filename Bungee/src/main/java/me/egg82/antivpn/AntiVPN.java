@@ -327,7 +327,7 @@ public class AntiVPN {
     }
 
     private void loadTasks() {
-        tasks.add(ProxyServer.getInstance().getScheduler().schedule(plugin, () -> VPNAPIProvider.getInstance().runUpdateTask(), 1L, 1L, TimeUnit.MILLISECONDS).getId());
+        tasks.add(ProxyServer.getInstance().getScheduler().schedule(plugin, () -> VPNAPIProvider.getInstance().runUpdateTask(), 1L, 1L, TimeUnit.SECONDS).getId());
     }
 
     private void loadHooks() {
