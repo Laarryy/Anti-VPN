@@ -309,14 +309,14 @@ public class AntiVPN {
     private void loadHooks() {
         PluginManager manager = proxy.getPluginManager();
 
-        if (manager.getPlugin("Plan").isPresent()) {
+        if (manager.getPlugin("plan").isPresent()) {
             consoleCommandIssuer.sendInfo(Message.GENERAL__HOOK_ENABLE, "{plugin}", "Plan");
             ServiceLocator.register(new PlayerAnalyticsHook(proxy));
         } else {
             consoleCommandIssuer.sendInfo(Message.GENERAL__HOOK_DISABLE, "{plugin}", "Plan");
         }
 
-        if (manager.getPlugin("LuckPerms").isPresent()) {
+        if (manager.getPlugin("luckperms").isPresent()) {
             consoleCommandIssuer.sendInfo(Message.GENERAL__HOOK_ENABLE, "{plugin}", "LuckPerms");
             if (ConfigUtil.getDebugOrFalse()) {
                 consoleCommandIssuer.sendMessage("<c2>Running actions on pre-login.</c2>");
