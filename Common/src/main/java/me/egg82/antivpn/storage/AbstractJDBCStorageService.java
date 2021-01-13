@@ -24,6 +24,10 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
     protected Database connection;
     protected HikariDataSource source;
 
+    protected AbstractJDBCStorageService(@NonNull String name) {
+        super(name);
+    }
+
     public void close() {
         queueLock.writeLock().lock();
         closed = true;
