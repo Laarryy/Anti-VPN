@@ -22,7 +22,7 @@ import redis.clients.jedis.JedisPoolConfig;
 import redis.clients.jedis.exceptions.JedisException;
 
 public class RedisMessagingService extends AbstractMessagingService {
-    private final ExecutorService workPool = Executors.newFixedThreadPool(1, new ThreadFactoryBuilder().setNameFormat("PlayerEmulator-Redis-%d").build());
+    private final ExecutorService workPool = Executors.newFixedThreadPool(1, new ThreadFactoryBuilder().setNameFormat("AntiVPN-Redis-%d").build());
 
     private JedisPool pool;
     private final PubSub pubSub = new PubSub(this);
@@ -30,7 +30,7 @@ public class RedisMessagingService extends AbstractMessagingService {
     private volatile boolean closed = false;
     private final ReadWriteLock queueLock = new ReentrantReadWriteLock();
 
-    private static final String CHANNEL_NAME = "pemu-data";
+    private static final String CHANNEL_NAME = "avpn-data";
     private static final byte[] CHANNEL_NAME_BYTES = CHANNEL_NAME.getBytes(StandardCharsets.UTF_8);
 
     private RedisMessagingService(@NonNull String name) {

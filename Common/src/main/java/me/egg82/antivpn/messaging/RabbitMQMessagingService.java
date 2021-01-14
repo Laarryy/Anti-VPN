@@ -27,7 +27,7 @@ public class RabbitMQMessagingService extends AbstractMessagingService {
     private volatile boolean closed = false;
     private final ReadWriteLock queueLock = new ReentrantReadWriteLock();
 
-    private static final String EXCHANGE_NAME = "pemu-data";
+    private static final String EXCHANGE_NAME = "avpn-data";
 
     private RabbitMQMessagingService(@NonNull String name) {
         super(name);
