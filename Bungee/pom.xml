@@ -422,6 +422,7 @@
             <groupId>io.netty</groupId>
             <artifactId>netty-buffer</artifactId>
             <version>${netty.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>ninja.egg82</groupId>

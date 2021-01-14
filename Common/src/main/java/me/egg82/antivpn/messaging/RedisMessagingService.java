@@ -73,7 +73,12 @@ public class RedisMessagingService extends AbstractMessagingService {
             try {
                 buffer.writeLong(serverId.getMostSignificantBits());
                 buffer.writeLong(serverId.getLeastSignificantBits());
-                service.serverIdBytes = buffer.array();
+                if (buffer.isDirect()) {
+                    service.serverIdBytes = new byte[16];
+                    buffer.readBytes(service.serverIdBytes);
+                } else {
+                    service.serverIdBytes = buffer.array();
+                }
             } finally {
                 buffer.release();
             }
