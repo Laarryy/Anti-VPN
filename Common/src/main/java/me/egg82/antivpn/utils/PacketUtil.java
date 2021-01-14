@@ -85,7 +85,9 @@ public class PacketUtil {
             MultiPacket multi = new MultiPacket();
             Packet packet;
             while ((packet = packetQueue.getReadBuffer().poll()) != null) {
-                multi.getPackets().add(packet);
+                if (!multi.getPackets().add(packet) && ConfigUtil.getDebugOrFalse()) {
+                    logger.info("Skipping duplicate packet " + packet.getClass().getSimpleName());
+                }
             }
 
             if (!multi.getPackets().isEmpty()) {

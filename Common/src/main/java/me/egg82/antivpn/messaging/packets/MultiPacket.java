@@ -4,24 +4,22 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.PooledByteBufAllocator;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedHashSet;
 import java.util.Objects;
+import java.util.Set;
 import me.egg82.antivpn.utils.PacketUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 public class MultiPacket extends AbstractPacket {
     private static final ByteBufAllocator alloc = PooledByteBufAllocator.DEFAULT;
 
-    private List<Packet> packets;
+    private Set<Packet> packets = new LinkedHashSet<>();
 
     public byte getPacketId() { return 0x21; }
 
     public MultiPacket(@NonNull ByteBuf data) { read(data); }
 
-    public MultiPacket() {
-        this.packets = new ArrayList<>();
-    }
+    public MultiPacket() { }
 
     public void read(@NonNull ByteBuf buffer) {
         if (!checkVersion(buffer)) {
@@ -78,9 +76,9 @@ public class MultiPacket extends AbstractPacket {
         buffer.writeByte((byte) 0x00); // End of multi-packet
     }
 
-    public @NonNull List<Packet> getPackets() { return packets; }
+    public @NonNull Set<Packet> getPackets() { return packets; }
 
-    public void setPackets(@NonNull List<Packet> packets) { this.packets = packets; }
+    public void setPackets(@NonNull Set<Packet> packets) { this.packets = packets; }
 
     public boolean equals(Object o) {
         if (this == o) return true;
