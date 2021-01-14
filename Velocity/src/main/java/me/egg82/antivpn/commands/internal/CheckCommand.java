@@ -4,7 +4,6 @@ import co.aikar.commands.CommandIssuer;
 import com.velocitypowered.api.proxy.ProxyServer;
 import java.util.UUID;
 import java.util.concurrent.CompletionException;
-
 import me.egg82.antivpn.api.VPNAPIProvider;
 import me.egg82.antivpn.api.model.ip.AlgorithmMethod;
 import me.egg82.antivpn.api.model.ip.IPManager;

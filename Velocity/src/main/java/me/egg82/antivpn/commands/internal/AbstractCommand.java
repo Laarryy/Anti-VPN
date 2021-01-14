@@ -2,6 +2,9 @@ package me.egg82.antivpn.commands.internal;
 
 import co.aikar.commands.CommandIssuer;
 import com.velocitypowered.api.proxy.ProxyServer;
+import java.io.IOException;
+import java.util.UUID;
+import java.util.concurrent.CompletionException;
 import me.egg82.antivpn.api.APIException;
 import me.egg82.antivpn.config.ConfigUtil;
 import me.egg82.antivpn.services.lookup.PlayerInfo;
@@ -10,10 +13,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.util.UUID;
-import java.util.concurrent.CompletionException;
 
 public abstract class AbstractCommand implements Runnable {
     protected final Logger logger = LoggerFactory.getLogger(getClass());

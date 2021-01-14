@@ -7,10 +7,9 @@ import co.aikar.commands.annotation.*;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.plugin.PluginDescription;
 import com.velocitypowered.api.proxy.ProxyServer;
+import java.io.File;
 import me.egg82.antivpn.commands.internal.*;
 import org.checkerframework.checker.nullness.qual.NonNull;
-
-import java.io.File;
 
 @CommandAlias("antivpn|avpn")
 public class AntiVPNCommand extends BaseCommand {

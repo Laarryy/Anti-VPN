@@ -1,10 +1,9 @@
 package me.egg82.antivpn.services.lookup;
 
 import com.velocitypowered.api.proxy.ProxyServer;
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import java.io.IOException;
 import java.util.UUID;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 public class PlayerLookup {
     private PlayerLookup() { }

@@ -1,11 +1,10 @@
 package me.egg82.antivpn.storage;
 
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public abstract class AbstractStorageService implements StorageService {
     protected final Logger logger = LoggerFactory.getLogger(getClass());

@@ -1,12 +1,11 @@
 package me.egg82.antivpn.api.platform;
 
 import com.google.common.collect.ImmutableSet;
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 public class VelocityPlatform implements Platform {
     private static final Set<UUID> uniquePlayers = new HashSet<>();

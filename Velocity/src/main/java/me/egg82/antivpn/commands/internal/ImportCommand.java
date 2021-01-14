@@ -1,9 +1,8 @@
 package me.egg82.antivpn.commands.internal;
 
 import co.aikar.commands.CommandIssuer;
-import java.util.Set;
-
 import com.velocitypowered.api.proxy.ProxyServer;
+import java.util.Set;
 import me.egg82.antivpn.config.CachedConfig;
 import me.egg82.antivpn.config.ConfigUtil;
 import me.egg82.antivpn.lang.Message;

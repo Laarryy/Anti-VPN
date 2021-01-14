@@ -1,15 +1,15 @@
 package me.egg82.antivpn.messaging;
 
 import com.rabbitmq.client.*;
+import io.netty.buffer.ByteBuf;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-
-import io.netty.buffer.ByteBuf;
 import me.egg82.antivpn.config.ConfigUtil;
 import me.egg82.antivpn.messaging.packets.Packet;
 import me.egg82.antivpn.utils.PacketUtil;
@@ -127,16 +127,11 @@ public class RabbitMQMessagingService extends AbstractMessagingService {
                         return;
                     }
 
-                    Packet packet;
                     try {
-                        packet = packetClass.newInstance();
-                    } catch (IllegalAccessException | InstantiationException | ExceptionInInitializerError | SecurityException ex) {
+                        handler.handlePacket(UUID.fromString(properties.getMessageId()), getName(), packetClass.getConstructor(ByteBuf.class).newInstance(data));
+                    } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException | InstantiationException | ExceptionInInitializerError | SecurityException ex) {
                         logger.error("Could not instantiate packet.", ex);
-                        return;
                     }
-                    packet.read(data);
-
-                    handler.handlePacket(UUID.fromString(properties.getMessageId()), getName(), packet);
                 } finally {
                     b.release();
                     if (data != null) {

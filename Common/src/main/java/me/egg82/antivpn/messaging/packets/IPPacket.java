@@ -1,8 +1,7 @@
 package me.egg82.antivpn.messaging.packets;
 
-import java.util.Objects;
-
 import io.netty.buffer.ByteBuf;
+import java.util.Objects;
 import me.egg82.antivpn.api.model.ip.AlgorithmMethod;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -80,17 +79,17 @@ public class IPPacket extends AbstractPacket {
         if (this == o) return true;
         if (!(o instanceof IPPacket)) return false;
         IPPacket ipPacket = (IPPacket) o;
-        return type == ipPacket.type && Objects.equals(ip, ipPacket.ip) && Objects.equals(cascade, ipPacket.cascade) && Objects.equals(consensus, ipPacket.consensus);
+        return type == ipPacket.type && ip.equals(ipPacket.ip) && Objects.equals(cascade, ipPacket.cascade) && Objects.equals(consensus, ipPacket.consensus);
     }
 
     public int hashCode() { return Objects.hash(ip, type, cascade, consensus); }
 
     public String toString() {
         return "IPPacket{" +
-                "ip='" + ip + '\'' +
-                ", type=" + type +
-                ", cascade=" + cascade +
-                ", consensus=" + consensus +
-                '}';
+            "ip='" + ip + '\'' +
+            ", type=" + type +
+            ", cascade=" + cascade +
+            ", consensus=" + consensus +
+            '}';
     }
 }

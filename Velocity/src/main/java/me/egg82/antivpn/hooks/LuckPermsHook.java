@@ -1,6 +1,8 @@
 package me.egg82.antivpn.hooks;
 
 import co.aikar.commands.CommandIssuer;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import me.egg82.antivpn.config.ConfigUtil;
 import net.luckperms.api.LuckPermsProvider;
 import net.luckperms.api.context.ContextManager;
@@ -9,9 +11,6 @@ import net.luckperms.api.model.user.User;
 import net.luckperms.api.model.user.UserManager;
 import net.luckperms.api.query.QueryOptions;
 import org.checkerframework.checker.nullness.qual.NonNull;
-
-import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 
 public class LuckPermsHook implements PluginHook {
     private final CommandIssuer console;

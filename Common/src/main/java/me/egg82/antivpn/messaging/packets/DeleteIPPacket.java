@@ -1,8 +1,7 @@
 package me.egg82.antivpn.messaging.packets;
 
-import java.util.Objects;
-
 import io.netty.buffer.ByteBuf;
+import java.util.Objects;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 public class DeleteIPPacket extends AbstractPacket {
@@ -47,7 +46,7 @@ public class DeleteIPPacket extends AbstractPacket {
 
     public String toString() {
         return "DeleteIPPacket{" +
-                "ip='" + ip + '\'' +
-                '}';
+            "ip='" + ip + '\'' +
+            '}';
     }
 }

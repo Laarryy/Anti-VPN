@@ -1,7 +1,9 @@
 package me.egg82.antivpn.messaging;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import io.netty.buffer.ByteBuf;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
@@ -9,8 +11,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-
-import io.netty.buffer.ByteBuf;
 import me.egg82.antivpn.config.ConfigUtil;
 import me.egg82.antivpn.messaging.packets.Packet;
 import me.egg82.antivpn.utils.PacketUtil;
@@ -199,16 +199,11 @@ public class RedisMessagingService extends AbstractMessagingService {
                     return;
                 }
 
-                Packet packet;
                 try {
-                    packet = packetClass.newInstance();
-                } catch (IllegalAccessException | InstantiationException | ExceptionInInitializerError | SecurityException ex) {
+                    service.handler.handlePacket(messageId, service.getName(), packetClass.getConstructor(ByteBuf.class).newInstance(data));
+                } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException | InstantiationException | ExceptionInInitializerError | SecurityException ex) {
                     service.logger.error("Could not instantiate packet.", ex);
-                    return;
                 }
-                packet.read(data);
-
-                service.handler.handlePacket(messageId, service.getName(), packet);
             } finally {
                 b.release();
                 if (data != null) {

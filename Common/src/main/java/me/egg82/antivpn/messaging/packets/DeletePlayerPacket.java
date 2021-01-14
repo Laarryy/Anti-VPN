@@ -1,9 +1,8 @@
 package me.egg82.antivpn.messaging.packets;
 
+import io.netty.buffer.ByteBuf;
 import java.util.Objects;
 import java.util.UUID;
-
-import io.netty.buffer.ByteBuf;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 public class DeletePlayerPacket extends AbstractPacket {
@@ -48,7 +47,7 @@ public class DeletePlayerPacket extends AbstractPacket {
 
     public String toString() {
         return "DeletePlayerPacket{" +
-                "uuid=" + uuid +
-                '}';
+            "uuid=" + uuid +
+            '}';
     }
 }

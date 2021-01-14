@@ -2,7 +2,6 @@ package me.egg82.antivpn.events;
 
 import co.aikar.commands.CommandIssuer;
 import inet.ipaddr.IPAddressString;
-
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;

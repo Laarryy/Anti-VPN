@@ -1,9 +1,8 @@
 package me.egg82.antivpn.messaging.packets;
 
+import io.netty.buffer.ByteBuf;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
-
-import io.netty.buffer.ByteBuf;
 import me.egg82.antivpn.config.ConfigUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.slf4j.Logger;

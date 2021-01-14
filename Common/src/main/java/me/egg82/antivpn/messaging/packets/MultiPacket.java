@@ -1,12 +1,12 @@
 package me.egg82.antivpn.messaging.packets;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.PooledByteBufAllocator;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import me.egg82.antivpn.utils.PacketUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -38,25 +38,18 @@ public class MultiPacket extends AbstractPacket {
                 continue;
             }
 
-            byte[] packetData = new byte[buffer.readInt()]; // Create packet data array with packet length given
-            buffer.readBytes(packetData);
-
-            Packet packet;
+            int packetLen = buffer.readInt();
+            ByteBuf packetBuf = alloc.buffer(packetLen, packetLen);
             try {
-                packet = packetClass.newInstance();
-            } catch (IllegalAccessException | InstantiationException | ExceptionInInitializerError | SecurityException ex) {
-                logger.error("Could not instantiate packet " + packetClass.getSimpleName() + ".", ex);
-                continue;
-            }
-            ByteBuf packetBuf = alloc.buffer(packetData.length, packetData.length);
-            try {
-                packetBuf.writeBytes(packetData);
-                packet.read(packetBuf);
+                buffer.readBytes(packetBuf);
+                try {
+                    packets.add(packetClass.getConstructor(ByteBuf.class).newInstance(packetBuf));
+                } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException | InstantiationException | ExceptionInInitializerError | SecurityException ex) {
+                    logger.error("Could not instantiate packet " + packetClass.getSimpleName() + ".", ex);
+                }
             } finally {
                 packetBuf.release();
             }
-
-            packets.add(packet);
         }
 
         checkReadPacket(buffer);
