@@ -47,6 +47,8 @@ public abstract class AbstractMessagingService implements MessagingService {
             return new byte[0];
         }
 
+        data.readerIndex(0);
+
         int uncompressedBytes = data.writerIndex();
         int upperBound = (int) Zstd.compressBound(uncompressedBytes) + 5;
 
@@ -54,13 +56,11 @@ public abstract class AbstractMessagingService implements MessagingService {
         ByteBuf ndd = alloc.directBuffer(upperBound, upperBound);
 
         try {
-            data.readerIndex(0);
-            nd.writeBytes(data);
-            ByteBuffer d = nd.nioBuffer();
-            d.rewind();
+            data.readBytes(nd);
+            ByteBuffer d = nd.nioBuffer(0, uncompressedBytes);
 
-            ByteBuffer dest = ndd.nioBuffer();
-            long compressedBytes = Zstd.compressDirectByteBuffer(dest, 5, dest.capacity() - 5, d, 0, uncompressedBytes, 9);
+            ByteBuffer dest = ndd.nioBuffer(0, upperBound);
+            long compressedBytes = Zstd.compressDirectByteBuffer(dest, 5, upperBound - 5, d, 0, uncompressedBytes, 9);
             if (Zstd.isError(compressedBytes)) {
                 throw new IOException(new ZstdException(compressedBytes));
             }
@@ -68,11 +68,10 @@ public abstract class AbstractMessagingService implements MessagingService {
             if ((double) uncompressedBytes / (double) (compressedBytes + 4L) < TOLERANCE) {
                 byte[] out = new byte[uncompressedBytes + 1];
                 out[0] = 0x00;
-                d.rewind();
-                d.get(out, 1, out.length - 1);
+                nd.readBytes(out, 1, uncompressedBytes);
 
                 if (ConfigUtil.getDebugOrFalse()) {
-                    logger.info("Sent (no) compression: " + out.length + "/" + (out.length - 1) + " (" + ratioFormat.format((double) (out.length - 1) / (double) out.length) + ")");
+                    logger.info("Sent (no) compression: " + out.length + "/" + uncompressedBytes + " (" + ratioFormat.format((double) uncompressedBytes / (double) out.length) + ")");
                 }
 
                 return out;
@@ -105,34 +104,32 @@ public abstract class AbstractMessagingService implements MessagingService {
 
         boolean compressed = data.readByte() != 0x00;
         if (!compressed) {
-            ByteBuf retVal = alloc.buffer(data.capacity() - 1, data.capacity() - 1);
-            retVal.writeBytes(data);
+            ByteBuf retVal = alloc.buffer(compressedBytes - 1, compressedBytes - 1);
+            data.readBytes(retVal);
 
             if (ConfigUtil.getDebugOrFalse()) {
-                logger.info("Received (no) compression: " + compressedBytes + "/" + retVal.capacity() + " (" + ratioFormat.format((double) retVal.capacity() / (double) compressedBytes) + ")");
+                logger.info("Received (no) compression: " + compressedBytes + "/" + (compressedBytes - 1) + " (" + ratioFormat.format((double) (compressedBytes - 1) / (double) compressedBytes) + ")");
             }
 
             return retVal;
         }
 
         int uncompressedBytes = data.readInt();
-        ByteBuf nd = alloc.directBuffer(compressedBytes, compressedBytes);
+        ByteBuf nd = alloc.directBuffer(compressedBytes - 5, compressedBytes - 5);
         ByteBuf ndd = alloc.directBuffer(uncompressedBytes, uncompressedBytes);
 
         try {
-            data.readerIndex(0);
-            nd.writeBytes(data);
-            ByteBuffer d = nd.nioBuffer();
-            d.rewind();
+            data.readBytes(nd);
+            ByteBuffer d = nd.nioBuffer(0, compressedBytes - 5);
 
-            ByteBuffer dest = ndd.nioBuffer();
-            long decompressedBytes = Zstd.decompressDirectByteBuffer(dest, 0, dest.capacity(), d, 5, compressedBytes - 5);
+            ByteBuffer dest = ndd.nioBuffer(0, uncompressedBytes);
+            long decompressedBytes = Zstd.decompressDirectByteBuffer(dest, 0, uncompressedBytes, d, 0, compressedBytes - 5);
             if (Zstd.isError(decompressedBytes)) {
                 throw new IOException(new ZstdException(decompressedBytes));
             }
 
             if (ConfigUtil.getDebugOrFalse()) {
-                logger.info("Received compression: " + compressedBytes + "/" + dest.capacity() + " (" + ratioFormat.format((double) dest.capacity() / (double) compressedBytes) + ")");
+                logger.info("Received compression: " + compressedBytes + "/" + uncompressedBytes + " (" + ratioFormat.format((double) uncompressedBytes / (double) compressedBytes) + ")");
             }
 
             dest.rewind();
