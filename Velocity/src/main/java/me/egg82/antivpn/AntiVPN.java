@@ -122,6 +122,8 @@ public class AntiVPN {
         }
         tasks.clear();
 
+        VPNAPIProvider.getInstance().runUpdateTask().join();
+
         for (EventHolder eventHolder : eventHolders) {
             eventHolder.cancel();
         }
@@ -303,7 +305,7 @@ public class AntiVPN {
     }
 
     private void loadTasks() {
-        tasks.add(proxy.getScheduler().buildTask(plugin, () -> VPNAPIProvider.getInstance().runUpdateTask()).delay(1L, TimeUnit.SECONDS).repeat(1L, TimeUnit.SECONDS).schedule());
+        tasks.add(proxy.getScheduler().buildTask(plugin, () -> VPNAPIProvider.getInstance().runUpdateTask().join()).delay(1L, TimeUnit.SECONDS).repeat(1L, TimeUnit.SECONDS).schedule());
     }
 
     private void loadHooks() {
