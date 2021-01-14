@@ -78,7 +78,7 @@ public abstract class AbstractMessagingService implements MessagingService {
             }
 
             if (ConfigUtil.getDebugOrFalse()) {
-                logger.info("Sent compression: " + compressedBytes + "/" + uncompressedBytes + " (" + ratioFormat.format((double) uncompressedBytes / (double) compressedBytes) + ")");
+                logger.info("Sent compression: " + (compressedBytes + 5) + "/" + uncompressedBytes + " (" + ratioFormat.format((double) uncompressedBytes / (double) (compressedBytes + 5)) + ")");
             }
 
             dest.put(0, (byte) 0x01);
