@@ -30,10 +30,13 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
 
     public void close() {
         queueLock.writeLock().lock();
-        closed = true;
-        connection.shutdown(false, false);
-        source.close();
-        queueLock.writeLock().unlock();
+        try {
+            closed = true;
+            connection.shutdown(false, false);
+            source.close();
+        } finally {
+            queueLock.writeLock().unlock();
+        }
     }
 
     public void storeModel(@NonNull BaseModel model) {

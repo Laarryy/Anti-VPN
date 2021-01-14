@@ -148,23 +148,28 @@ public abstract class AbstractMessagingService implements MessagingService {
 
     protected int getInitialCapacity() {
         capacityLock.readLock().lock();
-        int c = capacity;
-        capacityLock.readLock().unlock();
-        return c;
+        try {
+            return capacity;
+        } finally {
+            capacityLock.readLock().unlock();
+        }
     }
 
     protected void addCapacity(int capacity) {
         capacities.add(capacity);
         if (capacities.size() >= 50) {
             capacityLock.writeLock().lock();
-            if (capacities.size() >= 50) {
-                this.capacity = MathUtil.percentile(capacities, 80.0d);
-                if (ConfigUtil.getDebugOrFalse()) {
-                    logger.info("Set initial capacity to " + ratioFormat.format((double) this.capacity / 1024.0d) + "kb");
+            try {
+                if (capacities.size() >= 50) {
+                    this.capacity = MathUtil.percentile(capacities, 80.0d);
+                    if (ConfigUtil.getDebugOrFalse()) {
+                        logger.info("Set initial capacity to " + ratioFormat.format((double) this.capacity / 1024.0d) + "kb");
+                    }
+                    capacities.clear();
                 }
-                capacities.clear();
+            } finally {
+                capacityLock.writeLock().unlock();
             }
-            capacityLock.writeLock().unlock();
         }
     }
 

@@ -35,11 +35,14 @@ public class RabbitMQMessagingService extends AbstractMessagingService {
 
     public void close() {
         queueLock.writeLock().lock();
-        closed = true;
         try {
-            connection.close(8000);
-        } catch (IOException ignored) { }
-        queueLock.writeLock().unlock();
+            closed = true;
+            try {
+                connection.close(8000);
+            } catch (IOException ignored) { }
+        } finally {
+            queueLock.writeLock().unlock();
+        }
     }
 
     public boolean isClosed() { return closed || !connection.isOpen(); }
@@ -166,10 +169,10 @@ public class RabbitMQMessagingService extends AbstractMessagingService {
                 buffer.release();
             }
         } catch (IOException | TimeoutException ex) {
-            queueLock.readLock().unlock();
             throw ex;
+        } finally {
+            queueLock.readLock().unlock();
         }
-        queueLock.readLock().unlock();
     }
 
     private AMQP.BasicProperties getProperties(@NonNull DeliveryMode deliveryMode, @NonNull UUID messageId) {

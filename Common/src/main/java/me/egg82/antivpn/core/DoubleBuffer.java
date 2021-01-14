@@ -13,23 +13,30 @@ public class DoubleBuffer<T> {
 
     public @NonNull Queue<T> getReadBuffer() {
         lock.readLock().lock();
-        Queue<T> t = backBuffer;
-        lock.readLock().unlock();
-        return t;
+        try {
+            return backBuffer;
+        } finally {
+            lock.readLock().unlock();
+        }
     }
 
     public @NonNull Queue<T> getWriteBuffer() {
         lock.readLock().lock();
-        Queue<T> t = currentBuffer;
-        lock.readLock().unlock();
-        return t;
+        try {
+            return currentBuffer;
+        } finally {
+            lock.readLock().unlock();
+        }
     }
 
     public void swapBuffers() {
         lock.writeLock().lock();
-        Queue<T> t = currentBuffer;
-        currentBuffer = backBuffer;
-        backBuffer = t;
-        lock.writeLock().unlock();
+        try {
+            Queue<T> t = currentBuffer;
+            currentBuffer = backBuffer;
+            backBuffer = t;
+        } finally {
+            lock.writeLock().unlock();
+        }
     }
 }

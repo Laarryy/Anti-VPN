@@ -39,17 +39,20 @@ public class RedisMessagingService extends AbstractMessagingService {
 
     public void close() {
         queueLock.writeLock().lock();
-        closed = true;
-        workPool.shutdown();
         try {
-            if (!workPool.awaitTermination(8L, TimeUnit.SECONDS)) {
-                workPool.shutdownNow();
+            closed = true;
+            workPool.shutdown();
+            try {
+                if (!workPool.awaitTermination(8L, TimeUnit.SECONDS)) {
+                    workPool.shutdownNow();
+                }
+            } catch (InterruptedException ignored) {
+                Thread.currentThread().interrupt();
             }
-        } catch (InterruptedException ignored) {
-            Thread.currentThread().interrupt();
+            pool.close();
+        } finally {
+            queueLock.writeLock().unlock();
         }
-        pool.close();
-        queueLock.writeLock().unlock();
     }
 
     public boolean isClosed() { return closed || pool.isClosed(); }
@@ -230,9 +233,9 @@ public class RedisMessagingService extends AbstractMessagingService {
                 buffer.release();
             }
         } catch (JedisException ex) {
-            queueLock.readLock().unlock();
             throw new IOException(ex);
+        } finally {
+            queueLock.readLock().unlock();
         }
-        queueLock.readLock().unlock();
     }
 }
