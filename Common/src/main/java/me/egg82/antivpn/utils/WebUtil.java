@@ -137,6 +137,7 @@ public class WebUtil {
         setConnectionProperties(conn, method, timeout, userAgent, headers, postData, null);
 
         Set<String> previousUrls = new HashSet<>();
+        previousUrls.add(url.toExternalForm());
 
         int status;
         boolean redirect;
