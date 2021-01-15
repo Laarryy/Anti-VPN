@@ -172,7 +172,7 @@ public class BukkitVersionUtil {
         return bestMatch;
     }
 
-    private static int[] parseVersion(@NonNull String version, char separator) {
+    private static int @NonNull [] parseVersion(@NonNull String version, char separator) {
         List<Integer> ints = new ArrayList<>();
 
         int lastIndex = 0;

@@ -162,7 +162,7 @@ public class RedisMessagingService extends AbstractMessagingService {
 
         private PubSub(@NonNull RedisMessagingService service) { this.service = service; }
 
-        public void onMessage(byte[] c, byte[] m) {
+        public void onMessage(byte @NonNull [] c, byte @NonNull [] m) {
             String channel = new String(c, StandardCharsets.UTF_8);
             if (ConfigUtil.getDebugOrFalse()) {
                 service.logger.info("Got message from channel: " + channel);
@@ -182,7 +182,7 @@ public class RedisMessagingService extends AbstractMessagingService {
             }
         }
 
-        private void handleMessage(byte[] body) throws IOException {
+        private void handleMessage(byte @NonNull [] body) throws IOException {
             ByteBuf b = alloc.buffer(body.length, body.length);
             ByteBuf data = null;
             try {

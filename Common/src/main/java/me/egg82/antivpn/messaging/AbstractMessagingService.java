@@ -41,7 +41,7 @@ public abstract class AbstractMessagingService implements MessagingService {
 
     private static final double TOLERANCE = 1.1; // Compression ratio tolerance. Determines when compression should happen
 
-    protected final byte[] compressData(ByteBuf data) throws IOException {
+    protected final byte @NonNull [] compressData(ByteBuf data) throws IOException {
         if (data == null || data.capacity() == 0) {
             return new byte[0];
         }
@@ -205,7 +205,7 @@ public abstract class AbstractMessagingService implements MessagingService {
         logger.info(sb.toString());
     }
 
-    private void printBytes(byte[] bytes) {
+    private void printBytes(byte @NonNull [] bytes) {
         StringBuilder sb = new StringBuilder();
 
         sb.append('\n');
