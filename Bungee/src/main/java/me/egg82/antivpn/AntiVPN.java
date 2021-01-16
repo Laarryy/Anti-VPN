@@ -410,6 +410,9 @@ public class AntiVPN {
                     return v + 1;
                 });
             }
+            if (retVal.isEmpty()) {
+                retVal.put("None", 1);
+            }
 
             return retVal;
         }));
@@ -432,6 +435,9 @@ public class AntiVPN {
                     }
                     return v + 1;
                 });
+            }
+            if (retVal.isEmpty()) {
+                retVal.put("None", 1);
             }
 
             return retVal;
@@ -456,6 +462,9 @@ public class AntiVPN {
                     }
                     return v + 1;
                 });
+            }
+            if (retVal.isEmpty()) {
+                retVal.put("None", 1);
             }
 
             return retVal;
