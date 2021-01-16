@@ -38,6 +38,7 @@ public interface SourceManager {
      * @param modelClass the class of the model to return
      * @return a {@link Source} object, if one matching the name is available, or null if not
      * @throws NullPointerException if the name or model is null
+     * @throws ClassCastException is the modelClass is incorrect for this source
      */
     @Nullable <T extends SourceModel> Source<T> getSource(@NonNull String name, @NonNull Class<T> modelClass);
 
