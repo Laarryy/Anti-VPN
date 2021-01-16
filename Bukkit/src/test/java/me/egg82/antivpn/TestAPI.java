@@ -48,8 +48,8 @@ class TestAPI {
 
     @Test
     void testIps() {
-        IPManager manager = VPNAPIProvider.getInstance().getIpManager();
-        Assertions.assertDoesNotThrow(() -> manager.getIp("8.8.8.8").get());
+        IPManager manager = VPNAPIProvider.getInstance().getIPManager();
+        Assertions.assertDoesNotThrow(() -> manager.getIP("8.8.8.8").get());
     }
 
     @AfterAll

@@ -28,7 +28,7 @@ public interface Platform {
      *
      * @return the unique IPs
      */
-    @NonNull Set<String> getUniqueIps();
+    @NonNull Set<String> getUniqueIPs();
 
     /**
      * Gets the time when the plugin first started.

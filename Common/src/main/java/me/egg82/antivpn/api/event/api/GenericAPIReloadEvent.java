@@ -19,7 +19,7 @@ public class GenericAPIReloadEvent extends AbstractEvent implements APIReloadEve
         this.newSourceManager = newSourceManager;
     }
 
-    public @NonNull IPManager getNewIpManager() { return newIpManager; }
+    public @NonNull IPManager getNewIPManager() { return newIpManager; }
 
     public @NonNull PlayerManager getNewPlayerManager() { return newPlayerManager; }
 

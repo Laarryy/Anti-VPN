@@ -55,7 +55,7 @@ public interface VPNAPI {
      *
      * @return the IP manager
      */
-    @NonNull IPManager getIpManager();
+    @NonNull IPManager getIPManager();
 
     /**
      * Gets the {@link PlayerManager}, responsible for managing

@@ -87,7 +87,7 @@ public class PlayerAnalyticsHook implements PluginHook {
                 format = FormatType.NONE
         )
         public long getVpns() {
-            IPManager ipManager = VPNAPIProvider.getInstance().getIpManager();
+            IPManager ipManager = VPNAPIProvider.getInstance().getIPManager();
 
             Collection<Player> players = proxy.getAllPlayers();
             ExecutorService pool = Executors.newWorkStealingPool(Math.min(players.size() / 2, Runtime.getRuntime().availableProcessors() / 2));
@@ -226,7 +226,7 @@ public class PlayerAnalyticsHook implements PluginHook {
                 return false;
             }
 
-            IPManager ipManager = VPNAPIProvider.getInstance().getIpManager();
+            IPManager ipManager = VPNAPIProvider.getInstance().getIPManager();
 
             if (ipManager.getCurrentAlgorithmMethod() == AlgorithmMethod.CONSESNSUS) {
                 try {

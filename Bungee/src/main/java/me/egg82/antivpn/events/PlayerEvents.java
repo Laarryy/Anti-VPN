@@ -120,7 +120,7 @@ public class PlayerEvents extends EventHolder {
 
         if (isVpn(ip, event.getConnection().getName(), cachedConfig)) {
             AntiVPN.incrementBlockedVPNs();
-            IPManager ipManager = VPNAPIProvider.getInstance().getIpManager();
+            IPManager ipManager = VPNAPIProvider.getInstance().getIPManager();
             List<String> commands = ipManager.getVpnCommands(event.getConnection().getName(), uuid, ip);
             for (String command : commands) {
                 ProxyServer.getInstance().getPluginManager().dispatchCommand(ProxyServer.getInstance().getConsole(), command);
@@ -179,7 +179,7 @@ public class PlayerEvents extends EventHolder {
     private void cacheData(@NonNull String ip, @NonNull UUID uuid, @NonNull CachedConfig cachedConfig) {
         // Cache IP data
         if ((!cachedConfig.getVPNKickMessage().isEmpty() || !cachedConfig.getVPNActionCommands().isEmpty())) {
-            IPManager ipManager = VPNAPIProvider.getInstance().getIpManager();
+            IPManager ipManager = VPNAPIProvider.getInstance().getIPManager();
             if (cachedConfig.getVPNAlgorithmMethod() == AlgorithmMethod.CONSESNSUS) {
                 try {
                     ipManager.consensus(ip, true)
@@ -274,7 +274,7 @@ public class PlayerEvents extends EventHolder {
 
         if (isVpn(ip, event.getPlayer().getName(), cachedConfig)) {
             AntiVPN.incrementBlockedVPNs();
-            IPManager ipManager = VPNAPIProvider.getInstance().getIpManager();
+            IPManager ipManager = VPNAPIProvider.getInstance().getIPManager();
             List<String> commands = ipManager.getVpnCommands(event.getPlayer().getName(), event.getPlayer().getUniqueId(), ip);
             for (String command : commands) {
                 ProxyServer.getInstance().getPluginManager().dispatchCommand(ProxyServer.getInstance().getConsole(), command);
@@ -303,7 +303,7 @@ public class PlayerEvents extends EventHolder {
         if (!cachedConfig.getVPNKickMessage().isEmpty() || !cachedConfig.getVPNActionCommands().isEmpty()) {
             boolean isVPN;
 
-            IPManager ipManager = VPNAPIProvider.getInstance().getIpManager();
+            IPManager ipManager = VPNAPIProvider.getInstance().getIPManager();
             if (cachedConfig.getVPNAlgorithmMethod() == AlgorithmMethod.CONSESNSUS) {
                 try {
                     isVPN = ipManager.consensus(ip, true)

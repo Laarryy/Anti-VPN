@@ -1,18 +1,19 @@
 package me.egg82.antivpn.api.model.ip;
 
+import java.net.InetAddress;
 import java.util.Objects;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class GenericIP implements IP {
-    private final String ip;
+    private final InetAddress ip;
     private AlgorithmMethod type;
     private Boolean cascade;
     private Double consensus;
 
     private final int hc;
 
-    public GenericIP(@NonNull String ip, @NonNull AlgorithmMethod type, @Nullable Boolean cascade, @Nullable Double consensus) {
+    public GenericIP(@NonNull InetAddress ip, @NonNull AlgorithmMethod type, @Nullable Boolean cascade, @Nullable Double consensus) {
         this.ip = ip;
         this.type = type;
         this.cascade = cascade;
@@ -21,7 +22,7 @@ public class GenericIP implements IP {
         this.hc = Objects.hash(ip);
     }
 
-    public @NonNull String getIp() { return ip; }
+    public @NonNull InetAddress getIP() { return ip; }
 
     public @Nullable Boolean getCascade() { return cascade; }
 

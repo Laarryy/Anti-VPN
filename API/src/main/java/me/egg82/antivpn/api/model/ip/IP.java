@@ -1,6 +1,7 @@
 package me.egg82.antivpn.api.model.ip;
 
 import java.io.Serializable;
+import java.net.InetAddress;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -13,7 +14,7 @@ public interface IP extends Serializable {
      *
      * @return the IP
      */
-    @NonNull String getIp();
+    @NonNull InetAddress getIP();
 
     /**
      * Returns the IP's {@link AlgorithmMethod} type
@@ -32,28 +33,32 @@ public interface IP extends Serializable {
     /**
      * Returns the IP's cascade status.
      *
-     * @return true if the cascade result returned positive (VPN/Proxy detected), false if not (no VPN/proxy detected)
+     * <p>Returns null if cascade value has not been calculated for this IP.</p>
+     *
+     * @return true if the cascade result returned positive (VPN/Proxy detected), false if not (no VPN/proxy detected), or null if not calculated
      */
     @Nullable Boolean getCascade();
 
     /**
      * Sets the IP's cascade status.
      *
-     * @param status true if the cascade result should be positive (VPN/Proxy detected), false if not (no VPN/proxy detected)
+     * @param status true if the cascade result should be positive (VPN/Proxy detected), false if not (no VPN/proxy detected), or null if not calculated
      */
     void setCascade(@Nullable Boolean status);
 
     /**
      * Returns the IP's consensus status.
      *
-     * @return a number between 0 and 1 determining the likelihood that an IP is a VPN/proxy
+     * <p>Returns null if consensus value has not been calculated for this IP.</p>
+     *
+     * @return a number between 0 and 1 determining the likelihood that an IP is a VPN/proxy, or null if not calculated
      */
     @Nullable Double getConsensus();
 
     /**
      * Sets the IP's consensus status.
      *
-     * @param status a number between 0 and 1 determining the likelihood that an IP is a VPN/proxy
+     * @param status a number between 0 and 1 determining the likelihood that an IP is a VPN/proxy, or null if not calculated
      */
     void setConsensus(@Nullable Double status);
 

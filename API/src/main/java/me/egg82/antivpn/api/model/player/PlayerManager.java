@@ -1,5 +1,6 @@
 package me.egg82.antivpn.api.model.player;
 
+import java.net.InetAddress;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -124,7 +125,7 @@ public interface PlayerManager {
      * @return true if the player was online, false if not
      * @throws NullPointerException if player is null, player.getName() is null, or ip is null
      */
-    default boolean kickForMcLeaks(@NonNull Player player, @NonNull IP ip) { return kickForMcLeaks(Objects.requireNonNull(player.getName()), player.getUuid(), ip.getIp()); }
+    default boolean kickForMcLeaks(@NonNull Player player, @NonNull IP ip) { return kickForMcLeaks(Objects.requireNonNull(player.getName()), player.getUuid(), ip.getIP().getHostAddress()); }
 
     /**
      * Runs the player through the kick/command procedure
@@ -136,7 +137,18 @@ public interface PlayerManager {
      * @return true if the player was online, false if not
      * @throws NullPointerException if playerName, playerUuid, or ip is null
      */
-    default boolean kickForMcLeaks(@NonNull String playerName, @NonNull UUID playerUuid, @NonNull IP ip) { return kickForMcLeaks(playerName, playerUuid, ip.getIp()); }
+    default boolean kickForMcLeaks(@NonNull String playerName, @NonNull UUID playerUuid, @NonNull IP ip) { return kickForMcLeaks(playerName, playerUuid, ip.getIP().getHostAddress()); }
+
+    /**
+     * Runs the player through the kick/command procedure
+     * for MCLeaks usage, as outlined by Anti-VPN's config.
+     *
+     * @param player The {@link Player} to kick
+     * @param ip The IP of the player to kick
+     * @return true if the player was online, false if not
+     * @throws NullPointerException if player is null, player.getName() is null, or ip is null
+     */
+    default boolean kickForMcLeaks(@NonNull Player player, @NonNull InetAddress ip) { return kickForMcLeaks(Objects.requireNonNull(player.getName()), player.getUuid(), ip.getHostAddress()); }
 
     /**
      * Runs the player through the kick/command procedure
@@ -159,6 +171,18 @@ public interface PlayerManager {
      * @return true if the player was online, false if not
      * @throws NullPointerException if playerName, playerUuid, or ip is null
      */
+    default boolean kickForMcLeaks(@NonNull String playerName, @NonNull UUID playerUuid, @NonNull InetAddress ip) { return kickForMcLeaks(playerName, playerUuid, ip.getHostAddress()); };
+
+    /**
+     * Runs the player through the kick/command procedure
+     * for MCLeaks usage, as outlined by Anti-VPN's config.
+     *
+     * @param playerName The player name to kick
+     * @param playerUuid The player UUID to kick
+     * @param ip The IP of the player to kick
+     * @return true if the player was online, false if not
+     * @throws NullPointerException if playerName, playerUuid, or ip is null
+     */
     boolean kickForMcLeaks(@NonNull String playerName, @NonNull UUID playerUuid, @NonNull String ip);
 
     /**
@@ -170,7 +194,7 @@ public interface PlayerManager {
      * @return the MCLeaks kick message, as defined in Anti-VPN's config
      * @throws NullPointerException if player is null, player.getName() is null, or ip is null
      */
-    default @Nullable String getMcLeaksKickMessage(@NonNull Player player, @NonNull IP ip) { return getMcLeaksKickMessage(Objects.requireNonNull(player.getName()), player.getUuid(), ip.getIp()); }
+    default @Nullable String getMcLeaksKickMessage(@NonNull Player player, @NonNull IP ip) { return getMcLeaksKickMessage(Objects.requireNonNull(player.getName()), player.getUuid(), ip.getIP().getHostAddress()); }
 
     /**
      * Returns the MCLeaks kick message as defined
@@ -182,7 +206,18 @@ public interface PlayerManager {
      * @return the MCLeaks kick message, as defined in Anti-VPN's config
      * @throws NullPointerException if playerName, playerUuid, or ip is null
      */
-    default @Nullable String getMcLeaksKickMessage(@NonNull String playerName, @NonNull UUID playerUuid, @NonNull IP ip) { return getMcLeaksKickMessage(playerName, playerUuid, ip.getIp()); }
+    default @Nullable String getMcLeaksKickMessage(@NonNull String playerName, @NonNull UUID playerUuid, @NonNull IP ip) { return getMcLeaksKickMessage(playerName, playerUuid, ip.getIP().getHostAddress()); }
+
+    /**
+     * Returns the MCLeaks kick message as defined
+     * in Anti-VPN's config, tailored to the player provided.
+     *
+     * @param player The {@link Player} to tailor the message to
+     * @param ip The IP of the player to tailor the message to
+     * @return the MCLeaks kick message, as defined in Anti-VPN's config
+     * @throws NullPointerException if player is null, player.getName() is null, or ip is null
+     */
+    default @Nullable String getMcLeaksKickMessage(@NonNull Player player, @NonNull InetAddress ip) { return getMcLeaksKickMessage(Objects.requireNonNull(player.getName()), player.getUuid(), ip.getHostAddress()); }
 
     /**
      * Returns the MCLeaks kick message as defined
@@ -205,6 +240,18 @@ public interface PlayerManager {
      * @return the MCLeaks kick message, as defined in Anti-VPN's config
      * @throws NullPointerException if playerName, playerUuid, or ip is null
      */
+    default @Nullable String getMcLeaksKickMessage(@NonNull String playerName, @NonNull UUID playerUuid, @NonNull InetAddress ip) { return getMcLeaksKickMessage(playerName, playerUuid, ip.getHostAddress()); }
+
+    /**
+     * Returns the MCLeaks kick message as defined
+     * in Anti-VPN's config, tailored to the player provided.
+     *
+     * @param playerName The player name to tailor the message to
+     * @param playerUuid The player UUID to tailor the message to
+     * @param ip The IP of the player to tailor the message to
+     * @return the MCLeaks kick message, as defined in Anti-VPN's config
+     * @throws NullPointerException if playerName, playerUuid, or ip is null
+     */
     @Nullable String getMcLeaksKickMessage(@NonNull String playerName, @NonNull UUID playerUuid, @NonNull String ip);
 
     /**
@@ -216,7 +263,7 @@ public interface PlayerManager {
      * @return a {@link List} of MCLeaks commands to run, as defined in Anti-VPN's config
      * @throws NullPointerException if player is null, player.getName() is null, or ip is null
      */
-    default @NonNull List<String> getMcLeaksCommands(@NonNull Player player, @NonNull IP ip) { return getMcLeaksCommands(Objects.requireNonNull(player.getName()), player.getUuid(), ip.getIp()); }
+    default @NonNull List<String> getMcLeaksCommands(@NonNull Player player, @NonNull IP ip) { return getMcLeaksCommands(Objects.requireNonNull(player.getName()), player.getUuid(), ip.getIP().getHostAddress()); }
 
     /**
      * Returns the MCLeaks commands as defined
@@ -228,7 +275,18 @@ public interface PlayerManager {
      * @return a {@link List} of MCLeaks commands to run, as defined in Anti-VPN's config
      * @throws NullPointerException if playerName, playerUuid, or ip is null
      */
-    default @NonNull List<String> getMcLeaksCommands(@NonNull String playerName, @NonNull UUID playerUuid, @NonNull IP ip) { return getMcLeaksCommands(playerName, playerUuid, ip.getIp()); }
+    default @NonNull List<String> getMcLeaksCommands(@NonNull String playerName, @NonNull UUID playerUuid, @NonNull IP ip) { return getMcLeaksCommands(playerName, playerUuid, ip.getIP().getHostAddress()); }
+
+    /**
+     * Returns the MCLeaks commands as defined
+     * in Anti-VPN's config, tailored to the player provided.
+     *
+     * @param player The {@link Player} to tailor the commands to
+     * @param ip The IP of the player to tailor the commands to
+     * @return a {@link List} of MCLeaks commands to run, as defined in Anti-VPN's config
+     * @throws NullPointerException if player is null, player.getName() is null, or ip is null
+     */
+    default @NonNull List<String> getMcLeaksCommands(@NonNull Player player, @NonNull InetAddress ip) { return getMcLeaksCommands(Objects.requireNonNull(player.getName()), player.getUuid(), ip.getHostAddress()); }
 
     /**
      * Returns the MCLeaks commands as defined
@@ -240,6 +298,18 @@ public interface PlayerManager {
      * @throws NullPointerException if player is null, player.getName() is null, or ip is null
      */
     default @NonNull List<String> getMcLeaksCommands(@NonNull Player player, @NonNull String ip) { return getMcLeaksCommands(Objects.requireNonNull(player.getName()), player.getUuid(), ip); }
+
+    /**
+     * Returns the MCLeaks commands as defined
+     * in Anti-VPN's config, tailored to the player provided.
+     *
+     * @param playerName The player name to tailor the commands to
+     * @param playerUuid The player UUID to tailor the commands to
+     * @param ip The IP of the player to tailor the commands to
+     * @return a {@link List} of MCLeaks commands to run, as defined in Anti-VPN's config
+     * @throws NullPointerException if playerName, playerUuid, or ip is null
+     */
+    default @NonNull List<String> getMcLeaksCommands(@NonNull String playerName, @NonNull UUID playerUuid, @NonNull InetAddress ip) { return getMcLeaksCommands(playerName, playerUuid, ip.getHostAddress()); }
 
     /**
      * Returns the MCLeaks commands as defined

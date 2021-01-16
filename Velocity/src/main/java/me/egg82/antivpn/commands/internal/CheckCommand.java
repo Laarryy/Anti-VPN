@@ -32,7 +32,7 @@ public class CheckCommand extends AbstractCommand {
     }
 
     private void checkIp(@NonNull String ip) {
-        IPManager ipManager = VPNAPIProvider.getInstance().getIpManager();
+        IPManager ipManager = VPNAPIProvider.getInstance().getIPManager();
 
         if (ipManager.getCurrentAlgorithmMethod() == AlgorithmMethod.CONSESNSUS) {
             try {

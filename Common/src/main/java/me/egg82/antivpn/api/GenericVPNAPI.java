@@ -38,7 +38,7 @@ public class GenericVPNAPI implements VPNAPI {
 
     public @NonNull UUID getServerId() { return cachedConfig.getServerId(); }
 
-    public @NonNull IPManager getIpManager() { return ipManager; }
+    public @NonNull IPManager getIPManager() { return ipManager; }
 
     public @NonNull PlayerManager getPlayerManager() { return playerManager; }
 

@@ -32,7 +32,7 @@ public class CheckCommand extends AbstractCommand {
     }
 
     private void checkIp(@NonNull String ip) {
-        IPManager ipManager = VPNAPIProvider.getInstance().getIpManager();
+        IPManager ipManager = VPNAPIProvider.getInstance().getIPManager();
 
         taskFactory.<Void>newChain()
                 .<Boolean>asyncCallback((v, r) -> {

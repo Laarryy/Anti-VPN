@@ -1,5 +1,6 @@
 package me.egg82.antivpn.api.model.source;
 
+import java.net.InetAddress;
 import java.util.concurrent.CompletableFuture;
 import me.egg82.antivpn.api.APIException;
 import me.egg82.antivpn.api.model.ip.IP;
@@ -32,7 +33,18 @@ public interface Source<T extends SourceModel> {
      * @throws NullPointerException if the IP is null
      * @throws APIException in the result if the source returned an error
      */
-    default @NonNull CompletableFuture<Boolean> getResult(@NonNull IP ip) { return getResult(ip.getIp()); }
+    default @NonNull CompletableFuture<Boolean> getResult(@NonNull IP ip) { return getResult(ip.getIP().getHostAddress()); }
+
+    /**
+     * Returns the result from the source given its configuration.
+     *
+     * @param ip the IP to test
+     * @return a {@link CompletableFuture} - true if the source thinks the IP is a VPN/proxy, false if not
+     * @throws NullPointerException if the IP is null
+     * @throws IllegalArgumentException if the IP provided is invalid
+     * @throws APIException in the result if the source returned an error
+     */
+    default @NonNull CompletableFuture<Boolean> getResult(@NonNull InetAddress ip) { return getResult(ip.getHostAddress()); }
 
     /**
      * Returns the result from the source given its configuration.
@@ -44,6 +56,28 @@ public interface Source<T extends SourceModel> {
      * @throws APIException in the result if the source returned an error
      */
     @NonNull CompletableFuture<Boolean> getResult(@NonNull String ip);
+
+    /**
+     * Returns the raw response from the source given its configuration.
+     *
+     * @param ip the IP to test
+     * @return a {@link CompletableFuture} - the raw response model from the source
+     * @throws NullPointerException if the IP is null
+     * @throws IllegalArgumentException if the IP provided is invalid
+     * @throws APIException in the result if the source returned an error
+     */
+    default @NonNull CompletableFuture<T> getRawResponse(@NonNull IP ip) { return getRawResponse(ip.getIP().getHostAddress()); }
+
+    /**
+     * Returns the raw response from the source given its configuration.
+     *
+     * @param ip the IP to test
+     * @return a {@link CompletableFuture} - the raw response model from the source
+     * @throws NullPointerException if the IP is null
+     * @throws IllegalArgumentException if the IP provided is invalid
+     * @throws APIException in the result if the source returned an error
+     */
+    default @NonNull CompletableFuture<T> getRawResponse(@NonNull InetAddress ip) { return getRawResponse(ip.getHostAddress()); }
 
     /**
      * Returns the raw response from the source given its configuration.

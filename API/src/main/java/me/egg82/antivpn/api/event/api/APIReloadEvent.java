@@ -14,7 +14,7 @@ public interface APIReloadEvent {
      *
      * @return the new IP manager instance
      */
-    @NonNull IPManager getNewIpManager();
+    @NonNull IPManager getNewIPManager();
 
     /**
      * Gets the new {@link PlayerManager} instance

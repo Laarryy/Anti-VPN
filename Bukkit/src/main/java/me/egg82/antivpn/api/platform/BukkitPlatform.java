@@ -25,7 +25,7 @@ public class BukkitPlatform implements Platform {
 
     public @NonNull Set<UUID> getUniquePlayers() { return ImmutableSet.copyOf(uniquePlayers); }
 
-    public @NonNull Set<String> getUniqueIps() { return ImmutableSet.copyOf(uniqueIps); }
+    public @NonNull Set<String> getUniqueIPs() { return ImmutableSet.copyOf(uniqueIps); }
 
     public @NonNull Instant getStartTime() { return startTime; }
 }

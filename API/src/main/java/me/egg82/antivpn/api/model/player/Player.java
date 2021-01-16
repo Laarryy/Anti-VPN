@@ -43,6 +43,7 @@ public interface Player extends Serializable {
      * {@inheritDoc}
      */
     boolean equals(Object o);
+
     /**
      * {@inheritDoc}
      */

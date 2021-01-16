@@ -2,6 +2,8 @@ package me.egg82.antivpn.api.model.ip;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -40,7 +42,7 @@ public abstract class AbstractIPManager implements IPManager {
 
     public LoadingCache<Pair<String, AlgorithmMethod>, IPModel> getIpCache() { return ipCache; }
 
-    public @NonNull CompletableFuture<IP> getIp(@NonNull String ip) {
+    public @NonNull CompletableFuture<IP> getIP(@NonNull String ip) {
         return CompletableFuture.supplyAsync(() -> {
             CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
             if (cachedConfig == null) {
@@ -50,14 +52,18 @@ public abstract class AbstractIPManager implements IPManager {
             for (StorageService service : cachedConfig.getStorage()) {
                 IPModel model = service.getIpModel(ip, cachedConfig.getSourceCacheTime());
                 if (model != null) {
-                    return new GenericIP(ip, AlgorithmMethod.values()[model.getType()], model.getCascade(), model.getConsensus());
+                    try {
+                        return new GenericIP(InetAddress.getByName(ip), AlgorithmMethod.values()[model.getType()], model.getCascade(), model.getConsensus());
+                    } catch (UnknownHostException ex) {
+                        throw new IllegalArgumentException("Could not create InetAddress for " + model.getIp());
+                    }
                 }
             }
             return null;
         });
     }
 
-    public @NonNull CompletableFuture<Void> saveIp(@NonNull IP ip) {
+    public @NonNull CompletableFuture<Void> saveIP(@NonNull IP ip) {
         return CompletableFuture.runAsync(() -> {
             CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
             if (cachedConfig == null) {
@@ -65,14 +71,14 @@ public abstract class AbstractIPManager implements IPManager {
             }
 
             for (StorageService service : cachedConfig.getStorage()) {
-                IPModel model = service.getOrCreateIpModel(ip.getIp(), ip.getType().ordinal());
+                IPModel model = service.getOrCreateIpModel(ip.getIP().getHostAddress(), ip.getType().ordinal());
                 model.setCascade(ip.getCascade());
                 model.setConsensus(ip.getConsensus());
                 service.storeModel(model);
             }
 
             IPPacket packet = new IPPacket();
-            packet.setIp(ip.getIp());
+            packet.setIp(ip.getIP().getHostAddress());
             packet.setType(ip.getType().ordinal());
             packet.setCascade(ip.getCascade());
             packet.setConsensus(ip.getConsensus());
@@ -80,7 +86,7 @@ public abstract class AbstractIPManager implements IPManager {
         });
     }
 
-    public @NonNull CompletableFuture<Void> deleteIp(@NonNull String ip) {
+    public @NonNull CompletableFuture<Void> deleteIP(@NonNull String ip) {
         return CompletableFuture.runAsync(() -> {
             CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
             if (cachedConfig == null) {
@@ -100,19 +106,23 @@ public abstract class AbstractIPManager implements IPManager {
         });
     }
 
-    public @NonNull CompletableFuture<Set<String>> getIps() {
+    public @NonNull CompletableFuture<Set<InetAddress>> getIPs() {
         return CompletableFuture.supplyAsync(() -> {
             CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
             if (cachedConfig == null) {
                 throw new APIException(false, "Cached config could not be fetched.");
             }
 
-            Set<String> retVal = new HashSet<>();
+            Set<InetAddress> retVal = new HashSet<>();
             for (StorageService service : cachedConfig.getStorage()) {
                 Set<IPModel> models = service.getAllIps(cachedConfig.getSourceCacheTime());
-                if (models != null && !models.isEmpty()) {
+                if (!models.isEmpty()) {
                     for (IPModel model : models) {
-                        retVal.add(model.getIp());
+                        try {
+                            retVal.add(InetAddress.getByName(model.getIp()));
+                        } catch (UnknownHostException ex) {
+                            logger.warn("Could not create InetAddress for " + model.getIp());
+                        }
                     }
                     break;
                 }

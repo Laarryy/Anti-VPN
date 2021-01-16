@@ -56,7 +56,7 @@ public class KickCommand extends AbstractCommand {
         }
 
         if (type.equalsIgnoreCase("vpn")) {
-            IPManager ipManager = VPNAPIProvider.getInstance().getIpManager();
+            IPManager ipManager = VPNAPIProvider.getInstance().getIPManager();
 
             if (cachedConfig.getVPNActionCommands().isEmpty() && cachedConfig.getVPNKickMessage().isEmpty()) {
                 issuer.sendError(Message.KICK__API_MODE);

@@ -1,5 +1,6 @@
 package me.egg82.antivpn.api.model.ip;
 
+import java.net.InetAddress;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -37,7 +38,17 @@ public interface IPManager {
      * @throws NullPointerException if ip is null
      * @throws IllegalArgumentException if the IP provided is invalid
      */
-    @NonNull CompletableFuture<IP> getIp(@NonNull String ip);
+    default @NonNull CompletableFuture<IP> getIP(@NonNull InetAddress ip) { return getIP(ip.getHostAddress()); }
+
+    /**
+     * Gets an IP object.
+     *
+     * @param ip the IP of the IP object to get
+     * @return a {@link CompletableFuture} - an {@link IP} object, if one matching the IP is available, or null if not
+     * @throws NullPointerException if ip is null
+     * @throws IllegalArgumentException if the IP provided is invalid
+     */
+    @NonNull CompletableFuture<IP> getIP(@NonNull String ip);
 
     /**
      * Saves an IP back to the plugin's storage provider.
@@ -48,7 +59,7 @@ public interface IPManager {
      * @return a future to encapsulate the operation.
      * @throws NullPointerException if ip is null
      */
-    @NonNull CompletableFuture<Void> saveIp(@NonNull IP ip);
+    @NonNull CompletableFuture<Void> saveIP(@NonNull IP ip);
 
     /**
      * Deletes any data about a given IP from the system.
@@ -57,7 +68,7 @@ public interface IPManager {
      * @return a future encapsulating the result of the operation
      * @throws NullPointerException if ip is null
      */
-    default @NonNull CompletableFuture<Void> deleteIp(@NonNull IP ip) { return deleteIp(ip.getIp()); }
+    default @NonNull CompletableFuture<Void> deleteIP(@NonNull IP ip) { return deleteIP(ip.getIP().getHostAddress()); }
 
     /**
      * Deletes any data about a given IP from the system.
@@ -67,14 +78,24 @@ public interface IPManager {
      * @throws IllegalArgumentException if the IP provided is invalid
      * @throws NullPointerException if ip is null
      */
-    @NonNull CompletableFuture<Void> deleteIp(@NonNull String ip);
+    default @NonNull CompletableFuture<Void> deleteIP(@NonNull InetAddress ip) { return deleteIP(ip.getHostAddress()); }
+
+    /**
+     * Deletes any data about a given IP from the system.
+     *
+     * @param ip the IP
+     * @return a future encapsulating the result of the operation
+     * @throws IllegalArgumentException if the IP provided is invalid
+     * @throws NullPointerException if ip is null
+     */
+    @NonNull CompletableFuture<Void> deleteIP(@NonNull String ip);
 
     /**
      * Gets a set of all known IPs.
      *
      * @return a set of IPs
      */
-    @NonNull CompletableFuture<Set<String>> getIps();
+    @NonNull CompletableFuture<Set<InetAddress>> getIPs();
 
     /**
      * Gets the {@link AlgorithmMethod}, which represents the algorithm method
@@ -99,7 +120,23 @@ public interface IPManager {
      * @throws NullPointerException if ip is null
      * @throws APIException in the result if a result could not be obtained
      */
-    default @NonNull CompletableFuture<Boolean> cascade(@NonNull IP ip, boolean useCache) { return cascade(ip.getIp(), useCache); }
+    default @NonNull CompletableFuture<Boolean> cascade(@NonNull IP ip, boolean useCache) { return cascade(ip.getIP().getHostAddress(), useCache); }
+
+    /**
+     * Gets the cascade result from Anti-VPN using the configuration
+     * provided to the plugin.
+     *
+     * <p>You may choose to use Anti-VPN's internal cache
+     * for the result, or skip the cache and get an answer
+     * directly from the sources.</p>
+     *
+     * @param ip The IP to test
+     * @param useCache true if you would like to use Anti-VPN's internal cache, false if not
+     * @return a {@link CompletableFuture} - true if the cascade algorithm thinks the provided IP is a VPN/proxy, false if not
+     * @throws NullPointerException if ip is null
+     * @throws APIException in the result if a result could not be obtained
+     */
+    default @NonNull CompletableFuture<Boolean> cascade(@NonNull InetAddress ip, boolean useCache) { return cascade(ip.getHostAddress(), useCache); }
 
     /**
      * Gets the cascade result from Anti-VPN using the configuration
@@ -131,7 +168,23 @@ public interface IPManager {
      * @throws NullPointerException if ip is null
      * @throws APIException in the result if a result could not be obtained
      */
-    default @NonNull CompletableFuture<Double> consensus(@NonNull IP ip, boolean useCache) { return consensus(ip.getIp(), useCache); }
+    default @NonNull CompletableFuture<Double> consensus(@NonNull IP ip, boolean useCache) { return consensus(ip.getIP().getHostAddress(), useCache); }
+
+    /**
+     * Gets the consensus result from Anti-VPN using the configuration
+     * provided to the plugin.
+     *
+     * <p>You may choose to use Anti-VPN's internal cache
+     * for the result, or skip the cache and get an answer
+     * directly from the sources.</p>
+     *
+     * @param ip The IP to test
+     * @param useCache true if you would like to use Anti-VPN's internal cache, false if not
+     * @return a {@link CompletableFuture} - a number between 0 and 1 determining the likelihood that an IP is a VPN/proxy
+     * @throws NullPointerException if ip is null
+     * @throws APIException in the result if a result could not be obtained
+     */
+    default @NonNull CompletableFuture<Double> consensus(@NonNull InetAddress ip, boolean useCache) { return consensus(ip.getHostAddress(), useCache); }
 
     /**
      * Gets the consensus result from Anti-VPN using the configuration
@@ -171,7 +224,7 @@ public interface IPManager {
      * @return true if the player was online, false if not
      * @throws NullPointerException if player is null, player.getName() is null, or ip is null
      */
-    default boolean kickForVpn(@NonNull Player player, @NonNull IP ip) { return kickForVpn(Objects.requireNonNull(player.getName()), player.getUuid(), ip.getIp()); }
+    default boolean kickForVpn(@NonNull Player player, @NonNull IP ip) { return kickForVpn(Objects.requireNonNull(player.getName()), player.getUuid(), ip.getIP().getHostAddress()); }
 
     /**
      * Runs the player through the kick/command procedure
@@ -183,7 +236,18 @@ public interface IPManager {
      * @return true if the player was online, false if not
      * @throws NullPointerException if playerName, playerUuid, or ip is null
      */
-    default boolean kickForVpn(@NonNull String playerName, @NonNull UUID playerUuid, @NonNull IP ip) { return kickForVpn(playerName, playerUuid, ip.getIp()); }
+    default boolean kickForVpn(@NonNull String playerName, @NonNull UUID playerUuid, @NonNull IP ip) { return kickForVpn(playerName, playerUuid, ip.getIP().getHostAddress()); }
+
+    /**
+     * Runs the player through the kick/command procedure
+     * for VPN usage, as outlined by Anti-VPN's config.
+     *
+     * @param player The {@link Player} to kick
+     * @param ip The IP of the player to kick
+     * @return true if the player was online, false if not
+     * @throws NullPointerException if player is null, player.getName() is null, or ip is null
+     */
+    default boolean kickForVpn(@NonNull Player player, @NonNull InetAddress ip) { return kickForVpn(Objects.requireNonNull(player.getName()), player.getUuid(), ip.getHostAddress()); }
 
     /**
      * Runs the player through the kick/command procedure
@@ -206,6 +270,18 @@ public interface IPManager {
      * @return true if the player was online, false if not
      * @throws NullPointerException if playerName, playerUuid, or ip is null
      */
+    default boolean kickForVpn(@NonNull String playerName, @NonNull UUID playerUuid, @NonNull InetAddress ip) { return kickForVpn(playerName, playerUuid, ip.getHostAddress()); }
+
+    /**
+     * Runs the player through the kick/command procedure
+     * for VPN usage, as outlined by Anti-VPN's config.
+     *
+     * @param playerName The player name to kick
+     * @param playerUuid The player UUID to kick
+     * @param ip The IP of the player to kick
+     * @return true if the player was online, false if not
+     * @throws NullPointerException if playerName, playerUuid, or ip is null
+     */
     boolean kickForVpn(@NonNull String playerName, @NonNull UUID playerUuid, @NonNull String ip);
 
     /**
@@ -217,7 +293,7 @@ public interface IPManager {
      * @return the VPN kick message, as defined in Anti-VPN's config
      * @throws NullPointerException if player is null, player.getName() is null, or ip is null
      */
-    default @Nullable String getVpnKickMessage(@NonNull Player player, @NonNull IP ip) { return getVpnKickMessage(Objects.requireNonNull(player.getName()), player.getUuid(), ip.getIp()); }
+    default @Nullable String getVpnKickMessage(@NonNull Player player, @NonNull IP ip) { return getVpnKickMessage(Objects.requireNonNull(player.getName()), player.getUuid(), ip.getIP().getHostAddress()); }
 
     /**
      * Returns the VPN kick message as defined
@@ -229,7 +305,18 @@ public interface IPManager {
      * @return the VPN kick message, as defined in Anti-VPN's config
      * @throws NullPointerException if playerName, playerUuid, or ip is null
      */
-    default @Nullable String getVpnKickMessage(@NonNull String playerName, @NonNull UUID playerUuid, @NonNull IP ip) { return getVpnKickMessage(playerName, playerUuid, ip.getIp()); }
+    default @Nullable String getVpnKickMessage(@NonNull String playerName, @NonNull UUID playerUuid, @NonNull IP ip) { return getVpnKickMessage(playerName, playerUuid, ip.getIP().getHostAddress()); }
+
+    /**
+     * Returns the VPN kick message as defined
+     * in Anti-VPN's config, tailored to the player provided.
+     *
+     * @param player The {@link Player} to tailor the message to
+     * @param ip The IP of the player to tailor the message to
+     * @return the VPN kick message, as defined in Anti-VPN's config
+     * @throws NullPointerException if player is null, player.getName() is null, or ip is null
+     */
+    default @Nullable String getVpnKickMessage(@NonNull Player player, @NonNull InetAddress ip) { return getVpnKickMessage(Objects.requireNonNull(player.getName()), player.getUuid(), ip.getHostAddress()); }
 
     /**
      * Returns the VPN kick message as defined
@@ -252,6 +339,18 @@ public interface IPManager {
      * @return the VPN kick message, as defined in Anti-VPN's config
      * @throws NullPointerException if playerName, playerUuid, or ip is null
      */
+    default @Nullable String getVpnKickMessage(@NonNull String playerName, @NonNull UUID playerUuid, @NonNull InetAddress ip) { return getVpnKickMessage(playerName, playerUuid, ip.getHostAddress()); }
+
+    /**
+     * Returns the VPN kick message as defined
+     * in Anti-VPN's config, tailored to the player provided.
+     *
+     * @param playerName The player name to tailor the message to
+     * @param playerUuid The player UUID to tailor the message to
+     * @param ip The IP of the player to tailor the message to
+     * @return the VPN kick message, as defined in Anti-VPN's config
+     * @throws NullPointerException if playerName, playerUuid, or ip is null
+     */
     @Nullable String getVpnKickMessage(@NonNull String playerName, @NonNull UUID playerUuid, @NonNull String ip);
 
     /**
@@ -263,7 +362,7 @@ public interface IPManager {
      * @return a {@link List} of VPN commands to run, as defined in Anti-VPN's config
      * @throws NullPointerException if player is null, player.getName() is null, or ip is null
      */
-    default @NonNull List<String> getVpnCommands(@NonNull Player player, @NonNull IP ip) { return getVpnCommands(Objects.requireNonNull(player.getName()), player.getUuid(), ip.getIp()); }
+    default @NonNull List<String> getVpnCommands(@NonNull Player player, @NonNull IP ip) { return getVpnCommands(Objects.requireNonNull(player.getName()), player.getUuid(), ip.getIP().getHostAddress()); }
 
     /**
      * Returns the VPN commands as defined
@@ -275,7 +374,18 @@ public interface IPManager {
      * @return a {@link List} of VPN commands to run, as defined in Anti-VPN's config
      * @throws NullPointerException if playerName, playerUuid, or ip is null
      */
-    default @NonNull List<String> getVpnCommands(@NonNull String playerName, @NonNull UUID playerUuid, @NonNull IP ip) { return getVpnCommands(playerName, playerUuid, ip.getIp()); }
+    default @NonNull List<String> getVpnCommands(@NonNull String playerName, @NonNull UUID playerUuid, @NonNull IP ip) { return getVpnCommands(playerName, playerUuid, ip.getIP().getHostAddress()); }
+
+    /**
+     * Returns the VPN commands as defined
+     * in Anti-VPN's config, tailored to the player provided.
+     *
+     * @param player The {@link Player} to tailor the commands to
+     * @param ip The IP of the player to tailor the commands to
+     * @return a {@link List} of VPN commands to run, as defined in Anti-VPN's config
+     * @throws NullPointerException if player is null, player.getName() is null, or ip is null
+     */
+    default @NonNull List<String> getVpnCommands(@NonNull Player player, @NonNull InetAddress ip) { return getVpnCommands(Objects.requireNonNull(player.getName()), player.getUuid(), ip.getHostAddress()); }
 
     /**
      * Returns the VPN commands as defined
@@ -287,6 +397,18 @@ public interface IPManager {
      * @throws NullPointerException if player is null, player.getName() is null, or ip is null
      */
     default @NonNull List<String> getVpnCommands(@NonNull Player player, @NonNull String ip) { return getVpnCommands(Objects.requireNonNull(player.getName()), player.getUuid(), ip); }
+
+    /**
+     * Returns the VPN commands as defined
+     * in Anti-VPN's config, tailored to the player provided.
+     *
+     * @param playerName The player name to tailor the commands to
+     * @param playerUuid The player UUID to tailor the commands to
+     * @param ip The IP of the player to tailor the commands to
+     * @return a {@link List} of VPN commands to run, as defined in Anti-VPN's config
+     * @throws NullPointerException if playerName, playerUuid, or ip is null
+     */
+    default @NonNull List<String> getVpnCommands(@NonNull String playerName, @NonNull UUID playerUuid, @NonNull InetAddress ip) { return getVpnCommands(playerName, playerUuid, ip.getHostAddress()); }
 
     /**
      * Returns the VPN commands as defined
