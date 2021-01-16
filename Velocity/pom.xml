@@ -64,12 +64,24 @@
                             <shadedPattern>me.egg82.antivpn.external.annotator</shadedPattern>
                         </relocation>
                         <relocation>
+                            <pattern>co.aikar.commands</pattern>
+                            <shadedPattern>me.egg82.antivpn.external.co.aikar.commands</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>co.aikar.locales</pattern>
+                            <shadedPattern>me.egg82.antivpn.external.co.aikar.locales</shadedPattern>
+                        </relocation>
+                        <relocation>
                             <pattern>com.github.benmanes.caffeine</pattern>
                             <shadedPattern>me.egg82.antivpn.external.com.github.benmanes.caffeine</shadedPattern>
                         </relocation>
                         <relocation>
                             <pattern>com.rabbitmq</pattern>
                             <shadedPattern>me.egg82.antivpn.external.com.rabbitmq</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>com.zaxxer.hikari</pattern>
+                            <shadedPattern>me.egg82.antivpn.external.com.zaxxer.hikari</shadedPattern>
                         </relocation>
                         <relocation>
                             <pattern>inet.ipaddr</pattern>
@@ -104,16 +116,16 @@
                             <shadedPattern>me.egg82.antivpn.external.me.gong.mcleaks</shadedPattern>
                         </relocation>
                         <relocation>
+                            <pattern>ninja.egg82</pattern>
+                            <shadedPattern>me.egg82.antivpn.external.ninja.egg82</shadedPattern>
+                        </relocation>
+                        <relocation>
                             <pattern>okhttp</pattern>
                             <shadedPattern>me.egg82.antivpn.external.okhttp</shadedPattern>
                         </relocation>
                         <relocation>
                             <pattern>okio</pattern>
                             <shadedPattern>me.egg82.antivpn.external.okio</shadedPattern>
-                        </relocation>
-                        <relocation>
-                            <pattern>org.checkerframework</pattern>
-                            <shadedPattern>me.egg82.antivpn.external.org.checkerframework</shadedPattern>
                         </relocation>
                         <relocation>
                             <pattern>org.bstats</pattern>
