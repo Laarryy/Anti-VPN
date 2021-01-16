@@ -133,7 +133,7 @@ public class WebUtil {
         setConnectionProperties(conn, method, timeout, userAgent, headers, postData, null);
 
         Set<String> previousUrls = new HashSet<>();
-        previousUrls.add(url.toExternalForm());
+        previousUrls.add(url.toExternalForm() + (headers != null && headers.containsKey("Set-Cookie") ? ":" + headers.get("Set-Cookie") : ""));
 
         int status;
         boolean redirect;
@@ -147,7 +147,7 @@ public class WebUtil {
                 if (newUrl.charAt(0) == '/') {
                     newUrl = new URL(url.getProtocol(), url.getHost(), url.getPort(), newUrl, null).toExternalForm();
                 }
-                if (!previousUrls.add(newUrl)) {
+                if (!previousUrls.add(newUrl + (cookies != null ? ":" + cookies : ""))) {
                     throw new IOException("Recursive redirect detected.");
                 }
                 if (maxRedirects >= 0 && previousUrls.size() > maxRedirects) {
