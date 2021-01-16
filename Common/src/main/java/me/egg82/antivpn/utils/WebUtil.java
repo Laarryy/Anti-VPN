@@ -145,7 +145,7 @@ public class WebUtil {
                 String cookies = conn.getHeaderField("Set-Cookie");
                 String newUrl = conn.getHeaderField("Location");
                 if (newUrl.charAt(0) == '/') {
-                    newUrl = url.getProtocol() + "://" + url.getHost() + newUrl;
+                    newUrl = new URL(url.getProtocol(), url.getHost(), url.getPort(), newUrl, null).toExternalForm();
                 }
                 if (!previousUrls.add(newUrl)) {
                     throw new IOException("Recursive redirect detected.");
