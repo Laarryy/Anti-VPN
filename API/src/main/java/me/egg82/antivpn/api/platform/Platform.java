@@ -1,5 +1,6 @@
 package me.egg82.antivpn.api.platform;
 
+import java.net.InetAddress;
 import java.time.Instant;
 import java.util.Set;
 import java.util.UUID;
@@ -28,7 +29,7 @@ public interface Platform {
      *
      * @return the unique IPs
      */
-    @NonNull Set<String> getUniqueIPs();
+    @NonNull Set<InetAddress> getUniqueIPs();
 
     /**
      * Gets the time when the plugin first started.

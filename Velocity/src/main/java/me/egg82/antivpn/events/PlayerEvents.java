@@ -9,6 +9,7 @@ import inet.ipaddr.IPAddressString;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -54,7 +55,11 @@ public class PlayerEvents extends EventHolder {
                 VelocityEvents.subscribe(plugin, proxy, PostLoginEvent.class, PostOrder.LAST)
                         .handler(e -> {
                             VelocityPlatform.addUniquePlayer(e.getPlayer().getUniqueId());
-                            VelocityPlatform.addUniqueIp(getIp(e.getPlayer().getRemoteAddress()));
+                            try {
+                                VelocityPlatform.addUniqueIp(InetAddress.getByName(getIp(e.getPlayer().getRemoteAddress())));
+                            } catch (UnknownHostException ex) {
+                                logger.warn("Could not create InetAddress for " + getIp(e.getPlayer().getRemoteAddress()));
+                            }
                         })
         );
     }

@@ -3,6 +3,7 @@ package me.egg82.antivpn.events;
 import co.aikar.commands.CommandIssuer;
 import inet.ipaddr.IPAddressString;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -55,7 +56,11 @@ public class PlayerEvents extends EventHolder {
                             BukkitPlatform.addUniquePlayer(e.getPlayer().getUniqueId());
                             String ip = getIp(e.getAddress());
                             if (ip != null) {
-                                BukkitPlatform.addUniqueIp(ip);
+                                try {
+                                    BukkitPlatform.addUniqueIp(InetAddress.getByName(ip));
+                                } catch (UnknownHostException ex) {
+                                    logger.warn("Could not create InetAddress for " + ip);
+                                }
                             }
                         })
         );

@@ -5,6 +5,7 @@ import inet.ipaddr.IPAddressString;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -53,7 +54,11 @@ public class PlayerEvents extends EventHolder {
                 BungeeEvents.subscribe(plugin, PostLoginEvent.class, EventPriority.HIGHEST)
                         .handler(e -> {
                             BungeePlatform.addUniquePlayer(e.getPlayer().getUniqueId());
-                            BungeePlatform.addUniqueIp(getIp(e.getPlayer().getAddress()));
+                            try {
+                                BungeePlatform.addUniqueIp(InetAddress.getByName(getIp(e.getPlayer().getAddress())));
+                            } catch (UnknownHostException ex) {
+                                logger.warn("Could not create InetAddress for " + getIp(e.getPlayer().getAddress()));
+                            }
                         })
         );
     }
