@@ -141,27 +141,31 @@ public class WebUtil {
             status = conn.getResponseCode();
             redirect = status == HttpURLConnection.HTTP_MOVED_TEMP || status == HttpURLConnection.HTTP_MOVED_PERM || status == HttpURLConnection.HTTP_SEE_OTHER;
 
-            String cookies = conn.getHeaderField("Set-Cookie");
             if (redirect) {
+                String cookies = conn.getHeaderField("Set-Cookie");
                 String newUrl = conn.getHeaderField("Location");
+                if (newUrl.charAt(0) == '/') {
+                    newUrl = url.getProtocol() + "://" + url.getHost() + newUrl;
+                }
                 if (!previousUrls.add(newUrl)) {
                     throw new IOException("Recursive redirect detected.");
                 }
                 if (maxRedirects >= 0 && previousUrls.size() > maxRedirects) {
                     throw new IOException("Too many redirects.");
                 }
+                if (ConfigUtil.getDebugOrFalse()) {
+                    logger.info("Redirected to URL: " + newUrl);
+                }
                 conn = (HttpURLConnection) new URL(newUrl).openConnection();
-            } else {
-                conn = (HttpURLConnection) url.openConnection();
+                setConnectionProperties(conn, method, timeout, userAgent, headers, postData, cookies);
             }
-            setConnectionProperties(conn, method, timeout, userAgent, headers, postData, cookies);
         } while (redirect);
 
         return conn;
     }
 
     private static void setConnectionProperties(@NonNull HttpURLConnection conn, String method, int timeout, String userAgent, Map<String, String> headers, Map<String, String> postData, String cookies) throws IOException {
-        conn.setInstanceFollowRedirects(true);
+        conn.setInstanceFollowRedirects(false);
         conn.setConnectTimeout(timeout);
         conn.setReadTimeout(timeout);
 
