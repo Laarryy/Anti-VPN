@@ -31,9 +31,12 @@ class TestAPI {
 
     @Test
     void testSources() {
+        Assertions.assertDoesNotThrow(() -> VPNAPIProvider.getInstance().getSourceManager().getSources());
+
         List<Source<? extends SourceModel>> sources = VPNAPIProvider.getInstance().getSourceManager().getSources();
         for (Source<? extends SourceModel> source : sources) {
             Assertions.assertDoesNotThrow(() -> source.getResult("8.8.8.8").get());
+            Assertions.assertDoesNotThrow(() -> source.getRawResponse("8.8.8.8").get());
         }
     }
 
@@ -50,6 +53,12 @@ class TestAPI {
     void testIps() {
         IPManager manager = VPNAPIProvider.getInstance().getIPManager();
         Assertions.assertDoesNotThrow(() -> manager.getIP("8.8.8.8").get());
+        Assertions.assertDoesNotThrow(() -> manager.cascade("8.8.8.8", false).get());
+        Assertions.assertDoesNotThrow(() -> manager.cascade("8.8.8.8", true).get());
+        Assertions.assertDoesNotThrow(() -> manager.cascade("8.8.8.8", true).get());
+        Assertions.assertDoesNotThrow(() -> manager.consensus("8.8.8.8", false).get());
+        Assertions.assertDoesNotThrow(() -> manager.consensus("8.8.8.8", true).get());
+        Assertions.assertDoesNotThrow(() -> manager.consensus("8.8.8.8", true).get());
     }
 
     @AfterAll
