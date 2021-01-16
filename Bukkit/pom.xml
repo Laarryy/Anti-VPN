@@ -64,12 +64,28 @@
                             <shadedPattern>me.egg82.antivpn.external.annotator</shadedPattern>
                         </relocation>
                         <relocation>
+                            <pattern>co.aikar.commands</pattern>
+                            <shadedPattern>me.egg82.antivpn.external.co.aikar.commands</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>co.aikar.locales</pattern>
+                            <shadedPattern>me.egg82.antivpn.external.co.aikar.locales</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>co.aikar.taskchain</pattern>
+                            <shadedPattern>me.egg82.antivpn.external.co.aikar.taskchain</shadedPattern>
+                        </relocation>
+                        <relocation>
                             <pattern>com.github.benmanes.caffeine</pattern>
                             <shadedPattern>me.egg82.antivpn.external.com.github.benmanes.caffeine</shadedPattern>
                         </relocation>
                         <relocation>
                             <pattern>com.rabbitmq</pattern>
                             <shadedPattern>me.egg82.antivpn.external.com.rabbitmq</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>com.zaxxer.hikari</pattern>
+                            <shadedPattern>me.egg82.antivpn.external.com.zaxxer.hikari</shadedPattern>
                         </relocation>
                         <relocation>
                             <pattern>inet.ipaddr</pattern>
@@ -104,16 +120,16 @@
                             <shadedPattern>me.egg82.antivpn.external.me.gong.mcleaks</shadedPattern>
                         </relocation>
                         <relocation>
+                            <pattern>ninja.egg82</pattern>
+                            <shadedPattern>me.egg82.antivpn.external.ninja.egg82</shadedPattern>
+                        </relocation>
+                        <relocation>
                             <pattern>okhttp</pattern>
                             <shadedPattern>me.egg82.antivpn.external.okhttp</shadedPattern>
                         </relocation>
                         <relocation>
                             <pattern>okio</pattern>
                             <shadedPattern>me.egg82.antivpn.external.okio</shadedPattern>
-                        </relocation>
-                        <relocation>
-                            <pattern>org.checkerframework</pattern>
-                            <shadedPattern>me.egg82.antivpn.external.org.checkerframework</shadedPattern>
                         </relocation>
                         <relocation>
                             <pattern>org.bstats</pattern>
@@ -192,6 +208,10 @@
                                         <exclude>org/junit/**</exclude>
                                         <exclude>org/hamcrest/**</exclude>
                                         <exclude>ebean.mf</exclude>
+
+                                        <exclude>org/json/simple/**</exclude>
+                                        <exclude>org/slf4j/**</exclude>
+                                        <exclude>org/yaml/snakeyaml/**</exclude>
 
                                         <!-- dep injected (keep this to as few as possible) -->
                                         <exclude>io/ebeaninternal/api/**</exclude>
