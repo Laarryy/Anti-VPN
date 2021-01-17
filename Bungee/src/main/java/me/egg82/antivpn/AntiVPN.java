@@ -45,6 +45,7 @@ import me.egg82.antivpn.messaging.MessagingService;
 import me.egg82.antivpn.messaging.ServerIDUtil;
 import me.egg82.antivpn.services.GameAnalyticsErrorHandler;
 import me.egg82.antivpn.storage.StorageService;
+import me.egg82.antivpn.utils.ExceptionUtil;
 import me.egg82.antivpn.utils.ValidationUtil;
 import net.engio.mbassy.bus.MBassador;
 import net.md_5.bungee.api.ChatColor;
@@ -143,7 +144,11 @@ public class AntiVPN {
         }
         tasks.clear();
 
-        VPNAPIProvider.getInstance().runUpdateTask().join();
+        try {
+            VPNAPIProvider.getInstance().runUpdateTask().join();
+        } catch (CancellationException | CompletionException ex) {
+            ExceptionUtil.handleException(ex, logger);
+        }
 
         for (EventHolder eventHolder : eventHolders) {
             eventHolder.cancel();
@@ -329,7 +334,13 @@ public class AntiVPN {
     }
 
     private void loadTasks() {
-        tasks.add(ProxyServer.getInstance().getScheduler().schedule(plugin, () -> VPNAPIProvider.getInstance().runUpdateTask().join(), 1L, 1L, TimeUnit.SECONDS).getId());
+        tasks.add(ProxyServer.getInstance().getScheduler().schedule(plugin, () -> {
+            try {
+                VPNAPIProvider.getInstance().runUpdateTask().join();
+            } catch (CancellationException | CompletionException ex) {
+                ExceptionUtil.handleException(ex, logger);
+            }
+        }, 1L, 1L, TimeUnit.SECONDS).getId());
     }
 
     private void loadHooks() {

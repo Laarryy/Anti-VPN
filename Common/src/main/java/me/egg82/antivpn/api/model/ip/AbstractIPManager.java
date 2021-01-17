@@ -20,6 +20,7 @@ import me.egg82.antivpn.messaging.packets.DeleteIPPacket;
 import me.egg82.antivpn.messaging.packets.IPPacket;
 import me.egg82.antivpn.storage.StorageService;
 import me.egg82.antivpn.storage.models.IPModel;
+import me.egg82.antivpn.utils.ExceptionUtil;
 import me.egg82.antivpn.utils.PacketUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.slf4j.Logger;
@@ -242,9 +243,7 @@ public abstract class AbstractIPManager implements IPManager {
                         logger.info("Getting result from source " + source.getName() + ".");
                     }
                     try {
-                        Boolean result = source.getResult(ip)
-                                .exceptionally(this::handleException)
-                                .join();
+                        Boolean result = source.getResult(ip).get();
                         if (result != null) {
                             if (Boolean.TRUE.equals(result)) {
                                 results.addAndGet(1L);
@@ -254,17 +253,14 @@ public abstract class AbstractIPManager implements IPManager {
                             logger.error("Source " + source.getName() + " returned an error. Skipping.");
                             sourceInvalidationCache.put(source.getName(), Boolean.TRUE);
                         }
-                    } catch (CompletionException ignored) {
+                    } catch (InterruptedException ignored) {
                         logger.error("Source " + source.getName() + " returned an error. Skipping.");
                         sourceInvalidationCache.put(source.getName(), Boolean.TRUE);
-                    } catch (Exception ex) {
-                        if (cachedConfig.getDebug()) {
-                            logger.error(ex.getMessage(), ex);
-                        } else {
-                            logger.error(ex.getMessage());
-                        }
+                        Thread.currentThread().interrupt();
+                    } catch (ExecutionException | CancellationException ex) {
                         logger.error("Source " + source.getName() + " returned an error. Skipping.");
                         sourceInvalidationCache.put(source.getName(), Boolean.TRUE);
+                        ExceptionUtil.handleException(ex, logger);
                     }
                     latch.countDown();
                 });
@@ -304,26 +300,21 @@ public abstract class AbstractIPManager implements IPManager {
                     logger.info("Getting result from source " + source.getName() + ".");
                 }
                 try {
-                    retVal.setCascade(source.getResult(ip)
-                            .exceptionally(this::handleException)
-                            .join());
+                    retVal.setCascade(source.getResult(ip).get());
                     if (retVal.getCascade() != null) {
                         break;
                     } else {
                         logger.error("Source " + source.getName() + " returned an error. Skipping.");
                         sourceInvalidationCache.put(source.getName(), Boolean.TRUE);
                     }
-                } catch (CompletionException ignored) {
+                } catch (InterruptedException ignored) {
                     logger.error("Source " + source.getName() + " returned an error. Skipping.");
                     sourceInvalidationCache.put(source.getName(), Boolean.TRUE);
-                } catch (Exception ex) {
-                    if (cachedConfig.getDebug()) {
-                        logger.error(ex.getMessage(), ex);
-                    } else {
-                        logger.error(ex.getMessage());
-                    }
+                    Thread.currentThread().interrupt();
+                } catch (ExecutionException | CancellationException ex) {
                     logger.error("Source " + source.getName() + " returned an error. Skipping.");
                     sourceInvalidationCache.put(source.getName(), Boolean.TRUE);
+                    ExceptionUtil.handleException(ex, logger);
                 }
             }
 
@@ -335,29 +326,6 @@ public abstract class AbstractIPManager implements IPManager {
         }
 
         throw new APIException(false, "No sources were available to query. See https://github.com/egg82/AntiVPN/wiki/FAQ#Errors");
-    }
-
-    protected final <T> T handleException(Throwable ex) {
-        Throwable oldEx = null;
-        if (ex instanceof CompletionException) {
-            oldEx = ex;
-            ex = ex.getCause();
-        }
-
-        if (ex instanceof APIException) {
-            if (ConfigUtil.getDebugOrFalse()) {
-                logger.error("[Hard: " + ((APIException) ex).isHard() + "] " + ex.getMessage(), oldEx != null ? oldEx : ex);
-            } else {
-                logger.error("[Hard: " + ((APIException) ex).isHard() + "] " + ex.getMessage());
-            }
-        } else {
-            if (ConfigUtil.getDebugOrFalse()) {
-                logger.error(ex.getMessage(), oldEx != null ? oldEx : ex);
-            } else {
-                logger.error(ex.getMessage());
-            }
-        }
-        return null;
     }
 
     private void storeResult(@NonNull IPModel model, @NonNull CachedConfig cachedConfig) {

@@ -11,6 +11,7 @@ import me.egg82.antivpn.api.model.source.models.SourceModel;
 import me.egg82.antivpn.config.CachedConfig;
 import me.egg82.antivpn.config.ConfigUtil;
 import me.egg82.antivpn.lang.Message;
+import me.egg82.antivpn.utils.ExceptionUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 public class TestCommand extends AbstractCommand {
@@ -48,16 +49,11 @@ public class TestCommand extends AbstractCommand {
                             }
 
                             try {
-                                results.put(source.getName(), Optional.ofNullable(source.getResult(ip)
-                                        .exceptionally(this::handleException)
-                                        .join()));
-                            } catch (CompletionException ignored) {
-                            } catch (Exception ex) {
-                                if (cachedConfig.getDebug()) {
-                                    logger.error(ex.getMessage(), ex);
-                                } else {
-                                    logger.error(ex.getMessage());
-                                }
+                                results.put(source.getName(), Optional.ofNullable(source.getResult(ip).get()));
+                            } catch (InterruptedException ignored) {
+                                Thread.currentThread().interrupt();
+                            } catch (ExecutionException | CancellationException ex) {
+                                ExceptionUtil.handleException(ex, logger);
                             }
                             latch.countDown();
                         });

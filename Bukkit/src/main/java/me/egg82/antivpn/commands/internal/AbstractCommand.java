@@ -6,9 +6,6 @@ import co.aikar.taskchain.TaskChainAbortAction;
 import co.aikar.taskchain.TaskChainFactory;
 import java.io.IOException;
 import java.util.UUID;
-import java.util.concurrent.CompletionException;
-import me.egg82.antivpn.api.APIException;
-import me.egg82.antivpn.config.ConfigUtil;
 import me.egg82.antivpn.lang.Message;
 import me.egg82.antivpn.services.lookup.PlayerInfo;
 import me.egg82.antivpn.services.lookup.PlayerLookup;
@@ -26,29 +23,6 @@ public abstract class AbstractCommand implements Runnable {
     protected AbstractCommand(@NonNull CommandIssuer issuer, @NonNull TaskChainFactory taskFactory) {
         this.issuer = issuer;
         this.taskFactory = taskFactory;
-    }
-
-    protected final <T> @Nullable T handleException(@NonNull Throwable ex) {
-        Throwable oldEx = null;
-        if (ex instanceof CompletionException) {
-            oldEx = ex;
-            ex = ex.getCause();
-        }
-
-        if (ex instanceof APIException) {
-            if (ConfigUtil.getDebugOrFalse()) {
-                logger.error("[Hard: " + ((APIException) ex).isHard() + "] " + ex.getMessage(), oldEx != null ? oldEx : ex);
-            } else {
-                logger.error("[Hard: " + ((APIException) ex).isHard() + "] " + ex.getMessage());
-            }
-        } else {
-            if (ConfigUtil.getDebugOrFalse()) {
-                logger.error(ex.getMessage(), oldEx != null ? oldEx : ex);
-            } else {
-                logger.error(ex.getMessage());
-            }
-        }
-        return null;
     }
 
     protected @Nullable UUID fetchUuid(@NonNull String name) {

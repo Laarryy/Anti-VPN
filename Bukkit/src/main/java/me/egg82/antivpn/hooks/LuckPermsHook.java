@@ -2,8 +2,11 @@ package me.egg82.antivpn.hooks;
 
 import co.aikar.commands.CommandIssuer;
 import java.util.UUID;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import me.egg82.antivpn.config.ConfigUtil;
+import me.egg82.antivpn.utils.ExceptionUtil;
 import net.luckperms.api.LuckPermsProvider;
 import net.luckperms.api.context.ContextManager;
 import net.luckperms.api.context.ImmutableContextSet;
@@ -16,8 +19,12 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.server.PluginEnableEvent;
 import org.bukkit.plugin.Plugin;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class LuckPermsHook implements PluginHook {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+
     private final CommandIssuer console;
 
     public static void create(@NonNull Plugin plugin, @NonNull Plugin luckperms, @NonNull CommandIssuer console) {
@@ -58,7 +65,17 @@ public class LuckPermsHook implements PluginHook {
                 console.sendMessage("<c2>UUID</c2> <c1>" + uuid + "</c1><c2> is not loaded, forcing data load..</c2>");
             }
             CompletableFuture<User> future = userManager.loadUser(uuid);
-            user = future.join(); // Expensive
+            try {
+                user = future.get(); // Expensive
+            } catch (InterruptedException ignored) {
+                Thread.currentThread().interrupt();
+            } catch (ExecutionException | CancellationException ex) {
+                ExceptionUtil.handleException(ex, logger);
+                return false;
+            }
+            if (user == null) {
+                return false;
+            }
         } else {
             if (ConfigUtil.getDebugOrFalse()) {
                 console.sendMessage("<c2>UUID</c2> <c1>" + uuid + "</c1><c2> is previously loaded, using cached data..</c2>");

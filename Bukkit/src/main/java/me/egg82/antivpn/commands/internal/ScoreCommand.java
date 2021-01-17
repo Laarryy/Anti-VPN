@@ -4,6 +4,8 @@ import co.aikar.commands.CommandIssuer;
 import co.aikar.taskchain.TaskChainFactory;
 import java.text.DecimalFormat;
 import java.util.Set;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import me.egg82.antivpn.api.APIException;
 import me.egg82.antivpn.api.VPNAPIProvider;
@@ -13,6 +15,7 @@ import me.egg82.antivpn.api.model.source.models.SourceModel;
 import me.egg82.antivpn.config.ConfigUtil;
 import me.egg82.antivpn.lang.Message;
 import me.egg82.antivpn.utils.DNSUtil;
+import me.egg82.antivpn.utils.ExceptionUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 public class ScoreCommand extends AbstractCommand {
@@ -103,16 +106,20 @@ public class ScoreCommand extends AbstractCommand {
                 logger.info("Testing " + ip + " (" + i + "/" + ips.size() + ")");
             }
 
-            Boolean result;
+            boolean result;
             try {
-                result = source.getResult(ip)
-                        .exceptionally(this::handleException)
-                        .join();
-                if (result == null) {
+                Boolean val = source.getResult(ip).get();
+                if (val == null) {
                     error += 1;
                     continue;
                 }
-            } catch (Exception ex) {
+                result = val;
+            } catch (InterruptedException ignored) {
+                Thread.currentThread().interrupt();
+                error += 1;
+                continue;
+            } catch (ExecutionException | CancellationException ex) {
+                ExceptionUtil.handleException(ex, logger);
                 if (!(ex.getCause() instanceof APIException) || !((APIException) ex.getCause()).isHard()) {
                     error += 1;
                 }

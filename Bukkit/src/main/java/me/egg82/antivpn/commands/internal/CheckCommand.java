@@ -3,13 +3,16 @@ package me.egg82.antivpn.commands.internal;
 import co.aikar.commands.CommandIssuer;
 import co.aikar.taskchain.TaskChainFactory;
 import java.util.UUID;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletionException;
+import java.util.concurrent.ExecutionException;
 import me.egg82.antivpn.api.VPNAPIProvider;
 import me.egg82.antivpn.api.model.ip.AlgorithmMethod;
 import me.egg82.antivpn.api.model.ip.IPManager;
 import me.egg82.antivpn.api.model.player.PlayerManager;
 import me.egg82.antivpn.config.ConfigUtil;
 import me.egg82.antivpn.lang.Message;
+import me.egg82.antivpn.utils.ExceptionUtil;
 import me.egg82.antivpn.utils.ValidationUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -38,36 +41,26 @@ public class CheckCommand extends AbstractCommand {
                 .<Boolean>asyncCallback((v, r) -> {
                     if (ipManager.getCurrentAlgorithmMethod() == AlgorithmMethod.CONSESNSUS) {
                         try {
-                            Double val = ipManager.consensus(ip, true)
-                                .exceptionally(this::handleException)
-                                .join();
+                            Double val = ipManager.consensus(ip, true).get();
                             if (val == null) {
                                 r.accept(null);
                                 return;
                             }
                             r.accept(val >= ipManager.getMinConsensusValue());
                             return;
-                        } catch (CompletionException ignored) { }
-                        catch (Exception ex) {
-                            if (ConfigUtil.getDebugOrFalse()) {
-                                logger.error(ex.getMessage(), ex);
-                            } else {
-                                logger.error(ex.getMessage());
-                            }
+                        } catch (InterruptedException ignored) {
+                            Thread.currentThread().interrupt();
+                        } catch (ExecutionException | CancellationException ex) {
+                            ExceptionUtil.handleException(ex, logger);
                         }
                     } else {
                         try {
-                            r.accept(ipManager.cascade(ip, true)
-                                    .exceptionally(this::handleException)
-                                    .join());
+                            r.accept(ipManager.cascade(ip, true).get());
                             return;
-                        } catch (CompletionException ignored) { }
-                        catch (Exception ex) {
-                            if (ConfigUtil.getDebugOrFalse()) {
-                                logger.error(ex.getMessage(), ex);
-                            } else {
-                                logger.error(ex.getMessage());
-                            }
+                        } catch (InterruptedException ignored) {
+                            Thread.currentThread().interrupt();
+                        } catch (ExecutionException | CancellationException ex) {
+                            ExceptionUtil.handleException(ex, logger);
                         }
                     }
 
@@ -86,17 +79,12 @@ public class CheckCommand extends AbstractCommand {
                 .abortIfNull(this.handleAbort)
                 .<Boolean>asyncCallback((v, r) -> {
                     try {
-                        r.accept(playerManager.checkMcLeaks(v, true)
-                                .exceptionally(this::handleException)
-                                .join());
+                        r.accept(playerManager.checkMcLeaks(v, true).get());
                         return;
-                    } catch (CompletionException ignored) { }
-                    catch (Exception ex) {
-                        if (ConfigUtil.getDebugOrFalse()) {
-                            logger.error(ex.getMessage(), ex);
-                        } else {
-                            logger.error(ex.getMessage());
-                        }
+                    } catch (InterruptedException ignored) {
+                        Thread.currentThread().interrupt();
+                    } catch (ExecutionException | CancellationException ex) {
+                        ExceptionUtil.handleException(ex, logger);
                     }
 
                     r.accept(null);

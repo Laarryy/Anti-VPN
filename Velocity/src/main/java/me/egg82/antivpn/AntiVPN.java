@@ -12,6 +12,8 @@ import com.velocitypowered.api.scheduler.ScheduledTask;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import me.egg82.antivpn.api.*;
@@ -45,6 +47,7 @@ import me.egg82.antivpn.messaging.MessagingService;
 import me.egg82.antivpn.messaging.ServerIDUtil;
 import me.egg82.antivpn.services.GameAnalyticsErrorHandler;
 import me.egg82.antivpn.storage.StorageService;
+import me.egg82.antivpn.utils.ExceptionUtil;
 import me.egg82.antivpn.utils.ValidationUtil;
 import net.engio.mbassy.bus.MBassador;
 import net.kyori.text.format.TextColor;
@@ -121,7 +124,11 @@ public class AntiVPN {
         }
         tasks.clear();
 
-        VPNAPIProvider.getInstance().runUpdateTask().join();
+        try {
+            VPNAPIProvider.getInstance().runUpdateTask().join();
+        } catch (CancellationException | CompletionException ex) {
+            ExceptionUtil.handleException(ex, logger);
+        }
 
         for (EventHolder eventHolder : eventHolders) {
             eventHolder.cancel();
@@ -304,7 +311,13 @@ public class AntiVPN {
     }
 
     private void loadTasks() {
-        tasks.add(proxy.getScheduler().buildTask(plugin, () -> VPNAPIProvider.getInstance().runUpdateTask().join()).delay(1L, TimeUnit.SECONDS).repeat(1L, TimeUnit.SECONDS).schedule());
+        tasks.add(proxy.getScheduler().buildTask(plugin, () -> {
+            try {
+                VPNAPIProvider.getInstance().runUpdateTask().join();
+            } catch (CancellationException | CompletionException ex) {
+                ExceptionUtil.handleException(ex, logger);
+            }
+        }).delay(1L, TimeUnit.SECONDS).repeat(1L, TimeUnit.SECONDS).schedule());
     }
 
     private void loadHooks() {

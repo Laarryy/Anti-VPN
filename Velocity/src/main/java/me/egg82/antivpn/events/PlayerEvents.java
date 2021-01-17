@@ -13,9 +13,10 @@ import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletionException;
+import java.util.concurrent.ExecutionException;
 import me.egg82.antivpn.AntiVPN;
-import me.egg82.antivpn.api.APIException;
 import me.egg82.antivpn.api.VPNAPIProvider;
 import me.egg82.antivpn.api.model.ip.AlgorithmMethod;
 import me.egg82.antivpn.api.model.ip.IPManager;
@@ -26,6 +27,7 @@ import me.egg82.antivpn.config.ConfigUtil;
 import me.egg82.antivpn.hooks.LuckPermsHook;
 import me.egg82.antivpn.services.lookup.PlayerInfo;
 import me.egg82.antivpn.services.lookup.PlayerLookup;
+import me.egg82.antivpn.utils.ExceptionUtil;
 import me.egg82.antivpn.utils.ValidationUtil;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import ninja.egg82.events.VelocityEvents;
@@ -129,7 +131,11 @@ public class PlayerEvents extends EventHolder {
             IPManager ipManager = VPNAPIProvider.getInstance().getIPManager();
             List<String> commands = ipManager.getVpnCommands(event.getUsername(), uuid, ip);
             for (String command : commands) {
-                proxy.getCommandManager().executeImmediatelyAsync(proxy.getConsoleCommandSource(), command).join();
+                try {
+                    proxy.getCommandManager().executeImmediatelyAsync(proxy.getConsoleCommandSource(), command).join();
+                } catch (CancellationException | CompletionException ex) {
+                    ExceptionUtil.handleException(ex, logger);
+                }
             }
             String kickMessage = ipManager.getVpnKickMessage(event.getUsername(), uuid, ip);
             if (kickMessage != null) {
@@ -186,29 +192,19 @@ public class PlayerEvents extends EventHolder {
             IPManager ipManager = VPNAPIProvider.getInstance().getIPManager();
             if (cachedConfig.getVPNAlgorithmMethod() == AlgorithmMethod.CONSESNSUS) {
                 try {
-                    ipManager.consensus(ip, true)
-                        .exceptionally(this::handleException)
-                        .join(); // Calling this will cache the result internally, even if the value is unused
-                } catch (CompletionException ignored) { }
-                catch (Exception ex) {
-                    if (cachedConfig.getDebug()) {
-                        logger.error(ex.getMessage(), ex);
-                    } else {
-                        logger.error(ex.getMessage());
-                    }
+                    ipManager.consensus(ip, true).get(); // Calling this will cache the result internally, even if the value is unused
+                } catch (InterruptedException ignored) {
+                    Thread.currentThread().interrupt();
+                } catch (ExecutionException | CancellationException ex) {
+                    ExceptionUtil.handleException(ex, logger);
                 }
             } else {
                 try {
-                    ipManager.cascade(ip, true)
-                        .exceptionally(this::handleException)
-                        .join(); // Calling this will cache the result internally, even if the value is unused
-                } catch (CompletionException ignored) { }
-                catch (Exception ex) {
-                    if (cachedConfig.getDebug()) {
-                        logger.error(ex.getMessage(), ex);
-                    } else {
-                        logger.error(ex.getMessage());
-                    }
+                    ipManager.cascade(ip, true).get(); // Calling this will cache the result internally, even if the value is unused
+                } catch (InterruptedException ignored) {
+                    Thread.currentThread().interrupt();
+                } catch (ExecutionException | CancellationException ex) {
+                    ExceptionUtil.handleException(ex, logger);
                 }
             }
         }
@@ -217,16 +213,11 @@ public class PlayerEvents extends EventHolder {
         if (!cachedConfig.getMCLeaksKickMessage().isEmpty() || !cachedConfig.getMCLeaksActionCommands().isEmpty()) {
             PlayerManager playerManager = VPNAPIProvider.getInstance().getPlayerManager();
             try {
-                playerManager.checkMcLeaks(uuid, true)
-                    .exceptionally(this::handleException)
-                    .join(); // Calling this will cache the result internally, even if the value is unused
-            } catch (CompletionException ignored) { }
-            catch (Exception ex) {
-                if (cachedConfig.getDebug()) {
-                    logger.error(ex.getMessage(), ex);
-                } else {
-                    logger.error(ex.getMessage());
-                }
+                playerManager.checkMcLeaks(uuid, true).get(); // Calling this will cache the result internally, even if the value is unused
+            } catch (InterruptedException ignored) {
+                Thread.currentThread().interrupt();
+            } catch (ExecutionException | CancellationException ex) {
+                ExceptionUtil.handleException(ex, logger);
             }
         }
     }
@@ -310,33 +301,23 @@ public class PlayerEvents extends EventHolder {
             IPManager ipManager = VPNAPIProvider.getInstance().getIPManager();
             if (cachedConfig.getVPNAlgorithmMethod() == AlgorithmMethod.CONSESNSUS) {
                 try {
-                    Double val = ipManager.consensus(ip, true)
-                        .exceptionally(this::handleException)
-                        .join();
+                    Double val = ipManager.consensus(ip, true).get();
                     isVPN = val != null && val >= cachedConfig.getVPNAlgorithmConsensus();
-                } catch (CompletionException ignored) {
+                } catch (InterruptedException ignored) {
+                    Thread.currentThread().interrupt();
                     isVPN = false;
-                } catch (Exception ex) {
-                    if (cachedConfig.getDebug()) {
-                        logger.error(ex.getMessage(), ex);
-                    } else {
-                        logger.error(ex.getMessage());
-                    }
+                } catch (ExecutionException | CancellationException ex) {
+                    ExceptionUtil.handleException(ex, logger);
                     isVPN = false;
                 }
             } else {
                 try {
-                    isVPN = Boolean.TRUE.equals(ipManager.cascade(ip, true)
-                        .exceptionally(this::handleException)
-                        .join());
-                } catch (CompletionException ignored) {
+                    isVPN = Boolean.TRUE.equals(ipManager.cascade(ip, true).get());
+                } catch (InterruptedException ignored) {
+                    Thread.currentThread().interrupt();
                     isVPN = false;
-                } catch (Exception ex) {
-                    if (cachedConfig.getDebug()) {
-                        logger.error(ex.getMessage(), ex);
-                    } else {
-                        logger.error(ex.getMessage());
-                    }
+                } catch (ExecutionException | CancellationException ex) {
+                    ExceptionUtil.handleException(ex, logger);
                     isVPN = false;
                 }
             }
@@ -366,17 +347,12 @@ public class PlayerEvents extends EventHolder {
 
             PlayerManager playerManager = VPNAPIProvider.getInstance().getPlayerManager();
             try {
-                isMCLeaks = Boolean.TRUE.equals(playerManager.checkMcLeaks(uuid, true)
-                    .exceptionally(this::handleException)
-                    .join());
-            } catch (CompletionException ignored) {
+                isMCLeaks = Boolean.TRUE.equals(playerManager.checkMcLeaks(uuid, true).get());
+            } catch (InterruptedException ignored) {
+                Thread.currentThread().interrupt();
                 isMCLeaks = false;
-            } catch (Exception ex) {
-                if (cachedConfig.getDebug()) {
-                    logger.error(ex.getMessage(), ex);
-                } else {
-                    logger.error(ex.getMessage());
-                }
+            } catch (ExecutionException | CancellationException ex) {
+                ExceptionUtil.handleException(ex, logger);
                 isMCLeaks = false;
             }
 
@@ -422,27 +398,4 @@ public class PlayerEvents extends EventHolder {
     }
 
     private boolean rangeContains(@NonNull String range, @NonNull String ip) { return new IPAddressString(range).contains(new IPAddressString(ip)); }
-
-    private <T> @Nullable T handleException(@NonNull Throwable ex) {
-        Throwable oldEx = null;
-        if (ex instanceof CompletionException) {
-            oldEx = ex;
-            ex = ex.getCause();
-        }
-
-        if (ex instanceof APIException) {
-            if (ConfigUtil.getDebugOrFalse()) {
-                logger.error("[Hard: " + ((APIException) ex).isHard() + "] " + ex.getMessage(), oldEx != null ? oldEx : ex);
-            } else {
-                logger.error("[Hard: " + ((APIException) ex).isHard() + "] " + ex.getMessage());
-            }
-        } else {
-            if (ConfigUtil.getDebugOrFalse()) {
-                logger.error(ex.getMessage(), oldEx != null ? oldEx : ex);
-            } else {
-                logger.error(ex.getMessage());
-            }
-        }
-        return null;
-    }
 }

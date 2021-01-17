@@ -19,12 +19,12 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicLong;
-import me.egg82.antivpn.api.APIException;
 import me.egg82.antivpn.api.VPNAPIProvider;
 import me.egg82.antivpn.api.model.ip.AlgorithmMethod;
 import me.egg82.antivpn.api.model.ip.IPManager;
 import me.egg82.antivpn.api.model.player.PlayerManager;
 import me.egg82.antivpn.config.ConfigUtil;
+import me.egg82.antivpn.utils.ExceptionUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.slf4j.Logger;
@@ -104,34 +104,24 @@ public class PlayerAnalyticsHook implements PluginHook {
 
                     if (ipManager.getCurrentAlgorithmMethod() == AlgorithmMethod.CONSESNSUS) {
                         try {
-                            Double val = ipManager.consensus(ip, true)
-                                .exceptionally(this::handleException)
-                                .join();
+                            Double val = ipManager.consensus(ip, true).get();
                             if (val != null && val >= ipManager.getMinConsensusValue()) {
                                 results.addAndGet(1L);
                             }
-                        } catch (CompletionException ignored) {
-                        } catch (Exception ex) {
-                            if (ConfigUtil.getDebugOrFalse()) {
-                                logger.error(ex.getMessage(), ex);
-                            } else {
-                                logger.error(ex.getMessage());
-                            }
+                        } catch (InterruptedException ignored) {
+                            Thread.currentThread().interrupt();
+                        } catch (ExecutionException | CancellationException ex) {
+                            ExceptionUtil.handleException(ex, logger);
                         }
                     } else {
                         try {
-                            if (Boolean.TRUE.equals(ipManager.cascade(ip, true)
-                                    .exceptionally(this::handleException)
-                                    .join())) {
+                            if (Boolean.TRUE.equals(ipManager.cascade(ip, true).get())) {
                                 results.addAndGet(1L);
                             }
-                        } catch (CompletionException ignored) {
-                        } catch (Exception ex) {
-                            if (ConfigUtil.getDebugOrFalse()) {
-                                logger.error(ex.getMessage(), ex);
-                            } else {
-                                logger.error(ex.getMessage());
-                            }
+                        } catch (InterruptedException ignored) {
+                            Thread.currentThread().interrupt();
+                        } catch (ExecutionException | CancellationException ex) {
+                            ExceptionUtil.handleException(ex, logger);
                         }
                     }
                     latch.countDown();
@@ -175,18 +165,13 @@ public class PlayerAnalyticsHook implements PluginHook {
             for (Player p : players) {
                 pool.submit(() -> {
                     try {
-                        if (Boolean.TRUE.equals(playerManager.checkMcLeaks(p.getUniqueId(), true)
-                                .exceptionally(this::handleException)
-                                .join())) {
+                        if (Boolean.TRUE.equals(playerManager.checkMcLeaks(p.getUniqueId(), true).get())) {
                             results.addAndGet(1L);
                         }
-                    } catch (CompletionException ignored) {
-                    } catch (Exception ex) {
-                        if (ConfigUtil.getDebugOrFalse()) {
-                            logger.error(ex.getMessage(), ex);
-                        } else {
-                            logger.error(ex.getMessage());
-                        }
+                    } catch (InterruptedException ignored) {
+                        Thread.currentThread().interrupt();
+                    } catch (ExecutionException | CancellationException ex) {
+                        ExceptionUtil.handleException(ex, logger);
                     }
                     latch.countDown();
                 });
@@ -231,30 +216,20 @@ public class PlayerAnalyticsHook implements PluginHook {
 
             if (ipManager.getCurrentAlgorithmMethod() == AlgorithmMethod.CONSESNSUS) {
                 try {
-                    Double val = ipManager.consensus(ip, true)
-                        .exceptionally(this::handleException)
-                        .join();
+                    Double val = ipManager.consensus(ip, true).get();
                     return val != null && val >= ipManager.getMinConsensusValue();
-                } catch (CompletionException ignored) { }
-                catch (Exception ex) {
-                    if (ConfigUtil.getDebugOrFalse()) {
-                        logger.error(ex.getMessage(), ex);
-                    } else {
-                        logger.error(ex.getMessage());
-                    }
+                } catch (InterruptedException ignored) {
+                    Thread.currentThread().interrupt();
+                } catch (ExecutionException | CancellationException ex) {
+                    ExceptionUtil.handleException(ex, logger);
                 }
             } else {
                 try {
-                    return Boolean.TRUE.equals(ipManager.cascade(ip, true)
-                        .exceptionally(this::handleException)
-                        .join());
-                } catch (CompletionException ignored) { }
-                catch (Exception ex) {
-                    if (ConfigUtil.getDebugOrFalse()) {
-                        logger.error(ex.getMessage(), ex);
-                    } else {
-                        logger.error(ex.getMessage());
-                    }
+                    return Boolean.TRUE.equals(ipManager.cascade(ip, true).get());
+                } catch (InterruptedException ignored) {
+                    Thread.currentThread().interrupt();
+                } catch (ExecutionException | CancellationException ex) {
+                    ExceptionUtil.handleException(ex, logger);
                 }
             }
 
@@ -272,16 +247,11 @@ public class PlayerAnalyticsHook implements PluginHook {
             PlayerManager playerManager = VPNAPIProvider.getInstance().getPlayerManager();
 
             try {
-                return Boolean.TRUE.equals(playerManager.checkMcLeaks(playerId, true)
-                    .exceptionally(this::handleException)
-                    .join());
-            } catch (CompletionException ignored) { }
-            catch (Exception ex) {
-                if (ConfigUtil.getDebugOrFalse()) {
-                    logger.error(ex.getMessage(), ex);
-                } else {
-                    logger.error(ex.getMessage());
-                }
+                return Boolean.TRUE.equals(playerManager.checkMcLeaks(playerId, true).get());
+            } catch (InterruptedException ignored) {
+                Thread.currentThread().interrupt();
+            } catch (ExecutionException | CancellationException ex) {
+                ExceptionUtil.handleException(ex, logger);
             }
 
             return false;
@@ -297,29 +267,6 @@ public class PlayerAnalyticsHook implements PluginHook {
                 return null;
             }
             return host.getHostAddress();
-        }
-
-        private <T> @Nullable T handleException(@NonNull Throwable ex) {
-            Throwable oldEx = null;
-            if (ex instanceof CompletionException) {
-                oldEx = ex;
-                ex = ex.getCause();
-            }
-
-            if (ex instanceof APIException) {
-                if (ConfigUtil.getDebugOrFalse()) {
-                    logger.error("[Hard: " + ((APIException) ex).isHard() + "] " + ex.getMessage(), oldEx != null ? oldEx : ex);
-                } else {
-                    logger.error("[Hard: " + ((APIException) ex).isHard() + "] " + ex.getMessage());
-                }
-            } else {
-                if (ConfigUtil.getDebugOrFalse()) {
-                    logger.error(ex.getMessage(), oldEx != null ? oldEx : ex);
-                } else {
-                    logger.error(ex.getMessage());
-                }
-            }
-            return null;
         }
 
         public @NonNull CallEvents[] callExtensionMethodsOn() { return events; }
