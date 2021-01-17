@@ -623,6 +623,7 @@ public class AntiVPN {
     public void unloadServices() {
         VPNAPI api = VPNAPIProvider.getInstance();
         api.getEventBus().post(new GenericAPIDisableEvent(api)).now();
+        api.getEventBus().shutdown();
         APIRegistrationUtil.deregister();
 
         CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
