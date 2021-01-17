@@ -1,0 +1,59 @@
+acf-minecraft:
+  multiple_players_match: "cz"
+  version: 1.0
+
+description:
+  reload: "Znovu načte plugin."
+  import: "Importuje data z jednoho úložištového enginu na jiný."
+  check: "Prověří IP nebo hráče pomocí výchozího systému. Toto navrátí úplně stejnou hodnotu jako kterýkoli jiný API call."
+  score: "Skóruje určitý zdroj pomocí předvytvořeného seznamu známých dobrých a špatných IP adres. Toto vynutí prověření, takže při každém spuštění budou odečteny kredity."
+  test: "Otestuje IP adresu pomocí (povolených) služeb. Toto vynutí prověření, takže při každém spuštění budou odečteny kredity."
+
+general:
+  header: "<c2>[</c2><c3>Anti-VPN</c3><c2>]</c2> "
+  enabled: "<c4>Povoleno</c4>"
+  disabled: "<c5>Zakázáno</c5>"
+  load: "<c2>[</c2><c3>Verze</c3> {version}<c2>] [</c2>{commands} <c6>Příkazy</c6><c2>] [</c2>{events} <c7>Události</c7><c2>] [</c2>{tasks} <c8>Úkoly</c8><c2>]</c2>"
+  hook_enable: "<c4>Povolování podpory pro</c4> {plugin}"
+  hook_disable: "{plugin} <c2>nebyl nalezen. Podpora pro něj byla zakázána.</c2>"
+  update: "(Bukkit) <c3>má</c3> <c3>dostupnou</c3> <c4>aktualizaci</c4><c3>!</c3> Nová verze: <c2>{version}</c2>"
+
+error:
+  internal: "Interní chyba"
+
+import:
+  same_storage: "Zadaní master a slave jsou stejní!"
+  no_master: "Zadané master úložiště nebylo nalezeno."
+  no_slave: "Zadané slave úložiště nebylo nalezeno."
+  ips: "<c2>Importování IP adres..</c2> <c8>[</c8><c2>ID:</c2> <c3>{id}</c3><c8>]</c8>"
+  players: "<c2>Importování hráčů..</c2> <c8>[</c8><c2>ID:</c2> <c3>{id}</c3><c8>]</c8>"
+  vpns: "<c2>Importování VPN dat..</c2> <c8>[</c8><c2>ID:</c2> <c3>{id}</c3><c8>]</c8>"
+  mcleaks: "<c2>Importování MCLeaks dat..</c2> <c8>[</c8><c2>ID:</c2> <c3>{id}</c3><c8>]</c8>"
+  begin: "<c2>Importování dat, čekejte prosím..</c2>"
+  end: "<c4>Data úspěšně importována!</c4>"
+
+check:
+  begin: "<c2>Kontrola</c2> {type}<c2>, čekejte prosím..</c2>"
+  vpn_detected: "<c5>Detekována VPN/proxy</c5>"
+  no_vpn_detected: "<c4>Nebyla detekována VPN/proxy</c4>"
+  mcleaks_detected: "<c5>Detekován MCLeaks účet</c5>"
+  no_mcleaks_detected: "<c4>Nebyl detekován MCLeaks účet</c4>"
+
+score:
+  begin: "<c2>Skórování</c2> {source}<c2>, čekejte prosím..</c2>"
+  type: "<c2>Skórování vůči</c2> {type}<c2>..</c2>"
+  sleep: "<c2>Režim spánku na jednu minutu..</c2>"
+  error: "[{source}] {type} <c5>chyba</c5> {percent}%"
+  score: "[{source}] {type} <c2>skóre</c2> {percent}%"
+  end: "<c4>Skórování</c4> {source} <c4>dokončeno!</c4>"
+
+test:
+  begin: "<c2>Testování pomocí</c2> {ip}<c2>, čekejte prosím..</c2>"
+  error: "[{source}] <c2>chyba</c2>"
+  vpn_detected: "[{source}] <c5>Detekována VPN/proxy</c5>"
+  no_vpn_detected: "[{source}] <c4>Nebyla detekována VPN/proxy</c4>"
+  end: "<c4>Test IP adresy</c4> {ip} <c4>dokončen!</c4>"
+
+reload:
+  begin: "<c2>Znovunačítání, čekejte prosím..</c2>"
+  end: "<c4>Konfigurace znovu načtena!</c4>"
