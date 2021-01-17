@@ -310,9 +310,10 @@ public class PlayerEvents extends EventHolder {
             IPManager ipManager = VPNAPIProvider.getInstance().getIPManager();
             if (cachedConfig.getVPNAlgorithmMethod() == AlgorithmMethod.CONSESNSUS) {
                 try {
-                    isVPN = ipManager.consensus(ip, true)
+                    Double val = ipManager.consensus(ip, true)
                         .exceptionally(this::handleException)
-                        .join() >= cachedConfig.getVPNAlgorithmConsensus();
+                        .join();
+                    isVPN = val != null && val >= cachedConfig.getVPNAlgorithmConsensus();
                 } catch (CompletionException ignored) {
                     isVPN = false;
                 } catch (Exception ex) {
@@ -325,9 +326,9 @@ public class PlayerEvents extends EventHolder {
                 }
             } else {
                 try {
-                    isVPN = ipManager.cascade(ip, true)
+                    isVPN = Boolean.TRUE.equals(ipManager.cascade(ip, true)
                         .exceptionally(this::handleException)
-                        .join();
+                        .join());
                 } catch (CompletionException ignored) {
                     isVPN = false;
                 } catch (Exception ex) {
@@ -365,9 +366,9 @@ public class PlayerEvents extends EventHolder {
 
             PlayerManager playerManager = VPNAPIProvider.getInstance().getPlayerManager();
             try {
-                isMCLeaks = playerManager.checkMcLeaks(uuid, true)
+                isMCLeaks = Boolean.TRUE.equals(playerManager.checkMcLeaks(uuid, true)
                     .exceptionally(this::handleException)
-                    .join();
+                    .join());
             } catch (CompletionException ignored) {
                 isMCLeaks = false;
             } catch (Exception ex) {

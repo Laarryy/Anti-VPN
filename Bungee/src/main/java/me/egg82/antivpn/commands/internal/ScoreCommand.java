@@ -92,9 +92,9 @@ public class ScoreCommand extends AbstractCommand {
 
             boolean result;
             try {
-                result = source.getResult(ip)
+                result = Boolean.TRUE.equals(source.getResult(ip)
                         .exceptionally(this::handleException)
-                        .join();
+                        .join());
             } catch (Exception ex) {
                 if (!(ex.getCause() instanceof APIException) || !((APIException) ex.getCause()).isHard()) {
                     error += 1;

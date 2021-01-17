@@ -104,9 +104,10 @@ public class PlayerAnalyticsHook implements PluginHook {
 
                     if (ipManager.getCurrentAlgorithmMethod() == AlgorithmMethod.CONSESNSUS) {
                         try {
-                            if (ipManager.consensus(ip, true)
-                                    .exceptionally(this::handleException)
-                                    .join() >= ipManager.getMinConsensusValue()) {
+                            Double val = ipManager.consensus(ip, true)
+                                .exceptionally(this::handleException)
+                                .join();
+                            if (val != null && val >= ipManager.getMinConsensusValue()) {
                                 results.addAndGet(1L);
                             }
                         } catch (CompletionException ignored) {
@@ -230,9 +231,10 @@ public class PlayerAnalyticsHook implements PluginHook {
 
             if (ipManager.getCurrentAlgorithmMethod() == AlgorithmMethod.CONSESNSUS) {
                 try {
-                    return ipManager.consensus(ip, true)
-                            .exceptionally(this::handleException)
-                            .join() >= ipManager.getMinConsensusValue();
+                    Double val = ipManager.consensus(ip, true)
+                        .exceptionally(this::handleException)
+                        .join();
+                    return val != null && val >= ipManager.getMinConsensusValue();
                 } catch (CompletionException ignored) { }
                 catch (Exception ex) {
                     if (ConfigUtil.getDebugOrFalse()) {
@@ -243,9 +245,9 @@ public class PlayerAnalyticsHook implements PluginHook {
                 }
             } else {
                 try {
-                    return ipManager.cascade(ip, true)
-                            .exceptionally(this::handleException)
-                            .join();
+                    return Boolean.TRUE.equals(ipManager.cascade(ip, true)
+                        .exceptionally(this::handleException)
+                        .join());
                 } catch (CompletionException ignored) { }
                 catch (Exception ex) {
                     if (ConfigUtil.getDebugOrFalse()) {
@@ -270,9 +272,9 @@ public class PlayerAnalyticsHook implements PluginHook {
             PlayerManager playerManager = VPNAPIProvider.getInstance().getPlayerManager();
 
             try {
-                return playerManager.checkMcLeaks(playerId, true)
-                        .exceptionally(this::handleException)
-                        .join();
+                return Boolean.TRUE.equals(playerManager.checkMcLeaks(playerId, true)
+                    .exceptionally(this::handleException)
+                    .join());
             } catch (CompletionException ignored) { }
             catch (Exception ex) {
                 if (ConfigUtil.getDebugOrFalse()) {

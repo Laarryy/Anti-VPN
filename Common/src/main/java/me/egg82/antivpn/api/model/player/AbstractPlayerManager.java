@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.TimeUnit;
 import me.egg82.antivpn.api.APIException;
 import me.egg82.antivpn.config.CachedConfig;
@@ -94,7 +95,17 @@ public abstract class AbstractPlayerManager implements PlayerManager {
         return CompletableFuture.supplyAsync(() -> {
             PlayerModel model;
             if (useCache) {
-                model = playerCache.get(uniqueId);
+                try {
+                    model = playerCache.get(uniqueId);
+                } catch (CompletionException ex) {
+                    if (ex.getCause() instanceof APIException) {
+                        throw (APIException) ex.getCause();
+                    } else {
+                        throw new APIException(false, "Could not get data for player " + uniqueId, ex);
+                    }
+                } catch (RuntimeException | Error ex) {
+                    throw new APIException(false, "Could not get data for player " + uniqueId, ex);
+                }
             } else {
                 model = calculatePlayerResult(uniqueId, false);
             }

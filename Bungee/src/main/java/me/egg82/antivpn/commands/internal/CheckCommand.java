@@ -35,9 +35,10 @@ public class CheckCommand extends AbstractCommand {
 
         if (ipManager.getCurrentAlgorithmMethod() == AlgorithmMethod.CONSESNSUS) {
             try {
-                issuer.sendInfo(ipManager.consensus(ip, true)
-                        .exceptionally(this::handleException)
-                        .join() >= ipManager.getMinConsensusValue() ? Message.CHECK__VPN_DETECTED : Message.CHECK__NO_VPN_DETECTED);
+                Double val = ipManager.consensus(ip, true)
+                    .exceptionally(this::handleException)
+                    .join();
+                issuer.sendInfo(val != null && val >= ipManager.getMinConsensusValue() ? Message.CHECK__VPN_DETECTED : Message.CHECK__NO_VPN_DETECTED);
                 return;
             } catch (CompletionException ignored) { }
             catch (Exception ex) {
@@ -49,9 +50,9 @@ public class CheckCommand extends AbstractCommand {
             }
         } else {
             try {
-                issuer.sendInfo(ipManager.cascade(ip, true)
+                issuer.sendInfo(Boolean.TRUE.equals(ipManager.cascade(ip, true)
                         .exceptionally(this::handleException)
-                        .join() ? Message.CHECK__VPN_DETECTED : Message.CHECK__NO_VPN_DETECTED);
+                        .join()) ? Message.CHECK__VPN_DETECTED : Message.CHECK__NO_VPN_DETECTED);
                 return;
             } catch (CompletionException ignored) { }
             catch (Exception ex) {
@@ -76,9 +77,9 @@ public class CheckCommand extends AbstractCommand {
         }
 
         try {
-            issuer.sendInfo(playerManager.checkMcLeaks(uuid, true)
+            issuer.sendInfo(Boolean.TRUE.equals(playerManager.checkMcLeaks(uuid, true)
                     .exceptionally(this::handleException)
-                    .join() ? Message.CHECK__MCLEAKS_DETECTED : Message.CHECK__NO_MCLEAKS_DETECTED);
+                    .join()) ? Message.CHECK__MCLEAKS_DETECTED : Message.CHECK__NO_MCLEAKS_DETECTED);
             return;
         } catch (CompletionException ignored) { }
         catch (Exception ex) {

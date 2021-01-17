@@ -38,9 +38,14 @@ public class CheckCommand extends AbstractCommand {
                 .<Boolean>asyncCallback((v, r) -> {
                     if (ipManager.getCurrentAlgorithmMethod() == AlgorithmMethod.CONSESNSUS) {
                         try {
-                            r.accept(ipManager.consensus(ip, true)
-                                    .exceptionally(this::handleException)
-                                    .join() >= ipManager.getMinConsensusValue());
+                            Double val = ipManager.consensus(ip, true)
+                                .exceptionally(this::handleException)
+                                .join();
+                            if (val == null) {
+                                r.accept(null);
+                                return;
+                            }
+                            r.accept(val >= ipManager.getMinConsensusValue());
                             return;
                         } catch (CompletionException ignored) { }
                         catch (Exception ex) {

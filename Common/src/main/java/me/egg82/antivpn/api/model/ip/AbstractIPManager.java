@@ -143,7 +143,17 @@ public abstract class AbstractIPManager implements IPManager {
         return CompletableFuture.supplyAsync(() -> {
             IPModel model;
             if (useCache) {
-                model = ipCache.get(new Pair<>(ip, AlgorithmMethod.CASCADE));
+                try {
+                    model = ipCache.get(new Pair<>(ip, AlgorithmMethod.CASCADE));
+                } catch (CompletionException ex) {
+                    if (ex.getCause() instanceof APIException) {
+                        throw (APIException) ex.getCause();
+                    } else {
+                        throw new APIException(false, "Could not get data for IP " + ip, ex);
+                    }
+                } catch (RuntimeException | Error ex) {
+                    throw new APIException(false, "Could not get data for IP " + ip, ex);
+                }
             } else {
                 model = calculateIpResult(ip, AlgorithmMethod.CASCADE, false);
             }
@@ -158,7 +168,17 @@ public abstract class AbstractIPManager implements IPManager {
         return CompletableFuture.supplyAsync(() -> {
             IPModel model;
             if (useCache) {
-                model = ipCache.get(new Pair<>(ip, AlgorithmMethod.CONSESNSUS));
+                try {
+                    model = ipCache.get(new Pair<>(ip, AlgorithmMethod.CONSESNSUS));
+                } catch (CompletionException ex) {
+                    if (ex.getCause() instanceof APIException) {
+                        throw (APIException) ex.getCause();
+                    } else {
+                        throw new APIException(false, "Could not get data for IP " + ip, ex);
+                    }
+                } catch (RuntimeException | Error ex) {
+                    throw new APIException(false, "Could not get data for IP " + ip, ex);
+                }
             } else {
                 model = calculateIpResult(ip, AlgorithmMethod.CONSESNSUS, false);
             }

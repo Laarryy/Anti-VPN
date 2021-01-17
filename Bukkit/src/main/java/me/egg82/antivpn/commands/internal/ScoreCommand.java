@@ -103,11 +103,15 @@ public class ScoreCommand extends AbstractCommand {
                 logger.info("Testing " + ip + " (" + i + "/" + ips.size() + ")");
             }
 
-            boolean result;
+            Boolean result;
             try {
                 result = source.getResult(ip)
                         .exceptionally(this::handleException)
                         .join();
+                if (result == null) {
+                    error += 1;
+                    continue;
+                }
             } catch (Exception ex) {
                 if (!(ex.getCause() instanceof APIException) || !((APIException) ex.getCause()).isHard()) {
                     error += 1;
