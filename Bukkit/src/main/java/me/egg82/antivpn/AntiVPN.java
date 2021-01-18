@@ -160,7 +160,7 @@ public class AntiVPN {
             Thread.currentThread().interrupt();
         }
 
-        taskFactory.shutdown(4, TimeUnit.SECONDS);
+        taskFactory.shutdown(2, TimeUnit.SECONDS);
         commandManager.unregisterCommands();
 
         for (int task : tasks) {

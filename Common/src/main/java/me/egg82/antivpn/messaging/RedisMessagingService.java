@@ -43,7 +43,7 @@ public class RedisMessagingService extends AbstractMessagingService {
             closed = true;
             workPool.shutdown();
             try {
-                if (!workPool.awaitTermination(8L, TimeUnit.SECONDS)) {
+                if (!workPool.awaitTermination(4L, TimeUnit.SECONDS)) {
                     workPool.shutdownNow();
                 }
             } catch (InterruptedException ignored) {
