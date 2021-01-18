@@ -205,7 +205,6 @@
                                         <exclude>org/hamcrest/**</exclude>
                                         <exclude>ebean.mf</exclude>
 
-                                        <exclude>org/slf4j/**</exclude>
                                         <exclude>org/yaml/snakeyaml/**</exclude>
 
                                         <!-- dep injected (keep this to as few as possible) -->
