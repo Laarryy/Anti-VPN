@@ -1,6 +1,7 @@
 package me.egg82.antivpn.commands.internal;
 
 import co.aikar.commands.CommandIssuer;
+import co.aikar.taskchain.TaskChain;
 import co.aikar.taskchain.TaskChainFactory;
 import java.io.File;
 import me.egg82.antivpn.api.*;
@@ -17,6 +18,7 @@ import me.egg82.antivpn.messaging.GenericMessagingHandler;
 import me.egg82.antivpn.messaging.MessagingHandler;
 import me.egg82.antivpn.messaging.MessagingService;
 import me.egg82.antivpn.storage.StorageService;
+import me.egg82.antivpn.utils.ExceptionUtil;
 import ninja.egg82.service.ServiceLocator;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -33,7 +35,9 @@ public class ReloadCommand extends AbstractCommand {
     public void run() {
         issuer.sendInfo(Message.RELOAD__BEGIN);
 
-        taskFactory.<Void>newChain()
+        TaskChain<Void> chain = taskFactory.newChain();
+        chain.setErrorHandler((ex, task) -> ExceptionUtil.handleException(ex, logger));
+        chain
                 .async(() -> {
                     CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
                     if (cachedConfig == null) {

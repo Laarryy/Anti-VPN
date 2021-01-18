@@ -117,6 +117,7 @@ public class AntiVPN {
         GameAnalyticsErrorHandler.open(ServerIDUtil.getId(new File(plugin.getDataFolder(), "stats-id.txt")), plugin.getDescription().getVersion(), Bukkit.getVersion());
 
         taskFactory = BukkitTaskChainFactory.create(plugin);
+        taskFactory.setDefaultErrorHandler((ex, task) -> ExceptionUtil.handleException(ex, logger));
         commandManager = new PaperCommandManager(plugin);
         commandManager.enableUnstableAPI("help");
 

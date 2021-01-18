@@ -1,6 +1,7 @@
 package me.egg82.antivpn.commands.internal;
 
 import co.aikar.commands.CommandIssuer;
+import co.aikar.taskchain.TaskChain;
 import co.aikar.taskchain.TaskChainFactory;
 import java.util.*;
 import java.util.concurrent.*;
@@ -27,7 +28,9 @@ public class TestCommand extends AbstractCommand {
 
         SourceManager sourceManager = VPNAPIProvider.getInstance().getSourceManager();
 
-        taskFactory.<Void>newChain()
+        TaskChain<Void> chain = taskFactory.newChain();
+        chain.setErrorHandler((ex, task) -> ExceptionUtil.handleException(ex, logger));
+        chain
                 .<Map<String, Optional<Boolean>>>asyncCallback((v, r) -> {
                     CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
                     if (cachedConfig == null) {
@@ -36,42 +39,38 @@ public class TestCommand extends AbstractCommand {
                         return;
                     }
 
-                    ExecutorService pool = Executors.newWorkStealingPool(cachedConfig.getThreads());
+                    List<CompletableFuture<Boolean>> futures = new ArrayList<>();
                     List<Source<? extends SourceModel>> sources = sourceManager.getSources();
                     CountDownLatch latch = new CountDownLatch(sources.size());
 
                     ConcurrentMap<String, Optional<Boolean>> results = new ConcurrentHashMap<>(sources.size());
 
                     for (Source<? extends SourceModel> source : sources) {
-                        pool.submit(() -> {
-                            if (cachedConfig.getDebug()) {
-                                logger.info("Getting result from source " + source.getName() + ".");
-                            }
+                        if (cachedConfig.getDebug()) {
+                            logger.info("Getting result from source " + source.getName() + ".");
+                        }
 
-                            try {
-                                results.put(source.getName(), Optional.ofNullable(source.getResult(ip).get()));
-                            } catch (InterruptedException ignored) {
-                                Thread.currentThread().interrupt();
-                            } catch (ExecutionException | CancellationException ex) {
+                        futures.add(source.getResult(ip).whenCompleteAsync((val, ex) -> {
+                            if (ex != null) {
                                 ExceptionUtil.handleException(ex, logger);
+                                latch.countDown();
+                                return;
                             }
+                            results.put(source.getName(), Optional.ofNullable(val));
                             latch.countDown();
-                        });
+                        }));
                     }
 
                     try {
                         if (!latch.await(20L, TimeUnit.SECONDS)) {
                             logger.warn("Test timed out before all sources could be queried.");
                         }
-                    } catch (InterruptedException ex) {
-                        if (cachedConfig.getDebug()) {
-                            logger.error(ex.getMessage(), ex);
-                        } else {
-                            logger.error(ex.getMessage());
-                        }
+                    } catch (InterruptedException ignored) {
                         Thread.currentThread().interrupt();
                     }
-                    pool.shutdownNow(); // Kill it with fire
+                    for (CompletableFuture<Boolean> future : futures) {
+                        future.cancel(true); // Kill it with fire
+                    }
 
                     Map<String, Optional<Boolean>> retVal = new LinkedHashMap<>(sources.size());
                     for (Source<? extends SourceModel> source : sources) {

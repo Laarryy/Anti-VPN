@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CancellationException;
-import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutionException;
 import me.egg82.antivpn.AntiVPN;
 import me.egg82.antivpn.api.VPNAPIProvider;
@@ -78,7 +77,17 @@ public class PlayerEvents extends EventHolder {
             UUID uuid = fetchUuid(event.getConnection().getName());
             if (uuid != null) {
                 // LuckPerms + UUID is available, run through entire check gambit
-                checkPermsPlayer(event, uuid, luckPermsHook.get().hasPermission(uuid, "avpn.bypass"));
+                Boolean val;
+                try {
+                    val = luckPermsHook.get().hasPermission(uuid, "avpn.bypass").get();
+                } catch (InterruptedException ignored) {
+                    Thread.currentThread().interrupt();
+                    val = null;
+                } catch (ExecutionException | CancellationException ex) {
+                    ExceptionUtil.handleException(ex, logger);
+                    val = null;
+                }
+                checkPermsPlayer(event, uuid, Boolean.TRUE.equals(val));
             } else {
                 // LuckPerms is available but UUID is not, only cache data
                 cachePlayer(event, null);

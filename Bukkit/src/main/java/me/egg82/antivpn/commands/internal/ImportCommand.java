@@ -1,6 +1,7 @@
 package me.egg82.antivpn.commands.internal;
 
 import co.aikar.commands.CommandIssuer;
+import co.aikar.taskchain.TaskChain;
 import co.aikar.taskchain.TaskChainFactory;
 import java.util.Set;
 import me.egg82.antivpn.config.CachedConfig;
@@ -9,6 +10,7 @@ import me.egg82.antivpn.lang.Message;
 import me.egg82.antivpn.storage.StorageService;
 import me.egg82.antivpn.storage.models.IPModel;
 import me.egg82.antivpn.storage.models.PlayerModel;
+import me.egg82.antivpn.utils.ExceptionUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 public class ImportCommand extends AbstractCommand {
@@ -72,7 +74,9 @@ public class ImportCommand extends AbstractCommand {
         StorageService master = cachedConfig.getStorage().get(masterIndex);
         StorageService slave = cachedConfig.getStorage().get(slaveIndex);
 
-        taskFactory.<Void>newChain()
+        TaskChain<Void> chain = taskFactory.newChain();
+        chain.setErrorHandler((ex, task) -> ExceptionUtil.handleException(ex, logger));
+        chain
                 .sync(() -> issuer.sendInfo(Message.IMPORT__IPS, "{id}", "0"))
                 .<Integer>asyncCallback((v, r) -> {
                     int start = 1;

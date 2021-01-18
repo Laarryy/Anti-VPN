@@ -1,6 +1,7 @@
 package me.egg82.antivpn.commands.internal;
 
 import co.aikar.commands.CommandIssuer;
+import co.aikar.taskchain.TaskChain;
 import co.aikar.taskchain.TaskChainFactory;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -12,6 +13,7 @@ import me.egg82.antivpn.api.model.player.PlayerManager;
 import me.egg82.antivpn.config.CachedConfig;
 import me.egg82.antivpn.config.ConfigUtil;
 import me.egg82.antivpn.lang.Message;
+import me.egg82.antivpn.utils.ExceptionUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -35,7 +37,9 @@ public class KickCommand extends AbstractCommand {
             return;
         }
 
-        taskFactory.<Void>newChain()
+        TaskChain<Void> chain = taskFactory.newChain();
+        chain.setErrorHandler((ex, task) -> ExceptionUtil.handleException(ex, logger));
+        chain
                 .<UUID>asyncCallback((v, r) -> r.accept(fetchUuid(player)))
                 .abortIfNull(this.handleAbort)
                 .syncLast(v -> {

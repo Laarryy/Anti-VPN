@@ -4,6 +4,7 @@ import co.aikar.commands.CommandIssuer;
 import com.velocitypowered.api.proxy.ProxyServer;
 import java.io.IOException;
 import java.util.UUID;
+import me.egg82.antivpn.config.ConfigUtil;
 import me.egg82.antivpn.services.lookup.PlayerInfo;
 import me.egg82.antivpn.services.lookup.PlayerLookup;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -27,7 +28,11 @@ public abstract class AbstractCommand implements Runnable {
         try {
             info = PlayerLookup.get(name, proxy);
         } catch (IOException ex) {
-            logger.warn("Could not fetch player UUID. (rate-limited?)", ex);
+            if (ConfigUtil.getDebugOrFalse()) {
+                logger.warn("Could not fetch player UUID. (rate-limited?)", ex);
+            } else {
+                logger.warn("Could not fetch player UUID. (rate-limited?)");
+            }
             return null;
         }
         return info.getUUID();

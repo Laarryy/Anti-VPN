@@ -1,6 +1,7 @@
 package me.egg82.antivpn.commands.internal;
 
 import co.aikar.commands.CommandIssuer;
+import co.aikar.taskchain.TaskChain;
 import co.aikar.taskchain.TaskChainFactory;
 import java.text.DecimalFormat;
 import java.util.Set;
@@ -33,7 +34,9 @@ public class ScoreCommand extends AbstractCommand {
 
         SourceManager sourceManager = VPNAPIProvider.getInstance().getSourceManager();
 
-        taskFactory.<Void>newChain()
+        TaskChain<Void> chain = taskFactory.newChain();
+        chain.setErrorHandler((ex, task) -> ExceptionUtil.handleException(ex, logger));
+        chain
                 .<Source<? extends SourceModel>>currentCallback((v, r) -> r.accept(sourceManager.getSource(sourceName)))
                 .abortIfNull(this.handleAbort)
                 .sync(v -> {
