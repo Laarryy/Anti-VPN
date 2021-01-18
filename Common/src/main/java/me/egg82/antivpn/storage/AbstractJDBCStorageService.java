@@ -60,7 +60,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
     }
 
     public void deleteModel(@NonNull BaseModel model) {
-        BaseModel newModel = duplicateModel(model);
+        BaseModel newModel = duplicateModel(model, true);
         if (newModel == null) {
             return;
         }
@@ -258,7 +258,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         }
     }
 
-    private @Nullable BaseModel duplicateModel(@NonNull BaseModel model) {
+    private @Nullable BaseModel duplicateModel(@NonNull BaseModel model, boolean keepModified) {
         BaseModel retVal = null;
         if (model instanceof IPModel) {
             IPModel m = new IPModel();
@@ -276,7 +276,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
 
         if (retVal != null) {
             retVal.setCreated(model.getCreated());
-            retVal.setModified(model.getModified());
+            retVal.setModified(keepModified ? model.getModified() : null);
         } else {
             logger.error("duplicateModel is returning null.");
         }
@@ -290,12 +290,9 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
                     .ip.equalTo(((IPModel) model).getIp())
                     .findOne();
             if (m == null) {
-                m = (IPModel) duplicateModel(model);
+                m = (IPModel) duplicateModel(model, keepModified);
                 if (m == null) {
                     return;
-                }
-                if (!keepModified) {
-                    m.setModified(null);
                 }
                 connection.save(m);
             } else {
@@ -303,9 +300,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
                 m.setCascade(((IPModel) model).getCascade());
                 m.setConsensus(((IPModel) model).getConsensus());
                 m.setCreated(model.getCreated());
-                if (!keepModified) {
-                    m.setModified(null);
-                }
+                m.setModified(keepModified ? model.getModified() : null);
                 connection.update(m);
             }
         } else if (model instanceof PlayerModel) {
@@ -313,20 +308,15 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
                     .uuid.equalTo(((PlayerModel) model).getUuid())
                     .findOne();
             if (m == null) {
-                m = (PlayerModel) duplicateModel(model);
+                m = (PlayerModel) duplicateModel(model, keepModified);
                 if (m == null) {
                     return;
-                }
-                if (!keepModified) {
-                    m.setModified(null);
                 }
                 connection.save(m);
             } else {
                 m.setMcleaks(((PlayerModel) model).isMcleaks());
                 m.setCreated(model.getCreated());
-                if (!keepModified) {
-                    m.setModified(null);
-                }
+                m.setModified(keepModified ? model.getModified() : null);
                 connection.update(m);
             }
         }
