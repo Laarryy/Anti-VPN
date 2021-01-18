@@ -100,10 +100,7 @@ public class CachedConfig {
             return this;
         }
 
-        public CachedConfig.Builder sourceCacheTime(TimeUtil.Time value) {
-            if (value == null) {
-                throw new IllegalArgumentException("value cannot be null.");
-            }
+        public CachedConfig.Builder sourceCacheTime(TimeUtil.@NonNull Time value) {
             if (value.getMillis() <= 0L) {
                 throw new IllegalArgumentException("value cannot be <= 0.");
             }

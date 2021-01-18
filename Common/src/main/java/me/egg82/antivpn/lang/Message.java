@@ -20,8 +20,6 @@ public enum Message implements MessageKeyProvider {
     IMPORT__NO_SLAVE,
     IMPORT__IPS,
     IMPORT__PLAYERS,
-    IMPORT__VPNS,
-    IMPORT__MCLEAKS,
     IMPORT__BEGIN,
     IMPORT__END,
 

@@ -69,6 +69,8 @@ public class KickCommand extends AbstractCommand {
             if (kickMessage != null) {
                 p.disconnect(TextComponent.fromLegacyText(kickMessage));
             }
+
+            issuer.sendInfo(Message.KICK__END_VPN, "{player}", player);
         } else if (type.equalsIgnoreCase("mcleaks")) {
             PlayerManager playerManager = VPNAPIProvider.getInstance().getPlayerManager();
 
@@ -84,9 +86,9 @@ public class KickCommand extends AbstractCommand {
             if (kickMessage != null) {
                 p.disconnect(TextComponent.fromLegacyText(kickMessage));
             }
-        }
 
-        issuer.sendInfo(Message.KICK__END_VPN, "{player}", player);
+            issuer.sendInfo(Message.KICK__END_MCLEAKS, "{player}", player);
+        }
     }
 
     private @Nullable String getIp(InetSocketAddress address) {

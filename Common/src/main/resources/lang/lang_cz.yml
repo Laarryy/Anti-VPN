@@ -1,6 +1,6 @@
 acf-minecraft:
   multiple_players_match: "cz"
-  version: 1.0
+  version: 1.1
 
 description:
   reload: "Znovu načte plugin."
@@ -28,8 +28,6 @@ import:
   no_slave: "Zadané slave úložiště nebylo nalezeno."
   ips: "<c2>Importování IP adres..</c2> <c8>[</c8><c2>ID:</c2> <c3>{id}</c3><c8>]</c8>"
   players: "<c2>Importování hráčů..</c2> <c8>[</c8><c2>ID:</c2> <c3>{id}</c3><c8>]</c8>"
-  vpns: "<c2>Importování VPN dat..</c2> <c8>[</c8><c2>ID:</c2> <c3>{id}</c3><c8>]</c8>"
-  mcleaks: "<c2>Importování MCLeaks dat..</c2> <c8>[</c8><c2>ID:</c2> <c3>{id}</c3><c8>]</c8>"
   begin: "<c2>Importování dat, čekejte prosím..</c2>"
   end: "<c4>Data úspěšně importována!</c4>"
 

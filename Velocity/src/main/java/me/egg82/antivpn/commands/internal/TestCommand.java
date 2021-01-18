@@ -83,5 +83,6 @@ public class TestCommand extends AbstractCommand {
             }
             issuer.sendInfo(kvp.getValue().get() ? Message.TEST__VPN_DETECTED : Message.TEST__NO_VPN_DETECTED, "{source}", kvp.getKey());
         }
+        issuer.sendInfo(Message.TEST__END, "{ip}", ip);
     }
 }

@@ -1,6 +1,6 @@
 acf-minecraft:
   multiple_players_match: "en"
-  version: 1.1
+  version: 1.2
 
 description:
   reload: "Reloads the plugin."
@@ -28,8 +28,6 @@ import:
   no_slave: "The specified slave storage was not found."
   ips: "<c2>Importing IPs..</c2> <c8>[</c8><c2>ID:</c2> <c3>{id}</c3><c8>]</c8>"
   players: "<c2>Importing players..</c2> <c8>[</c8><c2>ID:</c2> <c3>{id}</c3><c8>]</c8>"
-  vpns: "<c2>Importing VPN data..</c2> <c8>[</c8><c2>ID:</c2> <c3>{id}</c3><c8>]</c8>"
-  mcleaks: "<c2>Importing MCLeaks data..</c2> <c8>[</c8><c2>ID:</c2> <c3>{id}</c3><c8>]</c8>"
   begin: "<c2>Importing data, please wait..</c2>"
   end: "<c4>Data successfully imported!</c4>"
 

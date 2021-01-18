@@ -3,7 +3,7 @@ package me.egg82.antivpn.api.platform;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
- * Provides information about the LuckPerms plugin.
+ * Provides information about the Anti-VPN plugin.
  */
 public interface PluginMetadata {
     /**

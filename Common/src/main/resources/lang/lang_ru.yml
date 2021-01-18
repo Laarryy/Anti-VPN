@@ -1,6 +1,6 @@
 acf-minecraft:
   multiple_players_match: "ru"
-  version: 1.0
+  version: 1.1
 
 description:
   reload: "Перезагрузка плагина."
@@ -28,8 +28,6 @@ import:
   no_slave: "(Plz translate) The specified slave storage was not found."
   ips: "(Plz translate) <c2>Importing IPs..</c2> <c8>[</c8><c2>ID:</c2> <c3>{id}</c3><c8>]</c8>"
   players: "(Plz translate) <c2>Importing players..</c2> <c8>[</c8><c2>ID:</c2> <c3>{id}</c3><c8>]</c8>"
-  vpns: "(Plz translate) <c2>Importing VPN data..</c2> <c8>[</c8><c2>ID:</c2> <c3>{id}</c3><c8>]</c8>"
-  mcleaks: "(Plz translate) <c2>Importing MCLeaks data..</c2> <c8>[</c8><c2>ID:</c2> <c3>{id}</c3><c8>]</c8>"
   begin: "(Plz translate) <c2>Importing data, please wait..</c2>"
   end: "(Plz translate) <c4>Data successfully imported!</c4>"
 
