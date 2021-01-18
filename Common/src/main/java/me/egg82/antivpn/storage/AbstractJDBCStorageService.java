@@ -42,7 +42,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
     public void storeModel(@NonNull BaseModel model) {
         queueLock.readLock().lock();
         try {
-            createOrUpdate(model);
+            createOrUpdate(model, false);
         } finally {
             queueLock.readLock().unlock();
         }
@@ -52,7 +52,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         queueLock.readLock().lock();
         try {
             for (BaseModel model : models) {
-                createOrUpdate(model);
+                createOrUpdate(model, true);
             }
         } finally {
             queueLock.readLock().unlock();
@@ -284,7 +284,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         return retVal;
     }
 
-    private void createOrUpdate(@NonNull BaseModel model) {
+    private void createOrUpdate(@NonNull BaseModel model, boolean keepModified) {
         if (model instanceof IPModel) {
             IPModel m = new QIPModel(connection)
                     .ip.equalTo(((IPModel) model).getIp())
@@ -294,13 +294,18 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
                 if (m == null) {
                     return;
                 }
+                if (!keepModified) {
+                    m.setModified(null);
+                }
                 connection.save(m);
             } else {
                 m.setType(((IPModel) model).getType());
                 m.setCascade(((IPModel) model).getCascade());
                 m.setConsensus(((IPModel) model).getConsensus());
                 m.setCreated(model.getCreated());
-                m.setModified(model.getModified());
+                if (!keepModified) {
+                    m.setModified(null);
+                }
                 connection.update(m);
             }
         } else if (model instanceof PlayerModel) {
@@ -312,11 +317,16 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
                 if (m == null) {
                     return;
                 }
+                if (!keepModified) {
+                    m.setModified(null);
+                }
                 connection.save(m);
             } else {
                 m.setMcleaks(((PlayerModel) model).isMcleaks());
                 m.setCreated(model.getCreated());
-                m.setModified(model.getModified());
+                if (!keepModified) {
+                    m.setModified(null);
+                }
                 connection.update(m);
             }
         }
