@@ -148,7 +148,7 @@ public class PlayerEvents extends EventHolder {
             }
         }
 
-        if (isMcLeaks(event.getConnection().getName(), event.getConnection().getUniqueId(), cachedConfig)) {
+        if (isMcLeaks(event.getConnection().getName(), uuid, cachedConfig)) {
             AntiVPN.incrementBlockedMCLeaks();
             PlayerManager playerManager = VPNAPIProvider.getInstance().getPlayerManager();
             List<String> commands = playerManager.getMcLeaksCommands(event.getConnection().getName(), uuid, ip);
