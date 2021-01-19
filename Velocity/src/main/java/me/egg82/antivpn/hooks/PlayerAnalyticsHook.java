@@ -90,7 +90,7 @@ public class PlayerAnalyticsHook implements PluginHook {
             IPManager ipManager = VPNAPIProvider.getInstance().getIPManager();
 
             Collection<Player> players = proxy.getAllPlayers();
-            ExecutorService pool = Executors.newWorkStealingPool(Math.min(players.size() / 2, Runtime.getRuntime().availableProcessors() / 2));
+            ExecutorService pool = Executors.newWorkStealingPool(Math.max(players.size() / 2, Runtime.getRuntime().availableProcessors() / 2));
             CountDownLatch latch = new CountDownLatch(players.size());
             AtomicLong results = new AtomicLong(0L);
 
@@ -158,7 +158,7 @@ public class PlayerAnalyticsHook implements PluginHook {
             PlayerManager playerManager = VPNAPIProvider.getInstance().getPlayerManager();
 
             Collection<Player> players = proxy.getAllPlayers();
-            ExecutorService pool = Executors.newWorkStealingPool(Math.min(players.size() / 2, Runtime.getRuntime().availableProcessors() / 2));
+            ExecutorService pool = Executors.newWorkStealingPool(Math.max(players.size() / 2, Runtime.getRuntime().availableProcessors() / 2));
             CountDownLatch latch = new CountDownLatch(players.size());
             AtomicLong results = new AtomicLong(0L);
 
