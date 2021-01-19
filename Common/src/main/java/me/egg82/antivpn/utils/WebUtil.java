@@ -61,6 +61,36 @@ public class WebUtil {
         }
     }
 
+    public static @NonNull String getStringWithThrows(@NonNull URL url) throws IOException { return getStringWithThrows(url, null, 5000, null, null, null, 20); }
+
+    public static @NonNull String getStringWithThrows(@NonNull URL url, String method) throws IOException { return getStringWithThrows(url, method, 5000, null, null, null, 20); }
+
+    public static @NonNull String getStringWithThrows(@NonNull URL url, String method, int timeout) throws IOException { return getStringWithThrows(url, method, timeout, null, null, null, 20); }
+
+    public static @NonNull String getStringWithThrows(@NonNull URL url, String method, int timeout, String userAgent) throws IOException { return getStringWithThrows(url, method, timeout, userAgent, null, null, 20); }
+
+    public static @NonNull String getStringWithThrows(@NonNull URL url, String method, int timeout, String userAgent, Map<String, String> headers) throws IOException { return getStringWithThrows(url, method, timeout, userAgent, headers, null, 20); }
+
+    public static @NonNull String getStringWithThrows(@NonNull URL url, String method, int timeout, String userAgent, Map<String, String> headers, Map<String, String> postData) throws IOException { return getStringWithThrows(url, method, timeout, userAgent, headers, postData, 20); }
+
+    public static @NonNull String getStringWithThrows(@NonNull URL url, String method, int timeout, String userAgent, Map<String, String> headers, Map<String, String> postData, int maxRedirects) throws IOException {
+        if (headers == null) {
+            headers = new HashMap<>();
+        }
+        if (!hasKey(headers, "Accept-Language")) {
+            headers.put("Accept-Language", "en-US,en;q=0.8");
+        }
+
+        try (InputStream in = getInputStreamWithThrows(url, method, timeout, userAgent, headers, postData, maxRedirects); InputStreamReader reader = new InputStreamReader(in); BufferedReader buffer = new BufferedReader(reader)) {
+            StringBuilder builder = new StringBuilder();
+            String line;
+            while ((line = buffer.readLine()) != null) {
+                builder.append(line);
+            }
+            return builder.toString();
+        }
+    }
+
     public static @NonNull String getString(@NonNull HttpURLConnection conn) throws IOException {
         try (InputStream in = getInputStream(conn); InputStreamReader reader = new InputStreamReader(in); BufferedReader buffer = new BufferedReader(reader)) {
             StringBuilder builder = new StringBuilder();
@@ -93,6 +123,37 @@ public class WebUtil {
         }
 
         try (InputStream in = getInputStream(url, method, timeout, userAgent, headers, postData, maxRedirects); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+            int read;
+            byte[] buffer = new byte[4096];
+            while ((read = in.read(buffer, 0, buffer.length)) > 0) {
+                out.write(buffer, 0, read);
+            }
+            out.flush();
+            return out.toByteArray();
+        }
+    }
+
+    public static byte @NonNull [] getBytesWithThrows(@NonNull URL url) throws IOException { return getBytesWithThrows(url, null, 5000, null, null, null, 20); }
+
+    public static byte @NonNull [] getBytesWithThrows(@NonNull URL url, String method) throws IOException { return getBytesWithThrows(url, method, 5000, null, null, null, 20); }
+
+    public static byte @NonNull [] getBytesWithThrows(@NonNull URL url, String method, int timeout) throws IOException { return getBytesWithThrows(url, method, timeout, null, null, null, 20); }
+
+    public static byte @NonNull [] getBytesWithThrows(@NonNull URL url, String method, int timeout, String userAgent) throws IOException { return getBytesWithThrows(url, method, timeout, userAgent, null, null, 20); }
+
+    public static byte @NonNull [] getBytesWithThrows(@NonNull URL url, String method, int timeout, String userAgent, Map<String, String> headers) throws IOException { return getBytesWithThrows(url, method, timeout, userAgent, headers, null, 20); }
+
+    public static byte @NonNull [] getBytesWithThrows(@NonNull URL url, String method, int timeout, String userAgent, Map<String, String> headers, Map<String, String> postData) throws IOException { return getBytesWithThrows(url, method, timeout, userAgent, headers, postData, 20); }
+
+    public static byte @NonNull [] getBytesWithThrows(@NonNull URL url, String method, int timeout, String userAgent, Map<String, String> headers, Map<String, String> postData, int maxRedirects) throws IOException {
+        if (headers == null) {
+            headers = new HashMap<>();
+        }
+        if (!hasKey(headers, "Accept-Language")) {
+            headers.put("Accept-Language", "en-US,en;q=0.8");
+        }
+
+        try (InputStream in = getInputStreamWithThrows(url, method, timeout, userAgent, headers, postData, maxRedirects); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             int read;
             byte[] buffer = new byte[4096];
             while ((read = in.read(buffer, 0, buffer.length)) > 0) {
@@ -207,12 +268,79 @@ public class WebUtil {
         }
     }
 
+    public static @NonNull HttpURLConnection getConnectionWithThrows(@NonNull URL url) throws IOException { return getConnectionWithThrows(url, null, 5000, null, null, null, 20); }
+
+    public static @NonNull HttpURLConnection getConnectionWithThrows(@NonNull URL url, String method) throws IOException { return getConnectionWithThrows(url, method, 5000, null, null, null, 20); }
+
+    public static @NonNull HttpURLConnection getConnectionWithThrows(@NonNull URL url, String method, int timeout) throws IOException { return getConnectionWithThrows(url, method, timeout, null, null, null, 20); }
+
+    public static @NonNull HttpURLConnection getConnectionWithThrows(@NonNull URL url, String method, int timeout, String userAgent) throws IOException { return getConnectionWithThrows(url, method, timeout, userAgent, null, null, 20); }
+
+    public static @NonNull HttpURLConnection getConnectionWithThrows(@NonNull URL url, String method, int timeout, String userAgent, Map<String, String> headers) throws IOException { return getConnectionWithThrows(url, method, timeout, userAgent, headers, null, 20); }
+
+    public static @NonNull HttpURLConnection getConnectionWithThrows(@NonNull URL url, String method, int timeout, String userAgent, Map<String, String> headers, Map<String, String> postData) throws IOException { return getConnectionWithThrows(url, method, timeout, userAgent, headers, postData, 20); }
+
+    public static @NonNull HttpURLConnection getConnectionWithThrows(@NonNull  URL url, String method, int timeout, String userAgent, Map<String, String> headers, Map<String, String> postData, int maxRedirects) throws IOException {
+        HttpURLConnection conn = WebUtil.getConnection(url, method, timeout, userAgent, headers, postData, maxRedirects);
+        int status = conn.getResponseCode();
+
+        if (status >= 200 && status < 300) {
+            if (status == 205) { // Reset
+                throw new IOException("Could not get connection (HTTP status " + status + " - reset connection)");
+            }
+            return conn;
+        } else if (status >= 400 && status < 500) {
+            if (status == 401 || status == 403) { // Unauthorized, forbidden
+                throw new IOException("Could not get connection (HTTP status " + status + " - access denied)");
+            }
+            if (status == 429) { // Too many queries
+                throw new IOException("Could not get connection (HTTP status " + status + " - too many queries, temporary issue)");
+            }
+            throw new IOException("Could not get connection (HTTP status " + status + ")");
+        } else if (status >= 500 && status < 600) { // Server errors (usually temporary)
+            throw new IOException("Could not get connection (HTTP status " + status + ")");
+        }
+        throw new IOException("Could not get connection (HTTP status " + status + ")");
+    }
+
+    public static @NonNull InputStream getInputStream(@NonNull URL url) throws IOException { return getInputStream(url, null, 5000, null, null, null, 20); }
+
+    public static @NonNull InputStream getInputStream(@NonNull URL url, String method) throws IOException { return getInputStream(url, method, 5000, null, null, null, 20); }
+
+    public static @NonNull InputStream getInputStream(@NonNull URL url, String method, int timeout) throws IOException { return getInputStream(url, method, timeout, null, null, null, 20); }
+
+    public static @NonNull InputStream getInputStream(@NonNull URL url, String method, int timeout, String userAgent) throws IOException { return getInputStream(url, method, timeout, userAgent, null, null, 20); }
+
     public static @NonNull InputStream getInputStream(@NonNull URL url, String method, int timeout, String userAgent, Map<String, String> headers) throws IOException { return getInputStream(url, method, timeout, userAgent, headers, null, 20); }
 
     public static @NonNull InputStream getInputStream(@NonNull URL url, String method, int timeout, String userAgent, Map<String, String> headers, Map<String, String> postData) throws IOException { return getInputStream(url, method, timeout, userAgent, headers, postData, 20); }
 
     public static @NonNull InputStream getInputStream(@NonNull URL url, String method, int timeout, String userAgent, Map<String, String> headers, Map<String, String> postData, int maxRedirects) throws IOException {
         HttpURLConnection conn = getConnection(url, method, timeout, userAgent, headers, postData, maxRedirects);
+        int status = conn.getResponseCode();
+
+        if (status >= 400 && status < 600) {
+            // 400-500 errors
+            throw new IOException("Server returned status code " + status);
+        }
+
+        return conn.getInputStream();
+    }
+
+    public static @NonNull InputStream getInputStreamWithThrows(@NonNull URL url) throws IOException { return getInputStreamWithThrows(url, null, 5000, null, null, null, 20); }
+
+    public static @NonNull InputStream getInputStreamWithThrows(@NonNull URL url, String method) throws IOException { return getInputStreamWithThrows(url, method, 5000, null, null, null, 20); }
+
+    public static @NonNull InputStream getInputStreamWithThrows(@NonNull URL url, String method, int timeout) throws IOException { return getInputStreamWithThrows(url, method, timeout, null, null, null, 20); }
+
+    public static @NonNull InputStream getInputStreamWithThrows(@NonNull URL url, String method, int timeout, String userAgent) throws IOException { return getInputStreamWithThrows(url, method, timeout, userAgent, null, null, 20); }
+
+    public static @NonNull InputStream getInputStreamWithThrows(@NonNull URL url, String method, int timeout, String userAgent, Map<String, String> headers) throws IOException { return getInputStreamWithThrows(url, method, timeout, userAgent, headers, null, 20); }
+
+    public static @NonNull InputStream getInputStreamWithThrows(@NonNull URL url, String method, int timeout, String userAgent, Map<String, String> headers, Map<String, String> postData) throws IOException { return getInputStreamWithThrows(url, method, timeout, userAgent, headers, postData, 20); }
+
+    public static @NonNull InputStream getInputStreamWithThrows(@NonNull URL url, String method, int timeout, String userAgent, Map<String, String> headers, Map<String, String> postData, int maxRedirects) throws IOException {
+        HttpURLConnection conn = getConnectionWithThrows(url, method, timeout, userAgent, headers, postData, maxRedirects);
         int status = conn.getResponseCode();
 
         if (status >= 400 && status < 600) {
