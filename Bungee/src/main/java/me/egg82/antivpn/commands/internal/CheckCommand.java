@@ -1,7 +1,6 @@
 package me.egg82.antivpn.commands.internal;
 
 import co.aikar.commands.CommandIssuer;
-import java.util.UUID;
 import me.egg82.antivpn.api.VPNAPIProvider;
 import me.egg82.antivpn.api.model.ip.AlgorithmMethod;
 import me.egg82.antivpn.api.model.ip.IPManager;
@@ -56,19 +55,15 @@ public class CheckCommand extends AbstractCommand {
     private void checkPlayer(@NonNull String playerName) {
         PlayerManager playerManager = VPNAPIProvider.getInstance().getPlayerManager();
 
-        UUID uuid = fetchUuid(playerName);
-        if (uuid == null) {
-            issuer.sendError(Message.ERROR__INTERNAL);
-            return;
-        }
-
-        playerManager.checkMcLeaks(uuid, true).whenCompleteAsync((val, ex) -> {
-            if (ex != null) {
-                ExceptionUtil.handleException(ex, logger);
-                issuer.sendError(Message.ERROR__INTERNAL);
-                return;
-            }
-            issuer.sendInfo(Boolean.TRUE.equals(val) ? Message.CHECK__MCLEAKS_DETECTED : Message.CHECK__NO_MCLEAKS_DETECTED);
-        });
+        fetchUuid(playerName)
+            .thenComposeAsync(uuid -> playerManager.checkMcLeaks(uuid, true))
+            .whenCompleteAsync((val, ex) -> {
+                if (ex != null) {
+                    ExceptionUtil.handleException(ex, logger);
+                    issuer.sendError(Message.ERROR__INTERNAL);
+                    return;
+                }
+                issuer.sendInfo(Boolean.TRUE.equals(val) ? Message.CHECK__MCLEAKS_DETECTED : Message.CHECK__NO_MCLEAKS_DETECTED);
+            });
     }
 }

@@ -1,7 +1,6 @@
 package me.egg82.antivpn.api.model.player;
 
 import com.google.common.collect.ImmutableList;
-import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -58,22 +57,16 @@ public class BungeePlayerManager extends AbstractPlayerManager {
     }
 
     public @NonNull CompletableFuture<Player> getPlayer(@NonNull String username) {
-        return CompletableFuture.supplyAsync(() -> {
-            try {
-                return PlayerLookup.get(username).getUUID();
-            } catch (IOException ex) {
-                throw new APIException(false, "Could not fetch player UUID. (rate-limited?)", ex);
-            }
-        }).thenApply(uniqueId -> {
+        return PlayerLookup.get(username).thenApply(info -> {
             CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
             if (cachedConfig == null) {
                 throw new APIException(false, "Cached config could not be fetched.");
             }
 
             for (StorageService service : cachedConfig.getStorage()) {
-                PlayerModel model = service.getPlayerModel(uniqueId, cachedConfig.getSourceCacheTime());
+                PlayerModel model = service.getPlayerModel(info.getUUID(), cachedConfig.getSourceCacheTime());
                 if (model != null) {
-                    return new BungeePlayer(uniqueId, model.isMcleaks());
+                    return new BungeePlayer(info.getUUID(), model.isMcleaks());
                 }
             }
             return null;

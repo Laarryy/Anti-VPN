@@ -3,7 +3,6 @@ package me.egg82.antivpn.commands.internal;
 import co.aikar.commands.CommandIssuer;
 import co.aikar.taskchain.TaskChain;
 import co.aikar.taskchain.TaskChainFactory;
-import java.util.UUID;
 import me.egg82.antivpn.api.VPNAPIProvider;
 import me.egg82.antivpn.api.model.ip.AlgorithmMethod;
 import me.egg82.antivpn.api.model.ip.IPManager;
@@ -59,7 +58,7 @@ public class CheckCommand extends AbstractCommand {
         TaskChain<Void> chain = taskFactory.newChain();
         chain.setErrorHandler((ex, task) -> ExceptionUtil.handleException(ex, logger));
         chain
-            .<UUID>asyncCallback((v, r) -> r.accept(fetchUuid(playerName)))
+            .asyncFirstFuture(() -> fetchUuid(playerName))
             .abortIfNull(this.handleAbort)
             .asyncFuture(v -> playerManager.checkMcLeaks(v, true))
             .abortIfNull(this.handleAbort)

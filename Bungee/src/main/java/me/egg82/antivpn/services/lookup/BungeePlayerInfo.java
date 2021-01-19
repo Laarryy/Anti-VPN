@@ -134,7 +134,7 @@ public class BungeePlayerInfo implements PlayerInfo {
             return name;
         }
 
-        throw new IOException("Could not load player data from Mojang (rate-limited?)");
+        throw new IOException("Mojang API response code: " + status);
     }
 
     private static @Nullable UUID uuidExpensive(@NonNull String name) throws IOException {
@@ -165,7 +165,7 @@ public class BungeePlayerInfo implements PlayerInfo {
             return uuid;
         }
 
-        throw new IOException("Could not load player data from Mojang (rate-limited?)");
+        throw new IOException("Mojang API response code: " + status);
     }
 
     private static @Nullable List<ProfileModel.ProfilePropertyModel> propertiesExpensive(@NonNull UUID uuid) throws IOException {
@@ -181,6 +181,6 @@ public class BungeePlayerInfo implements PlayerInfo {
             return modelDeserializer.deserialize(WebUtil.getString(conn), ProfileModel.class).getProperties();
         }
 
-        throw new IOException("Could not load skin data from Mojang (rate-limited?)");
+        throw new IOException("Mojang API response code: " + status);
     }
 }

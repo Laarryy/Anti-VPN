@@ -4,7 +4,6 @@ import co.aikar.commands.CommandIssuer;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.List;
-import java.util.UUID;
 import me.egg82.antivpn.api.VPNAPIProvider;
 import me.egg82.antivpn.api.model.ip.IPManager;
 import me.egg82.antivpn.api.model.player.PlayerManager;
@@ -35,13 +34,7 @@ public class KickCommand extends AbstractCommand {
             return;
         }
 
-        UUID uuid = fetchUuid(player);
-        if (uuid == null) {
-            issuer.sendError(Message.ERROR__INTERNAL);
-            return;
-        }
-
-        ProxiedPlayer p = ProxyServer.getInstance().getPlayer(uuid);
+        ProxiedPlayer p = ProxyServer.getInstance().getPlayer(player);
         if (p == null) {
             issuer.sendError(Message.KICK__NO_PLAYER);
             return;

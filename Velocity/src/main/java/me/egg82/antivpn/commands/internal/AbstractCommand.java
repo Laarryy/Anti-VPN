@@ -2,13 +2,11 @@ package me.egg82.antivpn.commands.internal;
 
 import co.aikar.commands.CommandIssuer;
 import com.velocitypowered.api.proxy.ProxyServer;
-import java.io.IOException;
 import java.util.UUID;
-import me.egg82.antivpn.config.ConfigUtil;
+import java.util.concurrent.CompletableFuture;
 import me.egg82.antivpn.services.lookup.PlayerInfo;
 import me.egg82.antivpn.services.lookup.PlayerLookup;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,18 +21,5 @@ public abstract class AbstractCommand implements Runnable {
         this.issuer = issuer;
     }
 
-    protected @Nullable UUID fetchUuid(@NonNull String name) {
-        PlayerInfo info;
-        try {
-            info = PlayerLookup.get(name, proxy);
-        } catch (IOException ex) {
-            if (ConfigUtil.getDebugOrFalse()) {
-                logger.warn("Could not fetch player UUID. (rate-limited?)", ex);
-            } else {
-                logger.warn("Could not fetch player UUID. (rate-limited?)");
-            }
-            return null;
-        }
-        return info.getUUID();
-    }
+    protected @NonNull CompletableFuture<UUID> fetchUuid(@NonNull String name) { return PlayerLookup.get(name, proxy).thenApply(PlayerInfo::getUUID); }
 }

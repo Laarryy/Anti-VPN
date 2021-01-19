@@ -6,7 +6,6 @@ import com.velocitypowered.api.event.connection.PostLoginEvent;
 import com.velocitypowered.api.event.connection.PreLoginEvent;
 import com.velocitypowered.api.proxy.ProxyServer;
 import inet.ipaddr.IPAddressString;
-import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
@@ -14,6 +13,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CancellationException;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutionException;
 import me.egg82.antivpn.AntiVPN;
@@ -75,8 +75,18 @@ public class PlayerEvents extends EventHolder {
             luckPermsHook = Optional.empty();
         }
 
+        UUID uuid;
+        try {
+            uuid = fetchUuid(event.getUsername()).get();
+        } catch (InterruptedException ignored) {
+            Thread.currentThread().interrupt();
+            uuid = null;
+        } catch (ExecutionException | CancellationException ex) {
+            ExceptionUtil.handleException(ex, logger);
+            uuid = null;
+        }
+
         if (luckPermsHook.isPresent()) {
-            UUID uuid = fetchUuid(event.getUsername());
             if (uuid != null) {
                 // LuckPerms + UUID is available, run through entire check gambit
                 Boolean val;
@@ -96,7 +106,7 @@ public class PlayerEvents extends EventHolder {
             }
         } else {
             // LuckPerms is not available, only cache data
-            cachePlayer(event, fetchUuid(event.getUsername()));
+            cachePlayer(event, uuid);
         }
     }
 
@@ -396,16 +406,7 @@ public class PlayerEvents extends EventHolder {
         return host.getHostAddress();
     }
 
-    private @Nullable UUID fetchUuid(@NonNull String name) {
-        PlayerInfo info;
-        try {
-            info = PlayerLookup.get(name, proxy);
-        } catch (IOException ex) {
-            logger.warn("Could not fetch player UUID. (rate-limited?)", ex);
-            return null;
-        }
-        return info.getUUID();
-    }
+    private @NonNull CompletableFuture<UUID> fetchUuid(@NonNull String name) { return PlayerLookup.get(name, proxy).thenApply(PlayerInfo::getUUID); }
 
     private boolean rangeContains(@NonNull String range, @NonNull String ip) { return new IPAddressString(range).contains(new IPAddressString(ip)); }
 }

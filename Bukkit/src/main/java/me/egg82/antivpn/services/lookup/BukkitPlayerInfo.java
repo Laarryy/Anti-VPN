@@ -116,7 +116,7 @@ public class BukkitPlayerInfo implements PlayerInfo {
         }
 
         // Network lookup
-        HttpURLConnection conn = WebUtil.getConnection(new URL("https://api.mojang.com/user/profiles/" + uuid.toString().replace("-", "") + "/names"), "GET", 2500, "egg82/PlayerInfo", headers);
+        HttpURLConnection conn = WebUtil.getConnectionWithThrows(new URL("https://api.mojang.com/user/profiles/" + uuid.toString().replace("-", "") + "/names"), "GET", 2500, "egg82/PlayerInfo", headers);
         int status = conn.getResponseCode();
 
         if (status == 204) {
@@ -134,7 +134,7 @@ public class BukkitPlayerInfo implements PlayerInfo {
             return name;
         }
 
-        throw new IOException("Could not load player data from Mojang (rate-limited?)");
+        throw new IOException("Mojang API response code: " + status);
     }
 
     private static @Nullable UUID uuidExpensive(@NonNull String name) throws IOException {
@@ -148,7 +148,7 @@ public class BukkitPlayerInfo implements PlayerInfo {
         }
 
         // Network lookup
-        HttpURLConnection conn = WebUtil.getConnection(new URL("https://api.mojang.com/users/profiles/minecraft/" + WebUtil.urlEncode(name)), "GET", 2500, "egg82/PlayerInfo", headers);
+        HttpURLConnection conn = WebUtil.getConnectionWithThrows(new URL("https://api.mojang.com/users/profiles/minecraft/" + WebUtil.urlEncode(name)), "GET", 2500, "egg82/PlayerInfo", headers);
         int status = conn.getResponseCode();
 
         if (status == 204) {
@@ -165,12 +165,12 @@ public class BukkitPlayerInfo implements PlayerInfo {
             return uuid;
         }
 
-        throw new IOException("Could not load player data from Mojang (rate-limited?)");
+        throw new IOException("Mojang API response code: " + status);
     }
 
     private static @Nullable List<ProfileModel.ProfilePropertyModel> propertiesExpensive(@NonNull UUID uuid) throws IOException {
         // Network lookup
-        HttpURLConnection conn = WebUtil.getConnection(new URL("https://sessionserver.mojang.com/session/minecraft/profile/" + uuid.toString().replace("-", "") + "?unsigned=false"), "GET", 2500, "egg82/PlayerInfo", headers);
+        HttpURLConnection conn = WebUtil.getConnectionWithThrows(new URL("https://sessionserver.mojang.com/session/minecraft/profile/" + uuid.toString().replace("-", "") + "?unsigned=false"), "GET", 2500, "egg82/PlayerInfo", headers);
         int status = conn.getResponseCode();
 
         if (status == 204) {
@@ -181,6 +181,6 @@ public class BukkitPlayerInfo implements PlayerInfo {
             return modelDeserializer.deserialize(WebUtil.getString(conn), ProfileModel.class).getProperties();
         }
 
-        throw new IOException("Could not load skin data from Mojang (rate-limited?)");
+        throw new IOException("Mojang API response code: " + status);
     }
 }

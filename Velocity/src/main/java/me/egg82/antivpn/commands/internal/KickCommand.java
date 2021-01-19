@@ -7,7 +7,6 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import me.egg82.antivpn.api.VPNAPIProvider;
 import me.egg82.antivpn.api.model.ip.IPManager;
 import me.egg82.antivpn.api.model.player.PlayerManager;
@@ -36,13 +35,7 @@ public class KickCommand extends AbstractCommand {
             return;
         }
 
-        UUID uuid = fetchUuid(player);
-        if (uuid == null) {
-            issuer.sendError(Message.ERROR__INTERNAL);
-            return;
-        }
-
-        Optional<Player> p = proxy.getPlayer(uuid);
+        Optional<Player> p = proxy.getPlayer(player);
         if (!p.isPresent()) {
             issuer.sendError(Message.KICK__NO_PLAYER);
             return;
