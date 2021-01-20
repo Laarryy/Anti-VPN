@@ -19,6 +19,7 @@ import me.egg82.antivpn.config.CachedConfig;
 import me.egg82.antivpn.config.ConfigUtil;
 import me.egg82.antivpn.hooks.LuckPermsHook;
 import me.egg82.antivpn.hooks.VaultHook;
+import me.egg82.antivpn.utils.BukkitCommandUtil;
 import me.egg82.antivpn.utils.ExceptionUtil;
 import me.egg82.antivpn.utils.ValidationUtil;
 import ninja.egg82.events.BukkitEvents;
@@ -33,9 +34,11 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class PlayerEvents extends EventHolder {
+    private final Plugin plugin;
     private final CommandIssuer console;
 
     public PlayerEvents(@NonNull Plugin plugin, @NonNull CommandIssuer console) {
+        this.plugin = plugin;
         this.console = console;
 
         events.add(
@@ -155,10 +158,7 @@ public class PlayerEvents extends EventHolder {
         if (isVpn(ip, event.getName(), cachedConfig)) {
             AntiVPN.incrementBlockedVPNs();
             IPManager ipManager = VPNAPIProvider.getInstance().getIPManager();
-            List<String> commands = ipManager.getVpnCommands(event.getName(), event.getUniqueId(), ip);
-            for (String command : commands) {
-                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
-            }
+            BukkitCommandUtil.dispatchCommands(ipManager.getVpnCommands(event.getName(), event.getUniqueId(), ip), Bukkit.getConsoleSender(), plugin, true);
             String kickMessage = ipManager.getVpnKickMessage(event.getName(), event.getUniqueId(), ip);
             if (kickMessage != null) {
                 event.setLoginResult(AsyncPlayerPreLoginEvent.Result.KICK_OTHER);
@@ -169,10 +169,7 @@ public class PlayerEvents extends EventHolder {
         if (isMcLeaks(event.getName(), event.getUniqueId(), cachedConfig)) {
             AntiVPN.incrementBlockedMCLeaks();
             PlayerManager playerManager = VPNAPIProvider.getInstance().getPlayerManager();
-            List<String> commands = playerManager.getMcLeaksCommands(event.getName(), event.getUniqueId(), ip);
-            for (String command : commands) {
-                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
-            }
+            BukkitCommandUtil.dispatchCommands(playerManager.getMcLeaksCommands(event.getName(), event.getUniqueId(), ip), Bukkit.getConsoleSender(), plugin, true);
             String kickMessage = playerManager.getMcLeaksKickMessage(event.getName(), event.getUniqueId(), ip);
             if (kickMessage != null) {
                 event.setLoginResult(AsyncPlayerPreLoginEvent.Result.KICK_OTHER);
@@ -302,10 +299,7 @@ public class PlayerEvents extends EventHolder {
         if (isVpn(ip, event.getPlayer().getName(), cachedConfig)) {
             AntiVPN.incrementBlockedVPNs();
             IPManager ipManager = VPNAPIProvider.getInstance().getIPManager();
-            List<String> commands = ipManager.getVpnCommands(event.getPlayer().getName(), event.getPlayer().getUniqueId(), ip);
-            for (String command : commands) {
-                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
-            }
+            BukkitCommandUtil.dispatchCommands(ipManager.getVpnCommands(event.getPlayer().getName(), event.getPlayer().getUniqueId(), ip), Bukkit.getConsoleSender(), plugin, false);
             String kickMessage = ipManager.getVpnKickMessage(event.getPlayer().getName(), event.getPlayer().getUniqueId(), ip);
             if (kickMessage != null) {
                 event.setResult(PlayerLoginEvent.Result.KICK_OTHER);
@@ -316,10 +310,7 @@ public class PlayerEvents extends EventHolder {
         if (isMcLeaks(event.getPlayer().getName(), event.getPlayer().getUniqueId(), cachedConfig)) {
             AntiVPN.incrementBlockedMCLeaks();
             PlayerManager playerManager = VPNAPIProvider.getInstance().getPlayerManager();
-            List<String> commands = playerManager.getMcLeaksCommands(event.getPlayer().getName(), event.getPlayer().getUniqueId(), ip);
-            for (String command : commands) {
-                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
-            }
+            BukkitCommandUtil.dispatchCommands(playerManager.getMcLeaksCommands(event.getPlayer().getName(), event.getPlayer().getUniqueId(), ip), Bukkit.getConsoleSender(), plugin, false);
             String kickMessage = playerManager.getMcLeaksKickMessage(event.getPlayer().getName(), event.getPlayer().getUniqueId(), ip);
             if (kickMessage != null) {
                 event.setResult(PlayerLoginEvent.Result.KICK_OTHER);

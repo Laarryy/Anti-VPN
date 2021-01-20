@@ -7,15 +7,20 @@ import java.util.concurrent.TimeUnit;
 import me.egg82.antivpn.api.model.source.SourceManager;
 import me.egg82.antivpn.config.CachedConfig;
 import me.egg82.antivpn.config.ConfigUtil;
+import me.egg82.antivpn.utils.BukkitCommandUtil;
 import me.egg82.antivpn.utils.BukkitTailorUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class BukkitIPManager extends AbstractIPManager {
-    public BukkitIPManager(@NonNull SourceManager sourceManager, long cacheTime, TimeUnit cacheTimeUnit) {
+    private final Plugin plugin;
+
+    public BukkitIPManager(@NonNull Plugin plugin, @NonNull SourceManager sourceManager, long cacheTime, TimeUnit cacheTimeUnit) {
         super(sourceManager, cacheTime, cacheTimeUnit);
+        this.plugin = plugin;
     }
 
     public boolean kickForVpn(@NonNull String playerName, @NonNull UUID playerUuid, @NonNull String ip) {
@@ -30,10 +35,7 @@ public class BukkitIPManager extends AbstractIPManager {
             return false;
         }
 
-        List<String> commands = BukkitTailorUtil.tailorCommands(cachedConfig.getVPNActionCommands(), playerName, playerUuid, ip);
-        for (String command : commands) {
-            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
-        }
+        BukkitCommandUtil.dispatchCommands(BukkitTailorUtil.tailorCommands(cachedConfig.getVPNActionCommands(), playerName, playerUuid, ip), Bukkit.getConsoleSender(), plugin);
         if (!cachedConfig.getVPNKickMessage().isEmpty()) {
             p.kickPlayer(BukkitTailorUtil.tailorKickMessage(cachedConfig.getVPNKickMessage(), playerName, playerUuid, ip));
         }

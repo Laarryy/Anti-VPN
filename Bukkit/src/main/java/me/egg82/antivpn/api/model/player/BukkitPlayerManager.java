@@ -12,19 +12,23 @@ import me.egg82.antivpn.messaging.packets.PlayerPacket;
 import me.egg82.antivpn.services.lookup.PlayerLookup;
 import me.egg82.antivpn.storage.StorageService;
 import me.egg82.antivpn.storage.models.PlayerModel;
+import me.egg82.antivpn.utils.BukkitCommandUtil;
 import me.egg82.antivpn.utils.BukkitTailorUtil;
 import me.egg82.antivpn.utils.PacketUtil;
 import me.gong.mcleaks.MCLeaksAPI;
 import org.bukkit.Bukkit;
+import org.bukkit.plugin.Plugin;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class BukkitPlayerManager extends AbstractPlayerManager {
+    private final Plugin plugin;
     private final MCLeaksAPI api;
 
-    public BukkitPlayerManager(int webThreads, String mcleaksKey, long cacheTime, TimeUnit cacheTimeUnit) {
+    public BukkitPlayerManager(@NonNull Plugin plugin, int webThreads, String mcleaksKey, long cacheTime, TimeUnit cacheTimeUnit) {
         super(cacheTime, cacheTimeUnit);
 
+        this.plugin = plugin;
         api = MCLeaksAPI.builder()
                 .nocache()
                 .threadCount(webThreads)
@@ -83,10 +87,7 @@ public class BukkitPlayerManager extends AbstractPlayerManager {
             return false;
         }
 
-        List<String> commands = BukkitTailorUtil.tailorCommands(cachedConfig.getMCLeaksActionCommands(), playerName, playerUuid, ip);
-        for (String command : commands) {
-            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
-        }
+        BukkitCommandUtil.dispatchCommands(BukkitTailorUtil.tailorCommands(cachedConfig.getMCLeaksActionCommands(), playerName, playerUuid, ip), Bukkit.getConsoleSender(), plugin);
         if (!cachedConfig.getMCLeaksKickMessage().isEmpty()) {
             p.kickPlayer(BukkitTailorUtil.tailorKickMessage(cachedConfig.getMCLeaksKickMessage(), playerName, playerUuid, ip));
         }

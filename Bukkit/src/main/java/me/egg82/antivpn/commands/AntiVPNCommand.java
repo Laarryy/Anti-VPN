@@ -27,7 +27,7 @@ public class AntiVPNCommand extends BaseCommand {
     @CommandPermission("avpn.admin")
     @Description("{@@description.reload}")
     public void onReload(@NonNull CommandIssuer issuer) {
-        new ReloadCommand(issuer, taskFactory, plugin.getDataFolder(), console).run();
+        new ReloadCommand(issuer, taskFactory, plugin.getDataFolder(), console, plugin).run();
     }
 
     @Subcommand("import")
@@ -45,7 +45,7 @@ public class AntiVPNCommand extends BaseCommand {
     @Syntax("<player> [type]")
     @CommandCompletion("@player @type")
     public void onKick(@NonNull CommandIssuer issuer, @NonNull String player, @Default("vpn") String type) {
-        new KickCommand(issuer, taskFactory, player, type).run();
+        new KickCommand(issuer, taskFactory, player, type, plugin).run();
     }
 
     @Subcommand("test")

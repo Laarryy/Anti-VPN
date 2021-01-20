@@ -11,19 +11,23 @@ import me.egg82.antivpn.api.model.player.PlayerManager;
 import me.egg82.antivpn.config.CachedConfig;
 import me.egg82.antivpn.config.ConfigUtil;
 import me.egg82.antivpn.lang.Message;
+import me.egg82.antivpn.utils.BukkitCommandUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class KickCommand extends AbstractCommand {
     private final String player;
     private final String type;
+    private final Plugin plugin;
 
-    public KickCommand(@NonNull CommandIssuer issuer, @NonNull TaskChainFactory taskFactory, @NonNull String player, @NonNull String type) {
+    public KickCommand(@NonNull CommandIssuer issuer, @NonNull TaskChainFactory taskFactory, @NonNull String player, @NonNull String type, @NonNull Plugin plugin) {
         super(issuer, taskFactory);
         this.player = player;
         this.type = type;
+        this.plugin = plugin;
     }
 
     public void run() {
@@ -54,10 +58,7 @@ public class KickCommand extends AbstractCommand {
                 issuer.sendError(Message.KICK__API_MODE);
                 return;
             }
-            List<String> commands = ipManager.getVpnCommands(p.getName(), p.getUniqueId(), ip);
-            for (String command : commands) {
-                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
-            }
+            BukkitCommandUtil.dispatchCommands(ipManager.getVpnCommands(p.getName(), p.getUniqueId(), ip), Bukkit.getConsoleSender(), plugin, false);
             String kickMessage = ipManager.getVpnKickMessage(p.getName(), p.getUniqueId(), ip);
             if (kickMessage != null) {
                 p.kickPlayer(kickMessage);
@@ -71,10 +72,7 @@ public class KickCommand extends AbstractCommand {
                 issuer.sendError(Message.KICK__API_MODE);
                 return;
             }
-            List<String> commands = playerManager.getMcLeaksCommands(p.getName(), p.getUniqueId(), ip);
-            for (String command : commands) {
-                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
-            }
+            BukkitCommandUtil.dispatchCommands(playerManager.getMcLeaksCommands(p.getName(), p.getUniqueId(), ip), Bukkit.getConsoleSender(), plugin, false);
             String kickMessage = playerManager.getMcLeaksKickMessage(p.getName(), p.getUniqueId(), ip);
             if (kickMessage != null) {
                 p.kickPlayer(kickMessage);

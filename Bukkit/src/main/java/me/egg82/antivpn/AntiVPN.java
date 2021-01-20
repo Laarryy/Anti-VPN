@@ -235,8 +235,8 @@ public class AntiVPN {
 
         CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
 
-        BukkitIPManager ipManager = new BukkitIPManager(sourceManager, cachedConfig.getCacheTime().getTime(), cachedConfig.getCacheTime().getUnit());
-        BukkitPlayerManager playerManager = new BukkitPlayerManager(cachedConfig.getThreads(), cachedConfig.getMcLeaksKey(), cachedConfig.getCacheTime().getTime(), cachedConfig.getCacheTime().getUnit());
+        BukkitIPManager ipManager = new BukkitIPManager(plugin, sourceManager, cachedConfig.getCacheTime().getTime(), cachedConfig.getCacheTime().getUnit());
+        BukkitPlayerManager playerManager = new BukkitPlayerManager(plugin, cachedConfig.getThreads(), cachedConfig.getMcLeaksKey(), cachedConfig.getCacheTime().getTime(), cachedConfig.getCacheTime().getUnit());
         Platform platform = new BukkitPlatform(System.currentTimeMillis());
         PluginMetadata metadata = new BukkitPluginMetadata(plugin.getDescription().getVersion());
         VPNAPI api = new GenericVPNAPI(platform, metadata, ipManager, playerManager, sourceManager, cachedConfig, new MBassador<>(new GenericPublicationErrorHandler()));
