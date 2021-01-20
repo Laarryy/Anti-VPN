@@ -163,6 +163,10 @@
                             <shadedPattern>me.egg82.antivpn.external.org.spongepowered.configurate</shadedPattern>
                         </relocation>
                         <relocation>
+                            <pattern>org.yaml.snakeyaml</pattern>
+                            <shadedPattern>me.egg82.antivpn.external.org.yaml.snakeyaml</shadedPattern>
+                        </relocation>
+                        <relocation>
                             <pattern>redis.clients.jedis</pattern>
                             <shadedPattern>me.egg82.antivpn.external.redis.clients.jedis</shadedPattern>
                         </relocation>
@@ -205,7 +209,6 @@
                                         <exclude>org/hamcrest/**</exclude>
                                         <exclude>ebean.mf</exclude>
 
-                                        <exclude>org/yaml/snakeyaml/**</exclude>
                                         <exclude>org/slf4j/**</exclude>
 
                                         <!-- dep injected (keep this to as few as possible) -->
