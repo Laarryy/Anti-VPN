@@ -178,6 +178,14 @@ public class BukkitBootstrap extends JavaPlugin {
         ), parentLoader, "MC Leaks API");
 
         try {
+            Class.forName("org.postgresql.Driver");
+        } catch (ClassNotFoundException ignored) {
+            Artifact.Builder sqlite = Artifact.builder("org.postgresql", "postgresql", "${postgresql.version}", cacheDir)
+                .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
+            buildRelocateInject(sqlite, jarsDir, Collections.emptyList(), parentLoader, "PostgreSQL");
+        }
+
+        try {
             Class.forName("org.sqlite.JDBC");
         } catch (ClassNotFoundException ignored) {
             Artifact.Builder sqlite = Artifact.builder("org.xerial", "sqlite-jdbc", "${sqlite.version}", cacheDir)
