@@ -146,6 +146,14 @@ public class VelocityBootstrap {
         buildRelocateInject(ipaddr, jarsDir, Collections.singletonList(new Relocation(getInetIpaddrPackage(), "me.egg82.antivpn.external." + getInetIpaddrPackage())), pluginManager, "IP Address");
 
         try {
+            Class.forName("org.h2.Driver");
+        } catch (ClassNotFoundException ignored) {
+            Artifact.Builder mysql = Artifact.builder("com.h2database", "h2", "${h2.version}", cacheDir)
+                .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
+            buildRelocateInject(mysql, jarsDir, Collections.emptyList(), pluginManager, "H2");
+        }
+
+        try {
             Class.forName("com.mysql.cj.jdbc.Driver");
         } catch (ClassNotFoundException ignored) {
             Artifact.Builder mysql = Artifact.builder("mysql", "mysql-connector-java", "${mysql.version}", cacheDir)

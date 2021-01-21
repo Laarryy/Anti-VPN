@@ -231,7 +231,7 @@ public class ConfigurationFileUtil {
             case "postgresql": {
                 AddressPort url = new AddressPort(connectionNode.key() + ".address", connectionNode.node("address").getString("127.0.0.1:5432"), 5432);
                 if (debug) {
-                    console.sendMessage(LogUtil.HEADING + "<c2>Creating engine</c2> <c1>" + name + "</c1> <c2>of type mariadb with address</c2> <c1>" + url.getAddress() + ":" + url.getPort() + "/" + connectionNode.node("database").getString("anti_vpn") + "</c1>");
+                    console.sendMessage(LogUtil.HEADING + "<c2>Creating engine</c2> <c1>" + name + "</c1> <c2>of type postgresql with address</c2> <c1>" + url.getAddress() + ":" + url.getPort() + "/" + connectionNode.node("database").getString("anti_vpn") + "</c1>");
                 }
                 String options = connectionNode.node("options").getString("useSSL=false&useUnicode=true&characterEncoding=utf8");
                 if (options.length() > 0 && options.charAt(0) == '?') {
@@ -244,6 +244,29 @@ public class ConfigurationFileUtil {
                     return PostgreSQLStorageService.builder(name)
                         .url(url.address, url.port, connectionNode.node("database").getString("anti_vpn"))
                         .credentials(connectionNode.node("username").getString(""), connectionNode.node("password").getString(""))
+                        .options(options)
+                        .poolSize(poolSettings.minPoolSize, poolSettings.maxPoolSize)
+                        .life(poolSettings.maxLifetime, poolSettings.timeout)
+                        .build();
+                } catch (Exception ex) {
+                    logger.error("Could not create engine \"" + name + "\".");
+                }
+                break;
+            }
+            case "h2": {
+                if (debug) {
+                    console.sendMessage(LogUtil.HEADING + "<c2>Creating engine</c2> <c1>" + name + "</c1> <c2>of type h2 with file</c2> <c1>" + connectionNode.node("file").getString("anti_vpn.h2") + "</c1>");
+                }
+                String options = connectionNode.node("options").getString("useUnicode=true&characterEncoding=utf8");
+                if (options.length() > 0 && options.charAt(0) == '?') {
+                    options = options.substring(1);
+                }
+                if (debug) {
+                    console.sendMessage(LogUtil.HEADING + "<c2>Setting options for engine</c2> <c1>" + name + "</c1> <c2>to</c2> <c1>" + options.replace("&", "&\\") + "</c1>");
+                }
+                try {
+                    return H2StorageService.builder(name)
+                        .file(new File(dataDirectory, connectionNode.node("file").getString("anti_vpn.h2")))
                         .options(options)
                         .poolSize(poolSettings.minPoolSize, poolSettings.maxPoolSize)
                         .life(poolSettings.maxLifetime, poolSettings.timeout)

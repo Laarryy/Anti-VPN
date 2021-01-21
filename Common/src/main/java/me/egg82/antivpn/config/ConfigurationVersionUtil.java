@@ -69,6 +69,9 @@ public class ConfigurationVersionUtil {
         if (config.node("version").getDouble() == 4.13d) {
             to50(config);
         }
+        if (config.node("version").getDouble() == 5.0d) {
+            to51(config);
+        }
 
         if (config.node("version").getDouble() != oldVersion) {
             File backupFile = new File(fileOnDisk.getParent(), fileOnDisk.getName() + ".bak");
@@ -653,5 +656,17 @@ public class ConfigurationVersionUtil {
 
         // Version
         config.node("version").set(5.0d);
+    }
+
+    private static void to51(@NonNull CommentedConfigurationNode config) throws SerializationException {
+        // Set default engine2 from SQLite to H2
+        String engine2 = config.node("storage", "engines", "engine2", "type").getString();
+        if ("sqlite".equalsIgnoreCase(engine2)) {
+            config.node("storage", "engines", "engine2", "type").set("h2");
+            config.node("storage", "engines", "engine2", "connection", "file").set("anti_vpn.h2");
+        }
+
+        // Version
+        config.node("version").set(5.1d);
     }
 }

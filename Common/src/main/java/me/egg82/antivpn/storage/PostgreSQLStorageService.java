@@ -1,7 +1,7 @@
 package me.egg82.antivpn.storage;
 
 import com.zaxxer.hikari.HikariConfig;
-import io.ebean.config.dbplatform.mariadb.MariaDbPlatform;
+import io.ebean.config.dbplatform.postgres.Postgres9Platform;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.io.IOException;
@@ -62,7 +62,7 @@ public class PostgreSQLStorageService extends AbstractJDBCStorageService {
         }
 
         public @NonNull PostgreSQLStorageService build() {
-            service.createSource(config, new MariaDbPlatform(), "/db/postgresql.sql");
+            service.createSource(config, new Postgres9Platform(), "/db/postgresql.sql");
             return service;
         }
     }
