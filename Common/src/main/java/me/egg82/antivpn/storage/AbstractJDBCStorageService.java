@@ -14,6 +14,7 @@ import me.egg82.antivpn.storage.models.BaseModel;
 import me.egg82.antivpn.storage.models.DataModel;
 import me.egg82.antivpn.storage.models.IPModel;
 import me.egg82.antivpn.storage.models.PlayerModel;
+import me.egg82.antivpn.storage.models.query.QDataModel;
 import me.egg82.antivpn.storage.models.query.QIPModel;
 import me.egg82.antivpn.storage.models.query.QPlayerModel;
 import org.checkerframework.checker.nullness.qual.NonNull;
