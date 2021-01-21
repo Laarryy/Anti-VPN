@@ -1,11 +1,10 @@
 package me.egg82.antivpn.storage.models;
 
 import io.ebean.annotation.NotNull;
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 @Entity
 @Table(name = "avpn_6_data")

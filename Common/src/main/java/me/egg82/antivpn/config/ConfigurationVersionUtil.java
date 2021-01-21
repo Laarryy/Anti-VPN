@@ -663,7 +663,7 @@ public class ConfigurationVersionUtil {
         String engine2 = config.node("storage", "engines", "engine2", "type").getString();
         if ("sqlite".equalsIgnoreCase(engine2)) {
             config.node("storage", "engines", "engine2", "type").set("h2");
-            config.node("storage", "engines", "engine2", "connection", "file").set("anti_vpn.h2");
+            config.node("storage", "engines", "engine2", "connection", "file").set("anti_vpn");
         }
 
         // Version

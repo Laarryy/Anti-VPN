@@ -37,8 +37,8 @@ public interface VPNAPI {
     /**
      * Gets the {@link UUID} of this server.
      *
-     * <p>This is defined in the Anti-VPN stats-id file, and is used in
-     * messaging services and server statistics (if enabled).</p>
+     * <p>This is defined in the Anti-VPN server-id file, and is used in
+     * messaging services to identify unique servers.</p>
      *
      * <p>The default server UUID is randomly-generated.</p>
      *

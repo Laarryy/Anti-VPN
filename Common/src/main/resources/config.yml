@@ -38,7 +38,7 @@ storage:
       enabled: true
       connection:
         # File name (SQLite, H2 only)
-        file: 'anti_vpn.h2'
+        file: 'anti_vpn'
         # Extra options to use with this storage engine
         # These values will override any others
         options: 'useUnicode=true&characterEncoding=utf8'

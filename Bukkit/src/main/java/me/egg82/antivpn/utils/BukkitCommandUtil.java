@@ -1,11 +1,10 @@
 package me.egg82.antivpn.utils;
 
+import java.util.Collection;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.Plugin;
 import org.checkerframework.checker.nullness.qual.NonNull;
-
-import java.util.Collection;
 
 public class BukkitCommandUtil {
     private BukkitCommandUtil() { }

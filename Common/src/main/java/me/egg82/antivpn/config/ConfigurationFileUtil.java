@@ -174,7 +174,7 @@ public class ConfigurationFileUtil {
                             .life(poolSettings.maxLifetime, poolSettings.timeout)
                             .build();
                 } catch (Exception ex) {
-                    logger.error("Could not create engine \"" + name + "\".");
+                    logger.error("Could not create engine \"" + name + "\".", ex);
                 }
                 break;
             }
@@ -199,7 +199,7 @@ public class ConfigurationFileUtil {
                             .life(poolSettings.maxLifetime, poolSettings.timeout)
                             .build();
                 } catch (Exception ex) {
-                    logger.error("Could not create engine \"" + name + "\".");
+                    logger.error("Could not create engine \"" + name + "\".", ex);
                 }
                 break;
             }
@@ -224,7 +224,7 @@ public class ConfigurationFileUtil {
                             .life(poolSettings.maxLifetime, poolSettings.timeout)
                             .build();
                 } catch (Exception ex) {
-                    logger.error("Could not create engine \"" + name + "\".");
+                    logger.error("Could not create engine \"" + name + "\".", ex);
                 }
                 break;
             }
@@ -249,13 +249,13 @@ public class ConfigurationFileUtil {
                         .life(poolSettings.maxLifetime, poolSettings.timeout)
                         .build();
                 } catch (Exception ex) {
-                    logger.error("Could not create engine \"" + name + "\".");
+                    logger.error("Could not create engine \"" + name + "\".", ex);
                 }
                 break;
             }
             case "h2": {
                 if (debug) {
-                    console.sendMessage(LogUtil.HEADING + "<c2>Creating engine</c2> <c1>" + name + "</c1> <c2>of type h2 with file</c2> <c1>" + connectionNode.node("file").getString("anti_vpn.h2") + "</c1>");
+                    console.sendMessage(LogUtil.HEADING + "<c2>Creating engine</c2> <c1>" + name + "</c1> <c2>of type h2 with file</c2> <c1>" + connectionNode.node("file").getString("anti_vpn") + "</c1>");
                 }
                 String options = connectionNode.node("options").getString("useUnicode=true&characterEncoding=utf8");
                 if (options.length() > 0 && options.charAt(0) == '?') {
@@ -266,13 +266,13 @@ public class ConfigurationFileUtil {
                 }
                 try {
                     return H2StorageService.builder(name)
-                        .file(new File(dataDirectory, connectionNode.node("file").getString("anti_vpn.h2")))
+                        .file(new File(dataDirectory, connectionNode.node("file").getString("anti_vpn")))
                         .options(options)
                         .poolSize(poolSettings.minPoolSize, poolSettings.maxPoolSize)
                         .life(poolSettings.maxLifetime, poolSettings.timeout)
                         .build();
                 } catch (Exception ex) {
-                    logger.error("Could not create engine \"" + name + "\".");
+                    logger.error("Could not create engine \"" + name + "\".", ex);
                 }
                 break;
             }
@@ -295,7 +295,7 @@ public class ConfigurationFileUtil {
                             .life(poolSettings.maxLifetime, poolSettings.timeout)
                             .build();
                 } catch (Exception ex) {
-                    logger.error("Could not create engine \"" + name + "\".");
+                    logger.error("Could not create engine \"" + name + "\".", ex);
                 }
                 break;
             }

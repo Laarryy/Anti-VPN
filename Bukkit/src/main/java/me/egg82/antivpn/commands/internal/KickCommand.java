@@ -4,7 +4,6 @@ import co.aikar.commands.CommandIssuer;
 import co.aikar.taskchain.TaskChainFactory;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.util.List;
 import me.egg82.antivpn.api.VPNAPIProvider;
 import me.egg82.antivpn.api.model.ip.IPManager;
 import me.egg82.antivpn.api.model.player.PlayerManager;

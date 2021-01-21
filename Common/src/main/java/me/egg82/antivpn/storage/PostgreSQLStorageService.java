@@ -2,11 +2,10 @@ package me.egg82.antivpn.storage;
 
 import com.zaxxer.hikari.HikariConfig;
 import io.ebean.config.dbplatform.postgres.Postgres9Platform;
-import org.checkerframework.checker.nullness.qual.NonNull;
-
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.Properties;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 public class PostgreSQLStorageService extends AbstractJDBCStorageService {
     private PostgreSQLStorageService(@NonNull String name) {

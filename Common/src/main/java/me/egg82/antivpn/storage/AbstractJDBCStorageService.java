@@ -7,12 +7,13 @@ import io.ebean.DatabaseFactory;
 import io.ebean.Transaction;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.Instant;
 import java.util.*;
+import java.util.stream.Stream;
 import javax.persistence.PersistenceException;
 import me.egg82.antivpn.storage.models.BaseModel;
 import me.egg82.antivpn.storage.models.DataModel;
@@ -290,16 +291,25 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         dbConfig.setDefaultServer(false);
         dbConfig.setRegister(false);
         dbConfig.setName(name);
-        dbConfig.setClasses(Arrays.asList(BaseModel.class, IPModel.class, PlayerModel.class));
+        dbConfig.setClasses(Arrays.asList(BaseModel.class, IPModel.class, PlayerModel.class, DataModel.class));
         connection = DatabaseFactory.createWithContextClassLoader(dbConfig, getClass().getClassLoader());
         connection.script().run("/db/" + scriptsName + ".sql");
 
-        DataModel model = getOrCreateDataModel("schema-version", "1.0");
+        DataModel model = getDataModel("schema-version");
+        if (model == null) {
+            model = new DataModel();
+            model.setKey("schema-version");
+            model.setValue("1.0");
+        }
+        if (model.getValue() == null) {
+            model.setValue("1.0");
+            model.setModified(null);
+        }
 
         try {
             List<File> dirs = getResourceDirs("/db/migration");
             for (File dir : dirs) {
-                if (!VersionUtil.isAtLeast(model.getValue() != null ? model.getValue() : "1.0", '.', dir.getName().substring(1), '_')) {
+                if (!VersionUtil.isAtLeast(model.getValue(), '.', dir.getName().substring(1), '_')) {
                     File upgrade = new File(dir, scriptsName + ".db");
                     if (upgrade.exists()) {
                         connection.script().run(upgrade.getPath());
@@ -311,6 +321,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         } catch (IOException ex) {
             logger.error(ex.getMessage(), ex);
         }
+
         if (model.getModified() == null) {
             connection.save(model);
         }
@@ -320,7 +331,9 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         List<File> retVal = new ArrayList<>();
         File dir = new File(path);
         if (dir.isDirectory()) {
-            Files.walk(dir.toPath()).filter(Files::isDirectory).forEach(d -> retVal.add(d.toFile()));
+            try (Stream<Path> walkedPath = Files.walk(dir.toPath())) {
+                walkedPath.filter(Files::isDirectory).forEach(d -> retVal.add(d.toFile()));
+            }
         }
         retVal.sort((f1, f2) -> {
             int[] v1 = VersionUtil.parseVersion(f1.getName().substring(1), '_');

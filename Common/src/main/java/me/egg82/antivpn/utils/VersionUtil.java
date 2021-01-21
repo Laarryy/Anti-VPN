@@ -1,12 +1,11 @@
 package me.egg82.antivpn.utils;
 
 import com.google.common.primitives.Ints;
+import java.util.ArrayList;
+import java.util.List;
 import ninja.egg82.reflect.PackageFilter;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class VersionUtil {
     private VersionUtil() { }
