@@ -79,7 +79,7 @@ public class MariaDBStorageService extends AbstractJDBCStorageService {
         }
 
         public @NonNull MariaDBStorageService build() {
-            service.createSource(config, new MariaDbPlatform(), "/db/mariadb.sql");
+            service.createSource(config, new MariaDbPlatform(), "mariadb");
             return service;
         }
     }

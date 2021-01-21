@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.UUID;
 import me.egg82.antivpn.storage.models.BaseModel;
+import me.egg82.antivpn.storage.models.DataModel;
 import me.egg82.antivpn.storage.models.IPModel;
 import me.egg82.antivpn.storage.models.PlayerModel;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -36,4 +37,11 @@ public interface StorageService {
     @Nullable PlayerModel getPlayerModel(long playerId, long cacheTimeMillis);
     @NonNull Set<PlayerModel> getAllPlayers(long cacheTimeMillis);
     @NonNull Set<PlayerModel> getAllPlayers(int start, int end);
+
+    /*
+   Note: Can be an expensive operation
+    */
+    @NonNull DataModel getOrCreateDataModel(@NonNull String key, String value);
+    @Nullable DataModel getDataModel(@NonNull String key);
+    @Nullable DataModel getDataModel(long dataId);
 }

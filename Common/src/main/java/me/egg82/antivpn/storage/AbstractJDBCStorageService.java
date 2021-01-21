@@ -7,6 +7,10 @@ import io.ebean.DatabaseFactory;
 import io.ebean.Transaction;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.time.Instant;
 import java.util.*;
 import javax.persistence.PersistenceException;
@@ -17,6 +21,7 @@ import me.egg82.antivpn.storage.models.PlayerModel;
 import me.egg82.antivpn.storage.models.query.QDataModel;
 import me.egg82.antivpn.storage.models.query.QIPModel;
 import me.egg82.antivpn.storage.models.query.QPlayerModel;
+import me.egg82.antivpn.utils.VersionUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -275,7 +280,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         }
     }
 
-    protected final void createSource(HikariConfig config, DatabasePlatform platform, String scriptPath) {
+    protected final void createSource(HikariConfig config, DatabasePlatform platform, String scriptsName) {
         config.setAutoCommit(false);
         source = new HikariDataSource(config);
         DatabaseConfig dbConfig = new DatabaseConfig();
@@ -287,7 +292,55 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         dbConfig.setName(name);
         dbConfig.setClasses(Arrays.asList(BaseModel.class, IPModel.class, PlayerModel.class));
         connection = DatabaseFactory.createWithContextClassLoader(dbConfig, getClass().getClassLoader());
-        connection.script().run(scriptPath);
+        connection.script().run("/db/" + scriptsName + ".sql");
+
+        DataModel model = getOrCreateDataModel("schema-version", "1.0");
+
+        try {
+            List<File> dirs = getResourceDirs("/db/migration");
+            for (File dir : dirs) {
+                if (!VersionUtil.isAtLeast(model.getValue() != null ? model.getValue() : "1.0", '.', dir.getName().substring(1), '_')) {
+                    File upgrade = new File(dir, scriptsName + ".db");
+                    if (upgrade.exists()) {
+                        connection.script().run(upgrade.getPath());
+                    }
+                    model.setValue(dir.getName().substring(1).replace('_', '.'));
+                    model.setModified(null);
+                }
+            }
+        } catch (IOException ex) {
+            logger.error(ex.getMessage(), ex);
+        }
+        if (model.getModified() == null) {
+            connection.save(model);
+        }
+    }
+
+    private List<File> getResourceDirs(@NonNull String path) throws IOException {
+        List<File> retVal = new ArrayList<>();
+        File dir = new File(path);
+        if (dir.isDirectory()) {
+            Files.walk(dir.toPath()).filter(Files::isDirectory).forEach(d -> retVal.add(d.toFile()));
+        }
+        retVal.sort((f1, f2) -> {
+            int[] v1 = VersionUtil.parseVersion(f1.getName().substring(1), '_');
+            int[] v2 = VersionUtil.parseVersion(f2.getName().substring(1), '_');
+
+            for (int i = 0; i < v1.length; i++) {
+                if (i > v2.length) {
+                    // We're looking for a version deeper than what we have
+                    // eg. 1.12.2 -> 1.12
+                    return 1;
+                }
+                if (v2[i] < v1[i]) {
+                    // The version we're at now is less than the one we want
+                    // eg. 1.13 -> 1.11
+                    return -1;
+                }
+            }
+            return 0;
+        });
+        return retVal;
     }
 
     private @Nullable BaseModel duplicateModel(@NonNull BaseModel model, boolean keepModified) {

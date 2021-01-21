@@ -79,7 +79,7 @@ public class MySQL55StorageService extends AbstractJDBCStorageService {
         }
 
         public @NonNull MySQL55StorageService build() {
-            service.createSource(config, new MySql55Platform(), "/db/mysql55.sql");
+            service.createSource(config, new MySql55Platform(), "mysql55");
             return service;
         }
     }

@@ -48,6 +48,7 @@ import me.egg82.antivpn.services.GameAnalyticsErrorHandler;
 import me.egg82.antivpn.storage.StorageService;
 import me.egg82.antivpn.utils.ExceptionUtil;
 import me.egg82.antivpn.utils.ValidationUtil;
+import me.egg82.antivpn.utils.VersionUtil;
 import net.engio.mbassy.bus.MBassador;
 import ninja.egg82.events.BukkitEventSubscriber;
 import ninja.egg82.events.BukkitEvents;
@@ -99,7 +100,7 @@ public class AntiVPN {
             log(Level.INFO, ChatColor.AQUA + "====================================");
         }
 
-        if (!BukkitVersionUtil.isAtLeast("1.8")) {
+        if (!VersionUtil.isAtLeast("1.8", '.', BukkitVersionUtil.getGameVersion(), '.')) {
             log(Level.INFO, ChatColor.GOLD + "====================================");
             log(Level.INFO, ChatColor.DARK_RED + "Anti-VPN will likely not work on servers < 1.8");
             log(Level.INFO, ChatColor.GOLD + "====================================");
