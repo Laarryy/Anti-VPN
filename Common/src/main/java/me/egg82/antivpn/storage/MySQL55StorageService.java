@@ -25,7 +25,6 @@ public class MySQL55StorageService extends AbstractJDBCStorageService {
             config.setPoolName("AntiVPN-MySQL55");
             config.setDriverClassName("com.mysql.cj.jdbc.Driver");
             config.setConnectionTestQuery("SELECT 1;");
-            config.setAutoCommit(true);
             config.addDataSourceProperty("useLegacyDatetimeCode", "false");
             config.addDataSourceProperty("serverTimezone", "UTC");
 

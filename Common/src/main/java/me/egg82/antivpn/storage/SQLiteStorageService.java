@@ -26,7 +26,6 @@ public class SQLiteStorageService extends AbstractJDBCStorageService {
             config.setPoolName("AntiVPN-SQLite");
             config.setDriverClassName("org.sqlite.JDBC");
             config.setConnectionTestQuery("SELECT 1;");
-            config.setAutoCommit(true);
             config.addDataSourceProperty("useLegacyDatetimeCode", "false");
             config.addDataSourceProperty("serverTimezone", "UTC");
         }
