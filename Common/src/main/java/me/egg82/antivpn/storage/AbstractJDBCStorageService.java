@@ -8,12 +8,10 @@ import io.ebean.Transaction;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import java.time.Instant;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import javax.persistence.PersistenceException;
 import me.egg82.antivpn.storage.models.BaseModel;
+import me.egg82.antivpn.storage.models.DataModel;
 import me.egg82.antivpn.storage.models.IPModel;
 import me.egg82.antivpn.storage.models.PlayerModel;
 import me.egg82.antivpn.storage.models.query.QIPModel;
@@ -225,6 +223,57 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         }
     }
 
+    public @NonNull DataModel getOrCreateDataModel(@NonNull String key, String value) {
+        queueLock.readLock().lock();
+        try {
+            DataModel model = new QDataModel(connection)
+                .key.equalTo(key)
+                .findOne();
+            if (model == null) {
+                model = new DataModel();
+                model.setKey(key);
+                model.setValue(value);
+                connection.save(model);
+                model = new QDataModel(connection)
+                    .key.equalTo(key)
+                    .findOne();
+                if (model == null) {
+                    throw new PersistenceException("findOne() returned null after saving.");
+                }
+            }
+            if (!Objects.equals(model.getValue(), value)) {
+                model.setValue(value);
+                model.setModified(null);
+                connection.save(model);
+            }
+            return model;
+        } finally {
+            queueLock.readLock().unlock();
+        }
+    }
+
+    public @Nullable DataModel getDataModel(@NonNull String key) {
+        queueLock.readLock().lock();
+        try {
+            return new QDataModel(connection)
+                .key.equalTo(key)
+                .findOne();
+        } finally {
+            queueLock.readLock().unlock();
+        }
+    }
+
+    public @Nullable DataModel getDataModel(long dataId) {
+        queueLock.readLock().lock();
+        try {
+            return new QDataModel(connection)
+                .id.equalTo(dataId)
+                .findOne();
+        } finally {
+            queueLock.readLock().unlock();
+        }
+    }
+
     protected final void createSource(HikariConfig config, DatabasePlatform platform, String scriptPath) {
         config.setAutoCommit(false);
         source = new HikariDataSource(config);
@@ -253,6 +302,11 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
             PlayerModel m = new PlayerModel();
             m.setUuid(((PlayerModel) model).getUuid());
             m.setMcleaks(((PlayerModel) model).isMcleaks());
+            retVal = m;
+        } else if (model instanceof DataModel) {
+            DataModel m = new DataModel();
+            m.setKey(((DataModel) model).getKey());
+            m.setValue(((DataModel) model).getValue());
             retVal = m;
         }
 
@@ -297,6 +351,23 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
                 connection.save(m);
             } else {
                 m.setMcleaks(((PlayerModel) model).isMcleaks());
+                m.setCreated(model.getCreated());
+                m.setModified(keepModified ? model.getModified() : null);
+                connection.update(m);
+            }
+        } else if (model instanceof DataModel) {
+            DataModel m = new QDataModel(connection)
+                .key.equalTo(((DataModel) model).getKey())
+                .findOne();
+            if (m == null) {
+                m = (DataModel) duplicateModel(model, keepModified);
+                if (m == null) {
+                    return;
+                }
+                connection.save(m);
+            } else {
+                m.setKey(((DataModel) model).getKey());
+                m.setValue(((DataModel) model).getValue());
                 m.setCreated(model.getCreated());
                 m.setModified(keepModified ? model.getModified() : null);
                 connection.update(m);

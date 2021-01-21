@@ -1,0 +1,1 @@
+ALTER TABLE `avpn_6_ip` MODIFY COLUMN `consensus` DOUBLE;

@@ -214,7 +214,6 @@
                                         <exclude>ebean.mf</exclude>
 
                                         <exclude>org/json/simple/**</exclude>
-                                        <exclude>org/slf4j/**</exclude>
 
                                         <!-- dep injected (keep this to as few as possible) -->
                                         <exclude>io/ebeaninternal/api/**</exclude>
@@ -490,6 +489,12 @@
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <version>${postgresql.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>${h2.version}</version>
             <scope>provided</scope>
         </dependency>
 

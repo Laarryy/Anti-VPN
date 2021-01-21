@@ -4,16 +4,17 @@ storage:
   engines:
     # Engine name. Can be anything
     engine1:
-      # Engine type. Can be "mysql", "old_mysql", "mariadb", "postgresql", or "sqlite"
+      # Engine type. Can be "mysql", "old_mysql", "mariadb", "postgresql", "h2", or "sqlite"
       # "mysql" is for MySQL versions > 5.5, "old_mysql" is for MySQL versions <= 5.5
       # https://mariadb.org/
       # https://www.postgresql.org/
+      # https://www.h2database.com/html/main.html
       # https://www.sqlite.org/index.html
       type: 'mysql'
       # Whether or not to use this engine
       enabled: false
       connection:
-        # Address and port (MySQL only)
+        # Address and port (MySQL, MariaDB, PostgreSQL only)
         address: '127.0.0.1:3306'
         # The name of the database the plugin will store data in (MySQL only)
         # This must be created beforehand
@@ -26,17 +27,18 @@ storage:
         options: 'useSSL=false&useUnicode=true&characterEncoding=utf8'
     # Engine name. Can be anything
     engine2:
-      # Engine type. Can be "mysql", "old_mysql", "mariadb", "postgresql", or "sqlite"
+      # Engine type. Can be "mysql", "old_mysql", "mariadb", "postgresql", "h2", or "sqlite"
       # "mysql" is for MySQL versions > 5.5, "old_mysql" is for MySQL versions <= 5.5
       # https://mariadb.org/
       # https://www.postgresql.org/
+      # https://www.h2database.com/html/main.html
       # https://www.sqlite.org/index.html
-      type: 'sqlite'
+      type: 'h2'
       # Whether or not to use this engine
       enabled: true
       connection:
-        # File name (SQLite only)
-        file: 'anti_vpn.db'
+        # File name (SQLite, H2 only)
+        file: 'anti_vpn.h2'
         # Extra options to use with this storage engine
         # These values will override any others
         options: 'useUnicode=true&characterEncoding=utf8'
@@ -358,4 +360,4 @@ update:
   notify: true
 
 # Config version, no touchy plz
-version: 5.0
+version: 5.1
