@@ -56,7 +56,7 @@ public class H2StorageService extends AbstractJDBCStorageService {
         }
 
         public @NonNull H2StorageService build() {
-            service.createSource(config, new H2Platform(), "h2");
+            service.createSource(config, new H2Platform(), false, "h2");
             return service;
         }
     }

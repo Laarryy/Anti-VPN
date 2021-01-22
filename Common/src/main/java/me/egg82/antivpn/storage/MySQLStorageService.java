@@ -79,7 +79,7 @@ public class MySQLStorageService extends AbstractJDBCStorageService {
         }
 
         public @NonNull MySQLStorageService build() {
-            service.createSource(config, new MySqlPlatform(), "mysql");
+            service.createSource(config, new MySqlPlatform(), true, "mysql");
             return service;
         }
     }

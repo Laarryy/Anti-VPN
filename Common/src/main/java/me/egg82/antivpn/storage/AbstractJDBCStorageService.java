@@ -8,12 +8,8 @@ import io.ebean.Transaction;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.time.Instant;
 import java.util.*;
-import java.util.stream.Stream;
 import javax.persistence.PersistenceException;
 import me.egg82.antivpn.storage.models.BaseModel;
 import me.egg82.antivpn.storage.models.DataModel;
@@ -25,6 +21,8 @@ import me.egg82.antivpn.storage.models.query.QPlayerModel;
 import me.egg82.antivpn.utils.VersionUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.reflections.Reflections;
+import org.reflections.scanners.ResourcesScanner;
 
 public abstract class AbstractJDBCStorageService extends AbstractStorageService {
     protected Database connection;
@@ -281,13 +279,13 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         }
     }
 
-    protected final void createSource(HikariConfig config, DatabasePlatform platform, String scriptsName) {
+    protected final void createSource(HikariConfig config, DatabasePlatform platform, boolean quote, String scriptsName) {
         config.setAutoCommit(false);
         source = new HikariDataSource(config);
         DatabaseConfig dbConfig = new DatabaseConfig();
         dbConfig.setDataSource(source);
         dbConfig.setDatabasePlatform(platform);
-        dbConfig.setAllQuotedIdentifiers(true);
+        dbConfig.setAllQuotedIdentifiers(quote);
         dbConfig.setDefaultServer(false);
         dbConfig.setRegister(false);
         dbConfig.setName(name);
@@ -306,20 +304,17 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
             model.setModified(null);
         }
 
-        try {
-            List<File> dirs = getResourceDirs("/db/migration");
-            for (File dir : dirs) {
-                if (!VersionUtil.isAtLeast(model.getValue(), '.', dir.getName().substring(1), '_')) {
-                    File upgrade = new File(dir, scriptsName + ".db");
-                    if (upgrade.exists()) {
-                        connection.script().run(upgrade.getPath());
-                    }
-                    model.setValue(dir.getName().substring(1).replace('_', '.'));
-                    model.setModified(null);
-                }
+        List<File> files = getResourceDirs("db.migration");
+        for (File file : files) {
+            if (!VersionUtil.isAtLeast(file.getParentFile().getName().substring(1), '_', model.getValue(), '.') && file.getName().equals(scriptsName + ".sql")) {
+                connection.script().run("/" + file.getPath().replace('\\', '/'));
+                model.setValue(file.getParentFile().getName().substring(1).replace('_', '.'));
+                model.setModified(null);
             }
-        } catch (IOException ex) {
-            logger.error(ex.getMessage(), ex);
+        }
+
+        if (!VersionUtil.isAtLeast(model.getValue(), '.', files.get(files.size() - 1).getParentFile().getName().substring(1), '_')) {
+            throw new PersistenceException("This plugin is running against a database with a higher version than expected and requires an update to continue.");
         }
 
         if (model.getModified() == null) {
@@ -327,17 +322,19 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         }
     }
 
-    private List<File> getResourceDirs(@NonNull String path) throws IOException {
+    private List<File> getResourceDirs(@NonNull String prefix) {
         List<File> retVal = new ArrayList<>();
-        File dir = new File(path);
-        if (dir.isDirectory()) {
-            try (Stream<Path> walkedPath = Files.walk(dir.toPath())) {
-                walkedPath.filter(Files::isDirectory).forEach(d -> retVal.add(d.toFile()));
-            }
+
+        Reflections reflections = new Reflections(prefix, new ResourcesScanner());
+        Set<String> files = reflections.getResources(x -> true);
+
+        for (String file : files) {
+            retVal.add(new File(file));
         }
+
         retVal.sort((f1, f2) -> {
-            int[] v1 = VersionUtil.parseVersion(f1.getName().substring(1), '_');
-            int[] v2 = VersionUtil.parseVersion(f2.getName().substring(1), '_');
+            int[] v1 = VersionUtil.parseVersion(f1.getParentFile().getName().substring(1), '_');
+            int[] v2 = VersionUtil.parseVersion(f2.getParentFile().getName().substring(1), '_');
 
             for (int i = 0; i < v1.length; i++) {
                 if (i > v2.length) {

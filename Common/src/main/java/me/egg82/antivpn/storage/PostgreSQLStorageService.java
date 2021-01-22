@@ -61,7 +61,7 @@ public class PostgreSQLStorageService extends AbstractJDBCStorageService {
         }
 
         public @NonNull PostgreSQLStorageService build() {
-            service.createSource(config, new Postgres9Platform(), "postgresql");
+            service.createSource(config, new Postgres9Platform(), false, "postgresql");
             return service;
         }
     }

@@ -56,7 +56,7 @@ public class SQLiteStorageService extends AbstractJDBCStorageService {
         }
 
         public @NonNull SQLiteStorageService build() {
-            service.createSource(config, new SQLitePlatform(), "sqlite");
+            service.createSource(config, new SQLitePlatform(), true, "sqlite");
             return service;
         }
     }
