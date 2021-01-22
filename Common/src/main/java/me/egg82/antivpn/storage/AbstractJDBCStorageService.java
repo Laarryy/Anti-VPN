@@ -291,9 +291,14 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         dbConfig.setName(name);
         dbConfig.setClasses(Arrays.asList(BaseModel.class, IPModel.class, PlayerModel.class, DataModel.class));
         connection = DatabaseFactory.createWithContextClassLoader(dbConfig, getClass().getClassLoader());
-        connection.script().run("/db/" + scriptsName + ".sql");
 
-        DataModel model = getDataModel("schema-version");
+        DataModel model;
+        try {
+            model = getDataModel("schema-version");
+        } catch (PersistenceException ignored) {
+            connection.script().run("/db/" + scriptsName + ".sql");
+            model = getDataModel("schema-version");
+        }
         if (model == null) {
             model = new DataModel();
             model.setKey("schema-version");
