@@ -185,6 +185,10 @@ public class VelocityBootstrap {
             new Relocation(getOkioPackage(), "me.egg82.antivpn.external." + getOkioPackage())
         ), pluginManager, "MC Leaks API");
 
+        Artifact.Builder javassist = Artifact.builder("org.javassist", getJavassistPackage(), "${javassist.version}", cacheDir)
+            .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
+        buildRelocateInject(javassist, jarsDir, Collections.singletonList(new Relocation(getJavassistPackage(), "me.egg82.antivpn.external." + getJavassistPackage())), pluginManager, "Javassist");
+
         try {
             Class.forName("org.postgresql.Driver");
         } catch (ClassNotFoundException ignored) {
@@ -236,6 +240,8 @@ public class VelocityBootstrap {
     private @NonNull String getOkhttp3Package() { return new String(new byte[] {'o', 'k', 'h', 't', 't', 'p'}); }
 
     private @NonNull String getOkioPackage() { return new String(new byte[] {'o', 'k', 'i', 'o'}); }
+
+    private @NonNull String getJavassistPackage() { return new String(new byte[] {'j', 'a', 'v', 'a', 's', 's', 'i', 's', 't'}); }
 
     private @NonNull String getJedisPackage() { return new String(new byte[] {'r', 'e', 'd', 'i', 's', '.', 'c', 'l', 'i', 'e', 'n', 't', 's', '.', 'j', 'e', 'd', 'i', 's'}); }
 

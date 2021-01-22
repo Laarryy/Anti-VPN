@@ -218,6 +218,8 @@
                                         <exclude>io/ebeaninternal/util/**</exclude>
                                         <exclude>io/ebeanservice/**</exclude>
 
+                                        <exclude>javassist/**</exclude>
+
                                         <exclude>redis/clients/jedis/**</exclude>
                                     </excludes>
                                 </filter>
@@ -470,6 +472,13 @@
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
             <version>${h2.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.javassist</groupId>
+            <artifactId>javassist</artifactId>
+            <version>${javassist.version}</version>
             <scope>provided</scope>
         </dependency>
 
