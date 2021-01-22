@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS `avpn_6_ip` (
 	`ip` VARCHAR(45) NOT NULL UNIQUE,
 	`type` INT NOT NULL,
 	`cascade` BOOLEAN,
-	`consensus` DOUBLE,
+	`consensus` BOOLEAN,
 	PRIMARY KEY( `id` )
 );
 

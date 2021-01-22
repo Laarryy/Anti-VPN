@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS "avpn_6_ip" (
 	"ip"	TEXT NOT NULL UNIQUE,
 	"type"	INTEGER NOT NULL,
 	"cascade"	INTEGER,
-	"consensus"	REAL,
+	"consensus"	INTEGER,
 	PRIMARY KEY("id" AUTOINCREMENT)
 );
 
