@@ -209,6 +209,7 @@
                                         <exclude>org/hamcrest/**</exclude>
                                         <exclude>ebean.mf</exclude>
 
+                                        <exclude>org/antlr/v4/runtime/**</exclude>
                                         <exclude>org/slf4j/**</exclude>
 
                                         <!-- dep injected (keep this to as few as possible) -->
@@ -218,7 +219,7 @@
                                         <exclude>io/ebeaninternal/util/**</exclude>
                                         <exclude>io/ebeanservice/**</exclude>
 
-                                        <axclude>redis/clients/jedis/**</axclude>
+                                        <exclude>redis/clients/jedis/**</exclude>
                                     </excludes>
                                 </filter>
                                 <filter>

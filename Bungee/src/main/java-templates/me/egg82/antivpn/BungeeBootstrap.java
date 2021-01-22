@@ -132,9 +132,9 @@ public class BungeeBootstrap extends Plugin {
         try {
             Class.forName("org.h2.Driver");
         } catch (ClassNotFoundException ignored) {
-            Artifact.Builder mysql = Artifact.builder("com.h2database", "h2", "${h2.version}", cacheDir)
+            Artifact.Builder h2 = Artifact.builder("com.h2database", "h2", "${h2.version}", cacheDir)
                 .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
-            buildRelocateInject(mysql, jarsDir, Collections.emptyList(), parentLoader, "H2");
+            buildRelocateInject(h2, jarsDir, Collections.emptyList(), parentLoader, "H2");
         }
 
         try {
@@ -172,9 +172,9 @@ public class BungeeBootstrap extends Plugin {
         try {
             Class.forName("org.postgresql.Driver");
         } catch (ClassNotFoundException ignored) {
-            Artifact.Builder sqlite = Artifact.builder("org.postgresql", "postgresql", "${postgresql.version}", cacheDir)
+            Artifact.Builder postgresql = Artifact.builder("org.postgresql", "postgresql", "${postgresql.version}", cacheDir)
                 .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
-            buildRelocateInject(sqlite, jarsDir, Collections.emptyList(), parentLoader, "PostgreSQL");
+            buildRelocateInject(postgresql, jarsDir, Collections.emptyList(), parentLoader, "PostgreSQL");
         }
 
         try {
@@ -185,9 +185,9 @@ public class BungeeBootstrap extends Plugin {
             buildRelocateInject(sqlite, jarsDir, Collections.emptyList(), parentLoader, "SQLite");
         }
 
-        Artifact.Builder sqlite = Artifact.builder("redis.clients", "jedis", "${jedis.version}", cacheDir)
+        Artifact.Builder redis = Artifact.builder("redis.clients", "jedis", "${jedis.version}", cacheDir)
                 .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
-        buildRelocateInject(sqlite, jarsDir, Collections.singletonList(new Relocation(getJedisPackage(), "me.egg82.antivpn.external." + getJedisPackage())), parentLoader, "Jedis");
+        buildRelocateInject(redis, jarsDir, Collections.singletonList(new Relocation(getJedisPackage(), "me.egg82.antivpn.external." + getJedisPackage())), parentLoader, "Jedis");
     }
 
     // Prevent Maven from relocating these

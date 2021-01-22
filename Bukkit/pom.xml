@@ -140,6 +140,10 @@
                             <shadedPattern>me.egg82.antivpn.external.org.jmlspecs</shadedPattern>
                         </relocation>
                         <relocation>
+                            <pattern>org.objectweb.asm</pattern>
+                            <shadedPattern>me.egg82.antivpn.external.org.objectweb.asm</shadedPattern>
+                        </relocation>
+                        <relocation>
                             <pattern>ninja.egg82.maven</pattern>
                             <shadedPattern>me.egg82.antivpn.external.ninja.egg82.maven</shadedPattern>
                         </relocation>
@@ -213,6 +217,7 @@
                                         <exclude>org/hamcrest/**</exclude>
                                         <exclude>ebean.mf</exclude>
 
+                                        <exclude>org/antlr/v4/runtime/**</exclude>
                                         <exclude>org/json/simple/**</exclude>
 
                                         <!-- dep injected (keep this to as few as possible) -->
@@ -222,7 +227,7 @@
                                         <exclude>io/ebeaninternal/util/**</exclude>
                                         <exclude>io/ebeanservice/**</exclude>
 
-                                        <axclude>redis/clients/jedis/**</axclude>
+                                        <exclude>redis/clients/jedis/**</exclude>
                                     </excludes>
                                 </filter>
                                 <filter>
