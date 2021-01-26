@@ -56,6 +56,9 @@ import ninja.egg82.service.ServiceLocator;
 import ninja.egg82.service.ServiceNotFoundException;
 import ninja.egg82.updater.SpigotUpdater;
 import org.bstats.bukkit.Metrics;
+import org.bstats.charts.AdvancedPie;
+import org.bstats.charts.SimplePie;
+import org.bstats.charts.SingleLineChart;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.InvalidConfigurationException;
@@ -65,6 +68,7 @@ import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,12 +86,12 @@ public class AntiVPN {
     private final List<BukkitEventSubscriber<?>> events = new ArrayList<>();
     private final IntList tasks = new IntArrayList();
 
-    private final Plugin plugin;
+    private final JavaPlugin plugin;
     private final boolean isBukkit;
 
     private CommandIssuer consoleCommandIssuer = null;
 
-    public AntiVPN(@NonNull Plugin plugin) {
+    public AntiVPN(@NonNull JavaPlugin plugin) {
         this.plugin = plugin;
         isBukkit = BukkitEnvironmentUtil.getEnvironment() == BukkitEnvironmentUtil.Environment.BUKKIT;
     }
@@ -424,7 +428,7 @@ public class AntiVPN {
 
     private void loadMetrics() {
         Metrics metrics = new Metrics(plugin, 3249); // TODO: Change ID when bStats finally allows multiple plugins of the same name
-        metrics.addCustomChart(new Metrics.SingleLineChart("blocked_vpns", () -> {
+        metrics.addCustomChart(new SingleLineChart("blocked_vpns", () -> {
             ConfigurationNode config = ConfigUtil.getConfig();
             if (config == null) {
                 return null;
@@ -436,7 +440,7 @@ public class AntiVPN {
 
             return (int) blockedVPNs.getAndSet(0L);
         }));
-        metrics.addCustomChart(new Metrics.SingleLineChart("blocked_mcleaks", () -> {
+        metrics.addCustomChart(new SingleLineChart("blocked_mcleaks", () -> {
             ConfigurationNode config = ConfigUtil.getConfig();
             if (config == null) {
                 return null;
@@ -448,7 +452,7 @@ public class AntiVPN {
 
             return (int) blockedMCLeaks.getAndSet(0L);
         }));
-        metrics.addCustomChart(new Metrics.AdvancedPie("storage", () -> {
+        metrics.addCustomChart(new AdvancedPie("storage", () -> {
             ConfigurationNode config = ConfigUtil.getConfig();
             CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
             if (config == null || cachedConfig == null) {
@@ -474,7 +478,7 @@ public class AntiVPN {
 
             return retVal;
         }));
-        metrics.addCustomChart(new Metrics.AdvancedPie("messaging", () -> {
+        metrics.addCustomChart(new AdvancedPie("messaging", () -> {
             ConfigurationNode config = ConfigUtil.getConfig();
             CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
             if (config == null || cachedConfig == null) {
@@ -500,7 +504,7 @@ public class AntiVPN {
 
             return retVal;
         }));
-        metrics.addCustomChart(new Metrics.AdvancedPie("sources", () -> {
+        metrics.addCustomChart(new AdvancedPie("sources", () -> {
             ConfigurationNode config = ConfigUtil.getConfig();
             CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
             if (config == null || cachedConfig == null) {
@@ -527,7 +531,7 @@ public class AntiVPN {
 
             return retVal;
         }));
-        metrics.addCustomChart(new Metrics.SimplePie("algorithm", () -> {
+        metrics.addCustomChart(new SimplePie("algorithm", () -> {
             ConfigurationNode config = ConfigUtil.getConfig();
             CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
             if (config == null || cachedConfig == null) {
@@ -540,7 +544,7 @@ public class AntiVPN {
 
             return cachedConfig.getVPNAlgorithmMethod().getName();
         }));
-        metrics.addCustomChart(new Metrics.SimplePie("vpn_action", () -> {
+        metrics.addCustomChart(new SimplePie("vpn_action", () -> {
             ConfigurationNode config = ConfigUtil.getConfig();
             CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
             if (config == null || cachedConfig == null) {
@@ -560,7 +564,7 @@ public class AntiVPN {
             }
             return "none";
         }));
-        metrics.addCustomChart(new Metrics.SimplePie("mcleaks_action", () -> {
+        metrics.addCustomChart(new SimplePie("mcleaks_action", () -> {
             ConfigurationNode config = ConfigUtil.getConfig();
             CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
             if (config == null || cachedConfig == null) {

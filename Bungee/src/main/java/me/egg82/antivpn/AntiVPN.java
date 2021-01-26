@@ -61,6 +61,9 @@ import ninja.egg82.service.ServiceLocator;
 import ninja.egg82.service.ServiceNotFoundException;
 import ninja.egg82.updater.BungeeUpdater;
 import org.bstats.bungeecord.Metrics;
+import org.bstats.charts.AdvancedPie;
+import org.bstats.charts.SimplePie;
+import org.bstats.charts.SingleLineChart;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -377,7 +380,7 @@ public class AntiVPN {
 
     private void loadMetrics() {
         Metrics metrics = new Metrics(plugin, 3249);
-        metrics.addCustomChart(new Metrics.SingleLineChart("blocked_vpns", () -> {
+        metrics.addCustomChart(new SingleLineChart("blocked_vpns", () -> {
             ConfigurationNode config = ConfigUtil.getConfig();
             if (config == null) {
                 return null;
@@ -389,7 +392,7 @@ public class AntiVPN {
 
             return (int) blockedVPNs.getAndSet(0L);
         }));
-        metrics.addCustomChart(new Metrics.SingleLineChart("blocked_mcleaks", () -> {
+        metrics.addCustomChart(new SingleLineChart("blocked_mcleaks", () -> {
             ConfigurationNode config = ConfigUtil.getConfig();
             if (config == null) {
                 return null;
@@ -401,7 +404,7 @@ public class AntiVPN {
 
             return (int) blockedMCLeaks.getAndSet(0L);
         }));
-        metrics.addCustomChart(new Metrics.AdvancedPie("storage", () -> {
+        metrics.addCustomChart(new AdvancedPie("storage", () -> {
             ConfigurationNode config = ConfigUtil.getConfig();
             CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
             if (config == null || cachedConfig == null) {
@@ -427,7 +430,7 @@ public class AntiVPN {
 
             return retVal;
         }));
-        metrics.addCustomChart(new Metrics.AdvancedPie("messaging", () -> {
+        metrics.addCustomChart(new AdvancedPie("messaging", () -> {
             ConfigurationNode config = ConfigUtil.getConfig();
             CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
             if (config == null || cachedConfig == null) {
@@ -453,7 +456,7 @@ public class AntiVPN {
 
             return retVal;
         }));
-        metrics.addCustomChart(new Metrics.AdvancedPie("sources", () -> {
+        metrics.addCustomChart(new AdvancedPie("sources", () -> {
             ConfigurationNode config = ConfigUtil.getConfig();
             CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
             if (config == null || cachedConfig == null) {
@@ -480,7 +483,7 @@ public class AntiVPN {
 
             return retVal;
         }));
-        metrics.addCustomChart(new Metrics.SimplePie("algorithm", () -> {
+        metrics.addCustomChart(new SimplePie("algorithm", () -> {
             ConfigurationNode config = ConfigUtil.getConfig();
             CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
             if (config == null || cachedConfig == null) {
@@ -493,7 +496,7 @@ public class AntiVPN {
 
             return cachedConfig.getVPNAlgorithmMethod().getName();
         }));
-        metrics.addCustomChart(new Metrics.SimplePie("vpn_action", () -> {
+        metrics.addCustomChart(new SimplePie("vpn_action", () -> {
             ConfigurationNode config = ConfigUtil.getConfig();
             CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
             if (config == null || cachedConfig == null) {
@@ -513,7 +516,7 @@ public class AntiVPN {
             }
             return "none";
         }));
-        metrics.addCustomChart(new Metrics.SimplePie("mcleaks_action", () -> {
+        metrics.addCustomChart(new SimplePie("mcleaks_action", () -> {
             ConfigurationNode config = ConfigUtil.getConfig();
             CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
             if (config == null || cachedConfig == null) {
