@@ -11,7 +11,7 @@ public class TeohModel implements SourceModel {
     private String type;
     private String risk;
     @JSON(name = "is_hosting")
-    private String hosting;
+    private int hosting;
     @JSON(name = "vpn_or_proxy")
     private String vpnOrProxy;
 
@@ -22,7 +22,7 @@ public class TeohModel implements SourceModel {
         this.asn = null;
         this.type = null;
         this.risk = null;
-        this.hosting = null;
+        this.hosting = -1;
         this.vpnOrProxy = null;
     }
 
@@ -51,10 +51,10 @@ public class TeohModel implements SourceModel {
     public void setRisk(String risk) { this.risk = risk; }
 
     @JSON(name = "is_hosting")
-    public String getHosting() { return hosting; }
+    public int getHosting() { return hosting; }
 
     @JSON(name = "is_hosting")
-    public void setHosting(String hosting) { this.hosting = hosting; }
+    public void setHosting(int hosting) { this.hosting = hosting; }
 
     @JSON(name = "vpn_or_proxy")
     public String getVpnOrProxy() { return vpnOrProxy; }

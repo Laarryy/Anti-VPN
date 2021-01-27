@@ -35,7 +35,7 @@ public class Teoh extends AbstractSource<TeohModel> {
                 throw new APIException(false, "Could not get result from " + getName() + " (" + model.getMessage() + ")");
             }
 
-            return "1".equals(model.getHosting()) || "yes".equalsIgnoreCase(model.getVpnOrProxy());
+            return model.getHosting() == 1 || "yes".equalsIgnoreCase(model.getVpnOrProxy());
         });
     }
 
