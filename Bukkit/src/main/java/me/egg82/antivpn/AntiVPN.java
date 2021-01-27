@@ -50,8 +50,8 @@ import me.egg82.antivpn.utils.ExceptionUtil;
 import me.egg82.antivpn.utils.ValidationUtil;
 import me.egg82.antivpn.utils.VersionUtil;
 import net.engio.mbassy.bus.MBassador;
-import ninja.egg82.events.BukkitEventSubscriber;
 import ninja.egg82.events.BukkitEvents;
+import ninja.egg82.events.PriorityEventSubscriber;
 import ninja.egg82.service.ServiceLocator;
 import ninja.egg82.service.ServiceNotFoundException;
 import ninja.egg82.updater.SpigotUpdater;
@@ -83,7 +83,7 @@ public class AntiVPN {
     private PaperCommandManager commandManager;
 
     private final List<EventHolder> eventHolders = new ArrayList<>();
-    private final List<BukkitEventSubscriber<?>> events = new ArrayList<>();
+    private final List<PriorityEventSubscriber<EventPriority, ?>> events = new ArrayList<>();
     private final IntList tasks = new IntArrayList();
 
     private final JavaPlugin plugin;
@@ -183,7 +183,7 @@ public class AntiVPN {
             eventHolder.cancel();
         }
         eventHolders.clear();
-        for (BukkitEventSubscriber<?> event : events) {
+        for (PriorityEventSubscriber<EventPriority, ?> event : events) {
             event.cancel();
         }
         events.clear();

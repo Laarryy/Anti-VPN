@@ -4,6 +4,7 @@ import co.aikar.commands.*;
 import co.aikar.locales.MessageKey;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.SetMultimap;
+import com.velocitypowered.api.event.PostOrder;
 import com.velocitypowered.api.plugin.PluginDescription;
 import com.velocitypowered.api.plugin.PluginManager;
 import com.velocitypowered.api.proxy.Player;
@@ -51,7 +52,7 @@ import me.egg82.antivpn.utils.ExceptionUtil;
 import me.egg82.antivpn.utils.ValidationUtil;
 import net.engio.mbassy.bus.MBassador;
 import net.kyori.text.format.TextColor;
-import ninja.egg82.events.VelocityEventSubscriber;
+import ninja.egg82.events.PriorityEventSubscriber;
 import ninja.egg82.service.ServiceLocator;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.slf4j.Logger;
@@ -67,7 +68,7 @@ public class AntiVPN {
     private VelocityCommandManager commandManager;
 
     private final List<EventHolder> eventHolders = new ArrayList<>();
-    private final List<VelocityEventSubscriber<?>> events = new ArrayList<>();
+    private final List<PriorityEventSubscriber<PostOrder, ?>> events = new ArrayList<>();
     private final List<ScheduledTask> tasks = new ArrayList<>();
 
     private final Object plugin;
@@ -134,7 +135,7 @@ public class AntiVPN {
             eventHolder.cancel();
         }
         eventHolders.clear();
-        for (VelocityEventSubscriber<?> event : events) {
+        for (PriorityEventSubscriber<PostOrder, ?> event : events) {
             event.cancel();
         }
         events.clear();

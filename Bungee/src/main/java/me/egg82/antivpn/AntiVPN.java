@@ -55,8 +55,8 @@ import net.md_5.bungee.api.event.PostLoginEvent;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.api.plugin.PluginManager;
 import net.md_5.bungee.event.EventPriority;
-import ninja.egg82.events.BungeeEventSubscriber;
 import ninja.egg82.events.BungeeEvents;
+import ninja.egg82.events.PriorityEventSubscriber;
 import ninja.egg82.service.ServiceLocator;
 import ninja.egg82.service.ServiceNotFoundException;
 import ninja.egg82.updater.BungeeUpdater;
@@ -77,7 +77,7 @@ public class AntiVPN {
     private BungeeCommandManager commandManager;
 
     private final List<EventHolder> eventHolders = new ArrayList<>();
-    private final List<BungeeEventSubscriber<?>> events = new ArrayList<>();
+    private final List<PriorityEventSubscriber<Byte, ?>> events = new ArrayList<>();
     private final IntList tasks = new IntArrayList();
 
     private final Plugin plugin;
@@ -157,7 +157,7 @@ public class AntiVPN {
             eventHolder.cancel();
         }
         eventHolders.clear();
-        for (BungeeEventSubscriber<?> event : events) {
+        for (PriorityEventSubscriber<Byte, ?> event : events) {
             event.cancel();
         }
         events.clear();
