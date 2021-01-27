@@ -299,6 +299,7 @@
             <groupId>ninja.egg82</groupId>
             <artifactId>event-chain-api</artifactId>
             <version>${eventchain.api.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>ninja.egg82</groupId>
