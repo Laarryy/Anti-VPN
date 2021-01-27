@@ -324,6 +324,11 @@
         </dependency>
         <dependency>
             <groupId>ninja.egg82</groupId>
+            <artifactId>event-chain-api</artifactId>
+            <version>${eventchain.api.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>ninja.egg82</groupId>
             <artifactId>event-chain-bukkit</artifactId>
             <version>${eventchain.version}</version>
         </dependency>
