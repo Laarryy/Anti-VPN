@@ -158,7 +158,7 @@ public class WebRequest {
         conn.setReadTimeout((int) timeout.getMillis());
 
         if (method != null) {
-            conn.setRequestMethod(method.name().toLowerCase());
+            conn.setRequestMethod(method.name());
         }
         if (!headers.isEmpty()) {
             for (Map.Entry<String, String> kvp : headers.entrySet()) {
@@ -310,6 +310,13 @@ public class WebRequest {
 
     public enum RequestMethod {
         GET,
-        POST
+        HEAD,
+        POST,
+        PUT,
+        DELETE,
+        CONNECT,
+        OPTIONS,
+        TRACE,
+        PATCH
     }
 }
