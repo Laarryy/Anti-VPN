@@ -16,7 +16,7 @@ storage:
       connection:
         # Address and port (MySQL, MariaDB, PostgreSQL only)
         address: '127.0.0.1:3306'
-        # The name of the database the plugin will store data in (MySQL only)
+        # The name of the database the plugin will store data in (MySQL, MariaDB, PostgreSQL only)
         # This must be created beforehand
         database: 'anti_vpn'
         # Credentials

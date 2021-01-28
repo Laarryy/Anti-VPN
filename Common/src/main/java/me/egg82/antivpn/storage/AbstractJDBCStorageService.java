@@ -22,6 +22,7 @@ import me.egg82.antivpn.utils.VersionUtil;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.reflections.Reflections;
+import org.reflections.ReflectionsException;
 import org.reflections.scanners.ResourcesScanner;
 
 public abstract class AbstractJDBCStorageService extends AbstractStorageService {
@@ -318,7 +319,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
             }
         }
 
-        if (!VersionUtil.isAtLeast(model.getValue(), '.', files.get(files.size() - 1).getParentFile().getName().substring(1), '_')) {
+        if (!files.isEmpty() && !VersionUtil.isAtLeast(model.getValue(), '.', files.get(files.size() - 1).getParentFile().getName().substring(1), '_')) {
             throw new PersistenceException("This plugin is running against a database with a higher version than expected and requires an update to continue.");
         }
 
@@ -331,7 +332,12 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         List<File> retVal = new ArrayList<>();
 
         Reflections reflections = new Reflections(prefix, new ResourcesScanner());
-        Set<String> files = reflections.getResources(x -> true);
+        Set<String> files;
+        try {
+            files = reflections.getResources(x -> true);
+        } catch (ReflectionsException ex) {
+            return retVal;
+        }
 
         for (String file : files) {
             retVal.add(new File(file));
