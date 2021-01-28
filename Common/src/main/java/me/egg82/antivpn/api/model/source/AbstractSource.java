@@ -3,13 +3,13 @@ package me.egg82.antivpn.api.model.source;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import me.egg82.antivpn.api.APIException;
 import me.egg82.antivpn.api.model.source.models.SourceModel;
 import me.egg82.antivpn.config.CachedConfig;
 import me.egg82.antivpn.config.ConfigUtil;
-import me.egg82.antivpn.utils.WebUtil;
+import me.egg82.antivpn.utils.TimeUtil;
+import me.egg82.antivpn.web.WebRequest;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.spongepowered.configurate.ConfigurationNode;
 
@@ -21,12 +21,6 @@ public abstract class AbstractSource<T extends SourceModel> implements Source<T>
     }
 
     public @NonNull Class<T> getModelClass() { return modelClass; }
-
-    protected static final Map<String, String> headers = new HashMap<>();
-    static {
-        headers.put("Accept", "application/json");
-        headers.put("Accept-Language", "en-US,en;q=0.8");
-    }
 
     protected final @NonNull ConfigurationNode getSourceConfigNode() throws APIException {
         ConfigurationNode config = ConfigUtil.getConfig();
@@ -46,11 +40,22 @@ public abstract class AbstractSource<T extends SourceModel> implements Source<T>
         return cachedConfig;
     }
 
-    protected final @NonNull HttpURLConnection getConnection(String url, String method, int timeout, String userAgent, Map<String, String> headers) throws APIException { return getConnection(url, method, timeout, userAgent, headers, null); }
-
-    protected final @NonNull HttpURLConnection getConnection(String url, String method, int timeout, String userAgent, Map<String, String> headers, Map<String, String> postData) throws APIException {
+    protected final WebRequest.@NonNull Builder getDefaultBuilder(@NonNull String url, long timeout) throws APIException {
         try {
-            HttpURLConnection conn = WebUtil.getConnection(new URL(url), method, timeout, userAgent, headers, postData);
+            WebRequest.Builder retVal = WebRequest.builder(new URL(url));
+            retVal.timeout(new TimeUtil.Time(timeout, TimeUnit.MILLISECONDS));
+            retVal.userAgent("egg82/AntiVPN");
+            retVal.header("Accept", "application/json");
+            retVal.throwOnStandardErrors(false);
+            return retVal;
+        } catch (IOException ex) {
+            throw new APIException(false, "Could not get builder for " + getName(), ex);
+        }
+    }
+
+    protected final @NonNull HttpURLConnection getConnection(@NonNull WebRequest request) throws APIException {
+        try {
+            HttpURLConnection conn = request.getConnection();
             int status = conn.getResponseCode();
 
             if (status >= 200 && status < 300) {
@@ -78,7 +83,7 @@ public abstract class AbstractSource<T extends SourceModel> implements Source<T>
 
     protected final @NonNull String getString(HttpURLConnection conn) throws APIException {
         try {
-            return WebUtil.getString(conn);
+            return WebRequest.getString(conn);
         } catch (IOException ex) {
             throw new APIException(false, "Could not get result from " + getName(), ex);
         }

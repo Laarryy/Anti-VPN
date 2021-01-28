@@ -6,6 +6,7 @@ import java.util.concurrent.CompletableFuture;
 import me.egg82.antivpn.api.APIException;
 import me.egg82.antivpn.api.model.source.models.IPQualityScoreModel;
 import me.egg82.antivpn.utils.ValidationUtil;
+import me.egg82.antivpn.web.WebRequest;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.spongepowered.configurate.ConfigurationNode;
 
@@ -53,7 +54,8 @@ public class IPQualityScore extends AbstractSource<IPQualityScoreModel> {
                 throw new APIException(true, "Key is not defined for " + getName());
             }
 
-            HttpURLConnection conn = getConnection("http://www.ipqualityscore.com/api/json/ip/" + key + "/" + ip + "?strictness=" + sourceConfigNode.node("strictness").getInt(0) + "&mobile=" + (sourceConfigNode.node("mobile").getBoolean(true) ? "true" : "false") + "&fast=true&allow_public_access_points=true&lighter_penalties=true", "GET", (int) getCachedConfig().getTimeout(), "egg82/AntiVPN", headers);
+            WebRequest.Builder builder = getDefaultBuilder("http://www.ipqualityscore.com/api/json/ip/" + key + "/" + ip + "?strictness=" + sourceConfigNode.node("strictness").getInt(0) + "&mobile=" + (sourceConfigNode.node("mobile").getBoolean(true) ? "true" : "false") + "&fast=true&allow_public_access_points=true&lighter_penalties=true", getCachedConfig().getTimeout());
+            HttpURLConnection conn = getConnection(builder.build());
             JSONDeserializer<IPQualityScoreModel> modelDeserializer = new JSONDeserializer<>();
             return modelDeserializer.deserialize(getString(conn), IPQualityScoreModel.class);
         });

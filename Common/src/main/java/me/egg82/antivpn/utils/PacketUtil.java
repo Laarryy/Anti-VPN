@@ -18,7 +18,7 @@ import me.egg82.antivpn.messaging.GenericMessagingHandler;
 import me.egg82.antivpn.messaging.MessagingService;
 import me.egg82.antivpn.messaging.packets.MultiPacket;
 import me.egg82.antivpn.messaging.packets.Packet;
-import ninja.egg82.reflect.PackageFilter;
+import me.egg82.antivpn.reflect.PackageFilter;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

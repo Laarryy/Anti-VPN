@@ -52,8 +52,6 @@ public class ReloadCommand extends AbstractCommand {
 
         ConfigurationFileUtil.reloadConfig(dataFolder, console, messagingHandler, sourceManager);
 
-        cachedConfig = ConfigUtil.getCachedConfig();
-
         BungeeIPManager ipManager = new BungeeIPManager(sourceManager, cachedConfig.getCacheTime().getTime(), cachedConfig.getCacheTime().getUnit());
         BungeePlayerManager playerManager = new BungeePlayerManager(cachedConfig.getThreads(), cachedConfig.getMcLeaksKey(), cachedConfig.getCacheTime().getTime(), cachedConfig.getCacheTime().getUnit());
         VPNAPI api = VPNAPIProvider.getInstance();

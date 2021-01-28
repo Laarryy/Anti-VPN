@@ -11,6 +11,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import me.egg82.antivpn.api.APIException;
 import me.egg82.antivpn.api.model.source.models.GetIPIntelModel;
 import me.egg82.antivpn.utils.ValidationUtil;
+import me.egg82.antivpn.web.WebRequest;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.spongepowered.configurate.ConfigurationNode;
 
@@ -64,7 +65,8 @@ public class GetIPIntel extends AbstractSource<GetIPIntelModel> {
                 throw new APIException(false, "API calls to this source have been limited to 15/minute as per request.");
             }
 
-            HttpURLConnection conn = getConnection("https://" + sourceConfigNode.node("subdomain").getString("check") + ".getipintel.net/check.php?ip=" + ip + "&contact=" + sourceConfigNode.node("contact").getString("admin@yoursite.com") + "&format=json&flags=b", "GET", (int) getCachedConfig().getTimeout(), "egg82/AntiVPN", headers);
+            WebRequest.Builder builder = getDefaultBuilder("https://" + sourceConfigNode.node("subdomain").getString("check") + ".getipintel.net/check.php?ip=" + ip + "&contact=" + sourceConfigNode.node("contact").getString("admin@yoursite.com") + "&format=json&flags=b", getCachedConfig().getTimeout());
+            HttpURLConnection conn = getConnection(builder.build());
             JSONDeserializer<GetIPIntelModel> modelDeserializer = new JSONDeserializer<>();
             return modelDeserializer.deserialize(getString(conn), GetIPIntelModel.class);
         });

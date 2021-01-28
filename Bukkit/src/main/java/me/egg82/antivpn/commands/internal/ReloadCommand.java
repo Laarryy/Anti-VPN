@@ -62,8 +62,6 @@ public class ReloadCommand extends AbstractCommand {
 
                 ConfigurationFileUtil.reloadConfig(dataFolder, console, messagingHandler, sourceManager);
 
-                cachedConfig = ConfigUtil.getCachedConfig();
-
                 BukkitIPManager ipManager = new BukkitIPManager(plugin, sourceManager, cachedConfig.getCacheTime().getTime(), cachedConfig.getCacheTime().getUnit());
                 BukkitPlayerManager playerManager = new BukkitPlayerManager(plugin, cachedConfig.getThreads(), cachedConfig.getMcLeaksKey(), cachedConfig.getCacheTime().getTime(), cachedConfig.getCacheTime().getUnit());
                 VPNAPI api = VPNAPIProvider.getInstance();

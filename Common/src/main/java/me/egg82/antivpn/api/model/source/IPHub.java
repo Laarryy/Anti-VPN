@@ -2,12 +2,11 @@ package me.egg82.antivpn.api.model.source;
 
 import flexjson.JSONDeserializer;
 import java.net.HttpURLConnection;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import me.egg82.antivpn.api.APIException;
 import me.egg82.antivpn.api.model.source.models.IPHubModel;
 import me.egg82.antivpn.utils.ValidationUtil;
+import me.egg82.antivpn.web.WebRequest;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.spongepowered.configurate.ConfigurationNode;
 
@@ -43,10 +42,9 @@ public class IPHub extends AbstractSource<IPHubModel> {
                 throw new APIException(true, "Key is not defined for " + getName());
             }
 
-            Map<String, String> newHeaders = new HashMap<>(headers);
-            newHeaders.put("X-Key", key);
-
-            HttpURLConnection conn = getConnection("https://v2.api.iphub.info/ip/" + ip, "GET", (int) getCachedConfig().getTimeout(), "egg82/AntiVPN", newHeaders);
+            WebRequest.Builder builder = getDefaultBuilder("https://v2.api.iphub.info/ip/" + ip, getCachedConfig().getTimeout());
+            builder.header("X-Key", key);
+            HttpURLConnection conn = getConnection(builder.build());
             JSONDeserializer<IPHubModel> modelDeserializer = new JSONDeserializer<>();
             return modelDeserializer.deserialize(getString(conn), IPHubModel.class);
         });

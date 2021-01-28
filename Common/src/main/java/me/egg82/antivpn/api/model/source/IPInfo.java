@@ -6,6 +6,7 @@ import java.util.concurrent.CompletableFuture;
 import me.egg82.antivpn.api.APIException;
 import me.egg82.antivpn.api.model.source.models.IPInfoModel;
 import me.egg82.antivpn.utils.ValidationUtil;
+import me.egg82.antivpn.web.WebRequest;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.spongepowered.configurate.ConfigurationNode;
 
@@ -47,7 +48,8 @@ public class IPInfo extends AbstractSource<IPInfoModel> {
                 throw new APIException(true, "Key is not defined for " + getName());
             }
 
-            HttpURLConnection conn = getConnection("https://ipinfo.io/" + ip + "/privacy?token=" + key, "GET", (int) getCachedConfig().getTimeout(), "egg82/AntiVPN", headers);
+            WebRequest.Builder builder = getDefaultBuilder("https://ipinfo.io/" + ip + "/privacy?token=" + key, getCachedConfig().getTimeout());
+            HttpURLConnection conn = getConnection(builder.build());
             JSONDeserializer<IPInfoModel> modelDeserializer = new JSONDeserializer<>();
             return modelDeserializer.deserialize(getString(conn), IPInfoModel.class);
         });

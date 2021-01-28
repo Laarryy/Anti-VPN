@@ -12,7 +12,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <plugin.version>6.4.16</plugin.version>
+        <plugin.version>6.4.17</plugin.version>
         <api.version>2.0.1</api.version>
 
         <paper.version>1.16.4-R0.1-SNAPSHOT</paper.version>
@@ -48,7 +48,7 @@
         <updater.version>1.1.5</updater.version>
         <depdownloader.version>2.2.16</depdownloader.version>
         <relocator.version>1.4</relocator.version>
-        <reflectionutils.version>1.0.5</reflectionutils.version>
+        <reflections.version>0.9.12</reflections.version>
         <javassist.version>3.27.0-GA</javassist.version>
 
         <plan.version>5.1-R0.4</plan.version>

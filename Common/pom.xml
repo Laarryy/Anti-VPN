@@ -127,9 +127,9 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>ninja.egg82</groupId>
-            <artifactId>reflection-utils</artifactId>
-            <version>${reflectionutils.version}</version>
+            <groupId>org.reflections</groupId>
+            <artifactId>reflections</artifactId>
+            <version>${reflections.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

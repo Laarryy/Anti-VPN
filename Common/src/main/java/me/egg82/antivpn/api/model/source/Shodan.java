@@ -6,6 +6,7 @@ import java.util.concurrent.CompletableFuture;
 import me.egg82.antivpn.api.APIException;
 import me.egg82.antivpn.api.model.source.models.ShodanModel;
 import me.egg82.antivpn.utils.ValidationUtil;
+import me.egg82.antivpn.web.WebRequest;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.spongepowered.configurate.ConfigurationNode;
 
@@ -50,7 +51,8 @@ public class Shodan extends AbstractSource<ShodanModel> {
                 throw new APIException(true, "Key is not defined for " + getName());
             }
 
-            HttpURLConnection conn = getConnection("https://api.shodan.io/shodan/host/" + ip + "?minify=true&key=" + key, "GET", (int) getCachedConfig().getTimeout(), "egg82/AntiVPN", headers);
+            WebRequest.Builder builder = getDefaultBuilder("https://api.shodan.io/shodan/host/" + ip + "?minify=true&key=" + key, getCachedConfig().getTimeout());
+            HttpURLConnection conn = getConnection(builder.build());
             JSONDeserializer<ShodanModel> modelDeserializer = new JSONDeserializer<>();
             return modelDeserializer.deserialize(getString(conn), ShodanModel.class);
         });

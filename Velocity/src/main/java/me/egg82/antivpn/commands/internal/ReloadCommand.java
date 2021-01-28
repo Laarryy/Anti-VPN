@@ -53,8 +53,6 @@ public class ReloadCommand extends AbstractCommand {
 
         ConfigurationFileUtil.reloadConfig(dataFolder, console, messagingHandler, sourceManager);
 
-        cachedConfig = ConfigUtil.getCachedConfig();
-
         VelocityIPManager ipManager = new VelocityIPManager(proxy, sourceManager, cachedConfig.getCacheTime().getTime(), cachedConfig.getCacheTime().getUnit());
         VelocityPlayerManager playerManager = new VelocityPlayerManager(proxy, cachedConfig.getThreads(), cachedConfig.getMcLeaksKey(), cachedConfig.getCacheTime().getTime(), cachedConfig.getCacheTime().getUnit());
         VPNAPI api = VPNAPIProvider.getInstance();

@@ -12,7 +12,8 @@ import java.util.concurrent.TimeUnit;
 import me.egg82.antivpn.services.lookup.models.PlayerNameModel;
 import me.egg82.antivpn.services.lookup.models.PlayerUUIDModel;
 import me.egg82.antivpn.services.lookup.models.ProfileModel;
-import me.egg82.antivpn.utils.WebUtil;
+import me.egg82.antivpn.utils.TimeUtil;
+import me.egg82.antivpn.web.WebRequest;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -116,7 +117,7 @@ public class BungeePlayerInfo implements PlayerInfo {
         }
 
         // Network lookup
-        HttpURLConnection conn = WebUtil.getConnection(new URL("https://api.mojang.com/user/profiles/" + uuid.toString().replace("-", "") + "/names"), "GET", 2500, "egg82/PlayerInfo", headers);
+        HttpURLConnection conn = WebRequest.builder(new URL("https://api.mojang.com/user/profiles/" + uuid.toString().replace("-", "") + "/names")).timeout(new TimeUtil.Time(2500L, TimeUnit.MILLISECONDS)).userAgent("egg82/PlayerInfo").header("Accept", "application/json").build().getConnection();
         int status = conn.getResponseCode();
 
         if (status == 204) {
@@ -125,7 +126,7 @@ public class BungeePlayerInfo implements PlayerInfo {
         } else if (status == 200) {
             JSONDeserializer<List<PlayerNameModel>> modelDeserializer = new JSONDeserializer<>();
             modelDeserializer.use("values", PlayerNameModel.class);
-            List<PlayerNameModel> model = modelDeserializer.deserialize(WebUtil.getString(conn));
+            List<PlayerNameModel> model = modelDeserializer.deserialize(WebRequest.getString(conn));
 
             String name = model.get(model.size() - 1).getName();
             synchronized (nameCacheLock) {
@@ -148,7 +149,7 @@ public class BungeePlayerInfo implements PlayerInfo {
         }
 
         // Network lookup
-        HttpURLConnection conn = WebUtil.getConnection(new URL("https://api.mojang.com/users/profiles/minecraft/" + WebUtil.urlEncode(name)), "GET", 2500, "egg82/PlayerInfo", headers);
+        HttpURLConnection conn = WebRequest.builder(new URL("https://api.mojang.com/users/profiles/minecraft/" + WebRequest.urlEncode(name))).timeout(new TimeUtil.Time(2500L, TimeUnit.MILLISECONDS)).userAgent("egg82/PlayerInfo").header("Accept", "application/json").build().getConnection();
         int status = conn.getResponseCode();
 
         if (status == 204) {
@@ -156,7 +157,7 @@ public class BungeePlayerInfo implements PlayerInfo {
             return null;
         } else if (status == 200) {
             JSONDeserializer<PlayerUUIDModel> modelDeserializer = new JSONDeserializer<>();
-            PlayerUUIDModel model = modelDeserializer.deserialize(WebUtil.getString(conn), PlayerUUIDModel.class);
+            PlayerUUIDModel model = modelDeserializer.deserialize(WebRequest.getString(conn), PlayerUUIDModel.class);
 
             UUID uuid = UUID.fromString(model.getId().replaceFirst("(\\p{XDigit}{8})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}{4})(\\p{XDigit}+)", "$1-$2-$3-$4-$5"));
             synchronized (uuidCacheLock) {
@@ -170,7 +171,7 @@ public class BungeePlayerInfo implements PlayerInfo {
 
     private static @Nullable List<ProfileModel.ProfilePropertyModel> propertiesExpensive(@NonNull UUID uuid) throws IOException {
         // Network lookup
-        HttpURLConnection conn = WebUtil.getConnection(new URL("https://sessionserver.mojang.com/session/minecraft/profile/" + uuid.toString().replace("-", "") + "?unsigned=false"), "GET", 2500, "egg82/PlayerInfo", headers);
+        HttpURLConnection conn = WebRequest.builder(new URL("https://sessionserver.mojang.com/session/minecraft/profile/" + uuid.toString().replace("-", "") + "?unsigned=false")).timeout(new TimeUtil.Time(2500L, TimeUnit.MILLISECONDS)).userAgent("egg82/PlayerInfo").header("Accept", "application/json").build().getConnection();
         int status = conn.getResponseCode();
 
         if (status == 204) {
@@ -178,7 +179,7 @@ public class BungeePlayerInfo implements PlayerInfo {
             return null;
         } else if (status == 200) {
             JSONDeserializer<ProfileModel> modelDeserializer = new JSONDeserializer<>();
-            return modelDeserializer.deserialize(WebUtil.getString(conn), ProfileModel.class).getProperties();
+            return modelDeserializer.deserialize(WebRequest.getString(conn), ProfileModel.class).getProperties();
         }
 
         throw new IOException("Mojang API response code: " + status);

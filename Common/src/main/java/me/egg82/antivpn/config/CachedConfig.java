@@ -73,7 +73,7 @@ public class CachedConfig {
     private String serverIdString = serverId.toString();
     public @NonNull String getServerIdString() { return serverIdString; }
 
-    public static CachedConfig.Builder builder() { return new CachedConfig.Builder(); }
+    public static CachedConfig.@NonNull Builder builder() { return new CachedConfig.Builder(); }
 
     public static class Builder {
         private final CachedConfig values = new CachedConfig();

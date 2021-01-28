@@ -6,6 +6,7 @@ import java.util.concurrent.CompletableFuture;
 import me.egg82.antivpn.api.APIException;
 import me.egg82.antivpn.api.model.source.models.IP2ProxyModel;
 import me.egg82.antivpn.utils.ValidationUtil;
+import me.egg82.antivpn.web.WebRequest;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.spongepowered.configurate.ConfigurationNode;
 
@@ -41,7 +42,8 @@ public class IP2Proxy extends AbstractSource<IP2ProxyModel> {
                 throw new APIException(true, "Key is not defined for " + getName());
             }
 
-            HttpURLConnection conn = getConnection("https://api.ip2proxy.com/?ip=" + ip + "&key=" + key + "&package=PX1&format=json", "GET", (int) getCachedConfig().getTimeout(), "egg82/AntiVPN", headers);
+            WebRequest.Builder builder = getDefaultBuilder("https://api.ip2proxy.com/?ip=" + ip + "&key=" + key + "&package=PX1&format=json", getCachedConfig().getTimeout());
+            HttpURLConnection conn = getConnection(builder.build());
             JSONDeserializer<IP2ProxyModel> modelDeserializer = new JSONDeserializer<>();
             return modelDeserializer.deserialize(getString(conn), IP2ProxyModel.class);
         });

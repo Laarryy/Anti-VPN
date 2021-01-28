@@ -11,6 +11,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import me.egg82.antivpn.api.APIException;
 import me.egg82.antivpn.api.model.source.models.TeohModel;
 import me.egg82.antivpn.utils.ValidationUtil;
+import me.egg82.antivpn.web.WebRequest;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 public class Teoh extends AbstractSource<TeohModel> {
@@ -49,7 +50,8 @@ public class Teoh extends AbstractSource<TeohModel> {
                 throw new APIException(false, "API calls to " + getName() + " have been limited to 1,000/day as per request.");
             }
 
-            HttpURLConnection conn = getConnection("https://ip.teoh.io/api/vpn/" + ip, "GET", (int) getCachedConfig().getTimeout(), "egg82/AntiVPN", headers);
+            WebRequest.Builder builder = getDefaultBuilder("https://ip.teoh.io/api/vpn/" + ip, getCachedConfig().getTimeout());
+            HttpURLConnection conn = getConnection(builder.build());
             JSONDeserializer<TeohModel> modelDeserializer = new JSONDeserializer<>();
             return modelDeserializer.deserialize(getString(conn), TeohModel.class);
         });

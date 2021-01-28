@@ -8,6 +8,7 @@ import java.util.concurrent.CompletableFuture;
 import me.egg82.antivpn.api.APIException;
 import me.egg82.antivpn.api.model.source.models.ProxyCheckModel;
 import me.egg82.antivpn.utils.ValidationUtil;
+import me.egg82.antivpn.web.WebRequest;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.spongepowered.configurate.ConfigurationNode;
 
@@ -40,7 +41,8 @@ public class ProxyCheck extends AbstractSource<ProxyCheckModel> {
 
             String key = sourceConfigNode.node("key").getString();
 
-            HttpURLConnection conn = getConnection("https://proxycheck.io/v2/" + ip + "?vpn=1" + ((key != null && !key.isEmpty()) ? "&key=" + key : ""), "GET", (int) getCachedConfig().getTimeout(), "egg82/AntiVPN", headers);
+            WebRequest.Builder builder = getDefaultBuilder("https://proxycheck.io/v2/" + ip + "?vpn=1" + ((key != null && !key.isEmpty()) ? "&key=" + key : ""), getCachedConfig().getTimeout());
+            HttpURLConnection conn = getConnection(builder.build());
             String str = getString(conn);
 
             JSONDeserializer<Map<String, Object>> mapDeserializer = new JSONDeserializer<>();

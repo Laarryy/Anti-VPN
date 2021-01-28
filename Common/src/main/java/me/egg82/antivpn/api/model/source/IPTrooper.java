@@ -6,6 +6,7 @@ import java.util.concurrent.CompletableFuture;
 import me.egg82.antivpn.api.APIException;
 import me.egg82.antivpn.api.model.source.models.IPTrooperModel;
 import me.egg82.antivpn.utils.ValidationUtil;
+import me.egg82.antivpn.web.WebRequest;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 public class IPTrooper extends AbstractSource<IPTrooperModel> {
@@ -33,7 +34,8 @@ public class IPTrooper extends AbstractSource<IPTrooperModel> {
                 throw new IllegalArgumentException("ip is invalid.");
             }
 
-            HttpURLConnection conn = getConnection("https://api.iptrooper.net/check/" + ip + "?full=1", "GET", (int) getCachedConfig().getTimeout(), "egg82/AntiVPN", headers);
+            WebRequest.Builder builder = getDefaultBuilder("https://api.iptrooper.net/check/" + ip + "?full=1", getCachedConfig().getTimeout());
+            HttpURLConnection conn = getConnection(builder.build());
             JSONDeserializer<IPTrooperModel> modelDeserializer = new JSONDeserializer<>();
             return modelDeserializer.deserialize(getString(conn), IPTrooperModel.class);
         });
