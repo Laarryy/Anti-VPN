@@ -2,6 +2,7 @@ package me.egg82.antivpn.web;
 
 import java.io.*;
 import java.net.HttpURLConnection;
+import java.net.Proxy;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -26,6 +27,8 @@ public class WebRequest {
     private final Map<String, String> postData = new HashMap<>();
     private int maxRedirects = 20;
     private boolean throwOnStandardErrors = true;
+    private boolean forOutput = false;
+    private Proxy proxy = null;
 
     private WebRequest(@NonNull URL url) {
         this.url = url;
@@ -85,7 +88,7 @@ public class WebRequest {
             logger.info("Fetching URL: " + url);
         }
 
-        HttpURLConnection retVal = openConnection(url);
+        HttpURLConnection retVal = (HttpURLConnection) (proxy != null ? url.openConnection(proxy) : url.openConnection());
         setConnectionProperties(retVal, null);
 
         Set<String> previousUrls = new HashSet<>();
@@ -112,19 +115,19 @@ public class WebRequest {
                 if (ConfigUtil.getDebugOrFalse()) {
                     logger.info("Redirected to URL: " + newUrl);
                 }
-                retVal = openConnection(new URL(newUrl));
+                retVal = (HttpURLConnection) (proxy != null ? new URL(newUrl).openConnection(proxy) : new URL(newUrl).openConnection());
                 setConnectionProperties(retVal, cookies);
             }
         } while (redirect);
 
+        tryThrowOnStandardErrors(retVal);
+
         return retVal;
     }
 
-    private @NonNull HttpURLConnection openConnection(@NonNull URL url) throws IOException {
-        HttpURLConnection retVal = (HttpURLConnection) url.openConnection();
-
-        if (throwOnStandardErrors) {
-            int status = retVal.getResponseCode();
+    private void tryThrowOnStandardErrors(@NonNull HttpURLConnection connection) throws IOException {
+        if (!forOutput && throwOnStandardErrors) {
+            int status = connection.getResponseCode();
 
             if (status >= 200 && status < 300) {
                 if (status == HttpURLConnection.HTTP_RESET) {
@@ -148,8 +151,6 @@ public class WebRequest {
                 throw new IOException("Could not get connection (HTTP status " + status + ")");
             }
         }
-
-        return retVal;
     }
 
     private void setConnectionProperties(@NonNull HttpURLConnection conn, String cookies) throws IOException {
@@ -157,7 +158,7 @@ public class WebRequest {
         conn.setConnectTimeout((int) timeout.getMillis());
         conn.setReadTimeout((int) timeout.getMillis());
 
-        if (method != null) {
+        if (method != RequestMethod.GET) {
             conn.setRequestMethod(method.name());
         }
         if (!headers.isEmpty()) {
@@ -271,6 +272,16 @@ public class WebRequest {
 
         public WebRequest.@NonNull Builder throwOnStandardErrors(boolean value) {
             request.throwOnStandardErrors = value;
+            return this;
+        }
+
+        public WebRequest.@NonNull Builder forOutput(boolean value) {
+            request.forOutput = value;
+            return this;
+        }
+
+        public WebRequest.@NonNull Builder proxy(Proxy value) {
+            request.proxy = value;
             return this;
         }
 
