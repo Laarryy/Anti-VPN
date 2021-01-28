@@ -91,6 +91,10 @@ public class WebRequest {
         HttpURLConnection retVal = (HttpURLConnection) (proxy != null ? url.openConnection(proxy) : url.openConnection());
         setConnectionProperties(retVal, null);
 
+        if (forOutput) {
+            return retVal;
+        }
+
         Set<String> previousUrls = new HashSet<>();
         previousUrls.add(url.toExternalForm() + (headers.containsKey("Set-Cookie") ? ":" + headers.get("Set-Cookie") : ""));
 
