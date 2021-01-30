@@ -79,7 +79,7 @@ public class ImportCommand extends AbstractCommand {
             ipModels = master.getAllIps(start, max);
             slave.storeModels(ipModels);
             issuer.sendInfo(Message.IMPORT__IPS, "{id}", String.valueOf(start + ipModels.size()));
-            start += max;
+            start += ipModels.size();
         } while (ipModels.size() == max);
 
         issuer.sendInfo(Message.IMPORT__PLAYERS, "{id}", "0");
@@ -89,7 +89,7 @@ public class ImportCommand extends AbstractCommand {
             playerModels = master.getAllPlayers(start, max);
             slave.storeModels(playerModels);
             issuer.sendInfo(Message.IMPORT__PLAYERS, "{id}", String.valueOf(start + playerModels.size()));
-            start += max;
+            start += playerModels.size();
         } while (playerModels.size() == max);
 
         issuer.sendInfo(Message.IMPORT__END);

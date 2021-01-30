@@ -143,11 +143,11 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         }
     }
 
-    public @NonNull Set<IPModel> getAllIps(int start, int end) {
+    public @NonNull Set<IPModel> getAllIps(int start, int max) {
         queueLock.readLock().lock();
         try {
             return new QIPModel(connection)
-                    .id.between(start - 1, end + 1)
+                    .id.between(start, start + max - 1)
                     .findSet();
         } finally {
             queueLock.readLock().unlock();
@@ -218,11 +218,11 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         }
     }
 
-    public @NonNull Set<PlayerModel> getAllPlayers(int start, int end) {
+    public @NonNull Set<PlayerModel> getAllPlayers(int start, int max) {
         queueLock.readLock().lock();
         try {
             return new QPlayerModel(connection)
-                    .id.between(start - 1, end + 1)
+                    .id.between(start, start + max - 1)
                     .findSet();
         } finally {
             queueLock.readLock().unlock();

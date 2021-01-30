@@ -27,7 +27,7 @@ public interface StorageService {
     @Nullable IPModel getIpModel(@NonNull String ip, long cacheTimeMillis);
     @Nullable IPModel getIpModel(long ipId, long cacheTimeMillis);
     @NonNull Set<IPModel> getAllIps(long cacheTimeMillis);
-    @NonNull Set<IPModel> getAllIps(int start, int end);
+    @NonNull Set<IPModel> getAllIps(int start, int max);
 
     /*
    Note: Can be an expensive operation
@@ -36,7 +36,7 @@ public interface StorageService {
     @Nullable PlayerModel getPlayerModel(@NonNull UUID player, long cacheTimeMillis);
     @Nullable PlayerModel getPlayerModel(long playerId, long cacheTimeMillis);
     @NonNull Set<PlayerModel> getAllPlayers(long cacheTimeMillis);
-    @NonNull Set<PlayerModel> getAllPlayers(int start, int end);
+    @NonNull Set<PlayerModel> getAllPlayers(int start, int max);
 
     /*
    Note: Can be an expensive operation

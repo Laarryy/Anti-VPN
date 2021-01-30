@@ -85,7 +85,7 @@ public class ImportCommand extends AbstractCommand {
                         models = master.getAllIps(start, max);
                         slave.storeModels(models);
                         issuer.sendInfo(Message.IMPORT__IPS, "{id}", String.valueOf(start + models.size()));
-                        start += max;
+                        start += models.size();
                     } while (models.size() == max);
                     r.accept(start);
                 })
@@ -97,7 +97,7 @@ public class ImportCommand extends AbstractCommand {
                         models = master.getAllPlayers(start, max);
                         slave.storeModels(models);
                         issuer.sendInfo(Message.IMPORT__PLAYERS, "{id}", String.valueOf(start + models.size()));
-                        start += max;
+                        start += models.size();
                     } while (models.size() == max);
                     r.accept(start);
                 })
