@@ -652,8 +652,18 @@ public class ConfigurationFileUtil {
         public PoolSettings(ConfigurationNode settingsNode) {
             minPoolSize = settingsNode.node("min-idle").getInt();
             maxPoolSize = settingsNode.node("max-pool-size").getInt();
-            maxLifetime = settingsNode.node("max-lifetime").getLong();
-            timeout = settingsNode.node("timeout").getLong();
+
+            TimeUtil.Time l = TimeUtil.getTime(settingsNode.node("max-lifetime").getString("30minutes"));
+            if (l == null) {
+                l = new TimeUtil.Time(30L, TimeUnit.MINUTES);
+            }
+            maxLifetime = l.getMillis();
+
+            TimeUtil.Time t = TimeUtil.getTime(settingsNode.node("timeout").getString("5seconds"));
+            if (t == null) {
+                t = new TimeUtil.Time(5L, TimeUnit.SECONDS);
+            }
+            timeout = t.getMillis();
         }
 
         public int getMinPoolSize() { return minPoolSize; }
