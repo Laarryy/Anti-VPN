@@ -8,9 +8,7 @@ import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
+import java.util.concurrent.*;
 import me.egg82.antivpn.AntiVPN;
 import me.egg82.antivpn.api.VPNAPIProvider;
 import me.egg82.antivpn.api.model.ip.AlgorithmMethod;
@@ -36,6 +34,8 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public class PlayerEvents extends EventHolder {
+    private static final ExecutorService POOL = Executors.newWorkStealingPool(Math.max(4, Runtime.getRuntime().availableProcessors() / 4));
+
     private final CommandIssuer console;
 
     public PlayerEvents(@NonNull Plugin plugin, @NonNull CommandIssuer console) {
@@ -43,7 +43,14 @@ public class PlayerEvents extends EventHolder {
 
         events.add(
                 BungeeEvents.subscribe(plugin, PreLoginEvent.class, EventPriority.HIGH)
-                        .handler(this::checkPerms)
+                        .handler(e -> e.registerIntent(plugin))
+                        .handler(e -> POOL.submit(() -> {
+                            try {
+                                checkPerms(e);
+                            } finally {
+                                e.completeIntent(plugin);
+                            }
+                        }))
         );
 
         events.add(
