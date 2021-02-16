@@ -34,7 +34,7 @@ import:
 kick:
   api_mode: "Le plugin est en mode API, et aucune action a été effectuée."
   end_vpn: "<c4>Le joueur</c4> {player} <c4>a été éjecté pour une utilisation d'un VPN, et/ou toutes les commandes ont été exécutées.</c4>"
-  end_mcleaks: " <c4>Le joueur</c4> {player} <c4>a été éjecté pour une utilisation MCLeaks, et/ou toutes les commandes nécessaires ont été exécutées.</c4>"
+  end_mcleaks: "<c4>Le joueur</c4> {player} <c4>a été éjecté pour une utilisation MCLeaks, et/ou toutes les commandes nécessaires ont été exécutées.</c4>"
   no_player: "Le joueur spécifié n'est pas connecté."
 
 check:
