@@ -33,12 +33,12 @@
         <zstd.version>1.4.8-4</zstd.version>
         <guava.version>30.1-jre</guava.version>
         <fastutil.version>8.5.2</fastutil.version>
-        <caffeine.version>2.8.8</caffeine.version>
+        <caffeine.version>2.9.0</caffeine.version>
         <ipaddress.version>5.3.3</ipaddress.version>
         <mcleaks.version>1.9.5-SNAPSHOT</mcleaks.version>
         <slf4j.version>1.7.30</slf4j.version>
         <gameanalytics.version>1.0.2</gameanalytics.version>
-        <netty.version>4.1.58.Final</netty.version>
+        <netty.version>4.1.59.Final</netty.version>
         <junit.version>5.8.0-M1</junit.version>
 
         <taskchain.version>3.7.2</taskchain.version>
@@ -89,6 +89,9 @@
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>versions-maven-plugin</artifactId>
                 <version>2.8.1</version>
+                <configuration>
+                    <rulesUri>file:///${project.basedir}/versions.xml</rulesUri>
+                </configuration>
             </plugin>
 
             <plugin>
