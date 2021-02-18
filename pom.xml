@@ -15,7 +15,7 @@
         <plugin.version>6.4.19</plugin.version>
         <api.version>2.0.1</api.version>
 
-        <paper.version>1.16.4-R0.1-SNAPSHOT</paper.version>
+        <paper.version>1.16.5-R0.1-SNAPSHOT</paper.version>
         <waterfall.version>1.16-R0.4-SNAPSHOT</waterfall.version>
         <velocity.version>1.1.4</velocity.version>
         <bstats.version>2.2.1</bstats.version>
@@ -44,7 +44,7 @@
         <taskchain.version>3.7.2</taskchain.version>
         <acf.version>0.5.0-SNAPSHOT</acf.version>
         <eventchain.api.version>1.0.0</eventchain.api.version>
-        <eventchain.version>2.0.2</eventchain.version>
+        <eventchain.version>2.0.3</eventchain.version>
         <updater.version>1.1.5</updater.version>
         <depdownloader.version>2.2.16</depdownloader.version>
         <relocator.version>1.4</relocator.version>
