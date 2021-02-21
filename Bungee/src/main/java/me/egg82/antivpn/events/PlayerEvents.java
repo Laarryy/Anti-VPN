@@ -57,7 +57,7 @@ public class PlayerEvents extends EventHolder {
                         .handler(e -> e.registerIntent(plugin))
                         .handler(e -> POOL.submit(() -> {
                             try {
-                                checkPerms(new LoginEventWrapper(e));
+                                checkPerms(new LoginEventWrapper(e,plugin));
                             } finally {
                                 e.completeIntent(plugin);
                             }
@@ -67,7 +67,7 @@ public class PlayerEvents extends EventHolder {
         events.add(
             (useWaterFallLoginEvent ? BungeeEvents.subscribe(plugin, LoginEvent.class, EventPriority.NORMAL)
                 : BungeeEvents.subscribe(plugin, PostLoginEvent.class, EventPriority.LOWEST))
-                        .handler(e -> this.checkPlayer(new LoginEventWrapper(e)))
+                        .handler(e -> this.checkPlayer(new LoginEventWrapper(e,plugin)))
         );
 
         events.add(
@@ -172,8 +172,7 @@ public class PlayerEvents extends EventHolder {
             }
             String kickMessage = ipManager.getVpnKickMessage(event.getConnection().getName(), uuid, ip);
             if (kickMessage != null) {
-                event.setCancelled(true);
-                event.setCancelReason(TextComponent.fromLegacyText(kickMessage));
+                event.disconnect(ip,false,TextComponent.fromLegacyText(kickMessage));
             }
         }
 
@@ -186,8 +185,7 @@ public class PlayerEvents extends EventHolder {
             }
             String kickMessage = playerManager.getMcLeaksKickMessage(event.getConnection().getName(), uuid, ip);
             if (kickMessage != null) {
-                event.setCancelled(true);
-                event.setCancelReason(TextComponent.fromLegacyText(kickMessage));
+                event.disconnect(ip,true,TextComponent.fromLegacyText(kickMessage));
             }
         }
     }
@@ -311,7 +309,7 @@ public class PlayerEvents extends EventHolder {
             }
             String kickMessage = ipManager.getVpnKickMessage(event.getName(), event.getUniqueId(), ip);
             if (kickMessage != null) {
-                event.disconnect(TextComponent.fromLegacyText(kickMessage));
+                event.disconnect(ip,false,TextComponent.fromLegacyText(kickMessage));
             }
         }
 
@@ -324,7 +322,7 @@ public class PlayerEvents extends EventHolder {
             }
             String kickMessage = playerManager.getMcLeaksKickMessage(event.getName(), event.getUniqueId(), ip);
             if (kickMessage != null) {
-                event.disconnect(TextComponent.fromLegacyText(kickMessage));
+                event.disconnect(ip,true,TextComponent.fromLegacyText(kickMessage));
             }
         }
     }

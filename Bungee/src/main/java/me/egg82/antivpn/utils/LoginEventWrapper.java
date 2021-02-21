@@ -1,23 +1,24 @@
 package me.egg82.antivpn.utils;
 
 import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.PendingConnection;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.LoginEvent;
 import net.md_5.bungee.api.event.PostLoginEvent;
 import net.md_5.bungee.api.event.PreLoginEvent;
+import net.md_5.bungee.api.plugin.Plugin;
 
 import javax.annotation.Nullable;
 import java.net.InetSocketAddress;
 import java.util.UUID;
 
 public class LoginEventWrapper {
-    PreLoginEvent preLoginEvent = null;
-    PostLoginEvent postLoginEvent = null;
-    LoginEvent loginEvent = null;
+    private PreLoginEvent preLoginEvent = null;
+    private PostLoginEvent postLoginEvent = null;
+    private LoginEvent loginEvent = null;
+    private Plugin plugin;
 
-    public LoginEventWrapper(Object event) {
+    public LoginEventWrapper(Object event,Plugin plugin) {
         if (event instanceof PreLoginEvent) {
             preLoginEvent = (PreLoginEvent) event;
         }else if (event instanceof PostLoginEvent) {
@@ -25,6 +26,7 @@ public class LoginEventWrapper {
         } else {
             loginEvent = (LoginEvent) event;
         }
+        this.plugin = plugin;
     }
 
     public InetSocketAddress getAddress() {
@@ -36,7 +38,7 @@ public class LoginEventWrapper {
             return loginEvent.getConnection().getAddress();
         }
     }
-    public void disconnect(BaseComponent... message){
+    public void disconnect(String ip,boolean mcLeaks,BaseComponent... message){
         if (preLoginEvent != null) {
             preLoginEvent.setCancelled(true);
             preLoginEvent.setCancelReason(message);
@@ -46,6 +48,7 @@ public class LoginEventWrapper {
             loginEvent.setCancelled(true);
             loginEvent.setCancelReason(message);
         }
+        plugin.getLogger().info("Disconnecting " + getConnection().getName() + " for using a" + (mcLeaks ? "n MCLeaks account" : " VPN") + ". Address: " + ip);
     }
 
     public UUID getUniqueId() {
