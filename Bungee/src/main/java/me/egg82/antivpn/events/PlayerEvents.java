@@ -48,10 +48,12 @@ public class PlayerEvents extends EventHolder {
         CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
         if (cachedConfig != null) {
             useWaterFallLoginEvent = cachedConfig.useWaterfallLoginEvent() && BungeeEnvironmentUtil.getEnvironment() == BungeeEnvironmentUtil.Environment.WATERFALL;
+            logger.info("Using waterfall's LoginEvent for vpn checking");
         }
 
         events.add(
-            (useWaterFallLoginEvent ?  BungeeEvents.subscribe(plugin, LoginEvent.class, EventPriority.HIGH) : BungeeEvents.subscribe(plugin, PreLoginEvent.class, EventPriority.HIGH))
+            (useWaterFallLoginEvent ? BungeeEvents.subscribe(plugin, LoginEvent.class, EventPriority.HIGH)
+                : BungeeEvents.subscribe(plugin, PreLoginEvent.class, EventPriority.HIGH))
                         .handler(e -> e.registerIntent(plugin))
                         .handler(e -> POOL.submit(() -> {
                             try {
