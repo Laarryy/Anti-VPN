@@ -46,6 +46,9 @@ public class CachedConfig {
     private long timeout = 5000L;
     public long getTimeout() { return timeout; }
 
+    private boolean waterfallLoginEvent = true;
+    public boolean useWaterfallLoginEvent() { return waterfallLoginEvent; }
+
     private String vpnKickMessage = "&cPlease disconnect from your proxy or VPN before re-joining!";
     public @NonNull String getVPNKickMessage() { return vpnKickMessage; }
 

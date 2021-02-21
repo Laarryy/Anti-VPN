@@ -15,15 +15,18 @@ import me.egg82.antivpn.api.model.ip.AlgorithmMethod;
 import me.egg82.antivpn.api.model.ip.IPManager;
 import me.egg82.antivpn.api.model.player.PlayerManager;
 import me.egg82.antivpn.api.platform.BungeePlatform;
+import me.egg82.antivpn.bungee.BungeeEnvironmentUtil;
 import me.egg82.antivpn.config.CachedConfig;
 import me.egg82.antivpn.config.ConfigUtil;
 import me.egg82.antivpn.hooks.LuckPermsHook;
 import me.egg82.antivpn.services.lookup.PlayerInfo;
 import me.egg82.antivpn.services.lookup.PlayerLookup;
+import me.egg82.antivpn.utils.AsyncLoginEventWrapper;
 import me.egg82.antivpn.utils.ExceptionUtil;
 import me.egg82.antivpn.utils.ValidationUtil;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.api.event.LoginEvent;
 import net.md_5.bungee.api.event.PostLoginEvent;
 import net.md_5.bungee.api.event.PreLoginEvent;
 import net.md_5.bungee.api.plugin.Plugin;
@@ -41,12 +44,18 @@ public class PlayerEvents extends EventHolder {
     public PlayerEvents(@NonNull Plugin plugin, @NonNull CommandIssuer console) {
         this.console = console;
 
+        boolean useWaterFallLoginEvent = false;
+        CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
+        if (cachedConfig != null) {
+            useWaterFallLoginEvent = cachedConfig.useWaterfallLoginEvent() && BungeeEnvironmentUtil.getEnvironment() == BungeeEnvironmentUtil.Environment.WATERFALL;
+        }
+
         events.add(
-                BungeeEvents.subscribe(plugin, PreLoginEvent.class, EventPriority.HIGH)
+            (useWaterFallLoginEvent ?  BungeeEvents.subscribe(plugin, LoginEvent.class, EventPriority.HIGH) : BungeeEvents.subscribe(plugin, PreLoginEvent.class, EventPriority.HIGH))
                         .handler(e -> e.registerIntent(plugin))
                         .handler(e -> POOL.submit(() -> {
                             try {
-                                checkPerms(e);
+                                checkPerms(new AsyncLoginEventWrapper(e));
                             } finally {
                                 e.completeIntent(plugin);
                             }
@@ -71,7 +80,7 @@ public class PlayerEvents extends EventHolder {
         );
     }
 
-    private void checkPerms(@NonNull PreLoginEvent event) {
+    private void checkPerms(@NonNull AsyncLoginEventWrapper event) {
         Optional<LuckPermsHook> luckPermsHook;
         try {
             luckPermsHook = ServiceLocator.getOptional(LuckPermsHook.class);
@@ -115,7 +124,7 @@ public class PlayerEvents extends EventHolder {
         }
     }
 
-    private void checkPermsPlayer(@NonNull PreLoginEvent event, @NonNull UUID uuid,  boolean hasBypass) {
+    private void checkPermsPlayer(@NonNull AsyncLoginEventWrapper event, @NonNull UUID uuid,  boolean hasBypass) {
         if (hasBypass) {
             if (ConfigUtil.getDebugOrFalse()) {
                 console.sendMessage("<c1>" + event.getConnection().getName() + "</c1> <c2>bypasses pre-check. Ignoring.</c2>");
@@ -180,7 +189,7 @@ public class PlayerEvents extends EventHolder {
         }
     }
 
-    private void cachePlayer(@NonNull PreLoginEvent event, UUID uuid) {
+    private void cachePlayer(@NonNull AsyncLoginEventWrapper event, UUID uuid) {
         if (uuid == null) {
             return;
         }
