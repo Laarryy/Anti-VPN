@@ -159,6 +159,11 @@ public class CachedConfig {
             return this;
         }
 
+        public CachedConfig.Builder waterfallLoginEvent(boolean value) {
+            values.waterfallLoginEvent = value;
+            return this;
+        }
+
         public CachedConfig.Builder vpnKickMessage(@NonNull String value) {
             values.vpnKickMessage = value;
             return this;

@@ -340,6 +340,8 @@ connection:
 
 # When true, logs some extra output to the console so you can see if/why things might be failing
 debug: false
+# When true, uses waterfall's login event instead of pre/postloginevent enable this if you are using waterfall
+use-waterfall-login-event: false
 # Default language (affects console output)
 lang: 'en'
 

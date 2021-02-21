@@ -74,6 +74,7 @@ public class ConfigurationFileUtil {
                 .ignoredIps(getIgnoredIps(config, debug, console))
                 .threads(config.node("connection", "threads").getInt(4))
                 .timeout(config.node("connection", "timeout").getLong(5000L))
+                .waterfallLoginEvent(config.node("use-waterfall-login-event").getBoolean(false))
                 .vpnKickMessage(config.node("action", "vpn", "kick-message").getString("&cPlease disconnect from your proxy or VPN before re-joining!"))
                 .vpnActionCommands(getVpnActionCommands(config, debug, console))
                 .mcleaksKickMessage(config.node("action", "mcleaks", "kick-message").getString("&cPlease discontinue your use of an MCLeaks account!"))
