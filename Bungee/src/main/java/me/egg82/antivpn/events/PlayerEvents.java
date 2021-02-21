@@ -21,7 +21,7 @@ import me.egg82.antivpn.config.ConfigUtil;
 import me.egg82.antivpn.hooks.LuckPermsHook;
 import me.egg82.antivpn.services.lookup.PlayerInfo;
 import me.egg82.antivpn.services.lookup.PlayerLookup;
-import me.egg82.antivpn.utils.AsyncLoginEventWrapper;
+import me.egg82.antivpn.utils.LoginEventWrapper;
 import me.egg82.antivpn.utils.ExceptionUtil;
 import me.egg82.antivpn.utils.ValidationUtil;
 import net.md_5.bungee.api.ProxyServer;
@@ -52,12 +52,12 @@ public class PlayerEvents extends EventHolder {
         }
 
         events.add(
-            (useWaterFallLoginEvent ? BungeeEvents.subscribe(plugin, LoginEvent.class, EventPriority.HIGH)
+            (useWaterFallLoginEvent ? BungeeEvents.subscribe(plugin, LoginEvent.class, EventPriority.LOW)
                 : BungeeEvents.subscribe(plugin, PreLoginEvent.class, EventPriority.HIGH))
                         .handler(e -> e.registerIntent(plugin))
                         .handler(e -> POOL.submit(() -> {
                             try {
-                                checkPerms(new AsyncLoginEventWrapper(e));
+                                checkPerms(new LoginEventWrapper(e));
                             } finally {
                                 e.completeIntent(plugin);
                             }
@@ -65,8 +65,9 @@ public class PlayerEvents extends EventHolder {
         );
 
         events.add(
-                BungeeEvents.subscribe(plugin, PostLoginEvent.class, EventPriority.LOWEST)
-                        .handler(this::checkPlayer)
+            (useWaterFallLoginEvent ? BungeeEvents.subscribe(plugin, LoginEvent.class, EventPriority.NORMAL)
+                : BungeeEvents.subscribe(plugin, PostLoginEvent.class, EventPriority.LOWEST))
+                        .handler(e -> this.checkPlayer(new LoginEventWrapper(e)))
         );
 
         events.add(
@@ -82,7 +83,7 @@ public class PlayerEvents extends EventHolder {
         );
     }
 
-    private void checkPerms(@NonNull AsyncLoginEventWrapper event) {
+    private void checkPerms(@NonNull LoginEventWrapper event) {
         Optional<LuckPermsHook> luckPermsHook;
         try {
             luckPermsHook = ServiceLocator.getOptional(LuckPermsHook.class);
@@ -126,7 +127,7 @@ public class PlayerEvents extends EventHolder {
         }
     }
 
-    private void checkPermsPlayer(@NonNull AsyncLoginEventWrapper event, @NonNull UUID uuid,  boolean hasBypass) {
+    private void checkPermsPlayer(@NonNull LoginEventWrapper event, @NonNull UUID uuid, boolean hasBypass) {
         if (hasBypass) {
             if (ConfigUtil.getDebugOrFalse()) {
                 console.sendMessage("<c1>" + event.getConnection().getName() + "</c1> <c2>bypasses pre-check. Ignoring.</c2>");
@@ -191,7 +192,7 @@ public class PlayerEvents extends EventHolder {
         }
     }
 
-    private void cachePlayer(@NonNull AsyncLoginEventWrapper event, UUID uuid) {
+    private void cachePlayer(@NonNull LoginEventWrapper event, UUID uuid) {
         if (uuid == null) {
             return;
         }
@@ -256,7 +257,7 @@ public class PlayerEvents extends EventHolder {
         }
     }
 
-    private void checkPlayer(@NonNull PostLoginEvent event) {
+    private void checkPlayer(@NonNull LoginEventWrapper event) {
         Optional<LuckPermsHook> luckPermsHook;
         try {
             luckPermsHook = ServiceLocator.getOptional(LuckPermsHook.class);
@@ -269,7 +270,7 @@ public class PlayerEvents extends EventHolder {
             return;
         }
 
-        String ip = getIp(event.getPlayer().getAddress());
+        String ip = getIp(event.getAddress());
         if (ip == null || ip.isEmpty()) {
             return;
         }
@@ -280,7 +281,7 @@ public class PlayerEvents extends EventHolder {
             return;
         }
 
-        if (event.getPlayer().hasPermission("avpn.bypass")) {
+        if (event.getPlayer() != null && event.getPlayer().hasPermission("avpn.bypass")) {
             if (ConfigUtil.getDebugOrFalse()) {
                 console.sendMessage("<c1>" + event.getPlayer().getName() + "</c1> <c2>bypasses actions. Ignoring.</c2>");
             }
@@ -290,40 +291,40 @@ public class PlayerEvents extends EventHolder {
         for (String testAddress : cachedConfig.getIgnoredIps()) {
             if (ValidationUtil.isValidIp(testAddress) && ip.equalsIgnoreCase(testAddress)) {
                 if (ConfigUtil.getDebugOrFalse()) {
-                    console.sendMessage("<c1>" + event.getPlayer().getName() + "</c1> <c2>is using an ignored IP</c2> <c1>" + ip + "</c1><c2>. Ignoring.</c2>");
+                    console.sendMessage("<c1>" + event.getName() + "</c1> <c2>is using an ignored IP</c2> <c1>" + ip + "</c1><c2>. Ignoring.</c2>");
                 }
                 return;
             } else if (ValidationUtil.isValidIpRange(testAddress) && rangeContains(testAddress, ip)) {
                 if (ConfigUtil.getDebugOrFalse()) {
-                    console.sendMessage("<c1>" + event.getPlayer().getName() + "</c1> <c2>is under an ignored range</c2> <c1>" + testAddress + " (" + ip + ")" + "</c1><c2>. Ignoring.</c2>");
+                    console.sendMessage("<c1>" + event.getName() + "</c1> <c2>is under an ignored range</c2> <c1>" + testAddress + " (" + ip + ")" + "</c1><c2>. Ignoring.</c2>");
                 }
                 return;
             }
         }
 
-        if (isVpn(ip, event.getPlayer().getName(), cachedConfig)) {
+        if (isVpn(ip, event.getName(), cachedConfig)) {
             AntiVPN.incrementBlockedVPNs();
             IPManager ipManager = VPNAPIProvider.getInstance().getIPManager();
-            List<String> commands = ipManager.getVpnCommands(event.getPlayer().getName(), event.getPlayer().getUniqueId(), ip);
+            List<String> commands = ipManager.getVpnCommands(event.getName(), event.getUniqueId(), ip);
             for (String command : commands) {
                 ProxyServer.getInstance().getPluginManager().dispatchCommand(ProxyServer.getInstance().getConsole(), command);
             }
-            String kickMessage = ipManager.getVpnKickMessage(event.getPlayer().getName(), event.getPlayer().getUniqueId(), ip);
+            String kickMessage = ipManager.getVpnKickMessage(event.getName(), event.getUniqueId(), ip);
             if (kickMessage != null) {
-                event.getPlayer().disconnect(TextComponent.fromLegacyText(kickMessage));
+                event.disconnect(TextComponent.fromLegacyText(kickMessage));
             }
         }
 
-        if (isMcLeaks(event.getPlayer().getName(), event.getPlayer().getUniqueId(), cachedConfig)) {
+        if (isMcLeaks(event.getName(), event.getUniqueId(), cachedConfig)) {
             AntiVPN.incrementBlockedMCLeaks();
             PlayerManager playerManager = VPNAPIProvider.getInstance().getPlayerManager();
-            List<String> commands = playerManager.getMcLeaksCommands(event.getPlayer().getName(), event.getPlayer().getUniqueId(), ip);
+            List<String> commands = playerManager.getMcLeaksCommands(event.getName(), event.getUniqueId(), ip);
             for (String command : commands) {
                 ProxyServer.getInstance().getPluginManager().dispatchCommand(ProxyServer.getInstance().getConsole(), command);
             }
-            String kickMessage = playerManager.getMcLeaksKickMessage(event.getPlayer().getName(), event.getPlayer().getUniqueId(), ip);
+            String kickMessage = playerManager.getMcLeaksKickMessage(event.getName(), event.getUniqueId(), ip);
             if (kickMessage != null) {
-                event.getPlayer().disconnect(TextComponent.fromLegacyText(kickMessage));
+                event.disconnect(TextComponent.fromLegacyText(kickMessage));
             }
         }
     }
