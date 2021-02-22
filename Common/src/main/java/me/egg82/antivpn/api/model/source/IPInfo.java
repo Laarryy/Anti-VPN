@@ -48,7 +48,7 @@ public class IPInfo extends AbstractSource<IPInfoModel> {
                 throw new APIException(true, "Key is not defined for " + getName());
             }
 
-            WebRequest.Builder builder = getDefaultBuilder("https://ipinfo.io/" + ip + "/privacy?token=" + key, getCachedConfig().getTimeout());
+            WebRequest.Builder builder = getDefaultBuilder("https://ipinfo.io/" + ip + "?token=" + key, getCachedConfig().getTimeout());
             HttpURLConnection conn = getConnection(builder.build());
             JSONDeserializer<IPInfoModel> modelDeserializer = new JSONDeserializer<>();
             return modelDeserializer.deserialize(getString(conn), IPInfoModel.class);
