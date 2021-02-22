@@ -74,6 +74,7 @@ public class ConfigurationFileUtil {
                 .ignoredIps(getIgnoredIps(config, debug, console))
                 .threads(config.node("connection", "threads").getInt(4))
                 .timeout(config.node("connection", "timeout").getLong(5000L))
+                .loginEvent(config.node("use-login-event").getBoolean(true))
                 .vpnKickMessage(config.node("action", "vpn", "kick-message").getString("&cPlease disconnect from your proxy or VPN before re-joining!"))
                 .vpnActionCommands(getVpnActionCommands(config, debug, console))
                 .mcleaksKickMessage(config.node("action", "mcleaks", "kick-message").getString("&cPlease discontinue your use of an MCLeaks account!"))
