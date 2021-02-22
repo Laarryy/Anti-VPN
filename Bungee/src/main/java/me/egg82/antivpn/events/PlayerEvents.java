@@ -50,7 +50,7 @@ public class PlayerEvents extends EventHolder {
             useLoginEvent = cachedConfig.getLoginEvent();
         }
         if(!useLoginEvent) {
-            logger.warn("Not using loginevent, more performance issues and mojang API failed lookups expected");
+            logger.warn("Not using LoginEvent, performance issues and failed UUID lookups expected");
         }
 
         events.add(
