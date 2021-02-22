@@ -46,8 +46,8 @@ public class CachedConfig {
     private long timeout = 5000L;
     public long getTimeout() { return timeout; }
 
-    private boolean waterfallLoginEvent = false;
-    public boolean useWaterfallLoginEvent() { return waterfallLoginEvent; }
+    private boolean loginEvent = true;
+    public boolean getLoginEvent() { return loginEvent; }
 
     private String vpnKickMessage = "&cPlease disconnect from your proxy or VPN before re-joining!";
     public @NonNull String getVPNKickMessage() { return vpnKickMessage; }
@@ -159,8 +159,8 @@ public class CachedConfig {
             return this;
         }
 
-        public CachedConfig.Builder waterfallLoginEvent(boolean value) {
-            values.waterfallLoginEvent = value;
+        public CachedConfig.Builder loginEvent(boolean value) {
+            values.loginEvent = value;
             return this;
         }
 

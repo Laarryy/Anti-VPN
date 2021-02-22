@@ -44,17 +44,17 @@ public class PlayerEvents extends EventHolder {
     public PlayerEvents(@NonNull Plugin plugin, @NonNull CommandIssuer console) {
         this.console = console;
 
-        boolean useWaterFallLoginEvent = false;
+        boolean useLoginEvent = true;
         CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
         if (cachedConfig != null) {
-            useWaterFallLoginEvent = cachedConfig.useWaterfallLoginEvent() && BungeeEnvironmentUtil.getEnvironment() == BungeeEnvironmentUtil.Environment.WATERFALL;
-           if(useWaterFallLoginEvent) {
-               logger.info("Using waterfall's LoginEvent for vpn checking");
-           }
+            useLoginEvent = cachedConfig.getLoginEvent();
+        }
+        if(!useLoginEvent) {
+            logger.warn("Not using loginevent, more performance issues and mojang API failed lookups expected");
         }
 
         events.add(
-            (useWaterFallLoginEvent ? BungeeEvents.subscribe(plugin, LoginEvent.class, EventPriority.LOW)
+            (useLoginEvent ? BungeeEvents.subscribe(plugin, LoginEvent.class, EventPriority.LOW)
                 : BungeeEvents.subscribe(plugin, PreLoginEvent.class, EventPriority.HIGH))
                         .handler(e -> e.registerIntent(plugin))
                         .handler(e -> POOL.submit(() -> {
@@ -67,7 +67,7 @@ public class PlayerEvents extends EventHolder {
         );
 
         events.add(
-            (useWaterFallLoginEvent ? BungeeEvents.subscribe(plugin, LoginEvent.class, EventPriority.NORMAL)
+            (useLoginEvent ? BungeeEvents.subscribe(plugin, LoginEvent.class, EventPriority.NORMAL)
                 : BungeeEvents.subscribe(plugin, PostLoginEvent.class, EventPriority.LOWEST))
                         .handler(e -> this.checkPlayer(new LoginEventWrapper(e,plugin)))
         );
