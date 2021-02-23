@@ -3,8 +3,8 @@ package me.egg82.antivpn.messaging.packets;
 import io.netty.buffer.ByteBuf;
 import java.util.Objects;
 import me.egg82.antivpn.api.model.ip.AlgorithmMethod;
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class IPPacket extends AbstractPacket {
     private String ip;
@@ -14,7 +14,7 @@ public class IPPacket extends AbstractPacket {
 
     public byte getPacketId() { return 0x01; }
 
-    public IPPacket(@NonNull ByteBuf data) { read(data); }
+    public IPPacket(@NotNull ByteBuf data) { read(data); }
 
     public IPPacket() {
         this.ip = "";
@@ -23,7 +23,7 @@ public class IPPacket extends AbstractPacket {
         this.consensus = null;
     }
 
-    public void read(@NonNull ByteBuf buffer) {
+    public void read(@NotNull ByteBuf buffer) {
         if (!checkVersion(buffer)) {
             return;
         }
@@ -40,7 +40,7 @@ public class IPPacket extends AbstractPacket {
         checkReadPacket(buffer);
     }
 
-    public void write(@NonNull ByteBuf buffer) {
+    public void write(@NotNull ByteBuf buffer) {
         buffer.writeByte(VERSION);
 
         writeString(this.ip, buffer);
@@ -59,17 +59,17 @@ public class IPPacket extends AbstractPacket {
         }
     }
 
-    public @NonNull String getIp() { return ip; }
+    public @NotNull String getIp() { return ip; }
 
-    public void setIp(@NonNull String ip) { this.ip = ip; }
+    public void setIp(@NotNull String ip) { this.ip = ip; }
 
     public @Nullable Boolean getCascade() { return cascade; }
 
-    public void setCascade(Boolean cascade) { this.cascade = cascade; }
+    public void setCascade(@Nullable Boolean cascade) { this.cascade = cascade; }
 
     public @Nullable Double getConsensus() { return consensus; }
 
-    public void setConsensus(Double consensus) { this.consensus = consensus; }
+    public void setConsensus(@Nullable Double consensus) { this.consensus = consensus; }
 
     public int getType() { return type; }
 

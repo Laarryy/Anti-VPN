@@ -1,15 +1,14 @@
 package me.egg82.antivpn.storage.models;
 
-import io.ebean.annotation.NotNull;
 import javax.persistence.Entity;
 import javax.persistence.Table;
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 @Entity
 @Table(name = "avpn_6_data")
 public class DataModel extends BaseModel {
-    @NotNull
+    @io.ebean.annotation.NotNull
     private String key;
     private String value;
 
@@ -19,19 +18,19 @@ public class DataModel extends BaseModel {
         this.value = null;
     }
 
-    public DataModel(@NonNull String dbName) {
+    public DataModel(@NotNull String dbName) {
         super(dbName);
         this.key = "";
         this.value = null;
     }
 
-    public @NonNull String getKey() { return key; }
+    public @NotNull String getKey() { return key; }
 
-    public void setKey(@NonNull String key) { this.key = key; }
+    public void setKey(@NotNull String key) { this.key = key; }
 
     public @Nullable String getValue() { return value; }
 
-    public void setValue(String value) { this.value = value; }
+    public void setValue(@Nullable String value) { this.value = value; }
 
     public String toString() {
         return "DataModel{" +

@@ -4,13 +4,13 @@ import co.aikar.commands.CommandManager;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 import me.egg82.antivpn.config.ConfigUtil;
-import me.egg82.antivpn.lang.Message;
+import me.egg82.antivpn.lang.MessageKey;
 import net.md_5.bungee.api.event.PostLoginEvent;
 import net.md_5.bungee.api.plugin.Plugin;
 import ninja.egg82.service.ServiceLocator;
 import ninja.egg82.service.ServiceNotFoundException;
 import ninja.egg82.updater.BungeeUpdater;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongepowered.configurate.ConfigurationNode;
@@ -21,20 +21,17 @@ public class PostLoginUpdateNotifyHandler implements Consumer<PostLoginEvent> {
     private final Plugin plugin;
     private final CommandManager commandManager;
 
-    public PostLoginUpdateNotifyHandler(@NonNull Plugin plugin, @NonNull CommandManager commandManager) {
+    public PostLoginUpdateNotifyHandler(@NotNull Plugin plugin, @NotNull CommandManager commandManager) {
         this.plugin = plugin;
         this.commandManager = commandManager;
     }
 
-    public void accept(@NonNull PostLoginEvent event) {
+    public void accept(@NotNull PostLoginEvent event) {
         if (!event.getPlayer().hasPermission("avpn.admin")) {
             return;
         }
 
         ConfigurationNode config = ConfigUtil.getConfig();
-        if (config == null) {
-            return;
-        }
 
         BungeeUpdater updater;
 
@@ -57,7 +54,7 @@ public class PostLoginUpdateNotifyHandler implements Consumer<PostLoginEvent> {
             if (config.node("update", "notify").getBoolean(true)) {
                 try {
                     String version = updater.getLatestVersion().get();
-                    commandManager.getCommandIssuer(event.getPlayer()).sendInfo(Message.GENERAL__UPDATE, "{version}", version);
+                    commandManager.getCommandIssuer(event.getPlayer()).sendInfo(MessageKey.GENERAL__UPDATE, "{version}", version);
                 } catch (ExecutionException ex) {
                     logger.error(ex.getMessage(), ex);
                 } catch (InterruptedException ex) {

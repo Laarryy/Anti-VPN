@@ -2,24 +2,18 @@ package me.egg82.antivpn.api.model.source.models;
 
 import flexjson.JSON;
 import java.util.Objects;
+import org.jetbrains.annotations.Nullable;
 
 public class IPTrooperModel implements SourceModel {
-    private int code;
-    private boolean bad;
-    private String asn;
+    private int code = -1;
+    private boolean bad = false;
+    private String asn = null;
     @JSON(name = "country")
-    private String countryCode;
-    private String name;
-    private String type;
+    private String countryCode = null;
+    private String name = null;
+    private String type = null;
 
-    public IPTrooperModel() {
-        this.code = -1;
-        this.bad = false;
-        this.asn = null;
-        this.countryCode = null;
-        this.name = null;
-        this.type = null;
-    }
+    public IPTrooperModel() { }
 
     public int getCode() { return code; }
 
@@ -29,23 +23,23 @@ public class IPTrooperModel implements SourceModel {
 
     public void setBad(boolean bad) { this.bad = bad; }
 
-    public String getAsn() { return asn; }
+    public @Nullable String getAsn() { return asn; }
 
-    public void setAsn(String asn) { this.asn = asn; }
-
-    @JSON(name = "country")
-    public String getCountryCode() { return countryCode; }
+    public void setAsn(@Nullable String asn) { this.asn = asn; }
 
     @JSON(name = "country")
-    public void setCountryCode(String countryCode) { this.countryCode = countryCode; }
+    public @Nullable String getCountryCode() { return countryCode; }
 
-    public String getName() { return name; }
+    @JSON(name = "country")
+    public void setCountryCode(@Nullable String countryCode) { this.countryCode = countryCode; }
 
-    public void setName(String name) { this.name = name; }
+    public @Nullable String getName() { return name; }
 
-    public String getType() { return type; }
+    public void setName(@Nullable String name) { this.name = name; }
 
-    public void setType(String type) { this.type = type; }
+    public @Nullable String getType() { return type; }
+
+    public void setType(@Nullable String type) { this.type = type; }
 
     public boolean equals(Object o) {
         if (this == o) return true;

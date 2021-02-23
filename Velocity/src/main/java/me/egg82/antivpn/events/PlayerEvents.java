@@ -32,14 +32,14 @@ import me.egg82.antivpn.utils.ValidationUtil;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import ninja.egg82.events.VelocityEvents;
 import ninja.egg82.service.ServiceLocator;
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class PlayerEvents extends EventHolder {
     private final ProxyServer proxy;
     private final CommandIssuer console;
 
-    public PlayerEvents(@NonNull Object plugin, @NonNull ProxyServer proxy, @NonNull CommandIssuer console) {
+    public PlayerEvents(@NotNull Object plugin, @NotNull ProxyServer proxy, @NotNull CommandIssuer console) {
         this.proxy = proxy;
         this.console = console;
 
@@ -66,7 +66,7 @@ public class PlayerEvents extends EventHolder {
         );
     }
 
-    private void checkPerms(@NonNull PreLoginEvent event) {
+    private void checkPerms(@NotNull PreLoginEvent event) {
         Optional<LuckPermsHook> luckPermsHook;
         try {
             luckPermsHook = ServiceLocator.getOptional(LuckPermsHook.class);
@@ -110,7 +110,7 @@ public class PlayerEvents extends EventHolder {
         }
     }
 
-    private void checkPermsPlayer(@NonNull PreLoginEvent event, @NonNull UUID uuid,  boolean hasBypass) {
+    private void checkPermsPlayer(@NotNull PreLoginEvent event, @NotNull UUID uuid,  boolean hasBypass) {
         if (hasBypass) {
             if (ConfigUtil.getDebugOrFalse()) {
                 console.sendMessage("<c1>" + event.getUsername() + "</c1> <c2>bypasses pre-check. Ignoring.</c2>");
@@ -124,10 +124,6 @@ public class PlayerEvents extends EventHolder {
         }
 
         CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
-        if (cachedConfig == null) {
-            logger.error("Cached config could not be fetched.");
-            return;
-        }
 
         // Check ignored IP addresses/ranges
         for (String testAddress : cachedConfig.getIgnoredIps()) {
@@ -177,7 +173,7 @@ public class PlayerEvents extends EventHolder {
         }
     }
 
-    private void cachePlayer(@NonNull PreLoginEvent event, UUID uuid) {
+    private void cachePlayer(@NotNull PreLoginEvent event, UUID uuid) {
         if (uuid == null) {
             return;
         }
@@ -188,10 +184,6 @@ public class PlayerEvents extends EventHolder {
         }
 
         CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
-        if (cachedConfig == null) {
-            logger.error("Cached config could not be fetched.");
-            return;
-        }
 
         // Check ignored IP addresses/ranges
         for (String testAddress : cachedConfig.getIgnoredIps()) {
@@ -206,7 +198,7 @@ public class PlayerEvents extends EventHolder {
         cacheData(ip, uuid, cachedConfig);
     }
 
-    private void cacheData(@NonNull String ip, @NonNull UUID uuid, @NonNull CachedConfig cachedConfig) {
+    private void cacheData(@NotNull String ip, @NotNull UUID uuid, @NotNull CachedConfig cachedConfig) {
         // Cache IP data
         if ((!cachedConfig.getVPNKickMessage().isEmpty() || !cachedConfig.getVPNActionCommands().isEmpty())) {
             IPManager ipManager = VPNAPIProvider.getInstance().getIPManager();
@@ -242,7 +234,7 @@ public class PlayerEvents extends EventHolder {
         }
     }
 
-    private void checkPlayer(@NonNull PostLoginEvent event) {
+    private void checkPlayer(@NotNull PostLoginEvent event) {
         Optional<LuckPermsHook> luckPermsHook;
         try {
             luckPermsHook = ServiceLocator.getOptional(LuckPermsHook.class);
@@ -261,10 +253,6 @@ public class PlayerEvents extends EventHolder {
         }
 
         CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
-        if (cachedConfig == null) {
-            logger.error("Cached config could not be fetched.");
-            return;
-        }
 
         if (event.getPlayer().hasPermission("avpn.bypass")) {
             if (ConfigUtil.getDebugOrFalse()) {
@@ -314,7 +302,7 @@ public class PlayerEvents extends EventHolder {
         }
     }
 
-    private boolean isVpn(@NonNull String ip, @NonNull String name, @NonNull CachedConfig cachedConfig) {
+    private boolean isVpn(@NotNull String ip, @NotNull String name, @NotNull CachedConfig cachedConfig) {
         if (!cachedConfig.getVPNKickMessage().isEmpty() || !cachedConfig.getVPNActionCommands().isEmpty()) {
             boolean isVPN;
 
@@ -361,7 +349,7 @@ public class PlayerEvents extends EventHolder {
         return false;
     }
 
-    private boolean isMcLeaks(@NonNull String name, @NonNull UUID uuid, @NonNull CachedConfig cachedConfig) {
+    private boolean isMcLeaks(@NotNull String name, @NotNull UUID uuid, @NotNull CachedConfig cachedConfig) {
         if (!cachedConfig.getMCLeaksKickMessage().isEmpty() || !cachedConfig.getMCLeaksActionCommands().isEmpty()) {
             boolean isMCLeaks;
 
@@ -406,7 +394,7 @@ public class PlayerEvents extends EventHolder {
         return host.getHostAddress();
     }
 
-    private @NonNull CompletableFuture<UUID> fetchUuid(@NonNull String name) { return PlayerLookup.get(name, proxy).thenApply(PlayerInfo::getUUID); }
+    private @NotNull CompletableFuture<UUID> fetchUuid(@NotNull String name) { return PlayerLookup.get(name, proxy).thenApply(PlayerInfo::getUUID); }
 
-    private boolean rangeContains(@NonNull String range, @NonNull String ip) { return new IPAddressString(range).contains(new IPAddressString(ip)); }
+    private boolean rangeContains(@NotNull String range, @NotNull String ip) { return new IPAddressString(range).contains(new IPAddressString(ip)); }
 }

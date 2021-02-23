@@ -1,7 +1,7 @@
 package me.egg82.antivpn.core;
 
 import java.util.Objects;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * This class should be used sparingly, only when needed.
@@ -15,7 +15,7 @@ public class Pair<T1, T2> {
 
     private final int hc;
 
-    public Pair(T1 t1, T2 t2) {
+    public Pair(@Nullable T1 t1, @Nullable T2 t2) {
         this.t1 = t1;
         this.t2 = t2;
 

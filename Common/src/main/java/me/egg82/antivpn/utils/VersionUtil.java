@@ -4,13 +4,13 @@ import com.google.common.primitives.Ints;
 import java.util.ArrayList;
 import java.util.List;
 import me.egg82.antivpn.reflect.PackageFilter;
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class VersionUtil {
     private VersionUtil() { }
 
-    public static boolean isAtLeast(@NonNull String atLeastVersion, char separator1, @NonNull String versionToTest, char separator2) {
+    public static boolean isAtLeast(@NotNull String atLeastVersion, char separator1, @NotNull String versionToTest, char separator2) {
         int[] v1 = parseVersion(atLeastVersion, separator1);
         int[] v2 = parseVersion(versionToTest, separator2);
 
@@ -34,7 +34,7 @@ public class VersionUtil {
         return equalOrGreater;
     }
 
-    public static <T> @Nullable Class<T> getBestMatch(@NonNull Class<T> clazz, @NonNull String version, @NonNull String packageName, boolean recursive) {
+    public static <T> @Nullable Class<T> getBestMatch(@NotNull Class<T> clazz, @NotNull String version, @NotNull String packageName, boolean recursive) {
         List<Class<T>> enums = PackageFilter.getClasses(clazz, packageName, recursive, false, false);
 
         // Sort by version, ascending
@@ -98,7 +98,7 @@ public class VersionUtil {
         return bestMatch;
     }
 
-    public static int @NonNull [] parseVersion(@NonNull String version, char separator) {
+    public static int @NotNull [] parseVersion(@NotNull String version, char separator) {
         List<Integer> ints = new ArrayList<>();
 
         int lastIndex = 0;
@@ -121,7 +121,7 @@ public class VersionUtil {
         return Ints.toArray(ints);
     }
 
-    public static int tryParseInt(@NonNull String value) {
+    public static int tryParseInt(@NotNull String value) {
         try {
             return Integer.parseInt(value);
         } catch (Exception ex) {

@@ -2,43 +2,36 @@ package me.egg82.antivpn.api.model.source.models;
 
 import flexjson.JSON;
 import java.util.Objects;
+import org.jetbrains.annotations.Nullable;
 
 public class VPNBlockerModel implements SourceModel {
-    private String status;
-    private String msg;
+    private String status = null;
+    private String msg = null;
     @JSON(name = "package")
-    private String packageName;
+    private String packageName = null;
     @JSON(name = "remaining_requests")
-    private int requestsRemaining;
+    private int requestsRemaining = -1;
     @JSON(name = "ipaddress")
-    private String ip;
+    private String ip = null;
     @JSON(name = "host-ip")
-    private boolean host;
-    private String org;
+    private boolean host = false;
+    private String org = null;
 
-    public VPNBlockerModel() {
-        this.status = null;
-        this.msg = null;
-        this.packageName = null;
-        this.requestsRemaining = -1;
-        this.ip = null;
-        this.host = false;
-        this.org = null;
-    }
+    public VPNBlockerModel() { }
 
-    public String getStatus() { return status; }
+    public @Nullable String getStatus() { return status; }
 
-    public void setStatus(String status) { this.status = status; }
+    public void setStatus(@Nullable String status) { this.status = status; }
 
-    public String getMsg() { return msg; }
+    public @Nullable String getMsg() { return msg; }
 
-    public void setMsg(String msg) { this.msg = msg; }
+    public void setMsg(@Nullable String msg) { this.msg = msg; }
 
     @JSON(name = "package")
-    public String getPackageName() { return packageName; }
+    public @Nullable String getPackageName() { return packageName; }
 
     @JSON(name = "package")
-    public void setPackageName(String packageName) { this.packageName = packageName; }
+    public void setPackageName(@Nullable String packageName) { this.packageName = packageName; }
 
     @JSON(name = "remaining_requests")
     public int getRequestsRemaining() { return requestsRemaining; }
@@ -47,10 +40,10 @@ public class VPNBlockerModel implements SourceModel {
     public void setRequestsRemaining(int requestsRemaining) { this.requestsRemaining = requestsRemaining; }
 
     @JSON(name = "ipaddress")
-    public String getIp() { return ip; }
+    public @Nullable String getIp() { return ip; }
 
     @JSON(name = "ipaddress")
-    public void setIp(String ip) { this.ip = ip; }
+    public void setIp(@Nullable String ip) { this.ip = ip; }
 
     @JSON(name = "host-ip")
     public boolean isHost() { return host; }
@@ -58,9 +51,9 @@ public class VPNBlockerModel implements SourceModel {
     @JSON(name = "host-ip")
     public void setHost(boolean host) { this.host = host; }
 
-    public String getOrg() { return org; }
+    public @Nullable String getOrg() { return org; }
 
-    public void setOrg(String org) { this.org = org; }
+    public void setOrg(@Nullable String org) { this.org = org; }
 
     public boolean equals(Object o) {
         if (this == o) return true;

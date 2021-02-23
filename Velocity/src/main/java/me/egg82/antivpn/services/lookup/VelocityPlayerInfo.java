@@ -18,8 +18,8 @@ import me.egg82.antivpn.services.lookup.models.PlayerUUIDModel;
 import me.egg82.antivpn.services.lookup.models.ProfileModel;
 import me.egg82.antivpn.utils.TimeUtil;
 import me.egg82.antivpn.web.WebRequest;
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class VelocityPlayerInfo implements PlayerInfo {
     private final UUID uuid;
@@ -34,7 +34,7 @@ public class VelocityPlayerInfo implements PlayerInfo {
     private static final Object nameCacheLock = new Object();
     private static final Object propertiesCacheLock = new Object();
 
-    VelocityPlayerInfo(@NonNull UUID uuid, @NonNull ProxyServer proxy) throws IOException {
+    VelocityPlayerInfo(@NotNull UUID uuid, @NotNull ProxyServer proxy) throws IOException {
         this.uuid = uuid;
 
         Optional<String> name = Optional.ofNullable(uuidCache.getIfPresent(uuid));
@@ -65,7 +65,7 @@ public class VelocityPlayerInfo implements PlayerInfo {
         }
     }
 
-    VelocityPlayerInfo(@NonNull String name, @NonNull ProxyServer proxy) throws IOException {
+    VelocityPlayerInfo(@NotNull String name, @NotNull ProxyServer proxy) throws IOException {
         this.name = name;
 
         Optional<UUID> uuid = Optional.ofNullable(nameCache.getIfPresent(name));
@@ -96,13 +96,13 @@ public class VelocityPlayerInfo implements PlayerInfo {
         }
     }
 
-    public @NonNull UUID getUUID() { return uuid; }
+    public @NotNull UUID getUUID() { return uuid; }
 
-    public @NonNull String getName() { return name; }
+    public @NotNull String getName() { return name; }
 
-    public @NonNull ImmutableList<ProfileModel.ProfilePropertyModel> getProperties() { return ImmutableList.copyOf(properties); }
+    public @NotNull ImmutableList<ProfileModel.ProfilePropertyModel> getProperties() { return ImmutableList.copyOf(properties); }
 
-    private static @Nullable String nameExpensive(@NonNull UUID uuid, @NonNull ProxyServer proxy) throws IOException {
+    private static @Nullable String nameExpensive(@NotNull UUID uuid, @NotNull ProxyServer proxy) throws IOException {
         // Currently-online lookup
         Optional<Player> player = proxy.getPlayer(uuid);
         if (player.isPresent()) {
@@ -134,7 +134,7 @@ public class VelocityPlayerInfo implements PlayerInfo {
         throw new IOException("Mojang API response code: " + status);
     }
 
-    private static @Nullable UUID uuidExpensive(@NonNull String name, @NonNull ProxyServer proxy) throws IOException {
+    private static @Nullable UUID uuidExpensive(@NotNull String name, @NotNull ProxyServer proxy) throws IOException {
         // Currently-online lookup
         Optional<Player> player = proxy.getPlayer(name);
         if (player.isPresent()) {
@@ -165,7 +165,7 @@ public class VelocityPlayerInfo implements PlayerInfo {
         throw new IOException("Mojang API response code: " + status);
     }
 
-    private static @Nullable List<ProfileModel.ProfilePropertyModel> propertiesExpensive(@NonNull UUID uuid) throws IOException {
+    private static @Nullable List<ProfileModel.ProfilePropertyModel> propertiesExpensive(@NotNull UUID uuid) throws IOException {
         // Network lookup
         HttpURLConnection conn = WebRequest.builder(new URL("https://sessionserver.mojang.com/session/minecraft/profile/" + uuid.toString().replace("-", "") + "?unsigned=false")).timeout(new TimeUtil.Time(2500L, TimeUnit.MILLISECONDS)).userAgent("egg82/PlayerInfo").header("Accept", "application/json").build().getConnection();
         int status = conn.getResponseCode();

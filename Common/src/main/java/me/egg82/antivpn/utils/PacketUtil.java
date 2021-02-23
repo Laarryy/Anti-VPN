@@ -14,12 +14,16 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import me.egg82.antivpn.config.CachedConfig;
 import me.egg82.antivpn.config.ConfigUtil;
 import me.egg82.antivpn.core.DoubleBuffer;
+import me.egg82.antivpn.lang.Locales;
+import me.egg82.antivpn.lang.MessageKey;
+import me.egg82.antivpn.logging.GELFLogger;
 import me.egg82.antivpn.messaging.GenericMessagingHandler;
 import me.egg82.antivpn.messaging.MessagingService;
 import me.egg82.antivpn.messaging.packets.MultiPacket;
 import me.egg82.antivpn.messaging.packets.Packet;
 import me.egg82.antivpn.reflect.PackageFilter;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +43,7 @@ public class PacketUtil {
             try {
                 packet = clazz.newInstance();
             } catch (IllegalAccessException | InstantiationException | ExceptionInInitializerError | SecurityException ex) {
-                logger.error("Could not instantiate packet " + clazz.getSimpleName() + ".", ex);
+                GELFLogger.exception(logger, ex, Locales.getUS(), MessageKey.ERROR__MESSAGING__BAD_PACKET, "{name}", clazz.getSimpleName());
                 continue;
             }
             packetCache.put(packet.getPacketId(), clazz);
@@ -59,17 +63,17 @@ public class PacketUtil {
         workPool = Executors.newFixedThreadPool(size, new ThreadFactoryBuilder().setNameFormat("AntiVPN-Messaging-%d").build());
     }
 
-    public static @NonNull Byte2ObjectMap<Class<Packet>> getPacketCache() { return packetCache; }
+    public static @NotNull Byte2ObjectMap<Class<Packet>> getPacketCache() { return packetCache; }
 
     private static final DoubleBuffer<Packet> packetQueue = new DoubleBuffer<>();
     private static final AtomicBoolean requiresSending = new AtomicBoolean(false);
 
-    public static void queuePacket(@NonNull Packet packet) {
+    public static void queuePacket(@NotNull Packet packet) {
         packetQueue.getWriteBuffer().add(packet);
         requiresSending.set(true);
     }
 
-    public static void repeatPacket(@NonNull UUID messageId, @NonNull Packet packet, @NonNull String fromService) { sendPacket(messageId, packet, fromService); }
+    public static void repeatPacket(@NotNull UUID messageId, @NotNull Packet packet, @NotNull String fromService) { sendPacket(messageId, packet, fromService); }
 
     public static void trySendQueue() {
         if (!requiresSending.compareAndSet(true, false)) {
@@ -101,12 +105,8 @@ public class PacketUtil {
         }
     }
 
-    private static void sendPacket(@NonNull UUID messageId, @NonNull Packet packet, String fromService) {
+    private static void sendPacket(@NotNull UUID messageId, @NotNull Packet packet, @Nullable String fromService) {
         CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
-        if (cachedConfig == null) {
-            logger.error("Could not get cached config.");
-            return;
-        }
 
         for (MessagingService service : cachedConfig.getMessaging()) {
             if (service.getName().equals(fromService)) {

@@ -122,16 +122,21 @@
 
     <dependencies>
         <dependency>
-            <groupId>ninja.egg82</groupId>
-            <artifactId>service-locator</artifactId>
-            <version>${servicelocator.version}</version>
+            <groupId>cloud.commandframework</groupId>
+            <artifactId>cloud-core</artifactId>
+            <version>${cloud.version}</version>
             <scope>provided</scope>
         </dependency>
-
         <dependency>
-            <groupId>co.aikar</groupId>
-            <artifactId>acf-core</artifactId>
-            <version>${acf.version}</version>
+            <groupId>net.kyori</groupId>
+            <artifactId>adventure-api</artifactId>
+            <version>${adventure.api.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.kyori</groupId>
+            <artifactId>adventure-text-minimessage</artifactId>
+            <version>${adventure.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -228,12 +233,6 @@
             <version>${slf4j.version}</version>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>ninja.egg82</groupId>
-            <artifactId>gameanalytics-api</artifactId>
-            <version>${gameanalytics.version}</version>
-            <scope>provided</scope>
-        </dependency>
 
         <dependency>
             <groupId>me.egg82</groupId>
@@ -243,9 +242,9 @@
 
         <!-- API -->
         <dependency>
-            <groupId>org.checkerframework</groupId>
-            <artifactId>checker</artifactId>
-            <version>${checkerframework.version}</version>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations</artifactId>
+            <version>${jetbrains.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

@@ -16,7 +16,7 @@ import me.egg82.antivpn.storage.StorageService;
 import me.egg82.antivpn.storage.models.IPModel;
 import me.egg82.antivpn.storage.models.PlayerModel;
 import me.egg82.antivpn.utils.PacketUtil;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,7 +28,7 @@ public class GenericMessagingHandler implements MessagingHandler {
 
     public GenericMessagingHandler() { }
 
-    public void handlePacket(@NonNull UUID messageId, @NonNull String fromService, @NonNull Packet packet) {
+    public void handlePacket(@NotNull UUID messageId, @NotNull String fromService, @NotNull Packet packet) {
         if (isDuplicate(messageId)) {
             return;
         }
@@ -40,7 +40,7 @@ public class GenericMessagingHandler implements MessagingHandler {
         }
     }
 
-    private void handleIp(@NonNull IPPacket packet) {
+    private void handleIp(@NotNull IPPacket packet) {
         if (ConfigUtil.getDebugOrFalse()) {
             logger.info("Handling packet for " + packet.getIp() + ".");
         }
@@ -59,10 +59,6 @@ public class GenericMessagingHandler implements MessagingHandler {
         ipManager.getIpCache().put(new Pair<>(packet.getIp(), AlgorithmMethod.values()[packet.getType()]), m);
 
         CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
-        if (cachedConfig == null) {
-            logger.error("Cached config could not be fetched.");
-            return;
-        }
 
         for (StorageService service : cachedConfig.getStorage()) {
             IPModel model = service.getOrCreateIpModel(packet.getIp(), packet.getType());
@@ -72,7 +68,7 @@ public class GenericMessagingHandler implements MessagingHandler {
         }
     }
 
-    private void handleDeleteIp(@NonNull DeleteIPPacket packet) {
+    private void handleDeleteIp(@NotNull DeleteIPPacket packet) {
         if (ConfigUtil.getDebugOrFalse()) {
             logger.info("Handling deletion packet for " + packet.getIp() + ".");
         }
@@ -87,10 +83,6 @@ public class GenericMessagingHandler implements MessagingHandler {
         ipManager.getIpCache().invalidate(new Pair<>(packet.getIp(), AlgorithmMethod.CONSESNSUS));
 
         CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
-        if (cachedConfig == null) {
-            logger.error("Cached config could not be fetched.");
-            return;
-        }
 
         for (StorageService service : cachedConfig.getStorage()) {
             IPModel model = new IPModel();
@@ -99,7 +91,7 @@ public class GenericMessagingHandler implements MessagingHandler {
         }
     }
 
-    private void handlePlayer(@NonNull PlayerPacket packet) {
+    private void handlePlayer(@NotNull PlayerPacket packet) {
         if (ConfigUtil.getDebugOrFalse()) {
             logger.info("Handling packet for " + packet.getUuid() + ".");
         }
@@ -116,10 +108,6 @@ public class GenericMessagingHandler implements MessagingHandler {
         playerManager.getPlayerCache().put(packet.getUuid(), m);
 
         CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
-        if (cachedConfig == null) {
-            logger.error("Cached config could not be fetched.");
-            return;
-        }
 
         for (StorageService service : cachedConfig.getStorage()) {
             PlayerModel model = service.getOrCreatePlayerModel(packet.getUuid(), packet.getValue());
@@ -127,7 +115,7 @@ public class GenericMessagingHandler implements MessagingHandler {
         }
     }
 
-    private void handleDeletePlayer(@NonNull DeletePlayerPacket packet) {
+    private void handleDeletePlayer(@NotNull DeletePlayerPacket packet) {
         if (ConfigUtil.getDebugOrFalse()) {
             logger.info("Handling deletion packet for " + packet.getUuid() + ".");
         }
@@ -141,10 +129,6 @@ public class GenericMessagingHandler implements MessagingHandler {
         playerManager.getPlayerCache().invalidate(packet.getUuid());
 
         CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
-        if (cachedConfig == null) {
-            logger.error("Cached config could not be fetched.");
-            return;
-        }
 
         for (StorageService service : cachedConfig.getStorage()) {
             PlayerModel model = new PlayerModel();
@@ -153,7 +137,7 @@ public class GenericMessagingHandler implements MessagingHandler {
         }
     }
 
-    private void handleMulti(@NonNull MultiPacket packet) {
+    private void handleMulti(@NotNull MultiPacket packet) {
         if (ConfigUtil.getDebugOrFalse()) {
             logger.info("Handling multi-packet.");
         }
@@ -163,7 +147,7 @@ public class GenericMessagingHandler implements MessagingHandler {
         }
     }
 
-    private void handleGenericPacket(@NonNull Packet packet) {
+    private void handleGenericPacket(@NotNull Packet packet) {
         if (packet instanceof IPPacket) {
             handleIp((IPPacket) packet);
         } else if (packet instanceof PlayerPacket) {
@@ -177,9 +161,7 @@ public class GenericMessagingHandler implements MessagingHandler {
         }
     }
 
-    public void cancel() { }
-
-    private boolean isDuplicate(@NonNull UUID messageId) {
+    private boolean isDuplicate(@NotNull UUID messageId) {
         if (Boolean.TRUE.equals(messageCache.getIfPresent(messageId))) {
             return true;
         }

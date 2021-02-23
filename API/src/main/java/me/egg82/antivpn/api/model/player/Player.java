@@ -2,8 +2,8 @@ package me.egg82.antivpn.api.model.player;
 
 import java.io.Serializable;
 import java.util.UUID;
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * A player which contains information about various statuses they hold.
@@ -14,7 +14,7 @@ public interface Player extends Serializable {
      *
      * @return the player's UUID
      */
-    @NonNull UUID getUuid();
+    @NotNull UUID getUuid();
 
     /**
      * Gets the player's username.

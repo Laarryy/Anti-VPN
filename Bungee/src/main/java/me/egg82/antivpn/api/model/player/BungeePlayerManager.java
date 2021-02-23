@@ -18,8 +18,8 @@ import me.gong.mcleaks.MCLeaksAPI;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class BungeePlayerManager extends AbstractPlayerManager {
     private final MCLeaksAPI api;
@@ -39,12 +39,9 @@ public class BungeePlayerManager extends AbstractPlayerManager {
         api.shutdown();
     }
 
-    public @NonNull CompletableFuture<Player> getPlayer(@NonNull UUID uniqueId) {
+    public @NotNull CompletableFuture<Player> getPlayer(@NotNull UUID uniqueId) {
         return CompletableFuture.supplyAsync(() -> {
             CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
-            if (cachedConfig == null) {
-                throw new APIException(false, "Cached config could not be fetched.");
-            }
 
             for (StorageService service : cachedConfig.getStorage()) {
                 PlayerModel model = service.getPlayerModel(uniqueId, cachedConfig.getSourceCacheTime());
@@ -56,12 +53,9 @@ public class BungeePlayerManager extends AbstractPlayerManager {
         });
     }
 
-    public @NonNull CompletableFuture<Player> getPlayer(@NonNull String username) {
+    public @NotNull CompletableFuture<Player> getPlayer(@NotNull String username) {
         return PlayerLookup.get(username).thenApply(info -> {
             CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
-            if (cachedConfig == null) {
-                throw new APIException(false, "Cached config could not be fetched.");
-            }
 
             for (StorageService service : cachedConfig.getStorage()) {
                 PlayerModel model = service.getPlayerModel(info.getUUID(), cachedConfig.getSourceCacheTime());
@@ -73,12 +67,8 @@ public class BungeePlayerManager extends AbstractPlayerManager {
         });
     }
 
-    public boolean kickForMcLeaks(@NonNull String playerName, @NonNull UUID playerUuid, @NonNull String ip) {
+    public boolean kickForMcLeaks(@NotNull String playerName, @NotNull UUID playerUuid, @NotNull String ip) {
         CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
-        if (cachedConfig == null) {
-            logger.error("Cached config could not be fetched.");
-            return false;
-        }
 
         ProxiedPlayer p = ProxyServer.getInstance().getPlayer(playerUuid);
         if (p == null) {
@@ -95,12 +85,8 @@ public class BungeePlayerManager extends AbstractPlayerManager {
         return true;
     }
 
-    public @Nullable String getMcLeaksKickMessage(@NonNull String playerName, @NonNull UUID playerUuid, @NonNull String ip) {
+    public @Nullable String getMcLeaksKickMessage(@NotNull String playerName, @NotNull UUID playerUuid, @NotNull String ip) {
         CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
-        if (cachedConfig == null) {
-            logger.error("Cached config could not be fetched.");
-            return null;
-        }
 
         if (!cachedConfig.getMCLeaksKickMessage().isEmpty()) {
             return BungeeTailorUtil.tailorKickMessage(cachedConfig.getMCLeaksKickMessage(), playerName, playerUuid, ip);
@@ -108,12 +94,8 @@ public class BungeePlayerManager extends AbstractPlayerManager {
         return null;
     }
 
-    public @NonNull List<String> getMcLeaksCommands(@NonNull String playerName, @NonNull UUID playerUuid, @NonNull String ip) {
+    public @NotNull List<String> getMcLeaksCommands(@NotNull String playerName, @NotNull UUID playerUuid, @NotNull String ip) {
         CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
-        if (cachedConfig == null) {
-            logger.error("Cached config could not be fetched.");
-            return ImmutableList.of();
-        }
 
         if (!cachedConfig.getMCLeaksActionCommands().isEmpty()) {
             return ImmutableList.copyOf(BungeeTailorUtil.tailorCommands(cachedConfig.getMCLeaksActionCommands(), playerName, playerUuid, ip));
@@ -121,11 +103,8 @@ public class BungeePlayerManager extends AbstractPlayerManager {
         return ImmutableList.of();
     }
 
-    protected @NonNull PlayerModel calculatePlayerResult(@NonNull UUID uuid, boolean useCache) throws APIException {
+    protected @NotNull PlayerModel calculatePlayerResult(@NotNull UUID uuid, boolean useCache) throws APIException {
         CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
-        if (cachedConfig == null) {
-            throw new APIException(false, "Cached config could not be fetched.");
-        }
 
         if (useCache) {
             for (StorageService service : cachedConfig.getStorage()) {
@@ -160,7 +139,7 @@ public class BungeePlayerManager extends AbstractPlayerManager {
         return retVal;
     }
 
-    private void storeResult(@NonNull PlayerModel model, @NonNull CachedConfig cachedConfig) {
+    private void storeResult(@NotNull PlayerModel model, @NotNull CachedConfig cachedConfig) {
         for (StorageService service : cachedConfig.getStorage()) {
             PlayerModel m = service.getOrCreatePlayerModel(model.getUuid(), model.isMcleaks());
             service.storeModel(m);
@@ -171,7 +150,7 @@ public class BungeePlayerManager extends AbstractPlayerManager {
         }
     }
 
-    private void sendResult(@NonNull PlayerModel model, @NonNull CachedConfig cachedConfig) {
+    private void sendResult(@NotNull PlayerModel model, @NotNull CachedConfig cachedConfig) {
         PlayerPacket packet = new PlayerPacket();
         packet.setUuid(model.getUuid());
         packet.setValue(model.isMcleaks());

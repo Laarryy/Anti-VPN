@@ -1,6 +1,6 @@
 package me.egg82.antivpn.api.platform;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Provides information about the Anti-VPN plugin.
@@ -11,12 +11,12 @@ public interface PluginMetadata {
      *
      * @return the version of the plugin running on the platform
      */
-    @NonNull String getVersion();
+    @NotNull String getVersion();
 
     /**
      * Gets the API version.
      *
      * @return the version of the API running on the platform
      */
-    @NonNull String getApiVersion();
+    @NotNull String getApiVersion();
 }

@@ -1,6 +1,6 @@
 package me.egg82.antivpn.api;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Provides static access to the {@link VPNAPI} service.
@@ -16,7 +16,7 @@ public final class VPNAPIProvider {
      * @return The current {@link VPNAPI} service
      * @throws IllegalStateException if not yet loaded
      */
-    public static @NonNull VPNAPI getInstance() {
+    public static @NotNull VPNAPI getInstance() {
         VPNAPI i = instance;
         if (i == null) {
             throw new IllegalStateException("VPNAPI is not loaded.");
@@ -24,7 +24,7 @@ public final class VPNAPIProvider {
         return i;
     }
 
-    private static void register(@NonNull VPNAPI instance) { VPNAPIProvider.instance = instance; }
+    private static void register(@NotNull VPNAPI instance) { VPNAPIProvider.instance = instance; }
 
     private static void deregister() { VPNAPIProvider.instance = null; }
 }

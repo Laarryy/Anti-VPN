@@ -12,7 +12,7 @@ import me.egg82.antivpn.api.model.source.SourceManager;
 import me.egg82.antivpn.api.platform.Platform;
 import me.egg82.antivpn.api.platform.PluginMetadata;
 import net.engio.mbassy.bus.MBassador;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * The Anti-VPN API.
@@ -44,7 +44,7 @@ public interface VPNAPI {
      *
      * @return the server UUID
      */
-    @NonNull UUID getServerId();
+    @NotNull UUID getServerId();
 
     /**
      * Gets the {@link IPManager}, responsible for managing
@@ -55,7 +55,7 @@ public interface VPNAPI {
      *
      * @return the IP manager
      */
-    @NonNull IPManager getIPManager();
+    @NotNull IPManager getIPManager();
 
     /**
      * Gets the {@link PlayerManager}, responsible for managing
@@ -66,7 +66,7 @@ public interface VPNAPI {
      *
      * @return the player manager
      */
-    @NonNull PlayerManager getPlayerManager();
+    @NotNull PlayerManager getPlayerManager();
 
     /**
      * Gets the {@link SourceManager}, responsible for managing
@@ -77,7 +77,7 @@ public interface VPNAPI {
      *
      * @return the source manager
      */
-    @NonNull SourceManager getSourceManager();
+    @NotNull SourceManager getSourceManager();
 
     /**
      * Gets the {@link Platform}, which represents the server platform the
@@ -85,7 +85,7 @@ public interface VPNAPI {
      *
      * @return the platform
      */
-    @NonNull Platform getPlatform();
+    @NotNull Platform getPlatform();
 
     /**
      * Gets the {@link PluginMetadata}, responsible for providing metadata about
@@ -93,7 +93,7 @@ public interface VPNAPI {
      *
      * @return the plugin metadata
      */
-    @NonNull PluginMetadata getPluginMetadata();
+    @NotNull PluginMetadata getPluginMetadata();
 
     /**
      * Schedules the execution of an update task, and returns an encapsulation
@@ -106,7 +106,7 @@ public interface VPNAPI {
      *
      * @return a future
      */
-    @NonNull CompletableFuture<Void> runUpdateTask();
+    @NotNull CompletableFuture<Void> runUpdateTask();
 
     /**
      * Gets the {@link MBassador} event bus, used for subscribing to internal Anti-VPN
@@ -114,5 +114,5 @@ public interface VPNAPI {
      *
      * @return the event bus
      */
-    @NonNull MBassador<VPNEvent> getEventBus();
+    @NotNull MBassador<VPNEvent> getEventBus();
 }

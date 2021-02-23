@@ -3,7 +3,7 @@ package me.egg82.antivpn.api;
 import me.egg82.antivpn.api.model.ip.AbstractIPManager;
 import me.egg82.antivpn.api.model.player.AbstractPlayerManager;
 import me.egg82.antivpn.api.model.source.GenericSourceManager;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public class APIUtil {
     private static AbstractIPManager ipManager = null;
@@ -12,7 +12,7 @@ public class APIUtil {
 
     private APIUtil() { }
 
-    public static void setManagers(AbstractIPManager ipManager, AbstractPlayerManager playerManager, GenericSourceManager sourceManager) {
+    public static void setManagers(@Nullable AbstractIPManager ipManager, @Nullable AbstractPlayerManager playerManager, @Nullable GenericSourceManager sourceManager) {
         APIUtil.ipManager = ipManager;
         APIUtil.playerManager = playerManager;
         APIUtil.sourceManager = sourceManager;

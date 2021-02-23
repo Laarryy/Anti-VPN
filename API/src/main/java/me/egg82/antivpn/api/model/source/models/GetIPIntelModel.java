@@ -2,62 +2,55 @@ package me.egg82.antivpn.api.model.source.models;
 
 import flexjson.JSON;
 import java.util.Objects;
+import org.jetbrains.annotations.Nullable;
 
 public class GetIPIntelModel implements SourceModel {
-    private String status;
-    private String result;
-    private String message;
+    private String status = null;
+    private String result = null;
+    private String message = null;
     @JSON(name = "queryIP")
-    private String ip;
+    private String ip = null;
     @JSON(name = "queryFlags")
-    private String flags;
+    private String flags = null;
     @JSON(name = "queryFormat")
-    private String format;
-    private String contact;
+    private String format = null;
+    private String contact = null;
 
-    public GetIPIntelModel() {
-        this.status = null;
-        this.result = null;
-        this.message = null;
-        this.ip = null;
-        this.flags = null;
-        this.format = null;
-        this.contact = null;
-    }
+    public GetIPIntelModel() { }
 
-    public String getStatus() { return status; }
+    public @Nullable String getStatus() { return status; }
 
-    public void setStatus(String status) { this.status = status; }
+    public void setStatus(@Nullable String status) { this.status = status; }
 
-    public String getResult() { return result; }
+    public @Nullable String getResult() { return result; }
 
-    public void setResult(String result) { this.result = result; }
+    public void setResult(@Nullable String result) { this.result = result; }
 
-    public String getMessage() { return message; }
+    public @Nullable String getMessage() { return message; }
 
-    public void setMessage(String message) { this.message = message; }
+    public void setMessage(@Nullable String message) { this.message = message; }
 
     @JSON(name = "queryIP")
-    public String getIp() { return ip; }
+    public @Nullable String getIp() { return ip; }
 
     @JSON(name = "queryIP")
-    public void setIp(String ip) { this.ip = ip; }
+    public void setIp(@Nullable String ip) { this.ip = ip; }
 
     @JSON(name = "queryFlags")
-    public String getFlags() { return flags; }
+    public @Nullable String getFlags() { return flags; }
 
     @JSON(name = "queryFlags")
-    public void setFlags(String flags) { this.flags = flags; }
+    public void setFlags(@Nullable String flags) { this.flags = flags; }
 
     @JSON(name = "queryFormat")
-    public String getFormat() { return format; }
+    public @Nullable String getFormat() { return format; }
 
     @JSON(name = "queryFormat")
-    public void setFormat(String format) { this.format = format; }
+    public void setFormat(@Nullable String format) { this.format = format; }
 
-    public String getContact() { return contact; }
+    public @Nullable String getContact() { return contact; }
 
-    public void setContact(String contact) { this.contact = contact; }
+    public void setContact(@Nullable String contact) { this.contact = contact; }
 
     public boolean equals(Object o) {
         if (this == o) return true;

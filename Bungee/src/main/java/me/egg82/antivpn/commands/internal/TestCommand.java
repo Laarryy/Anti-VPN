@@ -9,28 +9,24 @@ import me.egg82.antivpn.api.model.source.SourceManager;
 import me.egg82.antivpn.api.model.source.models.SourceModel;
 import me.egg82.antivpn.config.CachedConfig;
 import me.egg82.antivpn.config.ConfigUtil;
-import me.egg82.antivpn.lang.Message;
+import me.egg82.antivpn.lang.MessageKey;
 import me.egg82.antivpn.utils.ExceptionUtil;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.NotNull;
 
 public class TestCommand extends AbstractCommand {
     private final String ip;
 
-    public TestCommand(@NonNull CommandIssuer issuer, @NonNull String ip) {
+    public TestCommand(@NotNull CommandIssuer issuer, @NotNull String ip) {
         super(issuer);
         this.ip = ip;
     }
 
     public void run() {
-        issuer.sendInfo(Message.TEST__BEGIN, "{ip}", ip);
+        issuer.sendInfo(MessageKey.TEST__BEGIN, "{ip}", ip);
 
         SourceManager sourceManager = VPNAPIProvider.getInstance().getSourceManager();
 
         CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
-        if (cachedConfig == null) {
-            logger.error("Cached config could not be fetched.");
-            return;
-        }
 
         List<CompletableFuture<Boolean>> futures = new ArrayList<>();
         List<Source<? extends SourceModel>> sources = sourceManager.getSources();
@@ -71,17 +67,17 @@ public class TestCommand extends AbstractCommand {
         }
 
         if (retVal.isEmpty()) {
-            issuer.sendError(Message.ERROR__INTERNAL);
+            issuer.sendError(MessageKey.ERROR__INTERNAL);
             return;
         }
 
         for (Map.Entry<String, Optional<Boolean>> kvp : retVal.entrySet()) {
             if (!kvp.getValue().isPresent()) {
-                issuer.sendInfo(Message.TEST__ERROR, "{source}", kvp.getKey());
+                issuer.sendInfo(MessageKey.TEST__ERROR, "{source}", kvp.getKey());
                 continue;
             }
-            issuer.sendInfo(kvp.getValue().get() ? Message.TEST__VPN_DETECTED : Message.TEST__NO_VPN_DETECTED, "{source}", kvp.getKey());
+            issuer.sendInfo(kvp.getValue().get() ? MessageKey.TEST__VPN_DETECTED : MessageKey.TEST__NO_VPN_DETECTED, "{source}", kvp.getKey());
         }
-        issuer.sendInfo(Message.TEST__END, "{ip}", ip);
+        issuer.sendInfo(MessageKey.TEST__END, "{ip}", ip);
     }
 }

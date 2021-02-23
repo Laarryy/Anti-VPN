@@ -1,18 +1,18 @@
 package me.egg82.antivpn.api.event;
 
 import me.egg82.antivpn.api.VPNAPI;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.NotNull;
 
 public abstract class AbstractEvent implements VPNEvent {
     protected final VPNAPI api;
     private final Class<? extends VPNEvent> clazz;
 
-    protected AbstractEvent(@NonNull VPNAPI api) {
+    protected AbstractEvent(@NotNull VPNAPI api) {
         this.api = api;
         this.clazz = getClass();
     }
 
-    public @NonNull VPNAPI getApi() { return api; }
+    public @NotNull VPNAPI getApi() { return api; }
 
-    public @NonNull Class<? extends VPNEvent> getEventType() { return clazz; }
+    public @NotNull Class<? extends VPNEvent> getEventType() { return clazz; }
 }

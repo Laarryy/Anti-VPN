@@ -5,20 +5,20 @@ import io.ebean.config.dbplatform.mariadb.MariaDbPlatform;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.Properties;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.NotNull;
 
 public class MariaDBStorageService extends AbstractJDBCStorageService {
-    private MariaDBStorageService(@NonNull String name) {
+    private MariaDBStorageService(@NotNull String name) {
         super(name);
     }
 
-    public static Builder builder(@NonNull String name) { return new MariaDBStorageService.Builder(name); }
+    public static @NotNull Builder builder(@NotNull String name) { return new MariaDBStorageService.Builder(name); }
 
     public static class Builder {
         private final MariaDBStorageService service;
         private final HikariConfig config = new HikariConfig();
 
-        private Builder(@NonNull String name) {
+        private Builder(@NotNull String name) {
             service = new MariaDBStorageService(name);
 
             // Baseline
@@ -47,18 +47,18 @@ public class MariaDBStorageService extends AbstractJDBCStorageService {
             config.addDataSourceProperty("elideSetAutoCommits", "true");
         }
 
-        public MariaDBStorageService.Builder url(@NonNull String address, int port, @NonNull String database) {
+        public @NotNull MariaDBStorageService.Builder url(@NotNull String address, int port, @NotNull String database) {
             config.setJdbcUrl("jdbc:mysql://" + address + ":" + port + "/" + database);
             return this;
         }
 
-        public MariaDBStorageService.Builder credentials(@NonNull String user, @NonNull String pass) {
+        public @NotNull MariaDBStorageService.Builder credentials(@NotNull String user, @NotNull String pass) {
             config.setUsername(user);
             config.setPassword(pass);
             return this;
         }
 
-        public MariaDBStorageService.Builder options(@NonNull String options) throws IOException {
+        public @NotNull MariaDBStorageService.Builder options(@NotNull String options) throws IOException {
             options = !options.isEmpty() && options.charAt(0) == '?' ? options.substring(1) : options;
             Properties p = new Properties();
             p.load(new StringReader(options.replace("&", "\n")));
@@ -66,19 +66,19 @@ public class MariaDBStorageService extends AbstractJDBCStorageService {
             return this;
         }
 
-        public MariaDBStorageService.Builder poolSize(int min, int max) {
+        public @NotNull MariaDBStorageService.Builder poolSize(int min, int max) {
             config.setMaximumPoolSize(max);
             config.setMinimumIdle(min);
             return this;
         }
 
-        public MariaDBStorageService.Builder life(long lifetime, long timeout) {
+        public @NotNull MariaDBStorageService.Builder life(long lifetime, long timeout) {
             config.setMaxLifetime(lifetime);
             config.setConnectionTimeout(timeout);
             return this;
         }
 
-        public @NonNull MariaDBStorageService build() {
+        public @NotNull MariaDBStorageService build() {
             service.createSource(config, new MariaDbPlatform(), true, "mariadb");
             return service;
         }

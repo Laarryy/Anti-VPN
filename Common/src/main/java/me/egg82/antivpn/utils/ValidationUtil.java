@@ -3,6 +3,7 @@ package me.egg82.antivpn.utils;
 import inet.ipaddr.AddressStringException;
 import inet.ipaddr.IPAddressString;
 import java.util.regex.Pattern;
+import org.jetbrains.annotations.Nullable;
 
 public class ValidationUtil {
     /**
@@ -15,7 +16,7 @@ public class ValidationUtil {
 
     private ValidationUtil() { }
 
-    public static boolean isValidIpRange(String range) {
+    public static boolean isValidIpRange(@Nullable String range) {
         if (range == null || range.isEmpty()) {
             return false;
         }
@@ -24,7 +25,7 @@ public class ValidationUtil {
         } catch (AddressStringException ignored) { return false; }
     }
 
-    public static boolean isValidIp(String ip) {
+    public static boolean isValidIp(@Nullable String ip) {
         if (ip == null || ip.isEmpty()) {
             return false;
         }
@@ -33,7 +34,7 @@ public class ValidationUtil {
         } catch (AddressStringException ignored) { return false; }
     }
 
-    public static boolean isValidUuid(String uuid) {
+    public static boolean isValidUuid(@Nullable String uuid) {
         if (uuid == null || uuid.isEmpty()) {
             return false;
         }

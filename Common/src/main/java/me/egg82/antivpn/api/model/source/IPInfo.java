@@ -7,11 +7,11 @@ import me.egg82.antivpn.api.APIException;
 import me.egg82.antivpn.api.model.source.models.IPInfoModel;
 import me.egg82.antivpn.utils.ValidationUtil;
 import me.egg82.antivpn.web.WebRequest;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.NotNull;
 import org.spongepowered.configurate.ConfigurationNode;
 
 public class IPInfo extends AbstractSource<IPInfoModel> {
-    public @NonNull String getName() { return "ipinfo"; }
+    public @NotNull String getName() { return "ipinfo"; }
 
     public boolean isKeyRequired() { return true; }
 
@@ -19,10 +19,10 @@ public class IPInfo extends AbstractSource<IPInfoModel> {
         super(IPInfoModel.class);
     }
 
-    public @NonNull CompletableFuture<Boolean> getResult(@NonNull String ip) {
+    public @NotNull CompletableFuture<@NotNull Boolean> getResult(@NotNull String ip) {
         return getRawResponse(ip).thenApply(model -> {
             if (model.getError() != null) {
-                throw new APIException(model.getError().getMessage().contains("token"), "Could not get result from " + getName() + " (" + model.getError().getMessage() + ")");
+                throw new APIException(model.getError().getMessage() != null && model.getError().getMessage().contains("token"), "Could not get result from " + getName() + " (" + model.getError().getMessage() + ")");
             }
 
             ConfigurationNode sourceConfigNode = getSourceConfigNode();
@@ -35,7 +35,7 @@ public class IPInfo extends AbstractSource<IPInfoModel> {
         });
     }
 
-    public @NonNull CompletableFuture<IPInfoModel> getRawResponse(@NonNull String ip) {
+    public @NotNull CompletableFuture<@NotNull IPInfoModel> getRawResponse(@NotNull String ip) {
         return CompletableFuture.supplyAsync(() -> {
             if (!ValidationUtil.isValidIp(ip)) {
                 throw new IllegalArgumentException("ip is invalid.");
@@ -48,7 +48,7 @@ public class IPInfo extends AbstractSource<IPInfoModel> {
                 throw new APIException(true, "Key is not defined for " + getName());
             }
 
-            WebRequest.Builder builder = getDefaultBuilder("https://ipinfo.io/" + ip + "/privacy?token=" + key, getCachedConfig().getTimeout());
+            WebRequest.Builder builder = getDefaultBuilder("https://ipinfo.io/" + ip + "/privacy?token=" + key);
             HttpURLConnection conn = getConnection(builder.build());
             JSONDeserializer<IPInfoModel> modelDeserializer = new JSONDeserializer<>();
             return modelDeserializer.deserialize(getString(conn), IPInfoModel.class);

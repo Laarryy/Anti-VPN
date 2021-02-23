@@ -2,8 +2,8 @@ package me.egg82.antivpn.api.model.ip;
 
 import java.net.InetAddress;
 import java.util.Objects;
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class GenericIP implements IP {
     private final InetAddress ip;
@@ -13,7 +13,7 @@ public class GenericIP implements IP {
 
     private final int hc;
 
-    public GenericIP(@NonNull InetAddress ip, @NonNull AlgorithmMethod type, @Nullable Boolean cascade, @Nullable Double consensus) {
+    public GenericIP(@NotNull InetAddress ip, @NotNull AlgorithmMethod type, @Nullable Boolean cascade, @Nullable Double consensus) {
         this.ip = ip;
         this.type = type;
         this.cascade = cascade;
@@ -22,7 +22,7 @@ public class GenericIP implements IP {
         this.hc = Objects.hash(ip);
     }
 
-    public @NonNull InetAddress getIP() { return ip; }
+    public @NotNull InetAddress getIP() { return ip; }
 
     public @Nullable Boolean getCascade() { return cascade; }
 
@@ -32,9 +32,9 @@ public class GenericIP implements IP {
 
     public void setConsensus(@Nullable Double status) { this.consensus = status; }
 
-    public @NonNull AlgorithmMethod getType() { return type; }
+    public @NotNull AlgorithmMethod getType() { return type; }
 
-    public void setType(@NonNull AlgorithmMethod type) { this.type = type; }
+    public void setType(@NotNull AlgorithmMethod type) { this.type = type; }
 
     public boolean equals(Object o) {
         if (this == o) return true;

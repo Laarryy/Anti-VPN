@@ -7,11 +7,11 @@ import me.egg82.antivpn.api.APIException;
 import me.egg82.antivpn.api.model.source.models.ShodanModel;
 import me.egg82.antivpn.utils.ValidationUtil;
 import me.egg82.antivpn.web.WebRequest;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.NotNull;
 import org.spongepowered.configurate.ConfigurationNode;
 
 public class Shodan extends AbstractSource<ShodanModel> {
-    public @NonNull String getName() { return "shodan"; }
+    public @NotNull String getName() { return "shodan"; }
 
     public boolean isKeyRequired() { return true; }
 
@@ -19,7 +19,7 @@ public class Shodan extends AbstractSource<ShodanModel> {
         super(ShodanModel.class);
     }
 
-    public @NonNull CompletableFuture<Boolean> getResult(@NonNull String ip) {
+    public @NotNull CompletableFuture<@NotNull Boolean> getResult(@NotNull String ip) {
         return getRawResponse(ip).thenApply(model -> {
             if (model.getError() != null) {
                 throw new APIException(model.getError().contains("key"), "Could not get result from " + getName() + " (" + model.getError() + ")");
@@ -38,7 +38,7 @@ public class Shodan extends AbstractSource<ShodanModel> {
         });
     }
 
-    public @NonNull CompletableFuture<ShodanModel> getRawResponse(@NonNull String ip) {
+    public @NotNull CompletableFuture<@NotNull ShodanModel> getRawResponse(@NotNull String ip) {
         return CompletableFuture.supplyAsync(() -> {
             if (!ValidationUtil.isValidIp(ip)) {
                 throw new IllegalArgumentException("ip is invalid.");
@@ -51,7 +51,7 @@ public class Shodan extends AbstractSource<ShodanModel> {
                 throw new APIException(true, "Key is not defined for " + getName());
             }
 
-            WebRequest.Builder builder = getDefaultBuilder("https://api.shodan.io/shodan/host/" + ip + "?minify=true&key=" + key, getCachedConfig().getTimeout());
+            WebRequest.Builder builder = getDefaultBuilder("https://api.shodan.io/shodan/host/" + ip + "?minify=true&key=" + key);
             HttpURLConnection conn = getConnection(builder.build());
             JSONDeserializer<ShodanModel> modelDeserializer = new JSONDeserializer<>();
             return modelDeserializer.deserialize(getString(conn), ShodanModel.class);

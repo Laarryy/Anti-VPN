@@ -3,9 +3,10 @@ package me.egg82.antivpn.messaging;
 import java.io.*;
 import java.nio.file.Files;
 import java.util.UUID;
+import me.egg82.antivpn.logging.GELFLogger;
 import me.egg82.antivpn.utils.ValidationUtil;
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,13 +15,13 @@ public class ServerIDUtil {
 
     private ServerIDUtil() { }
 
-    public static @NonNull UUID getId(@NonNull File idFile) {
+    public static @NotNull UUID getId(@NotNull File idFile) {
         UUID retVal;
 
         try {
             retVal = readId(idFile);
         } catch (IOException ex) {
-            logger.error(ex.getMessage(), ex);
+            GELFLogger.exception(logger, ex);
             retVal = null;
         }
 
@@ -29,14 +30,14 @@ public class ServerIDUtil {
             try {
                 writeId(idFile, retVal);
             } catch (IOException ex) {
-                logger.error(ex.getMessage(), ex);
+                GELFLogger.exception(logger, ex);
             }
         }
 
         return retVal;
     }
 
-    private static @Nullable UUID readId(@NonNull File idFile) throws IOException {
+    private static @Nullable UUID readId(@NotNull File idFile) throws IOException {
         if (!idFile.exists() || (idFile.exists() && idFile.isDirectory())) {
             return null;
         }
@@ -53,7 +54,7 @@ public class ServerIDUtil {
         return ValidationUtil.isValidUuid(retVal) ? UUID.fromString(retVal) : null;
     }
 
-    private static void writeId(@NonNull File idFile, @NonNull UUID id) throws IOException {
+    private static void writeId(@NotNull File idFile, @NotNull UUID id) throws IOException {
         if (idFile.exists() && idFile.isDirectory()) {
             Files.delete(idFile.toPath());
         }

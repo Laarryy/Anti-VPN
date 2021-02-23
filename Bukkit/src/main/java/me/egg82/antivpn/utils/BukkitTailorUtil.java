@@ -9,7 +9,7 @@ import ninja.egg82.service.ServiceLocator;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,7 +18,7 @@ public class BukkitTailorUtil {
 
     private BukkitTailorUtil() { }
 
-    public static @NonNull List<String> tailorCommands(@NonNull List<String> commands, @NonNull String name, @NonNull UUID uuid, @NonNull String ip) {
+    public static @NotNull List<String> tailorCommands(@NotNull List<String> commands, @NotNull String name, @NotNull UUID uuid, @NotNull String ip) {
         List<String> retVal = new ArrayList<>();
 
         Optional<PlaceholderAPIHook> placeholderapi;
@@ -46,7 +46,7 @@ public class BukkitTailorUtil {
         return retVal;
     }
 
-    public static @NonNull String tailorKickMessage(@NonNull String message, @NonNull String name, @NonNull UUID uuid, @NonNull String ip) {
+    public static @NotNull String tailorKickMessage(@NotNull String message, @NotNull String name, @NotNull UUID uuid, @NotNull String ip) {
         Optional<PlaceholderAPIHook> placeholderapi;
         try {
             placeholderapi = ServiceLocator.getOptional(PlaceholderAPIHook.class);

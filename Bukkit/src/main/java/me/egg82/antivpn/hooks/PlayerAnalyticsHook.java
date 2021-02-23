@@ -20,17 +20,17 @@ import me.egg82.antivpn.api.VPNAPIProvider;
 import me.egg82.antivpn.api.model.ip.AlgorithmMethod;
 import me.egg82.antivpn.api.model.ip.IPManager;
 import me.egg82.antivpn.api.model.player.PlayerManager;
-import me.egg82.antivpn.config.ConfigUtil;
-import me.egg82.antivpn.utils.ExceptionUtil;
+import me.egg82.antivpn.lang.BukkitLocaleCommandUtil;
+import me.egg82.antivpn.lang.MessageKey;
+import me.egg82.antivpn.logging.GELFLogger;
 import ninja.egg82.events.BukkitEvents;
-import ninja.egg82.service.ServiceLocator;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.server.PluginEnableEvent;
 import org.bukkit.plugin.Plugin;
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,16 +38,19 @@ public class PlayerAnalyticsHook implements PluginHook {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final CapabilityService capabilities;
 
-    public static void create(@NonNull Plugin plugin, @NonNull Plugin plan) {
+    public static void create(@NotNull Plugin plugin, @NotNull Plugin plan) {
         if (!plan.isEnabled()) {
             BukkitEvents.subscribe(plugin, PluginEnableEvent.class, EventPriority.MONITOR)
                     .expireIf(e -> e.getPlugin().getName().equals("Plan"))
                     .filter(e -> e.getPlugin().getName().equals("Plan"))
-                    .handler(e -> ServiceLocator.register(new PlayerAnalyticsHook()));
+                    .handler(e -> hook = new PlayerAnalyticsHook());
             return;
         }
-        ServiceLocator.register(new PlayerAnalyticsHook());
+        hook = new PlayerAnalyticsHook();
     }
+
+    private static PlayerAnalyticsHook hook = null;
+    public @Nullable PlayerAnalyticsHook get() { return hook; }
 
     private PlayerAnalyticsHook() {
         capabilities = CapabilityService.getInstance();
@@ -57,20 +60,22 @@ public class PlayerAnalyticsHook implements PluginHook {
                 ExtensionService.getInstance().register(new Data());
             } catch (NoClassDefFoundError ex) {
                 // Plan not installed
-                logger.error("Plan is not installed.", ex);
+                GELFLogger.exception(logger, ex, BukkitLocaleCommandUtil.getConsole().getLocalizationManager(), MessageKey.HOOK__PLAN__NOT_INSTALLED);
             } catch (IllegalStateException ex) {
                 // Plan not enabled
-                logger.error("Plan is not enabled.", ex);
+                GELFLogger.exception(logger, ex, BukkitLocaleCommandUtil.getConsole().getLocalizationManager(), MessageKey.HOOK__PLAN__NOT_ENABLED);
             } catch (IllegalArgumentException ex) {
                 // DataExtension impl error
-                logger.error("DataExtension implementation exception.", ex);
+                GELFLogger.exception(logger, ex, BukkitLocaleCommandUtil.getConsole().getLocalizationManager(), MessageKey.HOOK__PLAN__DATA_EXCEPTION);
             }
         }
+
+        PluginHooks.getHooks().add(this);
     }
 
     public void cancel() { }
 
-    private boolean isCapabilityAvailable(@NonNull String capability) {
+    private boolean isCapabilityAvailable(@NotNull String capability) {
         try {
             return capabilities.hasCapability(capability);
         } catch (NoClassDefFoundError ignored) {
@@ -79,7 +84,7 @@ public class PlayerAnalyticsHook implements PluginHook {
     }
 
     @PluginInfo(
-            name = "AntiVPN",
+            name = "Anti-VPN",
             iconName = "shield-alt",
             iconFamily = Family.SOLID,
             color = Color.BLUE
@@ -116,24 +121,23 @@ public class PlayerAnalyticsHook implements PluginHook {
 
                     if (ipManager.getCurrentAlgorithmMethod() == AlgorithmMethod.CONSESNSUS) {
                         try {
-                            Double val = ipManager.consensus(ip, true).get();
-                            if (val != null && val >= ipManager.getMinConsensusValue()) {
+                            if (ipManager.consensus(ip, true).get() >= ipManager.getMinConsensusValue()) {
                                 results.addAndGet(1L);
                             }
                         } catch (InterruptedException ignored) {
                             Thread.currentThread().interrupt();
                         } catch (ExecutionException | CancellationException ex) {
-                            ExceptionUtil.handleException(ex, logger);
+                            GELFLogger.exception(logger, ex, BukkitLocaleCommandUtil.getConsole().getLocalizationManager());
                         }
                     } else {
                         try {
-                            if (Boolean.TRUE.equals(ipManager.cascade(ip, true).get())) {
+                            if (ipManager.cascade(ip, true).get()) {
                                 results.addAndGet(1L);
                             }
                         } catch (InterruptedException ignored) {
                             Thread.currentThread().interrupt();
                         } catch (ExecutionException | CancellationException ex) {
-                            ExceptionUtil.handleException(ex, logger);
+                            GELFLogger.exception(logger, ex, BukkitLocaleCommandUtil.getConsole().getLocalizationManager());
                         }
                     }
                     latch.countDown();
@@ -142,14 +146,10 @@ public class PlayerAnalyticsHook implements PluginHook {
 
             try {
                 if (!latch.await(40L, TimeUnit.SECONDS)) {
-                    logger.warn("Plan hook timed out before all results could be obtained.");
+                    GELFLogger.warn(logger, BukkitLocaleCommandUtil.getConsole().getLocalizationManager(), MessageKey.HOOK__PLAN__TIMEOUT);
                 }
             } catch (InterruptedException ex) {
-                if (ConfigUtil.getDebugOrFalse()) {
-                    logger.error(ex.getMessage(), ex);
-                } else {
-                    logger.error(ex.getMessage());
-                }
+                GELFLogger.exception(logger, ex, BukkitLocaleCommandUtil.getConsole().getLocalizationManager());
                 Thread.currentThread().interrupt();
             }
             pool.shutdownNow(); // Kill it with fire
@@ -177,13 +177,13 @@ public class PlayerAnalyticsHook implements PluginHook {
             for (Player p : players) {
                 pool.submit(() -> {
                     try {
-                        if (Boolean.TRUE.equals(playerManager.checkMcLeaks(p.getUniqueId(), true).get())) {
+                        if (playerManager.checkMcLeaks(p.getUniqueId(), true).get()) {
                             results.addAndGet(1L);
                         }
                     } catch (InterruptedException ignored) {
                         Thread.currentThread().interrupt();
                     } catch (ExecutionException | CancellationException ex) {
-                        ExceptionUtil.handleException(ex, logger);
+                        GELFLogger.exception(logger, ex, BukkitLocaleCommandUtil.getConsole().getLocalizationManager());
                     }
                     latch.countDown();
                 });
@@ -191,14 +191,10 @@ public class PlayerAnalyticsHook implements PluginHook {
 
             try {
                 if (!latch.await(40L, TimeUnit.SECONDS)) {
-                    logger.warn("Plan hook timed out before all results could be obtained.");
+                    GELFLogger.warn(logger, BukkitLocaleCommandUtil.getConsole().getLocalizationManager(), MessageKey.HOOK__PLAN__TIMEOUT);
                 }
             } catch (InterruptedException ex) {
-                if (ConfigUtil.getDebugOrFalse()) {
-                    logger.error(ex.getMessage(), ex);
-                } else {
-                    logger.error(ex.getMessage());
-                }
+                GELFLogger.exception(logger, ex, BukkitLocaleCommandUtil.getConsole().getLocalizationManager());
                 Thread.currentThread().interrupt();
             }
             pool.shutdownNow(); // Kill it with fire
@@ -213,7 +209,7 @@ public class PlayerAnalyticsHook implements PluginHook {
                 iconFamily = Family.SOLID,
                 iconColor = Color.NONE
         )
-        public boolean getUsingVpn(@NonNull UUID playerID) {
+        public boolean getUsingVpn(@NotNull UUID playerID) {
             Player player = Bukkit.getPlayer(playerID);
             if (player == null) {
                 return false;
@@ -228,20 +224,19 @@ public class PlayerAnalyticsHook implements PluginHook {
 
             if (ipManager.getCurrentAlgorithmMethod() == AlgorithmMethod.CONSESNSUS) {
                 try {
-                    Double val = ipManager.consensus(ip, true).get();
-                    return val != null && val >= ipManager.getMinConsensusValue();
+                    return ipManager.consensus(ip, true).get() >= ipManager.getMinConsensusValue();
                 } catch (InterruptedException ignored) {
                     Thread.currentThread().interrupt();
                 } catch (ExecutionException | CancellationException ex) {
-                    ExceptionUtil.handleException(ex, logger);
+                    GELFLogger.exception(logger, ex, BukkitLocaleCommandUtil.getConsole().getLocalizationManager());
                 }
             } else {
                 try {
-                    return Boolean.TRUE.equals(ipManager.cascade(ip, true).get());
+                    return ipManager.cascade(ip, true).get();
                 } catch (InterruptedException ignored) {
                     Thread.currentThread().interrupt();
                 } catch (ExecutionException | CancellationException ex) {
-                    ExceptionUtil.handleException(ex, logger);
+                    GELFLogger.exception(logger, ex, BukkitLocaleCommandUtil.getConsole().getLocalizationManager());
                 }
             }
 
@@ -255,21 +250,21 @@ public class PlayerAnalyticsHook implements PluginHook {
                 iconFamily = Family.SOLID,
                 iconColor = Color.NONE
         )
-        public boolean getMcLeaks(@NonNull UUID playerId) {
+        public boolean getMcLeaks(@NotNull UUID playerId) {
             PlayerManager playerManager = VPNAPIProvider.getInstance().getPlayerManager();
 
             try {
-                return Boolean.TRUE.equals(playerManager.checkMcLeaks(playerId, true).get());
+                return playerManager.checkMcLeaks(playerId, true).get();
             } catch (InterruptedException ignored) {
                 Thread.currentThread().interrupt();
             } catch (ExecutionException | CancellationException ex) {
-                ExceptionUtil.handleException(ex, logger);
+                GELFLogger.exception(logger, ex, BukkitLocaleCommandUtil.getConsole().getLocalizationManager());
             }
 
             return false;
         }
 
-        private @Nullable String getIp(@NonNull Player player) {
+        private @Nullable String getIp(@NotNull Player player) {
             InetSocketAddress address = player.getAddress();
             if (address == null) {
                 return null;
@@ -281,6 +276,6 @@ public class PlayerAnalyticsHook implements PluginHook {
             return host.getHostAddress();
         }
 
-        public @NonNull CallEvents[] callExtensionMethodsOn() { return events; }
+        public @NotNull CallEvents[] callExtensionMethodsOn() { return events; }
     }
 }

@@ -1,7 +1,6 @@
 package me.egg82.antivpn;
 
 import co.aikar.commands.*;
-import co.aikar.locales.MessageKey;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.SetMultimap;
 import com.velocitypowered.api.event.PostOrder;
@@ -40,7 +39,7 @@ import me.egg82.antivpn.hooks.LuckPermsHook;
 import me.egg82.antivpn.hooks.PlayerAnalyticsHook;
 import me.egg82.antivpn.hooks.PluginHook;
 import me.egg82.antivpn.lang.LanguageFileUtil;
-import me.egg82.antivpn.lang.Message;
+import me.egg82.antivpn.lang.MessageKey;
 import me.egg82.antivpn.lang.PluginMessageFormatter;
 import me.egg82.antivpn.messaging.GenericMessagingHandler;
 import me.egg82.antivpn.messaging.MessagingHandler;
@@ -54,7 +53,7 @@ import net.engio.mbassy.bus.MBassador;
 import net.kyori.text.format.TextColor;
 import ninja.egg82.events.PriorityEventSubscriber;
 import ninja.egg82.service.ServiceLocator;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongepowered.configurate.CommentedConfigurationNode;
@@ -77,7 +76,7 @@ public class AntiVPN {
 
     private CommandIssuer consoleCommandIssuer = null;
 
-    public AntiVPN(@NonNull Object plugin, @NonNull ProxyServer proxy, @NonNull PluginDescription description) {
+    public AntiVPN(@NotNull Object plugin, @NotNull ProxyServer proxy, @NotNull PluginDescription description) {
         this.plugin = plugin;
         this.proxy = proxy;
         this.description = description;
@@ -107,8 +106,8 @@ public class AntiVPN {
             numEvents += eventHolder.numEvents();
         }
 
-        consoleCommandIssuer.sendInfo(Message.GENERAL__ENABLED);
-        consoleCommandIssuer.sendInfo(Message.GENERAL__LOAD,
+        consoleCommandIssuer.sendInfo(MessageKey.GENERAL__ENABLED);
+        consoleCommandIssuer.sendInfo(MessageKey.GENERAL__LOAD,
             "{version}", description.getVersion().get(),
             "{apiversion}", VPNAPIProvider.getInstance().getPluginMetadata().getApiVersion(),
             "{commands}", String.valueOf(commandManager.getRegisteredRootCommands().size()),
@@ -143,16 +142,13 @@ public class AntiVPN {
         unloadHooks();
         unloadServices();
 
-        consoleCommandIssuer.sendInfo(Message.GENERAL__DISABLED);
+        consoleCommandIssuer.sendInfo(MessageKey.GENERAL__DISABLED);
 
         GameAnalyticsErrorHandler.close();
     }
 
     private void loadLanguages() {
         CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
-        if (cachedConfig == null) {
-            throw new RuntimeException("CachedConfig seems to be null.");
-        }
 
         VelocityLocales locales = commandManager.getLocales();
 
@@ -172,8 +168,8 @@ public class AntiVPN {
         locales.setDefaultLocale(cachedConfig.getLanguage());
         commandManager.usePerIssuerLocale(true);
 
-        commandManager.setFormat(MessageType.ERROR, new PluginMessageFormatter(commandManager, Message.GENERAL__HEADER));
-        commandManager.setFormat(MessageType.INFO, new PluginMessageFormatter(commandManager, Message.GENERAL__HEADER));
+        commandManager.setFormat(MessageType.ERROR, new PluginMessageFormatter(commandManager, MessageKey.GENERAL__HEADER));
+        commandManager.setFormat(MessageType.INFO, new PluginMessageFormatter(commandManager, MessageKey.GENERAL__HEADER));
         setChatColors();
     }
 
@@ -240,10 +236,6 @@ public class AntiVPN {
         commandManager.getCommandConditions().addCondition(String.class, "storage", (c, exec, value) -> {
             String v = value.replace(" ", "_");
             CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
-            if (cachedConfig == null) {
-                logger.error("Cached config could not be fetched.");
-                return;
-            }
             for (StorageService service : cachedConfig.getStorage()) {
                 if (service.getName().equalsIgnoreCase(v)) {
                     return;
@@ -256,10 +248,6 @@ public class AntiVPN {
             String lower = c.getInput().toLowerCase().replace(" ", "_");
             Set<String> retVal = new LinkedHashSet<>();
             CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
-            if (cachedConfig == null) {
-                logger.error("Cached config could not be fetched.");
-                return ImmutableList.copyOf(retVal);
-            }
             for (StorageService service : cachedConfig.getStorage()) {
                 String ss = service.getName();
                 if (ss.toLowerCase().startsWith(lower)) {
@@ -325,20 +313,20 @@ public class AntiVPN {
         PluginManager manager = proxy.getPluginManager();
 
         if (manager.getPlugin("plan").isPresent()) {
-            consoleCommandIssuer.sendInfo(Message.GENERAL__HOOK_ENABLE, "{plugin}", "Plan");
+            consoleCommandIssuer.sendInfo(MessageKey.GENERAL__HOOK_ENABLE, "{plugin}", "Plan");
             ServiceLocator.register(new PlayerAnalyticsHook(proxy));
         } else {
-            consoleCommandIssuer.sendInfo(Message.GENERAL__HOOK_DISABLE, "{plugin}", "Plan");
+            consoleCommandIssuer.sendInfo(MessageKey.GENERAL__HOOK_DISABLE, "{plugin}", "Plan");
         }
 
         if (manager.getPlugin("luckperms").isPresent()) {
-            consoleCommandIssuer.sendInfo(Message.GENERAL__HOOK_ENABLE, "{plugin}", "LuckPerms");
+            consoleCommandIssuer.sendInfo(MessageKey.GENERAL__HOOK_ENABLE, "{plugin}", "LuckPerms");
             if (ConfigUtil.getDebugOrFalse()) {
                 consoleCommandIssuer.sendMessage("<c2>Running actions on pre-login.</c2>");
             }
             ServiceLocator.register(new LuckPermsHook(consoleCommandIssuer));
         } else {
-            consoleCommandIssuer.sendInfo(Message.GENERAL__HOOK_DISABLE, "{plugin}", "LuckPerms");
+            consoleCommandIssuer.sendInfo(MessageKey.GENERAL__HOOK_DISABLE, "{plugin}", "LuckPerms");
             if (ConfigUtil.getDebugOrFalse()) {
                 consoleCommandIssuer.sendMessage("<c2>Running actions on post-login.</c2>");
             }
@@ -367,13 +355,11 @@ public class AntiVPN {
         APIRegistrationUtil.deregister();
 
         CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
-        if (cachedConfig != null) {
-            for (MessagingService service : cachedConfig.getMessaging()) {
-                service.close();
-            }
-            for (StorageService service : cachedConfig.getStorage()) {
-                service.close();
-            }
+        for (MessagingService service : cachedConfig.getMessaging()) {
+            service.close();
+        }
+        for (StorageService service : cachedConfig.getStorage()) {
+            service.close();
         }
 
         Set<? extends MessagingHandler> messagingHandlers = ServiceLocator.remove(MessagingHandler.class);
@@ -382,12 +368,12 @@ public class AntiVPN {
         }
     }
 
-    public boolean loadYamlLanguageFile(@NonNull VelocityLocales locales, @NonNull File file, @NonNull Locale locale) throws IOException {
+    public boolean loadYamlLanguageFile(@NotNull VelocityLocales locales, @NotNull File file, @NotNull Locale locale) throws IOException {
         ConfigurationLoader<CommentedConfigurationNode> fileLoader = YamlConfigurationLoader.builder().nodeStyle(NodeStyle.BLOCK).indent(2).file(file).build();
         return loadLanguage(locales, fileLoader.load(), locale);
     }
 
-    private boolean loadLanguage(@NonNull VelocityLocales locales, @NonNull CommentedConfigurationNode config, @NonNull Locale locale) {
+    private boolean loadLanguage(@NotNull VelocityLocales locales, @NotNull CommentedConfigurationNode config, @NotNull Locale locale) {
         boolean loaded = false;
         for (Map.Entry<Object, CommentedConfigurationNode> kvp : config.childrenMap().entrySet()) {
             for (Map.Entry<Object, CommentedConfigurationNode> kvp2 : kvp.getValue().childrenMap().entrySet()) {

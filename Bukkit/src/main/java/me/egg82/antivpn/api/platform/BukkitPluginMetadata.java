@@ -1,13 +1,13 @@
 package me.egg82.antivpn.api.platform;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.NotNull;
 
 public class BukkitPluginMetadata extends AbstractPluginMetadata {
     private final String pluginVersion;
 
-    public BukkitPluginMetadata(String pluginVersion) {
+    public BukkitPluginMetadata(@NotNull String pluginVersion) {
         this.pluginVersion = pluginVersion;
     }
 
-    public @NonNull String getVersion() { return pluginVersion; }
+    public @NotNull String getVersion() { return pluginVersion; }
 }

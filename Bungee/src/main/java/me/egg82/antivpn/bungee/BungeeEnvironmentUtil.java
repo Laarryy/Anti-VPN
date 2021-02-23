@@ -1,12 +1,12 @@
 package me.egg82.antivpn.bungee;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.NotNull;
 
 public class BungeeEnvironmentUtil {
     private BungeeEnvironmentUtil() { }
 
     private static Environment environemnt;
-    public static @NonNull Environment getEnvironment() { return environemnt; }
+    public static @NotNull Environment getEnvironment() { return environemnt; }
 
     static {
         try {

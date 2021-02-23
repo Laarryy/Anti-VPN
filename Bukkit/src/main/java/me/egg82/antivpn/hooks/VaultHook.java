@@ -1,54 +1,60 @@
 package me.egg82.antivpn.hooks;
 
-import co.aikar.commands.CommandIssuer;
 import me.egg82.antivpn.config.ConfigUtil;
+import me.egg82.antivpn.lang.BukkitLocaleCommandUtil;
+import me.egg82.antivpn.lang.BukkitLocalizedCommandSender;
+import me.egg82.antivpn.lang.MessageKey;
 import net.milkbowl.vault.permission.Permission;
 import ninja.egg82.events.BukkitEvents;
-import ninja.egg82.service.ServiceLocator;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.server.PluginEnableEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class VaultHook implements PluginHook {
     private final Permission permission;
-    private final CommandIssuer console;
 
-    public static void create(@NonNull Plugin plugin, @NonNull Plugin vault, @NonNull CommandIssuer console) {
+    public static void create(@NotNull Plugin plugin, @NotNull Plugin vault) {
         if (!vault.isEnabled()) {
             BukkitEvents.subscribe(plugin, PluginEnableEvent.class, EventPriority.MONITOR)
                     .expireIf(e -> e.getPlugin().getName().equals("Vault"))
                     .filter(e -> e.getPlugin().getName().equals("Vault"))
-                    .handler(e -> ServiceLocator.register(new VaultHook(console)));
+                    .handler(e -> hook = new VaultHook());
             return;
         }
-        ServiceLocator.register(new VaultHook(console));
+        hook = new VaultHook();
     }
 
-    private VaultHook(@NonNull CommandIssuer console) {
-        this.console = console;
-        final RegisteredServiceProvider<Permission> permissionProvider = Bukkit.getServicesManager().getRegistration(Permission.class);
+    private static VaultHook hook = null;
+    public static @Nullable VaultHook get() { return hook; }
+
+    private VaultHook() {
+        BukkitLocalizedCommandSender console = BukkitLocaleCommandUtil.getConsole();
+        RegisteredServiceProvider<Permission> permissionProvider = Bukkit.getServicesManager().getRegistration(Permission.class);
+
         if (permissionProvider != null) {
             if (ConfigUtil.getDebugOrFalse()) {
-                console.sendMessage("<c2>Found Vault permissions provider.</c2>");
+                console.sendMessage(MessageKey.HOOK__VAULT__FOUND);
             }
             permission = permissionProvider.getProvider();
         } else {
             if (ConfigUtil.getDebugOrFalse()) {
-                console.sendMessage("<c9>Could not find Vault permissions provider.</c9>");
+                console.sendMessage(MessageKey.HOOK__VAULT__NOT_FOUND);
             }
             permission = null;
         }
+
+        PluginHooks.getHooks().add(this);
     }
 
     public void cancel() { }
 
     public @Nullable Permission getPermission() {
         if (permission == null && ConfigUtil.getDebugOrFalse()) {
-            console.sendMessage("<c2>Returning null Vault permissions provider.</c2>");
+            BukkitLocaleCommandUtil.getConsole().sendMessage(MessageKey.HOOK__VAULT__NULL_PROVIDER);
         }
         return this.permission;
     }

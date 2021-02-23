@@ -12,32 +12,28 @@ import me.egg82.antivpn.api.model.source.GenericSourceManager;
 import me.egg82.antivpn.config.CachedConfig;
 import me.egg82.antivpn.config.ConfigUtil;
 import me.egg82.antivpn.config.ConfigurationFileUtil;
-import me.egg82.antivpn.lang.Message;
+import me.egg82.antivpn.lang.MessageKey;
 import me.egg82.antivpn.messaging.GenericMessagingHandler;
 import me.egg82.antivpn.messaging.MessagingHandler;
 import me.egg82.antivpn.messaging.MessagingService;
 import me.egg82.antivpn.storage.StorageService;
 import ninja.egg82.service.ServiceLocator;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.NotNull;
 
 public class ReloadCommand extends AbstractCommand {
     private final File dataFolder;
     private final CommandIssuer console;
 
-    public ReloadCommand(@NonNull ProxyServer proxy, @NonNull CommandIssuer issuer, @NonNull File dataFolder, @NonNull CommandIssuer console) {
+    public ReloadCommand(@NotNull ProxyServer proxy, @NotNull CommandIssuer issuer, @NotNull File dataFolder, @NotNull CommandIssuer console) {
         super(proxy, issuer);
         this.dataFolder = dataFolder;
         this.console = console;
     }
 
     public void run() {
-        issuer.sendInfo(Message.RELOAD__BEGIN);
+        issuer.sendInfo(MessageKey.RELOAD__BEGIN);
 
         CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
-        if (cachedConfig == null) {
-            logger.error("Could not get cached config.");
-            return;
-        }
 
         for (MessagingService service : cachedConfig.getMessaging()) {
             service.close();
@@ -65,6 +61,6 @@ public class ReloadCommand extends AbstractCommand {
 
         api.getEventBus().post(new GenericAPILoadedEvent(api)).now();
 
-        issuer.sendInfo(Message.RELOAD__END);
+        issuer.sendInfo(MessageKey.RELOAD__END);
     }
 }

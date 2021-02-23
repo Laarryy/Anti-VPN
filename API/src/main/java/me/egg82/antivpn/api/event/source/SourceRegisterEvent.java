@@ -4,7 +4,7 @@ import me.egg82.antivpn.api.event.VPNEvent;
 import me.egg82.antivpn.api.event.type.Cancellable;
 import me.egg82.antivpn.api.model.source.Source;
 import me.egg82.antivpn.api.model.source.models.SourceModel;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Called when a source is about to be added to the sources list
@@ -15,5 +15,5 @@ public interface SourceRegisterEvent extends VPNEvent, Cancellable {
      *
      * @return the source to be added
      */
-    @NonNull Source<? extends SourceModel> getSource();
+    @NotNull Source<? extends SourceModel> getSource();
 }

@@ -1,18 +1,17 @@
 package me.egg82.antivpn.storage.models;
 
 import io.ebean.annotation.Index;
-import io.ebean.annotation.NotNull;
 import java.util.UUID;
 import javax.persistence.Entity;
 import javax.persistence.Table;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.NotNull;
 
 @Entity
 @Table(name = "avpn_6_player")
 public class PlayerModel extends BaseModel {
-    @Index(unique = true) @NotNull
+    @Index(unique = true) @io.ebean.annotation.NotNull
     private UUID uuid;
-    @NotNull
+    @io.ebean.annotation.NotNull
     private boolean mcleaks;
 
     public PlayerModel() {
@@ -21,15 +20,15 @@ public class PlayerModel extends BaseModel {
         this.mcleaks = false;
     }
 
-    public PlayerModel(@NonNull String dbName) {
+    public PlayerModel(@NotNull String dbName) {
         super(dbName);
         this.uuid = new UUID(0L, 0L);
         this.mcleaks = false;
     }
 
-    public @NonNull UUID getUuid() { return uuid; }
+    public @NotNull UUID getUuid() { return uuid; }
 
-    public void setUuid(@NonNull UUID uuid) { this.uuid = uuid; }
+    public void setUuid(@NotNull UUID uuid) { this.uuid = uuid; }
 
     public boolean isMcleaks() { return mcleaks; }
 

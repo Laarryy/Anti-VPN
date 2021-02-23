@@ -2,29 +2,26 @@ package me.egg82.antivpn.api.model.source.models;
 
 import java.io.Serializable;
 import java.util.Objects;
+import org.jetbrains.annotations.Nullable;
 
 public class ProxyCheckModel implements SourceModel {
-    private String status;
-    private String message;
-    private ProxyCheckModel.IP ip;
+    private String status = null;
+    private String message = null;
+    private ProxyCheckModel.IP ip = null;
 
-    public ProxyCheckModel() {
-        this.status = null;
-        this.message = null;
-        this.ip = null;
-    }
+    public ProxyCheckModel() { }
 
-    public String getStatus() { return status; }
+    public @Nullable String getStatus() { return status; }
 
-    public void setStatus(String status) { this.status = status; }
+    public void setStatus(@Nullable String status) { this.status = status; }
 
-    public String getMessage() { return message; }
+    public @Nullable String getMessage() { return message; }
 
-    public void setMessage(String message) { this.message = message; }
+    public void setMessage(@Nullable String message) { this.message = message; }
 
-    public IP getIp() { return ip; }
+    public @Nullable IP getIp() { return ip; }
 
-    public void setIp(IP ip) { this.ip = ip; }
+    public void setIp(@Nullable IP ip) { this.ip = ip; }
 
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -44,21 +41,18 @@ public class ProxyCheckModel implements SourceModel {
     }
 
     public static final class IP implements Serializable {
-        private String proxy;
-        private String type;
+        private String proxy = null;
+        private String type = null;
 
-        public IP() {
-            this.proxy = null;
-            this.type = null;
-        }
+        public IP() { }
 
-        public String getProxy() { return proxy; }
+        public @Nullable String getProxy() { return proxy; }
 
-        public void setProxy(String proxy) { this.proxy = proxy; }
+        public void setProxy(@Nullable String proxy) { this.proxy = proxy; }
 
-        public String getType() { return type; }
+        public @Nullable String getType() { return type; }
 
-        public void setType(String type) { this.type = type; }
+        public void setType(@Nullable String type) { this.type = type; }
 
         public boolean equals(Object o) {
             if (this == o) return true;

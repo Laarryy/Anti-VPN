@@ -64,14 +64,6 @@
                 <configuration>
                     <relocations>
                         <relocation>
-                            <pattern>annotated-jdk</pattern>
-                            <shadedPattern>me.egg82.antivpn.external.annotated-jdk</shadedPattern>
-                        </relocation>
-                        <relocation>
-                            <pattern>annotator</pattern>
-                            <shadedPattern>me.egg82.antivpn.external.annotator</shadedPattern>
-                        </relocation>
-                        <relocation>
                             <pattern>co.aikar.commands</pattern>
                             <shadedPattern>me.egg82.antivpn.external.co.aikar.commands</shadedPattern>
                         </relocation>
@@ -120,10 +112,6 @@
                             <shadedPattern>me.egg82.antivpn.external.me.lucko.jarrelocator</shadedPattern>
                         </relocation>
                         <relocation>
-                            <pattern>me.gong.mcleaks</pattern>
-                            <shadedPattern>me.egg82.antivpn.external.me.gong.mcleaks</shadedPattern>
-                        </relocation>
-                        <relocation>
                             <pattern>ninja.egg82</pattern>
                             <shadedPattern>me.egg82.antivpn.external.ninja.egg82</shadedPattern>
                         </relocation>
@@ -138,10 +126,6 @@
                         <relocation>
                             <pattern>org.bstats</pattern>
                             <shadedPattern>me.egg82.antivpn.external.org.bstats</shadedPattern>
-                        </relocation>
-                        <relocation>
-                            <pattern>org.jmlspecs</pattern>
-                            <shadedPattern>me.egg82.antivpn.external.org.jmlspecs</shadedPattern>
                         </relocation>
                         <relocation>
                             <pattern>ninja.egg82.maven</pattern>
@@ -177,10 +161,6 @@
                         <relocation>
                             <pattern>redis.clients.jedis</pattern>
                             <shadedPattern>me.egg82.antivpn.external.redis.clients.jedis</shadedPattern>
-                        </relocation>
-                        <relocation>
-                            <pattern>scenelib</pattern>
-                            <shadedPattern>me.egg82.antivpn.external.scenelib</shadedPattern>
                         </relocation>
                     </relocations>
                 </configuration>
@@ -283,11 +263,6 @@
         </repository>
 
         <repository>
-            <id>mcleaks</id>
-            <url>https://nexus.wesjd.net/repository/thirdparty/</url>
-        </repository>
-
-        <repository>
             <id>jitpack.io</id>
             <url>https://jitpack.io</url>
         </repository>
@@ -308,9 +283,19 @@
         </dependency>
 
         <dependency>
-            <groupId>co.aikar</groupId>
-            <artifactId>acf-bungee</artifactId>
-            <version>${acf.version}</version>
+            <groupId>cloud.commandframework</groupId>
+            <artifactId>cloud-bungee</artifactId>
+            <version>${cloud.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>cloud.commandframework</groupId>
+            <artifactId>cloud-minecraft-extras</artifactId>
+            <version>${cloud.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>net.kyori</groupId>
+            <artifactId>adventure-platform-bungeecord</artifactId>
+            <version>${adventure.version}</version>
         </dependency>
         <dependency>
             <groupId>ninja.egg82</groupId>
@@ -323,17 +308,7 @@
             <artifactId>event-chain-bungee</artifactId>
             <version>${eventchain.version}</version>
         </dependency>
-        <dependency>
-            <groupId>ninja.egg82</groupId>
-            <artifactId>spigot-updater</artifactId>
-            <version>${updater.version}</version>
-        </dependency>
 
-        <dependency>
-            <groupId>ninja.egg82</groupId>
-            <artifactId>service-locator</artifactId>
-            <version>${servicelocator.version}</version>
-        </dependency>
         <dependency>
             <groupId>ninja.egg82</groupId>
             <artifactId>dep-downloader</artifactId>
@@ -364,13 +339,6 @@
         </dependency>
 
         <dependency>
-            <groupId>me.gong</groupId>
-            <artifactId>mcleaks-api</artifactId>
-            <version>${mcleaks.version}</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
             <groupId>me.egg82</groupId>
             <artifactId>antivpn-common</artifactId>
         </dependency>
@@ -380,6 +348,11 @@
         </dependency>
 
         <!-- common -->
+        <dependency>
+            <groupId>net.kyori</groupId>
+            <artifactId>adventure-text-minimessage</artifactId>
+            <version>${adventure.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.reflections</groupId>
             <artifactId>reflections</artifactId>
@@ -458,11 +431,6 @@
             <version>${netty.version}</version>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>ninja.egg82</groupId>
-            <artifactId>gameanalytics-api</artifactId>
-            <version>${gameanalytics.version}</version>
-        </dependency>
 
         <dependency>
             <groupId>org.xerial</groupId>
@@ -498,9 +466,9 @@
 
         <!-- API -->
         <dependency>
-            <groupId>org.checkerframework</groupId>
-            <artifactId>checker</artifactId>
-            <version>${checkerframework.version}</version>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations</artifactId>
+            <version>${jetbrains.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

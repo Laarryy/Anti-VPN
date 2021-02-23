@@ -2,52 +2,45 @@ package me.egg82.antivpn.api.model.source.models;
 
 import flexjson.JSON;
 import java.util.Objects;
+import org.jetbrains.annotations.Nullable;
 
 public class IPHubModel implements SourceModel {
-    private String error;
-    private String ip;
-    private String countryCode;
+    private String error = null;
+    private String ip = null;
+    private String countryCode = null;
     @JSON(name = "countryName")
-    private String country;
-    private int asn;
-    private String isp;
-    private int block;
+    private String country = null;
+    private int asn = -1;
+    private String isp = null;
+    private int block = -1;
 
-    public IPHubModel() {
-        this.error = null;
-        this.ip = null;
-        this.countryCode = null;
-        this.country = null;
-        this.asn = -1;
-        this.isp = null;
-        this.block = -1;
-    }
+    public IPHubModel() { }
 
-    public String getError() { return error; }
+    public @Nullable String getError() { return error; }
 
-    public void setError(String error) { this.error = error; }
+    public void setError(@Nullable String error) { this.error = error; }
 
-    public String getIp() { return ip; }
+    public @Nullable String getIp() { return ip; }
 
-    public void setIp(String ip) { this.ip = ip; }
+    public void setIp(@Nullable String ip) { this.ip = ip; }
 
-    public String getCountryCode() { return countryCode; }
+    public @Nullable String getCountryCode() { return countryCode; }
 
-    public void setCountryCode(String countryCode) { this.countryCode = countryCode; }
+    public void setCountryCode(@Nullable String countryCode) { this.countryCode = countryCode; }
 
     @JSON(name = "countryName")
-    public String getCountry() { return country; }
+    public @Nullable String getCountry() { return country; }
 
     @JSON(name = "countryName")
-    public void setCountry(String country) { this.country = country; }
+    public void setCountry(@Nullable String country) { this.country = country; }
 
     public int getAsn() { return asn; }
 
     public void setAsn(int asn) { this.asn = asn; }
 
-    public String getIsp() { return isp; }
+    public @Nullable String getIsp() { return isp; }
 
-    public void setIsp(String isp) { this.isp = isp; }
+    public void setIsp(@Nullable String isp) { this.isp = isp; }
 
     public int getBlock() { return block; }
 

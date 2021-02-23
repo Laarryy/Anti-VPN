@@ -12,10 +12,10 @@ import me.egg82.antivpn.api.APIException;
 import me.egg82.antivpn.api.model.source.models.TeohModel;
 import me.egg82.antivpn.utils.ValidationUtil;
 import me.egg82.antivpn.web.WebRequest;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.NotNull;
 
 public class Teoh extends AbstractSource<TeohModel> {
-    public @NonNull String getName() { return "teoh"; }
+    public @NotNull String getName() { return "teoh"; }
 
     public boolean isKeyRequired() { return false; }
 
@@ -30,7 +30,7 @@ public class Teoh extends AbstractSource<TeohModel> {
         super(TeohModel.class);
     }
 
-    public @NonNull CompletableFuture<Boolean> getResult(@NonNull String ip) {
+    public @NotNull CompletableFuture<@NotNull Boolean> getResult(@NotNull String ip) {
         return getRawResponse(ip).thenApply(model -> {
             if (model.getMessage() != null) {
                 throw new APIException(false, "Could not get result from " + getName() + " (" + model.getMessage() + ")");
@@ -40,7 +40,7 @@ public class Teoh extends AbstractSource<TeohModel> {
         });
     }
 
-    public @NonNull CompletableFuture<TeohModel> getRawResponse(@NonNull String ip) {
+    public @NotNull CompletableFuture<@NotNull TeohModel> getRawResponse(@NotNull String ip) {
         return CompletableFuture.supplyAsync(() -> {
             if (!ValidationUtil.isValidIp(ip)) {
                 throw new IllegalArgumentException("ip is invalid.");
@@ -50,7 +50,7 @@ public class Teoh extends AbstractSource<TeohModel> {
                 throw new APIException(false, "API calls to " + getName() + " have been limited to 1,000/day as per request.");
             }
 
-            WebRequest.Builder builder = getDefaultBuilder("https://ip.teoh.io/api/vpn/" + ip, getCachedConfig().getTimeout());
+            WebRequest.Builder builder = getDefaultBuilder("https://ip.teoh.io/api/vpn/" + ip);
             HttpURLConnection conn = getConnection(builder.build());
             JSONDeserializer<TeohModel> modelDeserializer = new JSONDeserializer<>();
             return modelDeserializer.deserialize(getString(conn), TeohModel.class);

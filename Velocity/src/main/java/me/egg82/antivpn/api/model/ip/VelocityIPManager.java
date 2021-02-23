@@ -12,23 +12,19 @@ import me.egg82.antivpn.config.CachedConfig;
 import me.egg82.antivpn.config.ConfigUtil;
 import me.egg82.antivpn.utils.VelocityTailorUtil;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class VelocityIPManager extends AbstractIPManager {
     private final ProxyServer proxy;
 
-    public VelocityIPManager(@NonNull ProxyServer proxy, @NonNull SourceManager sourceManager, long cacheTime, TimeUnit cacheTimeUnit) {
+    public VelocityIPManager(@NotNull ProxyServer proxy, @NotNull SourceManager sourceManager, long cacheTime, TimeUnit cacheTimeUnit) {
         super(sourceManager, cacheTime, cacheTimeUnit);
         this.proxy = proxy;
     }
 
-    public boolean kickForVpn(@NonNull String playerName, @NonNull UUID playerUuid, @NonNull String ip) {
+    public boolean kickForVpn(@NotNull String playerName, @NotNull UUID playerUuid, @NotNull String ip) {
         CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
-        if (cachedConfig == null) {
-            logger.error("Cached config could not be fetched.");
-            return false;
-        }
 
         Optional<Player> p = proxy.getPlayer(playerUuid);
         if (!p.isPresent()) {
@@ -45,12 +41,8 @@ public class VelocityIPManager extends AbstractIPManager {
         return true;
     }
 
-    public @Nullable String getVpnKickMessage(@NonNull String playerName, @NonNull UUID playerUuid, @NonNull String ip) {
+    public @Nullable String getVpnKickMessage(@NotNull String playerName, @NotNull UUID playerUuid, @NotNull String ip) {
         CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
-        if (cachedConfig == null) {
-            logger.error("Cached config could not be fetched.");
-            return null;
-        }
 
         if (!cachedConfig.getVPNKickMessage().isEmpty()) {
             return VelocityTailorUtil.tailorKickMessage(cachedConfig.getVPNKickMessage(), playerName, playerUuid, ip);
@@ -58,12 +50,8 @@ public class VelocityIPManager extends AbstractIPManager {
         return null;
     }
 
-    public @NonNull List<String> getVpnCommands(@NonNull String playerName, @NonNull UUID playerUuid, @NonNull String ip) {
+    public @NotNull List<String> getVpnCommands(@NotNull String playerName, @NotNull UUID playerUuid, @NotNull String ip) {
         CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
-        if (cachedConfig == null) {
-            logger.error("Cached config could not be fetched.");
-            return ImmutableList.of();
-        }
 
         if (!cachedConfig.getVPNActionCommands().isEmpty()) {
             return ImmutableList.copyOf(VelocityTailorUtil.tailorCommands(cachedConfig.getVPNActionCommands(), playerName, playerUuid, ip));

@@ -3,29 +3,26 @@ package me.egg82.antivpn.api.model.source.models;
 import flexjson.JSON;
 import java.io.Serializable;
 import java.util.Objects;
+import org.jetbrains.annotations.Nullable;
 
 public class IPHunterModel implements SourceModel {
-    private String status;
-    private String code;
-    private Data data;
+    private String status = null;
+    private String code = null;
+    private Data data = null;
 
-    public IPHunterModel() {
-        this.status = null;
-        this.code = null;
-        this.data = null;
-    }
+    public IPHunterModel() { }
 
-    public String getStatus() { return status; }
+    public @Nullable String getStatus() { return status; }
 
-    public void setStatus(String status) { this.status = status; }
+    public void setStatus(@Nullable String status) { this.status = status; }
 
-    public String getCode() { return code; }
+    public @Nullable String getCode() { return code; }
 
-    public void setCode(String code) { this.code = code; }
+    public void setCode(@Nullable String code) { this.code = code; }
 
-    public Data getData() { return data; }
+    public @Nullable Data getData() { return data; }
 
-    public void setData(Data data) { this.data = data; }
+    public void setData(@Nullable Data data) { this.data = data; }
 
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -45,30 +42,22 @@ public class IPHunterModel implements SourceModel {
     }
 
     public static final class Data implements Serializable {
-        private String ip;
+        private String ip = null;
         @JSON(name = "ip_num")
-        private long ipNumber;
+        private long ipNumber = -1L;
         @JSON(name = "country_code")
-        private String countryCode;
+        private String countryCode = null;
         @JSON(name = "country_name")
-        private String country;
-        private String city;
-        private String isp;
-        private int block;
+        private String country = null;
+        private String city = null;
+        private String isp = null;
+        private int block = -1;
 
-        public Data() {
-            this.ip = null;
-            this.ipNumber = -1L;
-            this.countryCode = null;
-            this.country = null;
-            this.city = null;
-            this.isp = null;
-            this.block = -1;
-        }
+        public Data() { }
 
-        public String getIp() { return ip; }
+        public @Nullable String getIp() { return ip; }
 
-        public void setIp(String ip) { this.ip = ip; }
+        public void setIp(@Nullable String ip) { this.ip = ip; }
 
         @JSON(name = "ip_num")
         public long getIpNumber() { return ipNumber; }
@@ -77,24 +66,24 @@ public class IPHunterModel implements SourceModel {
         public void setIpNumber(long ipNumber) { this.ipNumber = ipNumber; }
 
         @JSON(name = "country_code")
-        public String getCountryCode() { return countryCode; }
+        public @Nullable String getCountryCode() { return countryCode; }
 
         @JSON(name = "country_code")
-        public void setCountryCode(String countryCode) { this.countryCode = countryCode; }
+        public void setCountryCode(@Nullable String countryCode) { this.countryCode = countryCode; }
 
         @JSON(name = "country_name")
-        public String getCountry() { return country; }
+        public @Nullable String getCountry() { return country; }
 
         @JSON(name = "country_name")
-        public void setCountry(String country) { this.country = country; }
+        public void setCountry(@Nullable String country) { this.country = country; }
 
-        public String getCity() { return city; }
+        public @Nullable String getCity() { return city; }
 
-        public void setCity(String city) { this.city = city; }
+        public void setCity(@Nullable String city) { this.city = city; }
 
-        public String getIsp() { return isp; }
+        public @Nullable String getIsp() { return isp; }
 
-        public void setIsp(String isp) { this.isp = isp; }
+        public void setIsp(@Nullable String isp) { this.isp = isp; }
 
         public int getBlock() { return block; }
 

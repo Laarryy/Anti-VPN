@@ -4,7 +4,7 @@ import java.net.InetAddress;
 import java.time.Instant;
 import java.util.Set;
 import java.util.UUID;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Provides information about the platform Anti-VPN is running on.
@@ -15,28 +15,28 @@ public interface Platform {
      *
      * @return the type of platform Anti-VPN is running on
      */
-    Platform.@NonNull Type getType();
+    @NotNull Platform.Type getType();
 
     /**
      * Gets the unique players which have connected to the server since it started.
      *
      * @return the unique players
      */
-    @NonNull Set<UUID> getUniquePlayers();
+    @NotNull Set<@NotNull UUID> getUniquePlayers();
 
     /**
      * Gets the unique IPs which have connected to the server since it started.
      *
      * @return the unique IPs
      */
-    @NonNull Set<InetAddress> getUniqueIPs();
+    @NotNull Set<@NotNull InetAddress> getUniqueIPs();
 
     /**
      * Gets the time when the plugin first started.
      *
      * @return the enable time
      */
-    @NonNull Instant getStartTime();
+    @NotNull Instant getStartTime();
 
     /**
      * Represents a type of platform which Anti-VPN can run on.
@@ -48,7 +48,7 @@ public interface Platform {
 
         private final String friendlyName;
 
-        Type(String friendlyName) {
+        Type(@NotNull String friendlyName) {
             this.friendlyName = friendlyName;
         }
 
@@ -57,6 +57,6 @@ public interface Platform {
          *
          * @return a readable name
          */
-        public @NonNull String getFriendlyName() { return this.friendlyName; }
+        public @NotNull String getFriendlyName() { return this.friendlyName; }
     }
 }

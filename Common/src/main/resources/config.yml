@@ -278,7 +278,7 @@ action:
   vpn:
     # The kick message to display to players who are using VPNs
     # If left blank, will not kick the player
-    kick-message: '&cPlease disconnect from your proxy or VPN before re-joining!'
+    kick-message: '<red>Please disconnect from your proxy or VPN before re-joining!</red>'
     # The commands that CONSOLE will run for players who are using VPNs
     # Use %player% as a placeholder for the player's (real) name
     # Use %uuid% as a placeholder for the player's uuid
@@ -309,7 +309,7 @@ action:
   mcleaks:
     # The kick message to display to players who are using MCLeaks accounts
     # If left blank, will not kick the player
-    kick-message: '&cPlease discontinue your use of an MCLeaks account!'
+    kick-message: '<red>Please discontinue your use of an MCLeaks account!</red>'
     # The commands that CONSOLE will run for players who are using MCLeaks accounts
     # Use %player% as a placeholder for the player's (real) name
     # Use %uuid% as a placeholder for the player's uuid
@@ -327,6 +327,27 @@ action:
   - '::1/128'
   - 'fd00::/8'
 
+permissions:
+  # The admin permission
+  # This is used to verify command usage and send update alerts
+  admin: 'avpn.admin'
+  # The bypass permission
+  # This is used to allow players to bypass the VPN and MCLeaks checks
+  bypass: 'avpn.bypass'
+
+# Plugin command aliases
+# Set these as alternative commands to run the antivpn command or its subcommands
+aliases:
+  # The base plugin command is "antivpn"
+  base:
+    - 'avpn'
+  # The base help command is "help"
+  help:
+    - ''
+  # The base reload command is "reload"
+  reload:
+    - ''
+
 connection:
   # The amount of time to cache lookups in-memory
   # Higher values require slightly more memory
@@ -341,7 +362,7 @@ connection:
 # When true, logs some extra output to the console so you can see if/why things might be failing
 debug: false
 # Default language (affects console output)
-lang: 'en'
+lang: 'en-US'
 
 stats:
   # Whether or not to send anonymous usage statistics to bStats
@@ -349,8 +370,10 @@ stats:
   # False: Do not send stats and make the author sad :(
   usage: true
   # Whether or not to send anonymous errors to the author
-  # True: Send errors anonymously to Rollbar and/or GameAnalytics so the author can fix them!
+  # True: Send errors anonymously to the author's Graylog so the author can fix them!
   # False: Do not send errors and wonder why any bugs you encounter haven't been fixed
+  # Note: A very small subsection of critical errors (enable, disable, dependency injection on startup) will be sent regardless of this option
+  # PRs are welcome if you'd like to find a way to change this behavior: https://github.com/egg82/Anti-VPN
   errors: true
 
 update:
@@ -360,4 +383,4 @@ update:
   notify: true
 
 # Config version, no touchy plz
-version: 5.1
+version: 5.2

@@ -13,7 +13,8 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import me.egg82.antivpn.config.ConfigUtil;
 import me.egg82.antivpn.utils.TimeUtil;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,7 +31,7 @@ public class WebRequest {
     private boolean throwOnStandardErrors = true;
     private Proxy proxy = null;
 
-    private WebRequest(@NonNull URL url) {
+    private WebRequest(@NotNull URL url) {
         this.url = url;
     }
 
@@ -40,7 +41,7 @@ public class WebRequest {
         DEFAULT_HEADERS.put("Accept-Language", "en-US,en;q=0.8");
     }
 
-    public static @NonNull String urlEncode(@NonNull String part) {
+    public static @NotNull String urlEncode(@NotNull String part) {
         try {
             return URLEncoder.encode(part, StandardCharsets.UTF_8.toString());
         } catch (UnsupportedEncodingException ignored) {
@@ -52,9 +53,9 @@ public class WebRequest {
         }
     }
 
-    public @NonNull String getString() throws IOException { return getString(getConnection()); }
+    public @NotNull String getString() throws IOException { return getString(getConnection()); }
 
-    public static @NonNull String getString(@NonNull HttpURLConnection connection) throws IOException {
+    public static @NotNull String getString(@NotNull HttpURLConnection connection) throws IOException {
         String sep = System.lineSeparator();
 
         try (InputStream in = getInputStream(connection); InputStreamReader reader = new InputStreamReader(in); BufferedReader buffer = new BufferedReader(reader)) {
@@ -69,9 +70,9 @@ public class WebRequest {
         }
     }
 
-    public byte @NonNull [] getBytes() throws IOException { return getBytes(getConnection()); }
+    public byte @NotNull [] getBytes() throws IOException { return getBytes(getConnection()); }
 
-    public static byte @NonNull [] getBytes(@NonNull HttpURLConnection connection) throws IOException {
+    public static byte @NotNull [] getBytes(@NotNull HttpURLConnection connection) throws IOException {
         try (InputStream in = getInputStream(connection); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             int read;
             byte[] buffer = new byte[4096];
@@ -83,11 +84,11 @@ public class WebRequest {
         }
     }
 
-    public @NonNull InputStream getInputStream() throws IOException { return getInputStream(getConnection()); }
+    public @NotNull InputStream getInputStream() throws IOException { return getInputStream(getConnection()); }
 
-    public static @NonNull InputStream getInputStream(@NonNull HttpURLConnection connection) throws IOException { return connection.getInputStream(); }
+    public static @NotNull InputStream getInputStream(@NotNull HttpURLConnection connection) throws IOException { return connection.getInputStream(); }
 
-    public @NonNull HttpURLConnection getConnection() throws IOException {
+    public @NotNull HttpURLConnection getConnection() throws IOException {
         if (ConfigUtil.getDebugOrFalse()) {
             logger.info("Fetching URL: " + url);
         }
@@ -129,7 +130,7 @@ public class WebRequest {
         return retVal;
     }
 
-    private void tryThrowOnStandardErrors(@NonNull HttpURLConnection connection) throws IOException {
+    private void tryThrowOnStandardErrors(@NotNull HttpURLConnection connection) throws IOException {
         if (throwOnStandardErrors) {
             int status = connection.getResponseCode();
 
@@ -157,7 +158,7 @@ public class WebRequest {
         }
     }
 
-    private void setConnectionProperties(@NonNull HttpURLConnection conn, String cookies) throws IOException {
+    private void setConnectionProperties(@NotNull HttpURLConnection conn, String cookies) throws IOException {
         conn.setInstanceFollowRedirects(false);
         conn.setConnectTimeout((int) timeout.getMillis());
         conn.setReadTimeout((int) timeout.getMillis());
@@ -201,31 +202,31 @@ public class WebRequest {
         }
     }
 
-    public static WebRequest.@NonNull Builder builder(@NonNull URL url) { return new WebRequest.Builder(url); }
+    public static @NotNull WebRequest.Builder builder(@NotNull URL url) { return new WebRequest.Builder(url); }
 
     public static class Builder {
         private final WebRequest request;
 
-        private Builder(@NonNull URL url) {
+        private Builder(@NotNull URL url) {
             request = new WebRequest(url);
         }
 
-        public WebRequest.@NonNull Builder method(@NonNull RequestMethod value) {
+        public @NotNull WebRequest.@NotNull Builder method(@NotNull RequestMethod value) {
             request.method = value;
             return this;
         }
 
-        public WebRequest.@NonNull Builder timeout(TimeUtil.@NonNull Time value) {
+        public @NotNull WebRequest.@NotNull Builder timeout(@NotNull TimeUtil.Time value) {
             request.timeout = value;
             return this;
         }
 
-        public WebRequest.@NonNull Builder userAgent(@NonNull String value) {
+        public @NotNull WebRequest.Builder userAgent(@NotNull String value) {
             request.headers.put("User-Agent", value);
             return this;
         }
 
-        public WebRequest.@NonNull Builder header(@NonNull String key, String value) {
+        public @NotNull WebRequest.Builder header(@NotNull String key, @Nullable String value) {
             if (value != null) {
                 if (!hasKey(request.headers, key)) {
                     request.headers.put(key, value);
@@ -236,7 +237,7 @@ public class WebRequest {
             return this;
         }
 
-        public WebRequest.@NonNull Builder headers(@NonNull Map<String, String> value) {
+        public @NotNull WebRequest.Builder headers(@NotNull Map<String, String> value) {
             for (Map.Entry<String, String> kvp : value.entrySet()) {
                 if (kvp.getValue() != null) {
                     if (!hasKey(request.headers, kvp.getKey())) {
@@ -249,7 +250,7 @@ public class WebRequest {
             return this;
         }
 
-        public WebRequest.@NonNull Builder formData(@NonNull String key, String value) {
+        public @NotNull WebRequest.Builder formData(@NotNull String key, @Nullable String value) {
             if (request.outputData != null) {
                 throw new IllegalStateException("Cannot add form data when output data is set.");
             }
@@ -264,7 +265,7 @@ public class WebRequest {
             return this;
         }
 
-        public WebRequest.@NonNull Builder formData(@NonNull Map<String, String> value) {
+        public @NotNull WebRequest.Builder formData(@NotNull Map<String, String> value) {
             if (request.outputData != null) {
                 throw new IllegalStateException("Cannot add form data when output data is set.");
             }
@@ -281,8 +282,8 @@ public class WebRequest {
             return this;
         }
 
-        public WebRequest.@NonNull Builder outputData(byte[] value) {
-            if (!request.formData.isEmpty()) {
+        public @NotNull WebRequest.Builder outputData(byte @Nullable [] value) {
+            if (value != null && !request.formData.isEmpty()) {
                 throw new IllegalStateException("Cannot add output data when form data is set.");
             }
 
@@ -290,7 +291,7 @@ public class WebRequest {
             return this;
         }
 
-        public WebRequest.@NonNull Builder maxRedirects(int value) {
+        public @NotNull WebRequest.Builder maxRedirects(int value) {
             if (value < 0) {
                 throw new IllegalArgumentException("value cannot be negative.");
             }
@@ -298,17 +299,17 @@ public class WebRequest {
             return this;
         }
 
-        public WebRequest.@NonNull Builder throwOnStandardErrors(boolean value) {
+        public @NotNull WebRequest.Builder throwOnStandardErrors(boolean value) {
             request.throwOnStandardErrors = value;
             return this;
         }
 
-        public WebRequest.@NonNull Builder proxy(Proxy value) {
+        public @NotNull WebRequest.Builder proxy(@Nullable Proxy value) {
             request.proxy = value;
             return this;
         }
 
-        public @NonNull WebRequest build() {
+        public @NotNull WebRequest build() {
             for (Map.Entry<String, String> kvp : DEFAULT_HEADERS.entrySet()) {
                 if (kvp.getValue() != null && !hasKey(request.headers, kvp.getKey())) {
                     request.headers.put(kvp.getKey(), kvp.getValue());
@@ -318,7 +319,7 @@ public class WebRequest {
             return request;
         }
 
-        private boolean hasKey(@NonNull Map<String, String> map, @NonNull String key) {
+        private boolean hasKey(@NotNull Map<String, String> map, @NotNull String key) {
             for (String k : map.keySet()) {
                 if (k.equalsIgnoreCase(key)) {
                     return true;
@@ -327,7 +328,7 @@ public class WebRequest {
             return false;
         }
 
-        private void removeKey(@NonNull Map<String, String> map, @NonNull String key) {
+        private void removeKey(@NotNull Map<String, String> map, @NotNull String key) {
             String newKey = null;
             do {
                 for (String k : map.keySet()) {

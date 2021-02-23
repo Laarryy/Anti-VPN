@@ -4,12 +4,12 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import me.egg82.antivpn.services.lookup.PlayerInfo;
 import me.egg82.antivpn.services.lookup.PlayerLookup;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.NotNull;
 
 public class BungeePlayer extends AbstractPlayer {
-    public BungeePlayer(@NonNull UUID uuid, boolean mcleaks) { this(uuid, null, mcleaks); }
+    public BungeePlayer(@NotNull UUID uuid, boolean mcleaks) { this(uuid, null, mcleaks); }
 
-    public BungeePlayer(@NonNull UUID uuid, String name, boolean mcleaks) { super(uuid, name, mcleaks); }
+    public BungeePlayer(@NotNull UUID uuid, String name, boolean mcleaks) { super(uuid, name, mcleaks); }
 
-    protected @NonNull CompletableFuture<String> fetchName(@NonNull UUID uuid) { return PlayerLookup.get(uuid).thenApply(PlayerInfo::getName); }
+    protected @NotNull CompletableFuture<String> fetchName(@NotNull UUID uuid) { return PlayerLookup.get(uuid).thenApply(PlayerInfo::getName); }
 }

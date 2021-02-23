@@ -2,7 +2,8 @@ package me.egg82.antivpn.api;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import me.egg82.antivpn.logging.GELFLogger;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,11 +28,11 @@ public class APIRegistrationUtil {
 
     private APIRegistrationUtil() { }
 
-    public static void register(@NonNull VPNAPI api) {
+    public static void register(@NotNull VPNAPI api) {
         try {
             REGISTER.invoke(null, api);
         } catch (InvocationTargetException | IllegalAccessException ex) {
-            logger.error(ex.getMessage(), ex);
+            GELFLogger.exception(logger, ex);
         }
     }
 
@@ -39,7 +40,7 @@ public class APIRegistrationUtil {
         try {
             DEREGISTER.invoke(null);
         } catch (InvocationTargetException | IllegalAccessException ex) {
-            logger.error(ex.getMessage(), ex);
+            GELFLogger.exception(logger, ex);
         }
     }
 }

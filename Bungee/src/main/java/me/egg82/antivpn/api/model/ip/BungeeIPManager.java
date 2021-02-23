@@ -11,20 +11,16 @@ import me.egg82.antivpn.utils.BungeeTailorUtil;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class BungeeIPManager extends AbstractIPManager {
-    public BungeeIPManager(@NonNull SourceManager sourceManager, long cacheTime, TimeUnit cacheTimeUnit) {
+    public BungeeIPManager(@NotNull SourceManager sourceManager, long cacheTime, @NotNull TimeUnit cacheTimeUnit) {
         super(sourceManager, cacheTime, cacheTimeUnit);
     }
 
-    public boolean kickForVpn(@NonNull String playerName, @NonNull UUID playerUuid, @NonNull String ip) {
+    public boolean kickForVpn(@NotNull String playerName, @NotNull UUID playerUuid, @NotNull String ip) {
         CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
-        if (cachedConfig == null) {
-            logger.error("Cached config could not be fetched.");
-            return false;
-        }
 
         ProxiedPlayer p = ProxyServer.getInstance().getPlayer(playerUuid);
         if (p == null) {
@@ -41,12 +37,8 @@ public class BungeeIPManager extends AbstractIPManager {
         return true;
     }
 
-    public @Nullable String getVpnKickMessage(@NonNull String playerName, @NonNull UUID playerUuid, @NonNull String ip) {
+    public @Nullable String getVpnKickMessage(@NotNull String playerName, @NotNull UUID playerUuid, @NotNull String ip) {
         CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
-        if (cachedConfig == null) {
-            logger.error("Cached config could not be fetched.");
-            return null;
-        }
 
         if (!cachedConfig.getVPNKickMessage().isEmpty()) {
             return BungeeTailorUtil.tailorKickMessage(cachedConfig.getVPNKickMessage(), playerName, playerUuid, ip);
@@ -54,12 +46,8 @@ public class BungeeIPManager extends AbstractIPManager {
         return null;
     }
 
-    public @NonNull List<String> getVpnCommands(@NonNull String playerName, @NonNull UUID playerUuid, @NonNull String ip) {
+    public @NotNull List<String> getVpnCommands(@NotNull String playerName, @NotNull UUID playerUuid, @NotNull String ip) {
         CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
-        if (cachedConfig == null) {
-            logger.error("Cached config could not be fetched.");
-            return ImmutableList.of();
-        }
 
         if (!cachedConfig.getVPNActionCommands().isEmpty()) {
             return ImmutableList.copyOf(BungeeTailorUtil.tailorCommands(cachedConfig.getVPNActionCommands(), playerName, playerUuid, ip));

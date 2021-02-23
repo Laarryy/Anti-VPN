@@ -4,14 +4,14 @@ import java.util.Collection;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.Plugin;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.NotNull;
 
 public class BukkitCommandUtil {
     private BukkitCommandUtil() { }
 
-    public static void dispatchCommands(@NonNull Collection<String> commands, @NonNull CommandSender issuer, @NonNull Plugin plugin) { dispatchCommands(commands, issuer, plugin, Bukkit.isPrimaryThread()); }
+    public static void dispatchCommands(@NotNull Collection<String> commands, @NotNull CommandSender issuer, @NotNull Plugin plugin) { dispatchCommands(commands, issuer, plugin, Bukkit.isPrimaryThread()); }
 
-    public static void dispatchCommands(@NonNull Collection<String> commands, @NonNull CommandSender issuer, @NonNull Plugin plugin, boolean isAsync) {
+    public static void dispatchCommands(@NotNull Collection<String> commands, @NotNull CommandSender issuer, @NotNull Plugin plugin, boolean isAsync) {
         if (isAsync) {
             Bukkit.getScheduler().runTask(plugin, () -> {
                 for (String command : commands) {
@@ -25,9 +25,9 @@ public class BukkitCommandUtil {
         }
     }
 
-    public static void dispatchCommand(@NonNull String command, @NonNull CommandSender issuer, @NonNull Plugin plugin) { dispatchCommand(command, issuer, plugin, Bukkit.isPrimaryThread()); }
+    public static void dispatchCommand(@NotNull String command, @NotNull CommandSender issuer, @NotNull Plugin plugin) { dispatchCommand(command, issuer, plugin, Bukkit.isPrimaryThread()); }
 
-    public static void dispatchCommand(@NonNull String command, @NonNull CommandSender issuer, @NonNull Plugin plugin, boolean isAsync) {
+    public static void dispatchCommand(@NotNull String command, @NotNull CommandSender issuer, @NotNull Plugin plugin, boolean isAsync) {
         if (isAsync) {
             Bukkit.getScheduler().runTask(plugin, () -> Bukkit.dispatchCommand(issuer, command));
         } else {

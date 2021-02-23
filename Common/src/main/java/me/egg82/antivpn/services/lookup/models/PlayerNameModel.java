@@ -2,17 +2,16 @@ package me.egg82.antivpn.services.lookup.models;
 
 import java.io.Serializable;
 import java.util.Objects;
+import org.jetbrains.annotations.Nullable;
 
 public class PlayerNameModel implements Serializable {
-    private String name;
+    private String name = null;
 
-    public PlayerNameModel() {
-        this.name = null;
-    }
+    public PlayerNameModel() { }
 
-    public String getName() { return name; }
+    public @Nullable String getName() { return name; }
 
-    public void setName(String name) { this.name = name; }
+    public void setName(@Nullable String name) { this.name = name; }
 
     public boolean equals(Object o) {
         if (this == o) return true;

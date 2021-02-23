@@ -15,7 +15,8 @@ import javax.naming.NamingException;
 import javax.naming.directory.Attributes;
 import javax.naming.directory.InitialDirContext;
 import me.egg82.antivpn.config.ConfigUtil;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import me.egg82.antivpn.logging.GELFLogger;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,7 +25,7 @@ public class DNSUtil {
 
     private DNSUtil() { }
 
-    public static @NonNull Set<String> getNordVpnIps() {
+    public static @NotNull Set<@NotNull String> getNordVpnIps() {
         Set<String> dns = new HashSet<>();
         dns.addAll(validNordVpn.get("al{}.nordvpn.com"));
         dns.addAll(validNordVpn.get("ar{}.nordvpn.com"));
@@ -86,9 +87,9 @@ public class DNSUtil {
         return getIps(dns.toArray(new String[0]), 50);
     }
 
-    private static LoadingCache<String, Set<String>> validNordVpn = Caffeine.newBuilder().build(DNSUtil::findNordVpn);
+    private static final LoadingCache<String, Set<String>> validNordVpn = Caffeine.newBuilder().build(DNSUtil::findNordVpn);
 
-    private static @NonNull Set<String> findNordVpn(@NonNull String dns) {
+    private static @NotNull Set<@NotNull String> findNordVpn(@NotNull String dns) {
         if (ConfigUtil.getDebugOrFalse()) {
             logger.info("Building NordVPN set " + dns.replace("{}", ""));
         }
@@ -107,7 +108,7 @@ public class DNSUtil {
         return retVal;
     }
 
-    public static @NonNull Set<String> getCryptostormIps() {
+    public static @NotNull Set<@NotNull String> getCryptostormIps() {
         String[] dns = new String[] {
                 "balancer.cstorm.is",
                 "balancer.cstorm.net",
@@ -117,9 +118,9 @@ public class DNSUtil {
         return getIps(dns, 50);
     }
 
-    private static LoadingCache<String, Set<String>> records = Caffeine.newBuilder().build(DNSUtil::collectRecords);
+    private static final LoadingCache<String, Set<String>> records = Caffeine.newBuilder().build(DNSUtil::collectRecords);
 
-    private static @NonNull Set<String> collectRecords(@NonNull String dns) {
+    private static @NotNull Set<@NotNull String> collectRecords(@NotNull String dns) {
         if (ConfigUtil.getDebugOrFalse()) {
             logger.info("Collecting A records for " + dns);
         }
@@ -132,7 +133,7 @@ public class DNSUtil {
                 retVal.add(attributeEnum.next().toString());
             }
         } catch (NamingException ex) {
-            logger.error(ex.getMessage(), ex);
+            GELFLogger.exception(logger, ex);
         }
         if (ConfigUtil.getDebugOrFalse()) {
             logger.info("Got " + retVal.size() + " record(s) for " + dns);
@@ -140,7 +141,7 @@ public class DNSUtil {
         return retVal;
     }
 
-    public static @NonNull Set<String> getHomeIps() {
+    public static @NotNull Set<@NotNull String> getHomeIps() {
         String[] dns = new String[] {
                 // Comcast - https://postmaster.comcast.net/dynamic-IP-ranges.html
                 "24.0.0.0/12",
@@ -217,15 +218,12 @@ public class DNSUtil {
         return getIps(dns, 50);
     }
 
-    private static @NonNull Set<String> getIps(String[] dns, int count) {
+    private static @NotNull Set<@NotNull String> getIps(@NotNull String @NotNull [] dns, int count) {
         Set<String> retVal = new HashSet<>();
 
         int fails = 0;
         while (retVal.size() < count && fails < 1000) {
-            String name;
-            do {
-                name = dns[(int) fairRoundedRandom(0L, (long) dns.length - 1L)];
-            } while (name == null);
+            String name = dns[(int) fairRoundedRandom(0L, (long) dns.length - 1L)];
 
             if (ValidationUtil.isValidIp(name)) {
                 if (!retVal.add(name)) {
@@ -249,7 +247,7 @@ public class DNSUtil {
         return retVal;
     }
 
-    private static @NonNull Set<String> getIps(@NonNull String mask, int count) {
+    private static @NotNull Set<@NotNull String> getIps(@NotNull String mask, int count) {
         Set<String> retVal = new HashSet<>();
         IPAddress range = new IPAddressString(mask).getAddress();
 

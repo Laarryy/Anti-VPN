@@ -14,8 +14,10 @@ import java.util.UUID;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import me.egg82.antivpn.config.ConfigUtil;
+import me.egg82.antivpn.lang.I18NManager;
 import me.egg82.antivpn.utils.MathUtil;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,15 +35,18 @@ public abstract class AbstractMessagingService implements MessagingService {
 
     protected MessagingHandler handler;
 
-    protected AbstractMessagingService(@NonNull String name) {
+    protected final I18NManager consoleLocalizationManager;
+
+    protected AbstractMessagingService(@NotNull String name, @NotNull I18NManager consoleLocalizationManager) {
         this.name = name;
+        this.consoleLocalizationManager = consoleLocalizationManager;
     }
 
-    public @NonNull String getName() { return name; }
+    public @NotNull String getName() { return name; }
 
     private static final double TOLERANCE = 1.1; // Compression ratio tolerance. Determines when compression should happen
 
-    protected final byte @NonNull [] compressData(ByteBuf data) throws IOException {
+    protected final byte @NotNull [] compressData(@Nullable ByteBuf data) throws IOException {
         if (data == null || data.capacity() == 0) {
             return new byte[0];
         }
@@ -93,7 +98,7 @@ public abstract class AbstractMessagingService implements MessagingService {
         }
     }
 
-    protected final @NonNull ByteBuf decompressData(ByteBuf data) throws IOException {
+    protected final @NotNull ByteBuf decompressData(@Nullable ByteBuf data) throws IOException {
         if (data == null || data.capacity() == 0) {
             return alloc.buffer(0, 0);
         }
@@ -173,7 +178,7 @@ public abstract class AbstractMessagingService implements MessagingService {
         }
     }
 
-    private void printBytes(@NonNull ByteBuf buffer) {
+    private void printBytes(@NotNull ByteBuf buffer) {
         StringBuilder sb = new StringBuilder();
 
         sb.append('\n');
@@ -205,7 +210,7 @@ public abstract class AbstractMessagingService implements MessagingService {
         logger.info(sb.toString());
     }
 
-    private void printBytes(byte @NonNull [] bytes) {
+    private void printBytes(byte @NotNull [] bytes) {
         StringBuilder sb = new StringBuilder();
 
         sb.append('\n');

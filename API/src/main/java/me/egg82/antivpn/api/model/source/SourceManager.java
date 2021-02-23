@@ -5,8 +5,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.function.Consumer;
 import me.egg82.antivpn.api.model.source.models.SourceModel;
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Represents the object responsible for managing {@link Source} instances.
@@ -29,7 +29,7 @@ public interface SourceManager {
      * @return a {@link Source} object, if one matching the name is available, or null if not
      * @throws NullPointerException if the name is null
      */
-    @Nullable Source<? extends SourceModel> getSource(@NonNull String name);
+    @Nullable Source<? extends SourceModel> getSource(@NotNull String name);
 
     /**
      * Gets a source with a model type.
@@ -40,7 +40,7 @@ public interface SourceManager {
      * @throws NullPointerException if the name or model is null
      * @throws ClassCastException is the modelClass is incorrect for this source
      */
-    @Nullable <T extends SourceModel> Source<T> getSource(@NonNull String name, @NonNull Class<T> modelClass);
+    @Nullable <T extends SourceModel> Source<T> getSource(@NotNull String name, @NotNull Class<T> modelClass);
 
     /**
      * Registers and enables a new, unique {@link Source}, replacing
@@ -54,7 +54,7 @@ public interface SourceManager {
      * @return true if the replacement was successful, false if not
      * @throws NullPointerException if the new source is null
      */
-    default boolean replaceSource(@NonNull Source<? extends SourceModel> newSource) {
+    default boolean replaceSource(@NotNull Source<? extends SourceModel> newSource) {
         List<Source<? extends SourceModel>> sources = getSources();
         int index = -1;
         Source<? extends SourceModel> removedSource = null;
@@ -83,7 +83,7 @@ public interface SourceManager {
      * @return true if the addition was successful, false if not
      * @throws NullPointerException if the source is null
      */
-    default boolean registerSource(@NonNull Source<? extends SourceModel> source) { return registerSource(source, getSources().size()); }
+    default boolean registerSource(@NotNull Source<? extends SourceModel> source) { return registerSource(source, getSources().size()); }
 
     /**
      * Registers and enables a new, unique {@link Source}, inserting
@@ -97,7 +97,7 @@ public interface SourceManager {
      * @return true if the addition was successful, false if not
      * @throws NullPointerException if the source is null
      */
-    boolean registerSource(@NonNull Source<? extends SourceModel> source, int index);
+    boolean registerSource(@NotNull Source<? extends SourceModel> source, int index);
 
     /**
      * Deregisters, disables, and removes an existing source from
@@ -110,7 +110,7 @@ public interface SourceManager {
      * @return true if the removal was successful, false if not
      * @throws NullPointerException if the source is null
      */
-    boolean deregisterSource(@NonNull Source<? extends SourceModel> source);
+    boolean deregisterSource(@NotNull Source<? extends SourceModel> source);
 
     /**
      * Deregisters, disables, and removes an existing source from
@@ -123,7 +123,7 @@ public interface SourceManager {
      * @return true if the removal was successful, false if not
      * @throws NullPointerException if the source name is null
      */
-    default boolean deregisterSource(@NonNull String sourceName) {
+    default boolean deregisterSource(@NotNull String sourceName) {
         List<Source<? extends SourceModel>> sources = getSources();
         Source<? extends SourceModel> removedSource = null;
         for (Source<? extends SourceModel> source : sources) {
@@ -144,5 +144,5 @@ public interface SourceManager {
      *
      * @return a list of sources
      */
-    @NonNull List<Source<? extends SourceModel>> getSources();
+    @NotNull List<@NotNull Source<? extends SourceModel>> getSources();
 }

@@ -9,23 +9,28 @@ import net.luckperms.api.context.ContextManager;
 import net.luckperms.api.context.ImmutableContextSet;
 import net.luckperms.api.model.user.UserManager;
 import net.luckperms.api.query.QueryOptions;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.NotNull;
 
 public class LuckPermsHook implements PluginHook {
     private final CommandIssuer console;
 
-    public LuckPermsHook(@NonNull CommandIssuer console) {
+    public LuckPermsHook(@NotNull CommandIssuer console) {
         this.console = console;
     }
 
     public void cancel() { }
 
-    public boolean isExpensive(@NonNull UUID uuid) {
+    public boolean isExpensive(@NotNull UUID uuid) {
         UserManager userManager = LuckPermsProvider.get().getUserManager();
         return userManager.isLoaded(uuid) && userManager.getUser(uuid) != null;
     }
 
-    public @NonNull CompletableFuture<Boolean> hasPermission(@NonNull UUID uuid, @NonNull String permission) {
+    public @NotNull CompletableFuture<UUID> getUuid(@NotNull String name) {
+        UserManager userManager = LuckPermsProvider.get().getUserManager();
+        return userManager.lookupUniqueId(name);
+    }
+
+    public @NotNull CompletableFuture<Boolean> hasPermission(@NotNull UUID uuid, @NotNull String permission) {
         UserManager userManager = LuckPermsProvider.get().getUserManager();
         ContextManager contextManager = LuckPermsProvider.get().getContextManager();
 

@@ -2,31 +2,25 @@ package me.egg82.antivpn.api.model.source.models;
 
 import java.io.Serializable;
 import java.util.Objects;
+import org.jetbrains.annotations.Nullable;
 
 public class IPInfoModel implements SourceModel {
-    private int status;
-    private Error error;
-    private boolean vpn;
-    private boolean proxy;
-    private boolean tor;
-    private boolean hosting;
+    private int status = -1;
+    private Error error = null;
+    private boolean vpn = false;
+    private boolean proxy = false;
+    private boolean tor = false;
+    private boolean hosting = false;
 
-    public IPInfoModel() {
-        this.status = -1;
-        this.error = null;
-        this.vpn = false;
-        this.proxy = false;
-        this.tor = false;
-        this.hosting = false;
-    }
+    public IPInfoModel() { }
 
     public int getStatus() { return status; }
 
     public void setStatus(int status) { this.status = status; }
 
-    public Error getError() { return error; }
+    public @Nullable Error getError() { return error; }
 
-    public void setError(Error error) { this.error = error; }
+    public void setError(@Nullable Error error) { this.error = error; }
 
     public boolean isVpn() { return vpn; }
 
@@ -65,21 +59,18 @@ public class IPInfoModel implements SourceModel {
     }
 
     public static final class Error implements Serializable {
-        private String title;
-        private String message;
+        private String title = null;
+        private String message = null;
 
-        public Error() {
-            this.title = null;
-            this.message = null;
-        }
+        public Error() { }
 
-        public String getTitle() { return title; }
+        public @Nullable String getTitle() { return title; }
 
-        public void setTitle(String title) { this.title = title; }
+        public void setTitle(@Nullable String title) { this.title = title; }
 
-        public String getMessage() { return message; }
+        public @Nullable String getMessage() { return message; }
 
-        public void setMessage(String message) { this.message = message; }
+        public void setMessage(@Nullable String message) { this.message = message; }
 
         public boolean equals(Object o) {
             if (this == o) return true;

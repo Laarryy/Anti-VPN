@@ -12,9 +12,12 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import me.egg82.antivpn.config.ConfigUtil;
+import me.egg82.antivpn.lang.I18NManager;
+import me.egg82.antivpn.lang.MessageKey;
+import me.egg82.antivpn.logging.GELFLogger;
 import me.egg82.antivpn.messaging.packets.Packet;
 import me.egg82.antivpn.utils.PacketUtil;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.NotNull;
 import redis.clients.jedis.BinaryJedisPubSub;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
@@ -33,8 +36,8 @@ public class RedisMessagingService extends AbstractMessagingService {
     private static final String CHANNEL_NAME = "avpn-data";
     private static final byte[] CHANNEL_NAME_BYTES = CHANNEL_NAME.getBytes(StandardCharsets.UTF_8);
 
-    private RedisMessagingService(@NonNull String name) {
-        super(name);
+    private RedisMessagingService(@NotNull String name, @NotNull I18NManager consoleLocalizationManager) {
+        super(name, consoleLocalizationManager);
     }
 
     public void close() {
@@ -57,7 +60,7 @@ public class RedisMessagingService extends AbstractMessagingService {
 
     public boolean isClosed() { return closed || pool.isClosed(); }
 
-    public static Builder builder(@NonNull String name, @NonNull UUID serverId, @NonNull MessagingHandler handler) { return new Builder(name, serverId, handler); }
+    public static @NotNull Builder builder(@NotNull String name, @NotNull UUID serverId, @NotNull MessagingHandler handler, @NotNull I18NManager consoleLocalizationManager) { return new Builder(name, serverId, handler, consoleLocalizationManager); }
 
     public static class Builder {
         private final RedisMessagingService service;
@@ -68,8 +71,8 @@ public class RedisMessagingService extends AbstractMessagingService {
         private int timeout = 5000;
         private String pass = "";
 
-        public Builder(@NonNull String name, @NonNull UUID serverId, @NonNull MessagingHandler handler) {
-            service = new RedisMessagingService(name);
+        public Builder(@NotNull String name, @NotNull UUID serverId, @NotNull MessagingHandler handler, @NotNull I18NManager consoleLocalizationManager) {
+            service = new RedisMessagingService(name, consoleLocalizationManager);
             service.serverId = serverId;
             service.serverIdString = serverId.toString();
             ByteBuf buffer = alloc.buffer(16, 16);
@@ -89,31 +92,31 @@ public class RedisMessagingService extends AbstractMessagingService {
             service.handler = handler;
         }
 
-        public Builder url(@NonNull String address, int port) {
+        public @NotNull Builder url(@NotNull String address, int port) {
             this.address = address;
             this.port = port;
             return this;
         }
 
-        public Builder credentials(@NonNull String pass) {
+        public @NotNull Builder credentials(@NotNull String pass) {
             this.pass = pass;
             return this;
         }
 
-        public Builder poolSize(int min, int max) {
+        public @NotNull Builder poolSize(int min, int max) {
             config.setMinIdle(min);
             config.setMaxTotal(max);
             return this;
         }
 
-        public Builder life(long lifetime, int timeout) {
+        public @NotNull Builder life(long lifetime, int timeout) {
             config.setMinEvictableIdleTimeMillis(lifetime);
             config.setMaxWaitMillis(timeout);
             this.timeout = timeout;
             return this;
         }
 
-        public @NonNull RedisMessagingService build() {
+        public @NotNull RedisMessagingService build() {
             service.pool = new JedisPool(config, address, port, timeout, pass == null || pass.isEmpty() ? null : pass);
             // Warm up pool
             // https://partners-intl.aliyun.com/help/doc-detail/98726.htm
@@ -139,7 +142,7 @@ public class RedisMessagingService extends AbstractMessagingService {
             });
         }
 
-        private void warmup(@NonNull JedisPool pool) {
+        private void warmup(@NotNull JedisPool pool) {
             Jedis[] warmpupArr = new Jedis[config.getMinIdle()];
 
             for (int i = 0; i < config.getMinIdle(); i++) {
@@ -160,9 +163,9 @@ public class RedisMessagingService extends AbstractMessagingService {
     private static class PubSub extends BinaryJedisPubSub {
         private final RedisMessagingService service;
 
-        private PubSub(@NonNull RedisMessagingService service) { this.service = service; }
+        private PubSub(@NotNull RedisMessagingService service) { this.service = service; }
 
-        public void onMessage(byte @NonNull [] c, byte @NonNull [] m) {
+        public void onMessage(byte @NotNull [] c, byte @NotNull [] m) {
             String channel = new String(c, StandardCharsets.UTF_8);
             if (ConfigUtil.getDebugOrFalse()) {
                 service.logger.info("Got message from channel: " + channel);
@@ -178,11 +181,11 @@ public class RedisMessagingService extends AbstractMessagingService {
                         break;
                 }
             } catch (IOException ex) {
-                service.logger.error("Could not handle message.", ex);
+                GELFLogger.exception(service.logger, ex, service.consoleLocalizationManager, MessageKey.ERROR__MESSAGING__BAD_HANDLE);
             }
         }
 
-        private void handleMessage(byte @NonNull [] body) throws IOException {
+        private void handleMessage(byte @NotNull [] body) throws IOException {
             ByteBuf b = alloc.buffer(body.length, body.length);
             ByteBuf data = null;
             try {
@@ -205,7 +208,7 @@ public class RedisMessagingService extends AbstractMessagingService {
                 try {
                     service.handler.handlePacket(messageId, service.getName(), packetClass.getConstructor(ByteBuf.class).newInstance(data));
                 } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException | InstantiationException | ExceptionInInitializerError | SecurityException ex) {
-                    service.logger.error("Could not instantiate packet.", ex);
+                    GELFLogger.exception(service.logger, ex, service.consoleLocalizationManager, MessageKey.ERROR__MESSAGING__BAD_PACKET, "{name}", packetClass.getSimpleName());
                 }
             } finally {
                 b.release();
@@ -216,7 +219,7 @@ public class RedisMessagingService extends AbstractMessagingService {
         }
     }
 
-    public void sendPacket(@NonNull UUID messageId, @NonNull Packet packet) throws IOException {
+    public void sendPacket(@NotNull UUID messageId, @NotNull Packet packet) throws IOException {
         queueLock.readLock().lock();
         try (Jedis redis = pool.getResource()) {
             ByteBuf buffer = alloc.buffer(getInitialCapacity());

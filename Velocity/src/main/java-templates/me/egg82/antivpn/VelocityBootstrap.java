@@ -32,7 +32,7 @@ import ninja.egg82.maven.Repository;
 import ninja.egg82.maven.Scope;
 import ninja.egg82.utils.DownloadUtil;
 import ninja.egg82.utils.HTTPUtil;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
@@ -60,13 +60,13 @@ public class VelocityBootstrap {
     private final ExecutorService downloadPool = Executors.newWorkStealingPool(Math.max(4, Runtime.getRuntime().availableProcessors()));
 
     @Inject
-    public VelocityBootstrap(@NonNull ProxyServer proxy, @NonNull PluginDescription description) {
+    public VelocityBootstrap(@NotNull ProxyServer proxy, @NotNull PluginDescription description) {
         this.proxy = proxy;
         this.description = description;
     }
 
     @Subscribe(order = PostOrder.FIRST)
-    public void onEarlyInit(@NonNull ProxyInitializeEvent event) {
+    public void onEarlyInit(@NotNull ProxyInitializeEvent event) {
         if (!description.getSource().isPresent()) {
             throw new RuntimeException("Could not get plugin file path.");
         }
@@ -98,16 +98,16 @@ public class VelocityBootstrap {
     }
 
     @Subscribe(order = PostOrder.EARLY)
-    public void onEnable(@NonNull ProxyInitializeEvent event) {
+    public void onEnable(@NotNull ProxyInitializeEvent event) {
         concrete.onEnable();
     }
 
     @Subscribe(order = PostOrder.LATE)
-    public void onDisable(@NonNull ProxyShutdownEvent event) {
+    public void onDisable(@NotNull ProxyShutdownEvent event) {
         concrete.onDisable();
     }
 
-    private void loadJars(@NonNull File jarsDir, @NonNull PluginManager pluginManager) throws IOException {
+    private void loadJars(@NotNull File jarsDir, @NotNull PluginManager pluginManager) throws IOException {
         if (jarsDir.exists() && !jarsDir.isDirectory()) {
             Files.delete(jarsDir.toPath());
         }
@@ -118,16 +118,6 @@ public class VelocityBootstrap {
         }
 
         File cacheDir = new File(jarsDir, "cache");
-
-        Artifact.Builder checkerframework = Artifact.builder(getCheckerFrameworkPackage(), "checker", "${checkerframework.version}", cacheDir)
-            .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
-        buildRelocateInject(checkerframework, jarsDir, Arrays.asList(
-            new Relocation(getAnnotatedJdkPackage(), "me.egg82.antivpn.external." + getAnnotatedJdkPackage()),
-            new Relocation(getAnnotatorPackage(), "me.egg82.antivpn.external." + getAnnotatorPackage()),
-            new Relocation(getCheckerFrameworkPackage(), "me.egg82.antivpn.external." + getCheckerFrameworkPackage()),
-            new Relocation(getJmlSpecsPackage(), "me.egg82.antivpn.external." + getJmlSpecsPackage()),
-            new Relocation(getSceneLibPackage(), "me.egg82.antivpn.external." + getSceneLibPackage())
-        ), pluginManager, "Checker Framework");
 
         Artifact.Builder caffeine = Artifact.builder("com.github.ben-manes.caffeine", "caffeine", "${caffeine.version}", cacheDir)
             .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
@@ -177,14 +167,6 @@ public class VelocityBootstrap {
             .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
         buildRelocateInject(fastutil, jarsDir, Collections.singletonList(new Relocation(getFastUtilPackage(), "me.egg82.antivpn.external." + getFastUtilPackage())), pluginManager, "FastUtil");
 
-        Artifact.Builder mcleaks = Artifact.builder("me.gong", "mcleaks-api", "${mcleaks.version}", cacheDir)
-            .addRepository(Repository.builder("https://nexus.wesjd.net/repository/thirdparty/").addProxy("https://nexus.egg82.me/repository/wesjd/").build());
-        buildRelocateInject(mcleaks, jarsDir, Arrays.asList(
-            new Relocation(getMcLeaksPackage(), "me.egg82.antivpn.external." + getMcLeaksPackage()),
-            new Relocation(getOkhttp3Package(), "me.egg82.antivpn.external." + getOkhttp3Package()),
-            new Relocation(getOkioPackage(), "me.egg82.antivpn.external." + getOkioPackage())
-        ), pluginManager, "MC Leaks API");
-
         Artifact.Builder javassist = Artifact.builder("org.javassist", getJavassistPackage(), "${javassist.version}", cacheDir)
             .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
         buildRelocateInject(javassist, jarsDir, Collections.singletonList(new Relocation(getJavassistPackage(), "me.egg82.antivpn.external." + getJavassistPackage())), pluginManager, "Javassist");
@@ -211,56 +193,40 @@ public class VelocityBootstrap {
     }
 
     // Prevent Maven from relocating these
-    private @NonNull String getAnnotatedJdkPackage() { return new String(new byte[] {'a', 'n', 'n', 'o', 't', 'a', 't', 'e', 'd', '-', 'j', 'd', 'k'}); }
+    private @NotNull String getCaffeinePackage() { return new String(new byte[] {'c', 'o', 'm', '.', 'g', 'i', 't', 'h', 'u', 'b', '.', 'b', 'e', 'n', 'm', 'a', 'n', 'e', 's', '.', 'c', 'a', 'f', 'f', 'e', 'i', 'n', 'e'}); }
 
-    private @NonNull String getAnnotatorPackage() { return new String(new byte[] {'a', 'n', 'n', 'o', 't', 'a', 't', 'o', 'r'}); }
+    private @NotNull String getInetIpaddrPackage() { return new String(new byte[] {'i', 'n', 'e', 't', '.', 'i', 'p', 'a', 'd', 'd', 'r'}); }
 
-    private @NonNull String getCheckerFrameworkPackage() { return new String(new byte[] {'o', 'r', 'g', '.', 'c', 'h', 'e', 'c', 'k', 'e', 'r', 'f', 'r', 'a', 'm', 'e', 'w', 'o', 'r', 'k'}); }
+    private @NotNull String getRabbitMqPackage() { return new String(new byte[] {'c', 'o', 'm', '.', 'r', 'a', 'b', 'b', 'i', 't', 'm', 'q'}); }
 
-    private @NonNull String getJmlSpecsPackage() { return new String(new byte[] {'o', 'r', 'g', '.', 'j', 'm', 'l', 's', 'p', 'e', 'c', 's'}); }
+    private @NotNull String getEbeanPackage() { return new String(new byte[] {'i', 'o', '.', 'e', 'b', 'e', 'a', 'n'}); }
 
-    private @NonNull String getSceneLibPackage() { return new String(new byte[] {'s', 'c', 'e', 'n', 'e', 'l', 'i', 'b'}); }
+    private @NotNull String getEbeanInternalPackage() { return new String(new byte[] {'i', 'o', '.', 'e', 'b', 'e', 'a', 'n', 'i', 'n', 't', 'e', 'r', 'n', 'a', 'l'}); }
 
-    private @NonNull String getCaffeinePackage() { return new String(new byte[] {'c', 'o', 'm', '.', 'g', 'i', 't', 'h', 'u', 'b', '.', 'b', 'e', 'n', 'm', 'a', 'n', 'e', 's', '.', 'c', 'a', 'f', 'f', 'e', 'i', 'n', 'e'}); }
+    private @NotNull String getEbeanServicePackage() { return new String(new byte[] {'i', 'o', '.', 'e', 'b', 'e', 'a', 'n', 's', 'e', 'r', 'v', 'i', 'c', 'e'}); }
 
-    private @NonNull String getInetIpaddrPackage() { return new String(new byte[] {'i', 'n', 'e', 't', '.', 'i', 'p', 'a', 'd', 'd', 'r'}); }
+    private @NotNull String getFastUtilPackage() { return new String(new byte[] {'i', 't', '.', 'u', 'n', 'i', 'm', 'i', '.', 'd', 's', 'i', '.', 'f', 'a', 's', 't', 'u', 't', 'i', 'l'}); }
 
-    private @NonNull String getRabbitMqPackage() { return new String(new byte[] {'c', 'o', 'm', '.', 'r', 'a', 'b', 'b', 'i', 't', 'm', 'q'}); }
+    private @NotNull String getJavassistPackage() { return new String(new byte[] {'j', 'a', 'v', 'a', 's', 's', 'i', 's', 't'}); }
 
-    private @NonNull String getEbeanPackage() { return new String(new byte[] {'i', 'o', '.', 'e', 'b', 'e', 'a', 'n'}); }
+    private @NotNull String getJedisPackage() { return new String(new byte[] {'r', 'e', 'd', 'i', 's', '.', 'c', 'l', 'i', 'e', 'n', 't', 's', '.', 'j', 'e', 'd', 'i', 's'}); }
 
-    private @NonNull String getEbeanInternalPackage() { return new String(new byte[] {'i', 'o', '.', 'e', 'b', 'e', 'a', 'n', 'i', 'n', 't', 'e', 'r', 'n', 'a', 'l'}); }
-
-    private @NonNull String getEbeanServicePackage() { return new String(new byte[] {'i', 'o', '.', 'e', 'b', 'e', 'a', 'n', 's', 'e', 'r', 'v', 'i', 'c', 'e'}); }
-
-    private @NonNull String getFastUtilPackage() { return new String(new byte[] {'i', 't', '.', 'u', 'n', 'i', 'm', 'i', '.', 'd', 's', 'i', '.', 'f', 'a', 's', 't', 'u', 't', 'i', 'l'}); }
-
-    private @NonNull String getMcLeaksPackage() { return new String(new byte[] {'m', 'e', '.', 'g', 'o', 'n', 'g', '.', 'm', 'c', 'l', 'e', 'a', 'k', 's'}); }
-
-    private @NonNull String getOkhttp3Package() { return new String(new byte[] {'o', 'k', 'h', 't', 't', 'p'}); }
-
-    private @NonNull String getOkioPackage() { return new String(new byte[] {'o', 'k', 'i', 'o'}); }
-
-    private @NonNull String getJavassistPackage() { return new String(new byte[] {'j', 'a', 'v', 'a', 's', 's', 'i', 's', 't'}); }
-
-    private @NonNull String getJedisPackage() { return new String(new byte[] {'r', 'e', 'd', 'i', 's', '.', 'c', 'l', 'i', 'e', 'n', 't', 's', '.', 'j', 'e', 'd', 'i', 's'}); }
-
-    private void printLatest(@NonNull String friendlyName) {
+    private void printLatest(@NotNull String friendlyName) {
         proxy.getConsoleCommandSource().sendMessage(VelocityLogUtil.HEADING
             .append(Component.text("Checking version of ", NamedTextColor.YELLOW))
             .append(Component.text(friendlyName, NamedTextColor.WHITE))
         );
     }
 
-    private void buildInject(Artifact.Builder builder, @NonNull File jarsDir, @NonNull PluginManager pluginManager, @NonNull String friendlyName) {
+    private void buildInject(Artifact.Builder builder, @NotNull File jarsDir, @NotNull PluginManager pluginManager, @NotNull String friendlyName) {
         buildInject(builder, jarsDir, pluginManager, friendlyName, 0);
     }
 
-    private void buildInject(Artifact.Builder builder, @NonNull File jarsDir, @NonNull PluginManager pluginManager, @NonNull String friendlyName, int depth) {
+    private void buildInject(Artifact.Builder builder, @NotNull File jarsDir, @NotNull PluginManager pluginManager, @NotNull String friendlyName, int depth) {
         downloadPool.submit(() -> buildInjectWait(builder, jarsDir, pluginManager, friendlyName, depth));
     }
 
-    private void buildInjectWait(Artifact.Builder builder, @NonNull File jarsDir, @NonNull PluginManager pluginManager, @NonNull String friendlyName, int depth) {
+    private void buildInjectWait(Artifact.Builder builder, @NotNull File jarsDir, @NotNull PluginManager pluginManager, @NotNull String friendlyName, int depth) {
         Exception lastEx;
         try {
             injectArtifact(builder.build(), jarsDir, pluginManager, friendlyName, depth, null);
@@ -286,15 +252,15 @@ public class VelocityBootstrap {
         }
     }
 
-    private void buildRelocateInject(Artifact.Builder builder, @NonNull File jarsDir, @NonNull List<Relocation> rules, @NonNull PluginManager pluginManager, @NonNull String friendlyName) {
+    private void buildRelocateInject(Artifact.Builder builder, @NotNull File jarsDir, @NotNull List<Relocation> rules, @NotNull PluginManager pluginManager, @NotNull String friendlyName) {
         buildRelocateInject(builder, jarsDir, rules, pluginManager, friendlyName, 0);
     }
 
-    private void buildRelocateInject(Artifact.Builder builder, @NonNull File jarsDir, @NonNull List<Relocation> rules, @NonNull PluginManager pluginManager, @NonNull String friendlyName, int depth) {
+    private void buildRelocateInject(Artifact.Builder builder, @NotNull File jarsDir, @NotNull List<Relocation> rules, @NotNull PluginManager pluginManager, @NotNull String friendlyName, int depth) {
         downloadPool.submit(() -> buildRelocateInjectWait(builder, jarsDir, rules, pluginManager, friendlyName, depth));
     }
 
-    private void buildRelocateInjectWait(Artifact.Builder builder, @NonNull File jarsDir, @NonNull List<Relocation> rules, @NonNull PluginManager pluginManager, @NonNull String friendlyName, int depth) {
+    private void buildRelocateInjectWait(Artifact.Builder builder, @NotNull File jarsDir, @NotNull List<Relocation> rules, @NotNull PluginManager pluginManager, @NotNull String friendlyName, int depth) {
         Exception lastEx;
         try {
             injectArtifact(builder.build(), jarsDir, pluginManager, friendlyName, depth, rules);
@@ -320,7 +286,7 @@ public class VelocityBootstrap {
         }
     }
 
-    private void injectArtifact(@NonNull Artifact artifact, @NonNull File jarsDir, @NonNull PluginManager pluginManager, String friendlyName, int depth, List<Relocation> rules) throws IOException, IllegalAccessException, InvocationTargetException, URISyntaxException, XPathExpressionException, SAXException {
+    private void injectArtifact(@NotNull Artifact artifact, @NotNull File jarsDir, @NotNull PluginManager pluginManager, String friendlyName, int depth, List<Relocation> rules) throws IOException, IllegalAccessException, InvocationTargetException, URISyntaxException, XPathExpressionException, SAXException {
         File output = new File(jarsDir, artifact.getGroupId()
             + "-" + artifact.getArtifactId()
             + "-" + artifact.getRealVersion() + ".jar"
@@ -359,7 +325,7 @@ public class VelocityBootstrap {
         }
     }
 
-    private void injectArtifact(Artifact.Builder builder, @NonNull File jarsDir, @NonNull PluginManager pluginManager, List<Relocation> rules) throws IOException, IllegalAccessException, InvocationTargetException {
+    private void injectArtifact(Artifact.Builder builder, @NotNull File jarsDir, @NotNull PluginManager pluginManager, List<Relocation> rules) throws IOException, IllegalAccessException, InvocationTargetException {
         File[] files = jarsDir.listFiles();
         if (files == null) {
             throw new IOException();

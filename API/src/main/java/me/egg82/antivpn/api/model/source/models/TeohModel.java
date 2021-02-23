@@ -2,53 +2,45 @@ package me.egg82.antivpn.api.model.source.models;
 
 import flexjson.JSON;
 import java.util.Objects;
+import org.jetbrains.annotations.Nullable;
 
 public class TeohModel implements SourceModel {
-    private String message;
-    private String ip;
-    private String organization;
-    private String asn;
-    private String type;
-    private String risk;
+    private String message = null;
+    private String ip = null;
+    private String organization = null;
+    private String asn = null;
+    private String type = null;
+    private String risk = null;
     @JSON(name = "is_hosting")
-    private int hosting;
+    private int hosting = -1;
     @JSON(name = "vpn_or_proxy")
-    private String vpnOrProxy;
+    private String vpnOrProxy = null;
 
-    public TeohModel() {
-        this.message = null;
-        this.ip = null;
-        this.organization = null;
-        this.asn = null;
-        this.type = null;
-        this.risk = null;
-        this.hosting = -1;
-        this.vpnOrProxy = null;
-    }
+    public TeohModel() { }
 
-    public String getMessage() { return message; }
+    public @Nullable String getMessage() { return message; }
 
-    public void setMessage(String message) { this.message = message; }
+    public void setMessage(@Nullable String message) { this.message = message; }
 
-    public String getIp() { return ip; }
+    public @Nullable String getIp() { return ip; }
 
-    public void setIp(String ip) { this.ip = ip; }
+    public void setIp(@Nullable String ip) { this.ip = ip; }
 
-    public String getOrganization() { return organization; }
+    public @Nullable String getOrganization() { return organization; }
 
-    public void setOrganization(String organization) { this.organization = organization; }
+    public void setOrganization(@Nullable String organization) { this.organization = organization; }
 
-    public String getAsn() { return asn; }
+    public @Nullable String getAsn() { return asn; }
 
-    public void setAsn(String asn) { this.asn = asn; }
+    public void setAsn(@Nullable String asn) { this.asn = asn; }
 
-    public String getType() { return type; }
+    public @Nullable String getType() { return type; }
 
-    public void setType(String type) { this.type = type; }
+    public void setType(@Nullable String type) { this.type = type; }
 
-    public String getRisk() { return risk; }
+    public @Nullable String getRisk() { return risk; }
 
-    public void setRisk(String risk) { this.risk = risk; }
+    public void setRisk(@Nullable String risk) { this.risk = risk; }
 
     @JSON(name = "is_hosting")
     public int getHosting() { return hosting; }
@@ -57,10 +49,10 @@ public class TeohModel implements SourceModel {
     public void setHosting(int hosting) { this.hosting = hosting; }
 
     @JSON(name = "vpn_or_proxy")
-    public String getVpnOrProxy() { return vpnOrProxy; }
+    public @Nullable String getVpnOrProxy() { return vpnOrProxy; }
 
     @JSON(name = "vpn_or_proxy")
-    public void setVpnOrProxy(String vpnOrProxy) { this.vpnOrProxy = vpnOrProxy; }
+    public void setVpnOrProxy(@Nullable String vpnOrProxy) { this.vpnOrProxy = vpnOrProxy; }
 
     public boolean equals(Object o) {
         if (this == o) return true;

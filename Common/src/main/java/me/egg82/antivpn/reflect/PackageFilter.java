@@ -6,7 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import me.egg82.antivpn.config.ConfigUtil;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.NotNull;
 import org.reflections.ReflectionUtils;
 import org.reflections.Reflections;
 import org.reflections.scanners.ResourcesScanner;
@@ -23,7 +23,7 @@ public class PackageFilter {
 
     private PackageFilter() { }
 
-    public static <T> @NonNull List<Class<T>> getClasses(@NonNull Class<T> clazz, @NonNull String pkg, boolean recursive, boolean keepInterfaces, boolean keepAbstracts, String... excludePackages) {
+    public static <T> @NotNull List<@NotNull Class<T>> getClasses(@NotNull Class<T> clazz, @NotNull String pkg, boolean recursive, boolean keepInterfaces, boolean keepAbstracts, String... excludePackages) {
         String excludeString = null;
         if (excludePackages != null && excludePackages.length > 0) {
             for (int i = 0; i < excludePackages.length; i++) {
@@ -102,7 +102,7 @@ public class PackageFilter {
         return list;
     }
 
-    public static <T> @NonNull List<Class<? extends T>> getClassesParameterized(@NonNull Class<T> clazz, @NonNull String pkg, boolean recursive, boolean keepInterfaces, boolean keepAbstracts, String... excludePackages) {
+    public static <T> @NotNull List<@NotNull Class<? extends T>> getClassesParameterized(@NotNull Class<T> clazz, @NotNull String pkg, boolean recursive, boolean keepInterfaces, boolean keepAbstracts, String... excludePackages) {
         String excludeString = null;
         if (excludePackages != null && excludePackages.length > 0) {
             for (int i = 0; i < excludePackages.length; i++) {

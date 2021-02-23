@@ -16,8 +16,8 @@ import me.egg82.antivpn.utils.TimeUtil;
 import me.egg82.antivpn.web.WebRequest;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class BungeePlayerInfo implements PlayerInfo {
     private final UUID uuid;
@@ -38,7 +38,7 @@ public class BungeePlayerInfo implements PlayerInfo {
         headers.put("Accept-Language", "en-US,en;q=0.8");
     }
 
-    BungeePlayerInfo(@NonNull UUID uuid) throws IOException {
+    BungeePlayerInfo(@NotNull UUID uuid) throws IOException {
         this.uuid = uuid;
 
         Optional<String> name = Optional.ofNullable(uuidCache.getIfPresent(uuid));
@@ -69,7 +69,7 @@ public class BungeePlayerInfo implements PlayerInfo {
         }
     }
 
-    BungeePlayerInfo(@NonNull String name) throws IOException {
+    BungeePlayerInfo(@NotNull String name) throws IOException {
         this.name = name;
 
         Optional<UUID> uuid = Optional.ofNullable(nameCache.getIfPresent(name));
@@ -100,13 +100,13 @@ public class BungeePlayerInfo implements PlayerInfo {
         }
     }
 
-    public @NonNull UUID getUUID() { return uuid; }
+    public @NotNull UUID getUUID() { return uuid; }
 
-    public @NonNull String getName() { return name; }
+    public @NotNull String getName() { return name; }
 
-    public @NonNull ImmutableList<ProfileModel.ProfilePropertyModel> getProperties() { return ImmutableList.copyOf(properties); }
+    public @NotNull ImmutableList<ProfileModel.ProfilePropertyModel> getProperties() { return ImmutableList.copyOf(properties); }
 
-    private static @Nullable String nameExpensive(@NonNull UUID uuid) throws IOException {
+    private static @Nullable String nameExpensive(@NotNull UUID uuid) throws IOException {
         // Currently-online lookup
         ProxiedPlayer player = ProxyServer.getInstance().getPlayer(uuid);
         if (player != null) {
@@ -138,7 +138,7 @@ public class BungeePlayerInfo implements PlayerInfo {
         throw new IOException("Mojang API response code: " + status);
     }
 
-    private static @Nullable UUID uuidExpensive(@NonNull String name) throws IOException {
+    private static @Nullable UUID uuidExpensive(@NotNull String name) throws IOException {
         // Currently-online lookup
         ProxiedPlayer player = ProxyServer.getInstance().getPlayer(name);
         if (player != null) {
@@ -169,7 +169,7 @@ public class BungeePlayerInfo implements PlayerInfo {
         throw new IOException("Mojang API response code: " + status);
     }
 
-    private static @Nullable List<ProfileModel.ProfilePropertyModel> propertiesExpensive(@NonNull UUID uuid) throws IOException {
+    private static @Nullable List<ProfileModel.ProfilePropertyModel> propertiesExpensive(@NotNull UUID uuid) throws IOException {
         // Network lookup
         HttpURLConnection conn = WebRequest.builder(new URL("https://sessionserver.mojang.com/session/minecraft/profile/" + uuid.toString().replace("-", "") + "?unsigned=false")).timeout(new TimeUtil.Time(2500L, TimeUnit.MILLISECONDS)).userAgent("egg82/PlayerInfo").header("Accept", "application/json").build().getConnection();
         int status = conn.getResponseCode();

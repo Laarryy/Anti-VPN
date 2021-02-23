@@ -11,14 +11,14 @@ import me.egg82.antivpn.api.event.source.GenericSourceRegisterEvent;
 import me.egg82.antivpn.api.event.type.Cancellable;
 import me.egg82.antivpn.api.model.source.models.SourceModel;
 import net.engio.mbassy.bus.IMessagePublication;
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class GenericSourceManager implements SourceManager {
     private final List<Source<? extends SourceModel>> sources = new CopyOnWriteArrayList<>();
     private final Object sourceLock = new Object();
 
-    public @Nullable Source<? extends SourceModel> getSource(@NonNull String name) {
+    public @Nullable Source<? extends SourceModel> getSource(@NotNull String name) {
         for (Source<? extends SourceModel> source : sources) {
             if (source.getName().equals(name)) {
                 return source;
@@ -27,7 +27,7 @@ public class GenericSourceManager implements SourceManager {
         return null;
     }
 
-    public @Nullable <T extends SourceModel> Source<T> getSource(@NonNull String name, @NonNull Class<T> modelClass) {
+    public @Nullable <T extends SourceModel> Source<T> getSource(@NotNull String name, @NotNull Class<T> modelClass) {
         for (Source<? extends SourceModel> source : sources) {
             if (source.getName().equals(name) && source.getModelClass().isAssignableFrom(modelClass)) {
                 return (Source<T>) source;
@@ -36,7 +36,7 @@ public class GenericSourceManager implements SourceManager {
         return null;
     }
 
-    public boolean registerSource(@NonNull Source<? extends SourceModel> source, int index) {
+    public boolean registerSource(@NotNull Source<? extends SourceModel> source, int index) {
         synchronized (sourceLock) {
             for (Source<? extends SourceModel> s : sources) {
                 if (s.getName().equals(source.getName())) {
@@ -57,7 +57,7 @@ public class GenericSourceManager implements SourceManager {
         }
     }
 
-    public boolean deregisterSource(@NonNull Source<? extends SourceModel> source) {
+    public boolean deregisterSource(@NotNull Source<? extends SourceModel> source) {
         synchronized (sourceLock) {
             for (Iterator<Source<? extends SourceModel>> i = sources.iterator(); i.hasNext();) {
                 Source<? extends SourceModel> s = i.next();
@@ -78,5 +78,5 @@ public class GenericSourceManager implements SourceManager {
         }
     }
 
-    public @NonNull List<Source<? extends SourceModel>> getSources() { return ImmutableList.copyOf(sources); }
+    public @NotNull List<@NotNull Source<? extends SourceModel>> getSources() { return ImmutableList.copyOf(sources); }
 }

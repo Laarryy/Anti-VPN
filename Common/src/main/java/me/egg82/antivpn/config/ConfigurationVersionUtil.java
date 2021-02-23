@@ -6,19 +6,15 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import me.egg82.antivpn.utils.TimeUtil;
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.jetbrains.annotations.NotNull;
 import org.spongepowered.configurate.CommentedConfigurationNode;
 import org.spongepowered.configurate.loader.ConfigurationLoader;
 import org.spongepowered.configurate.serialize.SerializationException;
 
 public class ConfigurationVersionUtil {
-    private static final Logger logger = LoggerFactory.getLogger(ConfigurationVersionUtil.class);
-
     private ConfigurationVersionUtil() { }
 
-    public static void conformVersion(@NonNull ConfigurationLoader<CommentedConfigurationNode> loader, @NonNull CommentedConfigurationNode config, @NonNull File fileOnDisk) throws IOException {
+    public static void conformVersion(@NotNull ConfigurationLoader<CommentedConfigurationNode> loader, @NotNull CommentedConfigurationNode config, @NotNull File fileOnDisk) throws IOException {
         double oldVersion = config.node("version").getDouble(1.0d);
 
         if (config.node("version").getDouble(1.0d) == 1.0d) {
@@ -72,6 +68,9 @@ public class ConfigurationVersionUtil {
         if (config.node("version").getDouble() == 5.0d) {
             to51(config);
         }
+        if (config.node("version").getDouble() == 5.1d) {
+            to52(config);
+        }
 
         if (config.node("version").getDouble() != oldVersion) {
             File backupFile = new File(fileOnDisk.getParent(), fileOnDisk.getName() + ".bak");
@@ -84,7 +83,7 @@ public class ConfigurationVersionUtil {
         }
     }
 
-    private static void to20(@NonNull CommentedConfigurationNode config) throws SerializationException {
+    private static void to20(@NotNull CommentedConfigurationNode config) throws SerializationException {
         // Rabbit -> Messaging
         boolean rabbitEnabled = config.node("rabbit", "enabled").getBoolean();
         String rabbitAddress = config.node("rabbit", "address").getString("");
@@ -112,7 +111,7 @@ public class ConfigurationVersionUtil {
         config.node("version").set(2.0d);
     }
 
-    private static void to21(@NonNull CommentedConfigurationNode config) throws SerializationException {
+    private static void to21(@NotNull CommentedConfigurationNode config) throws SerializationException {
         // Add consensus
         config.node("consensus").set(-1.0d);
 
@@ -120,7 +119,7 @@ public class ConfigurationVersionUtil {
         config.node("version").set(2.1d);
     }
 
-    private static void to22(@NonNull CommentedConfigurationNode config) throws SerializationException {
+    private static void to22(@NotNull CommentedConfigurationNode config) throws SerializationException {
         // Add stats
         config.node("stats", "usage").set(Boolean.TRUE);
         config.node("stats", "errors").set(Boolean.TRUE);
@@ -133,7 +132,7 @@ public class ConfigurationVersionUtil {
         config.node("version").set(2.2d);
     }
 
-    private static void to23(@NonNull CommentedConfigurationNode config) throws SerializationException {
+    private static void to23(@NotNull CommentedConfigurationNode config) throws SerializationException {
         // Add voxprox
         config.node("sources", "voxprox", "enabled").set(Boolean.FALSE);
         config.node("sources", "voxprox", "key").set("");
@@ -153,7 +152,7 @@ public class ConfigurationVersionUtil {
         config.node("version").set(2.3d);
     }
 
-    private static void to33(@NonNull CommentedConfigurationNode config) throws SerializationException {
+    private static void to33(@NotNull CommentedConfigurationNode config) throws SerializationException {
         // sql -> storage
         String sqlType = config.node("sql", "type").getString("sqlite");
         int sqlThreads = config.node("sql", "threads").getInt(2);
@@ -247,7 +246,7 @@ public class ConfigurationVersionUtil {
         config.node("version").set(3.3d);
     }
 
-    private static void to34(@NonNull CommentedConfigurationNode config) throws SerializationException {
+    private static void to34(@NotNull CommentedConfigurationNode config) throws SerializationException {
         // Add storage->data->SSL
         config.node("storage", "data", "ssl").set(Boolean.FALSE);
 
@@ -255,7 +254,7 @@ public class ConfigurationVersionUtil {
         config.node("version").set(3.4d);
     }
 
-    private static void to35(@NonNull CommentedConfigurationNode config) throws SerializationException {
+    private static void to35(@NotNull CommentedConfigurationNode config) throws SerializationException {
         // Remove IPDetector
         List<String> order = !config.node("sources", "order").empty() ? new ArrayList<>(config.node("sources", "order").getList(String.class)) : new ArrayList<>();
 
@@ -275,7 +274,7 @@ public class ConfigurationVersionUtil {
         config.node("version").set(3.5d);
     }
 
-    private static void to36(@NonNull CommentedConfigurationNode config) throws SerializationException {
+    private static void to36(@NotNull CommentedConfigurationNode config) throws SerializationException {
         // Add ipwarner
         config.node("sources", "ipwarner", "enabled").set(Boolean.FALSE);
         config.node("sources", "ipwarner", "key").set("");
@@ -295,7 +294,7 @@ public class ConfigurationVersionUtil {
         config.node("version").set(3.6d);
     }
 
-    private static void to37(@NonNull CommentedConfigurationNode config) throws SerializationException {
+    private static void to37(@NotNull CommentedConfigurationNode config) throws SerializationException {
         // Remove kick->enabled
         boolean kickEnabled = config.node("kick", "enabled").getBoolean(true);
 
@@ -330,7 +329,7 @@ public class ConfigurationVersionUtil {
         config.node("version").set(3.7d);
     }
 
-    private static void to38(@NonNull CommentedConfigurationNode config) throws SerializationException {
+    private static void to38(@NotNull CommentedConfigurationNode config) throws SerializationException {
         // Remove voxprox
         List<String> order = !config.node("sources", "order").empty() ? new ArrayList<>(config.node("sources", "order").getList(String.class)) : new ArrayList<>();
 
@@ -372,7 +371,7 @@ public class ConfigurationVersionUtil {
         config.node("version").set(3.8d);
     }
 
-    private static void to39(@NonNull CommentedConfigurationNode config) throws SerializationException {
+    private static void to39(@NotNull CommentedConfigurationNode config) throws SerializationException {
         // Add ip2proxy
         config.node("sources", "ip2proxy", "enabled").set(Boolean.TRUE);
         config.node("sources", "ip2proxy", "key").set("demo");
@@ -392,7 +391,7 @@ public class ConfigurationVersionUtil {
         config.node("version").set(3.9d);
     }
 
-    private static void to49(@NonNull CommentedConfigurationNode config) throws SerializationException {
+    private static void to49(@NotNull CommentedConfigurationNode config) throws SerializationException {
         // Move storage
         String storageMethod = config.node("storage", "method").getString("sqlite");
         String storageAddress = config.node("storage", "data", "address").getString("127.0.0.1:3306");
@@ -518,7 +517,7 @@ public class ConfigurationVersionUtil {
         config.node("version").set(4.9d);
     }
 
-    private static void to411(@NonNull CommentedConfigurationNode config) throws SerializationException {
+    private static void to411(@NotNull CommentedConfigurationNode config) throws SerializationException {
         // Add lang
         config.node("lang").set("en");
 
@@ -526,7 +525,7 @@ public class ConfigurationVersionUtil {
         config.node("version").set(4.11d);
     }
 
-    private static void to412(@NonNull CommentedConfigurationNode config) throws SerializationException {
+    private static void to412(@NotNull CommentedConfigurationNode config) throws SerializationException {
         // Add proxy to ipqualityscore
         config.node("sources", "ipqualityscore", "proxy").set(Boolean.FALSE);
 
@@ -546,7 +545,7 @@ public class ConfigurationVersionUtil {
         config.node("version").set(4.12d);
     }
 
-    private static void to413(@NonNull CommentedConfigurationNode config) throws SerializationException {
+    private static void to413(@NotNull CommentedConfigurationNode config) throws SerializationException {
         // Add private ranges to ignore
         List<String> ignoredIPs = !config.node("action", "ignore").empty() ? new ArrayList<>(config.node("action", "ignore").getList(String.class)) : new ArrayList<>();
 
@@ -572,7 +571,7 @@ public class ConfigurationVersionUtil {
         config.node("version").set(4.13d);
     }
 
-    private static void to50(@NonNull CommentedConfigurationNode config) throws SerializationException {
+    private static void to50(@NotNull CommentedConfigurationNode config) throws SerializationException {
         // storage->engines->type to storage->engines->name
         config.node("storage", "engines", "engine1").from(config.node("storage", "engines", "mysql"));
         config.node("storage", "engines", "engine2").from(config.node("storage", "engines", "sqlite"));
@@ -658,7 +657,7 @@ public class ConfigurationVersionUtil {
         config.node("version").set(5.0d);
     }
 
-    private static void to51(@NonNull CommentedConfigurationNode config) throws SerializationException {
+    private static void to51(@NotNull CommentedConfigurationNode config) throws SerializationException {
         // Set default engine2 from SQLite to H2
         String engine2 = config.node("storage", "engines", "engine2", "type").getString();
         if ("sqlite".equalsIgnoreCase(engine2)) {
@@ -668,5 +667,27 @@ public class ConfigurationVersionUtil {
 
         // Version
         config.node("version").set(5.1d);
+    }
+
+    private static void to52(@NotNull CommentedConfigurationNode config) throws SerializationException {
+        // Update lang from en to en-US
+        if (config.node("lang").getString("en").equalsIgnoreCase("en")) {
+            config.node("lang").set("en-US");
+        }
+
+        // Update action->vpn/mcleaks->kick-message to use minimessage format
+        if (config.node("action", "vpn", "kick-message").getString("&cPlease disconnect from your proxy or VPN before re-joining!").equalsIgnoreCase("&cPlease disconnect from your proxy or VPN before re-joining!")) {
+            config.node("action", "vpn", "kick-message").set("<red>Please disconnect from your proxy or VPN before re-joining!</red>");
+        }
+        if (config.node("action", "mcleaks", "kick-message").getString("&cPlease discontinue your use of an MCLeaks account!").equalsIgnoreCase("&cPlease discontinue your use of an MCLeaks account!")) {
+            config.node("action", "mcleaks", "kick-message").set("<red>Please discontinue your use of an MCLeaks account!</red>");
+        }
+
+        // Add permissions->admin/bypass
+        config.node("permissions", "admin").set("avpn.admin");
+        config.node("permissions", "bypass").set("avpn.bypass");
+
+        // Version
+        config.node("version").set(5.2d);
     }
 }

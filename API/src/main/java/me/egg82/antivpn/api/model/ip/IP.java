@@ -2,8 +2,8 @@ package me.egg82.antivpn.api.model.ip;
 
 import java.io.Serializable;
 import java.net.InetAddress;
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * An IP which contains information about various statuses it holds.
@@ -14,21 +14,21 @@ public interface IP extends Serializable {
      *
      * @return the IP
      */
-    @NonNull InetAddress getIP();
+    @NotNull InetAddress getIP();
 
     /**
      * Returns the IP's {@link AlgorithmMethod} type
      *
      * @return the AlgorithmMethod used for this IP
      */
-    @NonNull AlgorithmMethod getType();
+    @NotNull AlgorithmMethod getType();
 
     /**
      * Sets the IP's {@link AlgorithmMethod} type
      *
      * @param type the AlgorithmMethod to use for this IP
      */
-    void setType(@NonNull AlgorithmMethod type);
+    void setType(@NotNull AlgorithmMethod type);
 
     /**
      * Returns the IP's cascade status.

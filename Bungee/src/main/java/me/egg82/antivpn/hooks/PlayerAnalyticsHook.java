@@ -24,8 +24,8 @@ import me.egg82.antivpn.config.ConfigUtil;
 import me.egg82.antivpn.utils.ExceptionUtil;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -197,7 +197,7 @@ public class PlayerAnalyticsHook implements PluginHook {
                 iconFamily = Family.SOLID,
                 iconColor = Color.NONE
         )
-        public boolean getUsingVpn(@NonNull UUID playerID) {
+        public boolean getUsingVpn(@NotNull UUID playerID) {
             ProxiedPlayer player = ProxyServer.getInstance().getPlayer(playerID);
             if (player == null) {
                 return false;
@@ -239,7 +239,7 @@ public class PlayerAnalyticsHook implements PluginHook {
                 iconFamily = Family.SOLID,
                 iconColor = Color.NONE
         )
-        public boolean getMcLeaks(@NonNull UUID playerId) {
+        public boolean getMcLeaks(@NotNull UUID playerId) {
             PlayerManager playerManager = VPNAPIProvider.getInstance().getPlayerManager();
 
             try {
@@ -253,7 +253,7 @@ public class PlayerAnalyticsHook implements PluginHook {
             return false;
         }
 
-        private @Nullable String getIp(@NonNull ProxiedPlayer player) {
+        private @Nullable String getIp(@NotNull ProxiedPlayer player) {
             InetSocketAddress address = player.getAddress();
             if (address == null) {
                 return null;
@@ -265,6 +265,6 @@ public class PlayerAnalyticsHook implements PluginHook {
             return host.getHostAddress();
         }
 
-        public @NonNull CallEvents[] callExtensionMethodsOn() { return events; }
+        public @NotNull CallEvents[] callExtensionMethodsOn() { return events; }
     }
 }

@@ -9,11 +9,11 @@ import me.egg82.antivpn.api.APIException;
 import me.egg82.antivpn.api.model.source.models.ProxyCheckModel;
 import me.egg82.antivpn.utils.ValidationUtil;
 import me.egg82.antivpn.web.WebRequest;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.NotNull;
 import org.spongepowered.configurate.ConfigurationNode;
 
 public class ProxyCheck extends AbstractSource<ProxyCheckModel> {
-    public @NonNull String getName() { return "proxycheck"; }
+    public @NotNull String getName() { return "proxycheck"; }
 
     public boolean isKeyRequired() { return false; }
 
@@ -21,17 +21,17 @@ public class ProxyCheck extends AbstractSource<ProxyCheckModel> {
         super(ProxyCheckModel.class);
     }
 
-    public @NonNull CompletableFuture<Boolean> getResult(@NonNull String ip) {
+    public @NotNull CompletableFuture<@NotNull Boolean> getResult(@NotNull String ip) {
         return getRawResponse(ip).thenApply(model -> {
             if (!"ok".equalsIgnoreCase(model.getStatus())) {
-                throw new APIException(model.getMessage().contains("Key"), "Could not get result from " + getName() + " (" + model.getMessage() + ")");
+                throw new APIException(model.getMessage() != null && model.getMessage().contains("Key"), "Could not get result from " + getName() + " (" + model.getMessage() + ")");
             }
 
-            return "yes".equalsIgnoreCase(model.getIp().getProxy());
+            return model.getIp() != null && "yes".equalsIgnoreCase(model.getIp().getProxy());
         });
     }
 
-    public @NonNull CompletableFuture<ProxyCheckModel> getRawResponse(@NonNull String ip) {
+    public @NotNull CompletableFuture<@NotNull ProxyCheckModel> getRawResponse(@NotNull String ip) {
         return CompletableFuture.supplyAsync(() -> {
             if (!ValidationUtil.isValidIp(ip)) {
                 throw new IllegalArgumentException("ip is invalid.");
@@ -41,7 +41,7 @@ public class ProxyCheck extends AbstractSource<ProxyCheckModel> {
 
             String key = sourceConfigNode.node("key").getString();
 
-            WebRequest.Builder builder = getDefaultBuilder("https://proxycheck.io/v2/" + ip + "?vpn=1" + ((key != null && !key.isEmpty()) ? "&key=" + key : ""), getCachedConfig().getTimeout());
+            WebRequest.Builder builder = getDefaultBuilder("https://proxycheck.io/v2/" + ip + "?vpn=1" + ((key != null && !key.isEmpty()) ? "&key=" + key : ""));
             HttpURLConnection conn = getConnection(builder.build());
             String str = getString(conn);
 

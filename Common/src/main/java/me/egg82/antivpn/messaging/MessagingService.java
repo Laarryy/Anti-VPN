@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.UUID;
 import java.util.concurrent.TimeoutException;
 import me.egg82.antivpn.messaging.packets.Packet;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.NotNull;
 
 public interface MessagingService {
     String getName();
@@ -12,5 +12,5 @@ public interface MessagingService {
     void close();
     boolean isClosed();
 
-    void sendPacket(@NonNull UUID messageId, @NonNull Packet packet) throws IOException, TimeoutException;
+    void sendPacket(@NotNull UUID messageId, @NotNull Packet packet) throws IOException, TimeoutException;
 }

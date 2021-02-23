@@ -5,9 +5,10 @@ import java.util.UUID;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import me.egg82.antivpn.utils.ExceptionUtil;
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import me.egg82.antivpn.lang.I18NManager;
+import me.egg82.antivpn.logging.GELFLogger;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,7 +21,7 @@ public abstract class AbstractPlayer implements Player {
 
     private final int hc;
 
-    protected AbstractPlayer(@NonNull UUID uuid, String name, boolean mcleaks) {
+    protected AbstractPlayer(@NotNull UUID uuid, String name, boolean mcleaks, @NotNull I18NManager consoleLocalizationManager) {
         this.uuid = uuid;
         if (name == null) {
             try {
@@ -28,7 +29,7 @@ public abstract class AbstractPlayer implements Player {
             } catch (InterruptedException ignored) {
                 Thread.currentThread().interrupt();
             } catch (ExecutionException | CancellationException ex) {
-                ExceptionUtil.handleException(ex, logger);
+                GELFLogger.exception(logger, ex, consoleLocalizationManager);
             }
         }
         this.name = name;
@@ -37,7 +38,7 @@ public abstract class AbstractPlayer implements Player {
         this.hc = Objects.hash(uuid);
     }
 
-    public @NonNull UUID getUuid() { return uuid; }
+    public @NotNull UUID getUuid() { return uuid; }
 
     public @Nullable String getName() { return name; }
 
@@ -45,7 +46,7 @@ public abstract class AbstractPlayer implements Player {
 
     public void setMcLeaks(boolean status) { this.mcleaks = status; }
 
-    protected abstract @NonNull CompletableFuture<String> fetchName(@NonNull UUID uuid);
+    protected abstract @NotNull CompletableFuture<@NotNull String> fetchName(@NotNull UUID uuid);
 
     public boolean equals(Object o) {
         if (this == o) return true;

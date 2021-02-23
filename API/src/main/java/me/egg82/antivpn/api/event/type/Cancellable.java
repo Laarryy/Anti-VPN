@@ -1,7 +1,7 @@
 package me.egg82.antivpn.api.event.type;
 
 import java.util.concurrent.atomic.AtomicBoolean;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Represents an event that can be cancelled
@@ -12,7 +12,7 @@ public interface Cancellable {
      *
      * @return the cancellation
      */
-    @NonNull AtomicBoolean cancellationState();
+    @NotNull AtomicBoolean cancellationState();
 
     /**
      * Returns true if the event is currently cancelled.

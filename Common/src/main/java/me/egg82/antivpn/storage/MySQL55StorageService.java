@@ -5,20 +5,20 @@ import io.ebean.config.dbplatform.mysql.MySql55Platform;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.Properties;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.NotNull;
 
 public class MySQL55StorageService extends AbstractJDBCStorageService {
-    private MySQL55StorageService(@NonNull String name) {
+    private MySQL55StorageService(@NotNull String name) {
         super(name);
     }
 
-    public static Builder builder(@NonNull String name) { return new MySQL55StorageService.Builder(name); }
+    public static @NotNull Builder builder(@NotNull String name) { return new MySQL55StorageService.Builder(name); }
 
     public static class Builder {
         private final MySQL55StorageService service;
         private final HikariConfig config = new HikariConfig();
 
-        private Builder(@NonNull String name) {
+        private Builder(@NotNull String name) {
             service = new MySQL55StorageService(name);
 
             // Baseline
@@ -47,18 +47,18 @@ public class MySQL55StorageService extends AbstractJDBCStorageService {
             config.addDataSourceProperty("elideSetAutoCommits", "true");
         }
 
-        public MySQL55StorageService.Builder url(@NonNull String address, int port, @NonNull String database) {
+        public @NotNull MySQL55StorageService.Builder url(@NotNull String address, int port, @NotNull String database) {
             config.setJdbcUrl("jdbc:mysql://" + address + ":" + port + "/" + database);
             return this;
         }
 
-        public MySQL55StorageService.Builder credentials(@NonNull String user, @NonNull String pass) {
+        public @NotNull MySQL55StorageService.Builder credentials(@NotNull String user, @NotNull String pass) {
             config.setUsername(user);
             config.setPassword(pass);
             return this;
         }
 
-        public MySQL55StorageService.Builder options(@NonNull String options) throws IOException {
+        public @NotNull MySQL55StorageService.Builder options(@NotNull String options) throws IOException {
             options = !options.isEmpty() && options.charAt(0) == '?' ? options.substring(1) : options;
             Properties p = new Properties();
             p.load(new StringReader(options.replace("&", "\n")));
@@ -66,19 +66,19 @@ public class MySQL55StorageService extends AbstractJDBCStorageService {
             return this;
         }
 
-        public MySQL55StorageService.Builder poolSize(int min, int max) {
+        public @NotNull MySQL55StorageService.Builder poolSize(int min, int max) {
             config.setMaximumPoolSize(max);
             config.setMinimumIdle(min);
             return this;
         }
 
-        public MySQL55StorageService.Builder life(long lifetime, long timeout) {
+        public @NotNull MySQL55StorageService.Builder life(long lifetime, long timeout) {
             config.setMaxLifetime(lifetime);
             config.setConnectionTimeout(timeout);
             return this;
         }
 
-        public @NonNull MySQL55StorageService build() {
+        public @NotNull MySQL55StorageService build() {
             service.createSource(config, new MySql55Platform(), true, "mysql55");
             return service;
         }

@@ -37,7 +37,7 @@ import me.egg82.antivpn.hooks.LuckPermsHook;
 import me.egg82.antivpn.hooks.PlayerAnalyticsHook;
 import me.egg82.antivpn.hooks.PluginHook;
 import me.egg82.antivpn.lang.LanguageFileUtil;
-import me.egg82.antivpn.lang.Message;
+import me.egg82.antivpn.lang.MessageKey;
 import me.egg82.antivpn.lang.PluginMessageFormatter;
 import me.egg82.antivpn.messaging.GenericMessagingHandler;
 import me.egg82.antivpn.messaging.MessagingHandler;
@@ -64,7 +64,7 @@ import org.bstats.bungeecord.Metrics;
 import org.bstats.charts.AdvancedPie;
 import org.bstats.charts.SimplePie;
 import org.bstats.charts.SingleLineChart;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongepowered.configurate.ConfigurationNode;
@@ -84,7 +84,7 @@ public class AntiVPN {
 
     private CommandIssuer consoleCommandIssuer = null;
 
-    public AntiVPN(@NonNull Plugin plugin) { this.plugin = plugin; }
+    public AntiVPN(@NotNull Plugin plugin) { this.plugin = plugin; }
 
     public void onLoad() {
         if (BungeeEnvironmentUtil.getEnvironment() != BungeeEnvironmentUtil.Environment.WATERFALL) {
@@ -118,8 +118,8 @@ public class AntiVPN {
             numEvents += eventHolder.numEvents();
         }
 
-        consoleCommandIssuer.sendInfo(Message.GENERAL__ENABLED);
-        consoleCommandIssuer.sendInfo(Message.GENERAL__LOAD,
+        consoleCommandIssuer.sendInfo(MessageKey.GENERAL__ENABLED);
+        consoleCommandIssuer.sendInfo(MessageKey.GENERAL__LOAD,
                 "{version}", plugin.getDescription().getVersion(),
                 "{apiversion}", VPNAPIProvider.getInstance().getPluginMetadata().getApiVersion(),
                 "{commands}", String.valueOf(commandManager.getRegisteredRootCommands().size()),
@@ -165,16 +165,13 @@ public class AntiVPN {
         unloadHooks();
         unloadServices();
 
-        consoleCommandIssuer.sendInfo(Message.GENERAL__DISABLED);
+        consoleCommandIssuer.sendInfo(MessageKey.GENERAL__DISABLED);
 
         GameAnalyticsErrorHandler.close();
     }
 
     private void loadLanguages() {
         CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
-        if (cachedConfig == null) {
-            throw new RuntimeException("CachedConfig seems to be null.");
-        }
 
         BungeeLocales locales = commandManager.getLocales();
 
@@ -194,8 +191,8 @@ public class AntiVPN {
         locales.setDefaultLocale(cachedConfig.getLanguage());
         commandManager.usePerIssuerLocale(true);
 
-        commandManager.setFormat(MessageType.ERROR, new PluginMessageFormatter(commandManager, Message.GENERAL__HEADER));
-        commandManager.setFormat(MessageType.INFO, new PluginMessageFormatter(commandManager, Message.GENERAL__HEADER));
+        commandManager.setFormat(MessageType.ERROR, new PluginMessageFormatter(commandManager, MessageKey.GENERAL__HEADER));
+        commandManager.setFormat(MessageType.INFO, new PluginMessageFormatter(commandManager, MessageKey.GENERAL__HEADER));
         setChatColors();
     }
 
@@ -264,10 +261,6 @@ public class AntiVPN {
         commandManager.getCommandConditions().addCondition(String.class, "storage", (c, exec, value) -> {
             String v = value.replace(" ", "_");
             CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
-            if (cachedConfig == null) {
-                logger.error("Cached config could not be fetched.");
-                return;
-            }
             for (StorageService service : cachedConfig.getStorage()) {
                 if (service.getName().equalsIgnoreCase(v)) {
                     return;
@@ -280,10 +273,6 @@ public class AntiVPN {
             String lower = c.getInput().toLowerCase().replace(" ", "_");
             Set<String> retVal = new LinkedHashSet<>();
             CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
-            if (cachedConfig == null) {
-                logger.error("Cached config could not be fetched.");
-                return ImmutableList.copyOf(retVal);
-            }
             for (StorageService service : cachedConfig.getStorage()) {
                 String ss = service.getName();
                 if (ss.toLowerCase().startsWith(lower)) {
@@ -350,20 +339,20 @@ public class AntiVPN {
         PluginManager manager = plugin.getProxy().getPluginManager();
 
         if (manager.getPlugin("Plan") != null) {
-            consoleCommandIssuer.sendInfo(Message.GENERAL__HOOK_ENABLE, "{plugin}", "Plan");
+            consoleCommandIssuer.sendInfo(MessageKey.GENERAL__HOOK_ENABLE, "{plugin}", "Plan");
             ServiceLocator.register(new PlayerAnalyticsHook());
         } else {
-            consoleCommandIssuer.sendInfo(Message.GENERAL__HOOK_DISABLE, "{plugin}", "Plan");
+            consoleCommandIssuer.sendInfo(MessageKey.GENERAL__HOOK_DISABLE, "{plugin}", "Plan");
         }
 
         if (manager.getPlugin("LuckPerms") != null) {
-            consoleCommandIssuer.sendInfo(Message.GENERAL__HOOK_ENABLE, "{plugin}", "LuckPerms");
+            consoleCommandIssuer.sendInfo(MessageKey.GENERAL__HOOK_ENABLE, "{plugin}", "LuckPerms");
             if (ConfigUtil.getDebugOrFalse()) {
                 consoleCommandIssuer.sendMessage("<c2>Running actions on pre-login.</c2>");
             }
             ServiceLocator.register(new LuckPermsHook(consoleCommandIssuer));
         } else {
-            consoleCommandIssuer.sendInfo(Message.GENERAL__HOOK_DISABLE, "{plugin}", "LuckPerms");
+            consoleCommandIssuer.sendInfo(MessageKey.GENERAL__HOOK_DISABLE, "{plugin}", "LuckPerms");
             if (ConfigUtil.getDebugOrFalse()) {
                 consoleCommandIssuer.sendMessage("<c2>Running actions on post-login.</c2>");
             }
@@ -382,9 +371,6 @@ public class AntiVPN {
         Metrics metrics = new Metrics(plugin, 3249);
         metrics.addCustomChart(new SingleLineChart("blocked_vpns", () -> {
             ConfigurationNode config = ConfigUtil.getConfig();
-            if (config == null) {
-                return null;
-            }
 
             if (!config.node("stats", "usage").getBoolean(true)) {
                 return null;
@@ -394,9 +380,6 @@ public class AntiVPN {
         }));
         metrics.addCustomChart(new SingleLineChart("blocked_mcleaks", () -> {
             ConfigurationNode config = ConfigUtil.getConfig();
-            if (config == null) {
-                return null;
-            }
 
             if (!config.node("stats", "usage").getBoolean(true)) {
                 return null;
@@ -407,9 +390,6 @@ public class AntiVPN {
         metrics.addCustomChart(new AdvancedPie("storage", () -> {
             ConfigurationNode config = ConfigUtil.getConfig();
             CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
-            if (config == null || cachedConfig == null) {
-                return null;
-            }
 
             if (!config.node("stats", "usage").getBoolean(true)) {
                 return null;
@@ -433,9 +413,6 @@ public class AntiVPN {
         metrics.addCustomChart(new AdvancedPie("messaging", () -> {
             ConfigurationNode config = ConfigUtil.getConfig();
             CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
-            if (config == null || cachedConfig == null) {
-                return null;
-            }
 
             if (!config.node("stats", "usage").getBoolean(true)) {
                 return null;
@@ -459,9 +436,6 @@ public class AntiVPN {
         metrics.addCustomChart(new AdvancedPie("sources", () -> {
             ConfigurationNode config = ConfigUtil.getConfig();
             CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
-            if (config == null || cachedConfig == null) {
-                return null;
-            }
 
             if (!config.node("stats", "usage").getBoolean(true)) {
                 return null;
@@ -486,9 +460,6 @@ public class AntiVPN {
         metrics.addCustomChart(new SimplePie("algorithm", () -> {
             ConfigurationNode config = ConfigUtil.getConfig();
             CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
-            if (config == null || cachedConfig == null) {
-                return null;
-            }
 
             if (!config.node("stats", "usage").getBoolean(true)) {
                 return null;
@@ -499,9 +470,6 @@ public class AntiVPN {
         metrics.addCustomChart(new SimplePie("vpn_action", () -> {
             ConfigurationNode config = ConfigUtil.getConfig();
             CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
-            if (config == null || cachedConfig == null) {
-                return null;
-            }
 
             if (!config.node("stats", "usage").getBoolean(true)) {
                 return null;
@@ -519,9 +487,6 @@ public class AntiVPN {
         metrics.addCustomChart(new SimplePie("mcleaks_action", () -> {
             ConfigurationNode config = ConfigUtil.getConfig();
             CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
-            if (config == null || cachedConfig == null) {
-                return null;
-            }
 
             if (!config.node("stats", "usage").getBoolean(true)) {
                 return null;
@@ -540,9 +505,6 @@ public class AntiVPN {
 
     private void checkUpdate() {
         ConfigurationNode config = ConfigUtil.getConfig();
-        if (config == null) {
-            return;
-        }
 
         BungeeUpdater updater;
         try {
@@ -562,7 +524,7 @@ public class AntiVPN {
             }
 
             try {
-                consoleCommandIssuer.sendInfo(Message.GENERAL__UPDATE, "{version}", updater.getLatestVersion().get());
+                consoleCommandIssuer.sendInfo(MessageKey.GENERAL__UPDATE, "{version}", updater.getLatestVersion().get());
             } catch (ExecutionException ex) {
                 logger.error(ex.getMessage(), ex);
             } catch (InterruptedException ex) {
@@ -596,13 +558,11 @@ public class AntiVPN {
         APIRegistrationUtil.deregister();
 
         CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
-        if (cachedConfig != null) {
-            for (MessagingService service : cachedConfig.getMessaging()) {
-                service.close();
-            }
-            for (StorageService service : cachedConfig.getStorage()) {
-                service.close();
-            }
+        for (MessagingService service : cachedConfig.getMessaging()) {
+            service.close();
+        }
+        for (StorageService service : cachedConfig.getStorage()) {
+            service.close();
         }
 
         Set<? extends MessagingHandler> messagingHandlers = ServiceLocator.remove(MessagingHandler.class);

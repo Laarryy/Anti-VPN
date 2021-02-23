@@ -2,10 +2,8 @@ package me.egg82.antivpn.messaging;
 
 import java.util.UUID;
 import me.egg82.antivpn.messaging.packets.Packet;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.NotNull;
 
 public interface MessagingHandler {
-    void handlePacket(@NonNull UUID messageId, @NonNull String fromService, @NonNull Packet packet);
-
-    void cancel();
+    void handlePacket(@NotNull UUID messageId, @NotNull String fromService, @NotNull Packet packet);
 }

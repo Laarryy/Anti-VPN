@@ -2,20 +2,20 @@ package me.egg82.antivpn.messaging.packets;
 
 import io.netty.buffer.ByteBuf;
 import java.util.Objects;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.NotNull;
 
 public class DeleteIPPacket extends AbstractPacket {
     private String ip;
 
     public byte getPacketId() { return 0x03; }
 
-    public DeleteIPPacket(@NonNull ByteBuf data) { read(data); }
+    public DeleteIPPacket(@NotNull ByteBuf data) { read(data); }
 
     public DeleteIPPacket() {
         this.ip = "";
     }
 
-    public void read(@NonNull ByteBuf buffer) {
+    public void read(@NotNull ByteBuf buffer) {
         if (!checkVersion(buffer)) {
             return;
         }
@@ -25,15 +25,15 @@ public class DeleteIPPacket extends AbstractPacket {
         checkReadPacket(buffer);
     }
 
-    public void write(@NonNull ByteBuf buffer) {
+    public void write(@NotNull ByteBuf buffer) {
         buffer.writeByte(VERSION);
 
         writeString(this.ip, buffer);
     }
 
-    public @NonNull String getIp() { return ip; }
+    public @NotNull String getIp() { return ip; }
 
-    public void setIp(@NonNull String ip) { this.ip = ip; }
+    public void setIp(@NotNull String ip) { this.ip = ip; }
 
     public boolean equals(Object o) {
         if (this == o) return true;

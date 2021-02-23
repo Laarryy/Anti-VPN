@@ -12,8 +12,8 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <plugin.version>6.4.19</plugin.version>
-        <api.version>2.0.1</api.version>
+        <plugin.version>7.0.0</plugin.version>
+        <api.version>3.0.0</api.version>
 
         <paper.version>1.16.5-R0.1-SNAPSHOT</paper.version>
         <waterfall.version>1.16-R0.4-SNAPSHOT</waterfall.version>
@@ -21,8 +21,6 @@
         <bstats.version>2.2.1</bstats.version>
         <mockbukkit.version>0.24.0</mockbukkit.version>
 
-        <checkerframework.version>3.10.0</checkerframework.version>
-        <servicelocator.version>1.0.2</servicelocator.version>
         <configurate.version>4.0.0</configurate.version>
         <ebean.version>12.6.7</ebean.version>
         <hikari.version>4.0.2</hikari.version>
@@ -35,17 +33,17 @@
         <fastutil.version>8.5.2</fastutil.version>
         <caffeine.version>2.9.0</caffeine.version>
         <ipaddress.version>5.3.3</ipaddress.version>
-        <mcleaks.version>1.9.5-SNAPSHOT</mcleaks.version>
         <slf4j.version>1.7.30</slf4j.version>
-        <gameanalytics.version>1.0.2</gameanalytics.version>
         <netty.version>4.1.59.Final</netty.version>
+        <jetbrains.version>20.1.0</jetbrains.version>
         <junit.version>5.8.0-M1</junit.version>
 
-        <taskchain.version>3.7.2</taskchain.version>
-        <acf.version>0.5.0-SNAPSHOT</acf.version>
-        <eventchain.api.version>1.0.0</eventchain.api.version>
-        <eventchain.version>2.0.3</eventchain.version>
-        <updater.version>1.1.5</updater.version>
+        <cloud.version>1.4.0</cloud.version>
+        <commodore.version>1.9</commodore.version>
+        <adventure.api.version>4.4.0</adventure.api.version>
+        <adventure.version>4.0.0-SNAPSHOT</adventure.version>
+        <eventchain.api.version>2.0.0</eventchain.api.version>
+        <eventchain.version>3.0.0</eventchain.version>
         <depdownloader.version>2.2.16</depdownloader.version>
         <relocator.version>1.4</relocator.version>
         <reflections.version>0.9.12</reflections.version>
@@ -183,7 +181,7 @@
         <module>API</module>
         <module>Common</module>
         <module>Bukkit</module>
-        <module>Bungee</module>
-        <module>Velocity</module>
+        <!--<module>Bungee</module>
+        <module>Velocity</module>-->
     </modules>
 </project>

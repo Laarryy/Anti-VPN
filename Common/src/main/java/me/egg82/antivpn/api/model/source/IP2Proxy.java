@@ -7,11 +7,11 @@ import me.egg82.antivpn.api.APIException;
 import me.egg82.antivpn.api.model.source.models.IP2ProxyModel;
 import me.egg82.antivpn.utils.ValidationUtil;
 import me.egg82.antivpn.web.WebRequest;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.NotNull;
 import org.spongepowered.configurate.ConfigurationNode;
 
 public class IP2Proxy extends AbstractSource<IP2ProxyModel> {
-    public @NonNull String getName() { return "ip2proxy"; }
+    public @NotNull String getName() { return "ip2proxy"; }
 
     public boolean isKeyRequired() { return true; }
 
@@ -19,7 +19,7 @@ public class IP2Proxy extends AbstractSource<IP2ProxyModel> {
         super(IP2ProxyModel.class);
     }
 
-    public @NonNull CompletableFuture<Boolean> getResult(@NonNull String ip) {
+    public @NotNull CompletableFuture<@NotNull Boolean> getResult(@NotNull String ip) {
         return getRawResponse(ip).thenApply(model -> {
             if (!"OK".equalsIgnoreCase(model.getResponse())) {
                 throw new APIException(false, "Could not get result from " + getName() + " (" + model.getResponse() + ")");
@@ -29,7 +29,7 @@ public class IP2Proxy extends AbstractSource<IP2ProxyModel> {
         });
     }
 
-    public @NonNull CompletableFuture<IP2ProxyModel> getRawResponse(@NonNull String ip) {
+    public @NotNull CompletableFuture<@NotNull IP2ProxyModel> getRawResponse(@NotNull String ip) {
         return CompletableFuture.supplyAsync(() -> {
             if (!ValidationUtil.isValidIp(ip)) {
                 throw new IllegalArgumentException("ip is invalid.");
@@ -42,7 +42,7 @@ public class IP2Proxy extends AbstractSource<IP2ProxyModel> {
                 throw new APIException(true, "Key is not defined for " + getName());
             }
 
-            WebRequest.Builder builder = getDefaultBuilder("https://api.ip2proxy.com/?ip=" + ip + "&key=" + key + "&package=PX1&format=json", getCachedConfig().getTimeout());
+            WebRequest.Builder builder = getDefaultBuilder("https://api.ip2proxy.com/?ip=" + ip + "&key=" + key + "&package=PX1&format=json");
             HttpURLConnection conn = getConnection(builder.build());
             JSONDeserializer<IP2ProxyModel> modelDeserializer = new JSONDeserializer<>();
             return modelDeserializer.deserialize(getString(conn), IP2ProxyModel.class);

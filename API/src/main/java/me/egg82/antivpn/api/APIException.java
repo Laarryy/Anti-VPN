@@ -1,22 +1,24 @@
 package me.egg82.antivpn.api;
 
+import org.jetbrains.annotations.Nullable;
+
 /**
  * An exception thrown from the Anti-VPN API.
  */
 public class APIException extends RuntimeException {
     private final boolean hard;
 
-    public APIException(boolean hard, String message) {
+    public APIException(boolean hard, @Nullable String message) {
         super(message);
         this.hard = hard;
     }
 
-    public APIException(boolean hard, Throwable cause) {
+    public APIException(boolean hard, @Nullable Throwable cause) {
         super(cause);
         this.hard = hard;
     }
 
-    public APIException(boolean hard, String message, Throwable cause) {
+    public APIException(boolean hard, @Nullable String message, @Nullable Throwable cause) {
         super(message, cause);
         this.hard = hard;
     }

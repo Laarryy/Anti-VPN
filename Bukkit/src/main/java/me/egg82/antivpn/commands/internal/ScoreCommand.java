@@ -14,23 +14,23 @@ import me.egg82.antivpn.api.model.source.Source;
 import me.egg82.antivpn.api.model.source.SourceManager;
 import me.egg82.antivpn.api.model.source.models.SourceModel;
 import me.egg82.antivpn.config.ConfigUtil;
-import me.egg82.antivpn.lang.Message;
+import me.egg82.antivpn.lang.MessageKey;
 import me.egg82.antivpn.utils.DNSUtil;
 import me.egg82.antivpn.utils.ExceptionUtil;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.NotNull;
 
 public class ScoreCommand extends AbstractCommand {
     private final String sourceName;
 
     private static final DecimalFormat format = new DecimalFormat("##0.00");
 
-    public ScoreCommand(@NonNull CommandIssuer issuer, @NonNull TaskChainFactory taskFactory, @NonNull String sourceName) {
+    public ScoreCommand(@NotNull CommandIssuer issuer, @NotNull TaskChainFactory taskFactory, @NotNull String sourceName) {
         super(issuer, taskFactory);
         this.sourceName = sourceName;
     }
 
     public void run() {
-        issuer.sendInfo(Message.SCORE__BEGIN, "{source}", sourceName);
+        issuer.sendInfo(MessageKey.SCORE__BEGIN, "{source}", sourceName);
 
         SourceManager sourceManager = VPNAPIProvider.getInstance().getSourceManager();
 
@@ -40,7 +40,7 @@ public class ScoreCommand extends AbstractCommand {
                 .<Source<? extends SourceModel>>currentCallback((v, r) -> r.accept(sourceManager.getSource(sourceName)))
                 .abortIfNull(this.handleAbort)
                 .sync(v -> {
-                    issuer.sendInfo(Message.SCORE__TYPE, "{type}", "NordVPN");
+                    issuer.sendInfo(MessageKey.SCORE__TYPE, "{type}", "NordVPN");
                     return v;
                 })
                 .async(v -> {
@@ -48,12 +48,12 @@ public class ScoreCommand extends AbstractCommand {
                     return v;
                 })
                 .sync(v -> {
-                    issuer.sendInfo(Message.SCORE__SLEEP);
+                    issuer.sendInfo(MessageKey.SCORE__SLEEP);
                     return v;
                 })
                 .delay(60, TimeUnit.SECONDS)
                 .sync(v -> {
-                    issuer.sendInfo(Message.SCORE__TYPE, "{type}", "Cryptostorm");
+                    issuer.sendInfo(MessageKey.SCORE__TYPE, "{type}", "Cryptostorm");
                     return v;
                 })
                 .async(v -> {
@@ -61,27 +61,27 @@ public class ScoreCommand extends AbstractCommand {
                     return v;
                 })
                 .sync(v -> {
-                    issuer.sendInfo(Message.SCORE__SLEEP);
+                    issuer.sendInfo(MessageKey.SCORE__SLEEP);
                     return v;
                 })
                 .delay(60, TimeUnit.SECONDS)
                 .sync(v -> {
-                    issuer.sendInfo(Message.SCORE__TYPE, "{type}", "random home IPs");
+                    issuer.sendInfo(MessageKey.SCORE__TYPE, "{type}", "random home IPs");
                     return v;
                 })
                 .async(v -> {
                     test(v, "Random home IP", DNSUtil.getHomeIps(), true);
                     return v;
                 })
-                .syncLast(v -> issuer.sendInfo(Message.SCORE__END, "{source}", v.getName()))
+                .syncLast(v -> issuer.sendInfo(MessageKey.SCORE__END, "{source}", v.getName()))
                 .execute();
     }
 
-    private void test(@NonNull Source<? extends SourceModel> source, @NonNull String vpnName, @NonNull Set<String> ips) {
+    private void test(@NotNull Source<? extends SourceModel> source, @NotNull String vpnName, @NotNull Set<String> ips) {
         test(source, vpnName, ips, false);
     }
 
-    private void test(@NonNull Source<? extends SourceModel> source, @NonNull String vpnName, @NonNull Set<String> ips, boolean flipResult) {
+    private void test(@NotNull Source<? extends SourceModel> source, @NotNull String vpnName, @NotNull Set<String> ips, boolean flipResult) {
         if (ConfigUtil.getDebugOrFalse()) {
             logger.info("Testing against " + vpnName);
         }
@@ -135,8 +135,8 @@ public class ScoreCommand extends AbstractCommand {
         }
 
         if (error > 0) {
-            issuer.sendInfo(Message.SCORE__ERROR, "{source}", source.getName(), "{type}", vpnName, "{percent}", format.format((error / ips.size()) * 100.0d));
+            issuer.sendInfo(MessageKey.SCORE__ERROR, "{source}", source.getName(), "{type}", vpnName, "{percent}", format.format((error / ips.size()) * 100.0d));
         }
-        issuer.sendInfo(Message.SCORE__SCORE, "{source}", source.getName(), "{type}", vpnName, "{percent}", format.format((good / ips.size()) * 100.0d));
+        issuer.sendInfo(MessageKey.SCORE__SCORE, "{source}", source.getName(), "{type}", vpnName, "{percent}", format.format((good / ips.size()) * 100.0d));
     }
 }

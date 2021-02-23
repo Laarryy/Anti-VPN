@@ -3,7 +3,7 @@ package me.egg82.antivpn.utils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,7 +12,7 @@ public class VelocityTailorUtil {
 
     private VelocityTailorUtil() { }
 
-    public static @NonNull List<String> tailorCommands(@NonNull List<String> commands, @NonNull String name, @NonNull UUID uuid, @NonNull String ip) {
+    public static @NotNull List<String> tailorCommands(@NotNull List<String> commands, @NotNull String name, @NotNull UUID uuid, @NotNull String ip) {
         List<String> retVal = new ArrayList<>();
 
         for (String command : commands) {
@@ -27,7 +27,7 @@ public class VelocityTailorUtil {
         return retVal;
     }
 
-    public static @NonNull String tailorKickMessage(@NonNull String message, @NonNull String name, @NonNull UUID uuid, @NonNull String ip) {
+    public static @NotNull String tailorKickMessage(@NotNull String message, @NotNull String name, @NotNull UUID uuid, @NotNull String ip) {
         message = message.replace("%player%", name).replace("%uuid%", uuid.toString()).replace("%ip%", ip);
         return message.replace("\\r", "").replace("\r", "").replace("\\n", "\n");
     }

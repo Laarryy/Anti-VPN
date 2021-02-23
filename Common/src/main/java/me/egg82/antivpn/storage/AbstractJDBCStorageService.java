@@ -19,8 +19,8 @@ import me.egg82.antivpn.storage.models.query.QDataModel;
 import me.egg82.antivpn.storage.models.query.QIPModel;
 import me.egg82.antivpn.storage.models.query.QPlayerModel;
 import me.egg82.antivpn.utils.VersionUtil;
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.reflections.Reflections;
 import org.reflections.ReflectionsException;
 import org.reflections.scanners.ResourcesScanner;
@@ -29,7 +29,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
     protected Database connection;
     protected HikariDataSource source;
 
-    protected AbstractJDBCStorageService(@NonNull String name) {
+    protected AbstractJDBCStorageService(@NotNull String name) {
         super(name);
     }
 
@@ -44,7 +44,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         }
     }
 
-    public void storeModel(@NonNull BaseModel model) {
+    public void storeModel(@NotNull BaseModel model) {
         queueLock.readLock().lock();
         try {
             createOrUpdate(model, false);
@@ -53,7 +53,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         }
     }
 
-    public void storeModels(@NonNull Collection<? extends BaseModel> models) {
+    public void storeModels(@NotNull Collection<@NotNull ? extends BaseModel> models) {
         queueLock.readLock().lock();
         try (Transaction tx = connection.beginTransaction()) {
             for (BaseModel model : models) {
@@ -65,7 +65,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         }
     }
 
-    public void deleteModel(@NonNull BaseModel model) {
+    public void deleteModel(@NotNull BaseModel model) {
         BaseModel newModel = duplicateModel(model, true);
         if (newModel == null) {
             return;
@@ -79,7 +79,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         }
     }
 
-    public @NonNull IPModel getOrCreateIpModel(@NonNull String ip, int type) {
+    public @NotNull IPModel getOrCreateIpModel(@NotNull String ip, int type) {
         queueLock.readLock().lock();
         try {
             IPModel model = new QIPModel(connection)
@@ -108,7 +108,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         }
     }
 
-    public @Nullable IPModel getIpModel(@NonNull String ip, long cacheTimeMillis) {
+    public @Nullable IPModel getIpModel(@NotNull String ip, long cacheTimeMillis) {
         queueLock.readLock().lock();
         try {
             return new QIPModel(connection)
@@ -132,7 +132,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         }
     }
 
-    public @NonNull Set<IPModel> getAllIps(long cacheTimeMillis) {
+    public @NotNull Set<@NotNull IPModel> getAllIps(long cacheTimeMillis) {
         queueLock.readLock().lock();
         try {
             return new QIPModel(connection)
@@ -143,7 +143,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         }
     }
 
-    public @NonNull Set<IPModel> getAllIps(int start, int max) {
+    public @NotNull Set<@NotNull IPModel> getAllIps(int start, int max) {
         queueLock.readLock().lock();
         try {
             return new QIPModel(connection)
@@ -154,7 +154,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         }
     }
 
-    public @NonNull PlayerModel getOrCreatePlayerModel(@NonNull UUID player, boolean isMcLeaks) {
+    public @NotNull PlayerModel getOrCreatePlayerModel(@NotNull UUID player, boolean isMcLeaks) {
         queueLock.readLock().lock();
         try {
             PlayerModel model = new QPlayerModel(connection)
@@ -183,7 +183,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         }
     }
 
-    public @Nullable PlayerModel getPlayerModel(@NonNull UUID player, long cacheTimeMillis) {
+    public @Nullable PlayerModel getPlayerModel(@NotNull UUID player, long cacheTimeMillis) {
         queueLock.readLock().lock();
         try {
             return new QPlayerModel(connection)
@@ -207,7 +207,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         }
     }
 
-    public @NonNull Set<PlayerModel> getAllPlayers(long cacheTimeMillis) {
+    public @NotNull Set<@NotNull PlayerModel> getAllPlayers(long cacheTimeMillis) {
         queueLock.readLock().lock();
         try {
             return new QPlayerModel(connection)
@@ -218,7 +218,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         }
     }
 
-    public @NonNull Set<PlayerModel> getAllPlayers(int start, int max) {
+    public @NotNull Set<@NotNull PlayerModel> getAllPlayers(int start, int max) {
         queueLock.readLock().lock();
         try {
             return new QPlayerModel(connection)
@@ -229,7 +229,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         }
     }
 
-    public @NonNull DataModel getOrCreateDataModel(@NonNull String key, String value) {
+    public @NotNull DataModel getOrCreateDataModel(@NotNull String key, String value) {
         queueLock.readLock().lock();
         try {
             DataModel model = new QDataModel(connection)
@@ -258,7 +258,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         }
     }
 
-    public @Nullable DataModel getDataModel(@NonNull String key) {
+    public @Nullable DataModel getDataModel(@NotNull String key) {
         queueLock.readLock().lock();
         try {
             return new QDataModel(connection)
@@ -280,7 +280,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         }
     }
 
-    protected final void createSource(HikariConfig config, DatabasePlatform platform, boolean quote, String scriptsName) {
+    protected final void createSource(@NotNull HikariConfig config, @NotNull DatabasePlatform platform, boolean quote, @NotNull String scriptsName) {
         config.setAutoCommit(false);
         source = new HikariDataSource(config);
         DatabaseConfig dbConfig = new DatabaseConfig();
@@ -328,7 +328,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         }
     }
 
-    private List<File> getResourceDirs(@NonNull String prefix) {
+    private @NotNull List<@NotNull File> getResourceDirs(@NotNull String prefix) {
         List<File> retVal = new ArrayList<>();
 
         Reflections reflections = new Reflections(prefix, new ResourcesScanner());
@@ -364,7 +364,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         return retVal;
     }
 
-    private @Nullable BaseModel duplicateModel(@NonNull BaseModel model, boolean keepModified) {
+    private @Nullable BaseModel duplicateModel(@NotNull BaseModel model, boolean keepModified) {
         BaseModel retVal = null;
         if (model instanceof IPModel) {
             IPModel m = new IPModel();
@@ -395,7 +395,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         return retVal;
     }
 
-    private void createOrUpdate(@NonNull BaseModel model, boolean keepModified) {
+    private void createOrUpdate(@NotNull BaseModel model, boolean keepModified) {
         if (model instanceof IPModel) {
             IPModel m = new QIPModel(connection)
                     .ip.equalTo(((IPModel) model).getIp())

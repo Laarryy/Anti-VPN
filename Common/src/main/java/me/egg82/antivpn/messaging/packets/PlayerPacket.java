@@ -3,7 +3,7 @@ package me.egg82.antivpn.messaging.packets;
 import io.netty.buffer.ByteBuf;
 import java.util.Objects;
 import java.util.UUID;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.NotNull;
 
 public class PlayerPacket extends AbstractPacket {
     private UUID uuid;
@@ -11,14 +11,14 @@ public class PlayerPacket extends AbstractPacket {
 
     public byte getPacketId() { return 0x02; }
 
-    public PlayerPacket(@NonNull ByteBuf data) { read(data); }
+    public PlayerPacket(@NotNull ByteBuf data) { read(data); }
 
     public PlayerPacket() {
         this.uuid = new UUID(0L, 0L);
         this.value = false;
     }
 
-    public void read(@NonNull ByteBuf buffer) {
+    public void read(@NotNull ByteBuf buffer) {
         if (!checkVersion(buffer)) {
             return;
         }
@@ -29,16 +29,16 @@ public class PlayerPacket extends AbstractPacket {
         checkReadPacket(buffer);
     }
 
-    public void write(@NonNull ByteBuf buffer) {
+    public void write(@NotNull ByteBuf buffer) {
         buffer.writeByte(VERSION);
 
         writeUUID(this.uuid, buffer);
         buffer.writeBoolean(this.value);
     }
 
-    public @NonNull UUID getUuid() { return uuid; }
+    public @NotNull UUID getUuid() { return uuid; }
 
-    public void setUuid(@NonNull UUID uuid) { this.uuid = uuid; }
+    public void setUuid(@NotNull UUID uuid) { this.uuid = uuid; }
 
     public boolean getValue() { return value; }
 

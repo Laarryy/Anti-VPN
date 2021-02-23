@@ -1,6 +1,6 @@
 package me.egg82.antivpn.api.platform;
 
-import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.NotNull;
 
 public class BungeePluginMetadata extends AbstractPluginMetadata {
     private final String pluginVersion;
@@ -9,5 +9,5 @@ public class BungeePluginMetadata extends AbstractPluginMetadata {
         this.pluginVersion = pluginVersion;
     }
 
-    public @NonNull String getVersion() { return pluginVersion; }
+    public @NotNull String getVersion() { return pluginVersion; }
 }

@@ -16,13 +16,16 @@ import me.egg82.antivpn.api.model.source.models.SourceModel;
 import me.egg82.antivpn.config.CachedConfig;
 import me.egg82.antivpn.config.ConfigUtil;
 import me.egg82.antivpn.core.Pair;
+import me.egg82.antivpn.lang.I18NManager;
+import me.egg82.antivpn.logging.GELFLogger;
 import me.egg82.antivpn.messaging.packets.DeleteIPPacket;
 import me.egg82.antivpn.messaging.packets.IPPacket;
 import me.egg82.antivpn.storage.StorageService;
 import me.egg82.antivpn.storage.models.IPModel;
-import me.egg82.antivpn.utils.ExceptionUtil;
 import me.egg82.antivpn.utils.PacketUtil;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import me.egg82.antivpn.utils.TimeUtil;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,22 +36,21 @@ public abstract class AbstractIPManager implements IPManager {
     private final LoadingCache<String, Boolean> sourceInvalidationCache;
 
     private final SourceManager sourceManager;
+    private final I18NManager consoleLocalizationManager;
 
-    protected AbstractIPManager(@NonNull SourceManager sourceManager, long cacheTime, TimeUnit cacheTimeUnit) {
+    protected AbstractIPManager(@NotNull SourceManager sourceManager, @NotNull TimeUtil.Time cacheTime, @NotNull I18NManager consoleLocalizationManager) {
         this.sourceManager = sourceManager;
+        this.consoleLocalizationManager = consoleLocalizationManager;
 
-        ipCache = Caffeine.newBuilder().expireAfterAccess(cacheTime, cacheTimeUnit).expireAfterWrite(cacheTime, cacheTimeUnit).build(k -> calculateIpResult(k.getT1(), k.getT2(), true));
+        ipCache = Caffeine.newBuilder().expireAfterAccess(cacheTime.getTime(), cacheTime.getUnit()).expireAfterWrite(cacheTime.getTime(), cacheTime.getUnit()).build(k -> calculateIpResult(k.getT1(), k.getT2(), true));
         sourceInvalidationCache = Caffeine.newBuilder().expireAfterWrite(1L, TimeUnit.MINUTES).build(k -> Boolean.FALSE);
     }
 
     public LoadingCache<Pair<String, AlgorithmMethod>, IPModel> getIpCache() { return ipCache; }
 
-    public @NonNull CompletableFuture<IP> getIP(@NonNull String ip) {
+    public @NotNull CompletableFuture<@Nullable IP> getIP(@NotNull String ip) {
         return CompletableFuture.supplyAsync(() -> {
             CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
-            if (cachedConfig == null) {
-                throw new APIException(false, "Cached config could not be fetched.");
-            }
 
             for (StorageService service : cachedConfig.getStorage()) {
                 IPModel model = service.getIpModel(ip, cachedConfig.getSourceCacheTime());
@@ -64,12 +66,9 @@ public abstract class AbstractIPManager implements IPManager {
         });
     }
 
-    public @NonNull CompletableFuture<Void> saveIP(@NonNull IP ip) {
+    public @NotNull CompletableFuture<Void> saveIP(@NotNull IP ip) {
         return CompletableFuture.runAsync(() -> {
             CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
-            if (cachedConfig == null) {
-                throw new APIException(false, "Cached config could not be fetched.");
-            }
 
             for (StorageService service : cachedConfig.getStorage()) {
                 IPModel model = service.getOrCreateIpModel(ip.getIP().getHostAddress(), ip.getType().ordinal());
@@ -87,12 +86,9 @@ public abstract class AbstractIPManager implements IPManager {
         });
     }
 
-    public @NonNull CompletableFuture<Void> deleteIP(@NonNull String ip) {
+    public @NotNull CompletableFuture<Void> deleteIP(@NotNull String ip) {
         return CompletableFuture.runAsync(() -> {
             CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
-            if (cachedConfig == null) {
-                throw new APIException(false, "Cached config could not be fetched.");
-            }
 
             for (StorageService service : cachedConfig.getStorage()) {
                 IPModel model = new IPModel();
@@ -107,12 +103,9 @@ public abstract class AbstractIPManager implements IPManager {
         });
     }
 
-    public @NonNull CompletableFuture<Set<InetAddress>> getIPs() {
+    public @NotNull CompletableFuture<@NotNull Set<@NotNull InetAddress>> getIPs() {
         return CompletableFuture.supplyAsync(() -> {
             CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
-            if (cachedConfig == null) {
-                throw new APIException(false, "Cached config could not be fetched.");
-            }
 
             Set<InetAddress> retVal = new HashSet<>();
             for (StorageService service : cachedConfig.getStorage()) {
@@ -132,15 +125,9 @@ public abstract class AbstractIPManager implements IPManager {
         });
     }
 
-    public @NonNull AlgorithmMethod getCurrentAlgorithmMethod() throws APIException {
-        CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
-        if (cachedConfig == null) {
-            throw new APIException(false, "Cached config could not be fetched.");
-        }
-        return cachedConfig.getVPNAlgorithmMethod();
-    }
+    public @NotNull AlgorithmMethod getCurrentAlgorithmMethod() { return ConfigUtil.getCachedConfig().getVPNAlgorithmMethod(); }
 
-    public @NonNull CompletableFuture<Boolean> cascade(@NonNull String ip, boolean useCache) {
+    public @NotNull CompletableFuture<@NotNull Boolean> cascade(@NotNull String ip, boolean useCache) {
         return CompletableFuture.supplyAsync(() -> {
             IPModel model;
             if (useCache) {
@@ -152,7 +139,7 @@ public abstract class AbstractIPManager implements IPManager {
                     } else {
                         throw new APIException(false, "Could not get data for IP " + ip, ex);
                     }
-                } catch (RuntimeException | Error ex) {
+                } catch (RuntimeException ex) {
                     throw new APIException(false, "Could not get data for IP " + ip, ex);
                 }
             } else {
@@ -161,11 +148,11 @@ public abstract class AbstractIPManager implements IPManager {
             if (model == null) {
                 throw new APIException(false, "Could not get data for IP " + ip);
             }
-            return model.getCascade();
+            return Boolean.TRUE.equals(model.getCascade());
         });
     }
 
-    public @NonNull CompletableFuture<Double> consensus(@NonNull String ip, boolean useCache) {
+    public @NotNull CompletableFuture<@NotNull Double> consensus(@NotNull String ip, boolean useCache) {
         return CompletableFuture.supplyAsync(() -> {
             IPModel model;
             if (useCache) {
@@ -177,7 +164,7 @@ public abstract class AbstractIPManager implements IPManager {
                     } else {
                         throw new APIException(false, "Could not get data for IP " + ip, ex);
                     }
-                } catch (RuntimeException | Error ex) {
+                } catch (RuntimeException ex) {
                     throw new APIException(false, "Could not get data for IP " + ip, ex);
                 }
             } else {
@@ -186,23 +173,14 @@ public abstract class AbstractIPManager implements IPManager {
             if (model == null) {
                 throw new APIException(false, "Could not get data for IP " + ip);
             }
-            return model.getConsensus();
+            return model.getConsensus() == null ? 1.0d : model.getConsensus();
         });
     }
 
-    public double getMinConsensusValue() throws APIException {
-        CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
-        if (cachedConfig == null) {
-            throw new APIException(false, "Cached config could not be fetched.");
-        }
-        return cachedConfig.getVPNAlgorithmConsensus();
-    }
+    public double getMinConsensusValue() { return ConfigUtil.getCachedConfig().getVPNAlgorithmConsensus(); }
 
-    private @NonNull IPModel calculateIpResult(@NonNull String ip, @NonNull AlgorithmMethod method, boolean useCache) throws APIException {
+    private @NotNull IPModel calculateIpResult(@NotNull String ip, @NotNull AlgorithmMethod method, boolean useCache) throws APIException {
         CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
-        if (cachedConfig == null) {
-            throw new APIException(false, "Cached config could not be fetched.");
-        }
 
         if (useCache) {
             for (StorageService service : cachedConfig.getStorage()) {
@@ -243,16 +221,10 @@ public abstract class AbstractIPManager implements IPManager {
                         logger.info("Getting result from source " + source.getName() + ".");
                     }
                     try {
-                        Boolean result = source.getResult(ip).get();
-                        if (result != null) {
-                            if (Boolean.TRUE.equals(result)) {
-                                results.addAndGet(1L);
-                            }
-                            totalSources.addAndGet(1L);
-                        } else {
-                            logger.error("Source " + source.getName() + " returned an error. Skipping.");
-                            sourceInvalidationCache.put(source.getName(), Boolean.TRUE);
+                        if (source.getResult(ip).get()) {
+                            results.addAndGet(1L);
                         }
+                        totalSources.addAndGet(1L);
                     } catch (InterruptedException ignored) {
                         logger.error("Source " + source.getName() + " returned an error. Skipping.");
                         sourceInvalidationCache.put(source.getName(), Boolean.TRUE);
@@ -260,7 +232,7 @@ public abstract class AbstractIPManager implements IPManager {
                     } catch (ExecutionException | CancellationException ex) {
                         logger.error("Source " + source.getName() + " returned an error. Skipping.");
                         sourceInvalidationCache.put(source.getName(), Boolean.TRUE);
-                        ExceptionUtil.handleException(ex, logger);
+                        GELFLogger.exception(logger, ex, consoleLocalizationManager);
                     }
                     latch.countDown();
                 });
@@ -271,11 +243,7 @@ public abstract class AbstractIPManager implements IPManager {
                     logger.warn("Consensus timed out before all sources could be queried.");
                 }
             } catch (InterruptedException ex) {
-                if (cachedConfig.getDebug()) {
-                    logger.error(ex.getMessage(), ex);
-                } else {
-                    logger.error(ex.getMessage());
-                }
+                GELFLogger.exception(logger, ex);
                 Thread.currentThread().interrupt();
             }
             pool.shutdownNow(); // Kill it with fire
@@ -314,7 +282,7 @@ public abstract class AbstractIPManager implements IPManager {
                 } catch (ExecutionException | CancellationException ex) {
                     logger.error("Source " + source.getName() + " returned an error. Skipping.");
                     sourceInvalidationCache.put(source.getName(), Boolean.TRUE);
-                    ExceptionUtil.handleException(ex, logger);
+                    GELFLogger.exception(logger, ex, consoleLocalizationManager);
                 }
             }
 
@@ -325,10 +293,10 @@ public abstract class AbstractIPManager implements IPManager {
             return retVal;
         }
 
-        throw new APIException(false, "No sources were available to query. See https://github.com/egg82/AntiVPN/wiki/FAQ#Errors");
+        throw new APIException(false, "No sources were available to query. See https://github.com/egg82/Anti-VPN/wiki/FAQ#Errors");
     }
 
-    private void storeResult(@NonNull IPModel model, @NonNull CachedConfig cachedConfig) {
+    private void storeResult(@NotNull IPModel model, @NotNull CachedConfig cachedConfig) {
         for (StorageService service : cachedConfig.getStorage()) {
             IPModel m = service.getOrCreateIpModel(model.getIp(), model.getType());
             m.setCascade(model.getCascade());
@@ -341,7 +309,7 @@ public abstract class AbstractIPManager implements IPManager {
         }
     }
 
-    private void sendResult(@NonNull IPModel model, @NonNull CachedConfig cachedConfig) {
+    private void sendResult(@NotNull IPModel model, @NotNull CachedConfig cachedConfig) {
         IPPacket packet = new IPPacket();
         packet.setIp(model.getIp());
         packet.setType(model.getType());

@@ -7,8 +7,11 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
+import me.egg82.antivpn.lang.Locales;
+import me.egg82.antivpn.lang.MessageKey;
+import me.egg82.antivpn.logging.GELFLogger;
 import me.egg82.antivpn.utils.PacketUtil;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.NotNull;
 
 public class MultiPacket extends AbstractPacket {
     private static final ByteBufAllocator alloc = PooledByteBufAllocator.DEFAULT;
@@ -17,11 +20,11 @@ public class MultiPacket extends AbstractPacket {
 
     public byte getPacketId() { return 0x21; }
 
-    public MultiPacket(@NonNull ByteBuf data) { read(data); }
+    public MultiPacket(@NotNull ByteBuf data) { read(data); }
 
     public MultiPacket() { }
 
-    public void read(@NonNull ByteBuf buffer) {
+    public void read(@NotNull ByteBuf buffer) {
         if (!checkVersion(buffer)) {
             return;
         }
@@ -43,7 +46,7 @@ public class MultiPacket extends AbstractPacket {
                 try {
                     packets.add(packetClass.getConstructor(ByteBuf.class).newInstance(packetBuf));
                 } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException | InstantiationException | ExceptionInInitializerError | SecurityException ex) {
-                    logger.error("Could not instantiate packet " + packetClass.getSimpleName() + ".", ex);
+                    GELFLogger.exception(logger, ex, Locales.getUS(), MessageKey.ERROR__MESSAGING__BAD_PACKET, "{name}", packetClass.getSimpleName());
                 }
             } finally {
                 packetBuf.release();
@@ -53,7 +56,7 @@ public class MultiPacket extends AbstractPacket {
         checkReadPacket(buffer);
     }
 
-    public void write(@NonNull ByteBuf buffer) {
+    public void write(@NotNull ByteBuf buffer) {
         buffer.writeByte(VERSION);
 
         if (packets.isEmpty()) {
@@ -76,9 +79,9 @@ public class MultiPacket extends AbstractPacket {
         buffer.writeByte((byte) 0x00); // End of multi-packet
     }
 
-    public @NonNull Set<Packet> getPackets() { return packets; }
+    public @NotNull Set<@NotNull Packet> getPackets() { return packets; }
 
-    public void setPackets(@NonNull Set<Packet> packets) { this.packets = packets; }
+    public void setPackets(@NotNull Set<@NotNull Packet> packets) { this.packets = packets; }
 
     public boolean equals(Object o) {
         if (this == o) return true;

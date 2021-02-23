@@ -4,7 +4,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,7 +13,7 @@ public class ClassFilter {
 
     private ClassFilter() { }
 
-    public static @NonNull Object[] getStaticFields(@NonNull Class<?> clazz) {
+    public static @NotNull Object @NotNull [] getStaticFields(@NotNull Class<?> clazz) {
         Field[] fields = clazz.getDeclaredFields();
         List<Object> returns = new ArrayList<>();
 

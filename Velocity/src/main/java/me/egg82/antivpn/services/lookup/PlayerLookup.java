@@ -5,12 +5,12 @@ import java.io.IOException;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.NotNull;
 
 public class PlayerLookup {
     private PlayerLookup() { }
 
-    public static @NonNull CompletableFuture<PlayerInfo> get(@NonNull UUID uuid, @NonNull ProxyServer proxy) {
+    public static @NotNull CompletableFuture<PlayerInfo> get(@NotNull UUID uuid, @NotNull ProxyServer proxy) {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 return new VelocityPlayerInfo(uuid, proxy);
@@ -20,7 +20,7 @@ public class PlayerLookup {
         });
     }
 
-    public static @NonNull CompletableFuture<PlayerInfo> get(@NonNull String name, @NonNull ProxyServer proxy) {
+    public static @NotNull CompletableFuture<PlayerInfo> get(@NotNull String name, @NotNull ProxyServer proxy) {
         return CompletableFuture.supplyAsync(() -> {
             try {
                 return new VelocityPlayerInfo(name, proxy);

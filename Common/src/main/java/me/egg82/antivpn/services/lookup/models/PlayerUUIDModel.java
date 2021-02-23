@@ -2,23 +2,21 @@ package me.egg82.antivpn.services.lookup.models;
 
 import java.io.Serializable;
 import java.util.Objects;
+import org.jetbrains.annotations.Nullable;
 
 public class PlayerUUIDModel implements Serializable {
-    private String name;
-    private String id;
+    private String name = null;
+    private String id = null;
 
-    public PlayerUUIDModel() {
-        this.name = null;
-        this.id = null;
-    }
+    public PlayerUUIDModel() { }
 
-    public String getName() { return name; }
+    public @Nullable String getName() { return name; }
 
-    public void setName(String name) { this.name = name; }
+    public void setName(@Nullable String name) { this.name = name; }
 
-    public String getId() { return id; }
+    public @Nullable String getId() { return id; }
 
-    public void setId(String id) { this.id = id; }
+    public void setId(@Nullable String id) { this.id = id; }
 
     public boolean equals(Object o) {
         if (this == o) return true;

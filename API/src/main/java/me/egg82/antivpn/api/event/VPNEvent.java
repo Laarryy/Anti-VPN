@@ -1,7 +1,7 @@
 package me.egg82.antivpn.api.event;
 
 import me.egg82.antivpn.api.VPNAPI;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * A superinterface for all Anti-VPN events.
@@ -12,12 +12,12 @@ public interface VPNEvent {
      *
      * @return the api instance
      */
-    @NonNull VPNAPI getApi();
+    @NotNull VPNAPI getApi();
 
     /**
      * Gets the type of the event.
      *
      * @return the type of the event
      */
-    @NonNull Class<? extends VPNEvent> getEventType();
+    @NotNull Class<? extends VPNEvent> getEventType();
 }

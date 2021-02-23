@@ -25,8 +25,8 @@ import me.egg82.antivpn.api.model.ip.IPManager;
 import me.egg82.antivpn.api.model.player.PlayerManager;
 import me.egg82.antivpn.config.ConfigUtil;
 import me.egg82.antivpn.utils.ExceptionUtil;
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,7 +34,7 @@ public class PlayerAnalyticsHook implements PluginHook {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final CapabilityService capabilities;
 
-    public PlayerAnalyticsHook(@NonNull ProxyServer proxy) {
+    public PlayerAnalyticsHook(@NotNull ProxyServer proxy) {
         capabilities = CapabilityService.getInstance();
 
         if (isCapabilityAvailable("DATA_EXTENSION_VALUES") && isCapabilityAvailable("DATA_EXTENSION_TABLES")) {
@@ -73,7 +73,7 @@ public class PlayerAnalyticsHook implements PluginHook {
         private final ProxyServer proxy;
         private final CallEvents[] events = new CallEvents[] { CallEvents.SERVER_PERIODICAL, CallEvents.SERVER_EXTENSION_REGISTER, CallEvents.PLAYER_JOIN };
 
-        private Data(@NonNull ProxyServer proxy) {
+        private Data(@NotNull ProxyServer proxy) {
             this.proxy = proxy;
         }
 
@@ -201,7 +201,7 @@ public class PlayerAnalyticsHook implements PluginHook {
                 iconFamily = Family.SOLID,
                 iconColor = Color.NONE
         )
-        public boolean getUsingVpn(@NonNull UUID playerID) {
+        public boolean getUsingVpn(@NotNull UUID playerID) {
             Optional<Player> player = proxy.getPlayer(playerID);
             if (!player.isPresent()) {
                 return false;
@@ -243,7 +243,7 @@ public class PlayerAnalyticsHook implements PluginHook {
                 iconFamily = Family.SOLID,
                 iconColor = Color.NONE
         )
-        public boolean getMcLeaks(@NonNull UUID playerId) {
+        public boolean getMcLeaks(@NotNull UUID playerId) {
             PlayerManager playerManager = VPNAPIProvider.getInstance().getPlayerManager();
 
             try {
@@ -257,7 +257,7 @@ public class PlayerAnalyticsHook implements PluginHook {
             return false;
         }
 
-        private @Nullable String getIp(@NonNull Player player) {
+        private @Nullable String getIp(@NotNull Player player) {
             InetSocketAddress address = player.getRemoteAddress();
             if (address == null) {
                 return null;
@@ -269,6 +269,6 @@ public class PlayerAnalyticsHook implements PluginHook {
             return host.getHostAddress();
         }
 
-        public @NonNull CallEvents[] callExtensionMethodsOn() { return events; }
+        public @NotNull CallEvents[] callExtensionMethodsOn() { return events; }
     }
 }

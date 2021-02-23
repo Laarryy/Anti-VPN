@@ -12,7 +12,7 @@ import me.egg82.antivpn.api.APIException;
 import me.egg82.antivpn.api.model.source.models.GetIPIntelModel;
 import me.egg82.antivpn.utils.ValidationUtil;
 import me.egg82.antivpn.web.WebRequest;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.NotNull;
 import org.spongepowered.configurate.ConfigurationNode;
 
 public class GetIPIntel extends AbstractSource<GetIPIntelModel> {
@@ -29,14 +29,14 @@ public class GetIPIntel extends AbstractSource<GetIPIntelModel> {
         super(GetIPIntelModel.class);
     }
 
-    public @NonNull String getName() { return "getipintel"; }
+    public @NotNull String getName() { return "getipintel"; }
 
     public boolean isKeyRequired() { return false; }
 
-    public @NonNull CompletableFuture<Boolean> getResult(@NonNull String ip) {
+    public @NotNull CompletableFuture<@NotNull Boolean> getResult(@NotNull String ip) {
         return getRawResponse(ip).thenApply(model -> {
-            if (!"success".equalsIgnoreCase(model.getStatus())) {
-                boolean isHard = "-5".equals(model.getResult()) || "-6".equals(model.getResult());
+            if (!"success".equalsIgnoreCase(model.getStatus()) || model.getResult() == null) {
+                boolean isHard = model.getResult() != null && ("-5".equals(model.getResult()) || "-6".equals(model.getResult()));
                 throw new APIException(isHard, "Could not get result from " + getName() + " (" + model.getResult() + ": " + model.getMessage() + ")" + (isHard ? " (Is your server's IP banned due to an improper contact e-mail in the config? Send an e-mail to contact@getipintel.net for an unban)" : ""));
             }
 
@@ -47,7 +47,7 @@ public class GetIPIntel extends AbstractSource<GetIPIntelModel> {
         });
     }
 
-    public @NonNull CompletableFuture<GetIPIntelModel> getRawResponse(@NonNull String ip) {
+    public @NotNull CompletableFuture<@NotNull GetIPIntelModel> getRawResponse(@NotNull String ip) {
         return CompletableFuture.supplyAsync(() -> {
             if (!ValidationUtil.isValidIp(ip)) {
                 throw new IllegalArgumentException("ip is invalid.");
@@ -65,7 +65,7 @@ public class GetIPIntel extends AbstractSource<GetIPIntelModel> {
                 throw new APIException(false, "API calls to this source have been limited to 15/minute as per request.");
             }
 
-            WebRequest.Builder builder = getDefaultBuilder("https://" + sourceConfigNode.node("subdomain").getString("check") + ".getipintel.net/check.php?ip=" + ip + "&contact=" + sourceConfigNode.node("contact").getString("admin@yoursite.com") + "&format=json&flags=b", getCachedConfig().getTimeout());
+            WebRequest.Builder builder = getDefaultBuilder("https://" + sourceConfigNode.node("subdomain").getString("check") + ".getipintel.net/check.php?ip=" + ip + "&contact=" + sourceConfigNode.node("contact").getString("admin@yoursite.com") + "&format=json&flags=b");
             HttpURLConnection conn = getConnection(builder.build());
             JSONDeserializer<GetIPIntelModel> modelDeserializer = new JSONDeserializer<>();
             return modelDeserializer.deserialize(getString(conn), GetIPIntelModel.class);

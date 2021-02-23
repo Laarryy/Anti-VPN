@@ -2,8 +2,8 @@ package me.egg82.antivpn.bukkit;
 
 import me.egg82.antivpn.utils.VersionUtil;
 import org.bukkit.Bukkit;
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class BukkitVersionUtil {
     private static final Object versionLock = new Object();
@@ -11,7 +11,7 @@ public class BukkitVersionUtil {
 
     private BukkitVersionUtil() { }
 
-    public static @NonNull String getGameVersion() {
+    public static @NotNull String getGameVersion() {
         String localVersion = gameVersion;
         if (localVersion == null) {
             synchronized (versionLock) {
@@ -39,7 +39,7 @@ public class BukkitVersionUtil {
         return localVersion;
     }
 
-    private static boolean isVersion(@NonNull String versionString) {
+    private static boolean isVersion(@NotNull String versionString) {
         String[] numbers = versionString.split("\\.");
         int[] version = VersionUtil.parseVersion(versionString, '.');
         if (version.length != numbers.length) {
@@ -55,7 +55,7 @@ public class BukkitVersionUtil {
         return true;
     }
 
-    private static @Nullable String getVersionFromVersionString(@NonNull String versionString) {
+    private static @Nullable String getVersionFromVersionString(@NotNull String versionString) {
         int versionIndex = versionString.indexOf("(MC: ");
         if (versionIndex == -1) {
             return null;
@@ -68,7 +68,7 @@ public class BukkitVersionUtil {
         return versionString.substring(versionIndex + 5, endIndex).trim().replace('_', '.');
     }
 
-    private static @Nullable String getVersionFromBukkitString(@NonNull String versionString) {
+    private static @Nullable String getVersionFromBukkitString(@NotNull String versionString) {
         int endIndex = versionString.indexOf("-R");
         if (endIndex == -1) {
             return null;
@@ -77,7 +77,7 @@ public class BukkitVersionUtil {
         return versionString.substring(0, endIndex).trim().replace('_', '.');
     }
 
-    private static @NonNull String getVersionFromServerPackageString(@NonNull String versionString) {
+    private static @NotNull String getVersionFromServerPackageString(@NotNull String versionString) {
         return versionString.substring(versionString.lastIndexOf('.') + 1).trim().replace('_', '.');
     }
 }

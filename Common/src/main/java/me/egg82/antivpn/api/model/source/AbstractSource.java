@@ -6,44 +6,27 @@ import java.net.URL;
 import java.util.concurrent.TimeUnit;
 import me.egg82.antivpn.api.APIException;
 import me.egg82.antivpn.api.model.source.models.SourceModel;
-import me.egg82.antivpn.config.CachedConfig;
 import me.egg82.antivpn.config.ConfigUtil;
 import me.egg82.antivpn.utils.TimeUtil;
 import me.egg82.antivpn.web.WebRequest;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.NotNull;
 import org.spongepowered.configurate.ConfigurationNode;
 
 public abstract class AbstractSource<T extends SourceModel> implements Source<T> {
     private final Class<T> modelClass;
 
-    protected AbstractSource(Class<T> modelClass) {
+    protected AbstractSource(@NotNull Class<T> modelClass) {
         this.modelClass = modelClass;
     }
 
-    public @NonNull Class<T> getModelClass() { return modelClass; }
+    public @NotNull Class<T> getModelClass() { return modelClass; }
 
-    protected final @NonNull ConfigurationNode getSourceConfigNode() throws APIException {
-        ConfigurationNode config = ConfigUtil.getConfig();
-        if (config == null) {
-            throw new APIException(false, "Could not get configuration.");
-        }
+    protected final @NotNull ConfigurationNode getSourceConfigNode() { return ConfigUtil.getConfig().node("sources", getName()); }
 
-        return config.node("sources", getName());
-    }
-
-    protected final @NonNull CachedConfig getCachedConfig() throws APIException {
-        CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
-        if (cachedConfig == null) {
-            throw new APIException(false, "Cached config could not be fetched.");
-        }
-
-        return cachedConfig;
-    }
-
-    protected final WebRequest.@NonNull Builder getDefaultBuilder(@NonNull String url, long timeout) throws APIException {
+    protected final @NotNull WebRequest.Builder getDefaultBuilder(@NotNull String url) throws APIException {
         try {
             WebRequest.Builder retVal = WebRequest.builder(new URL(url));
-            retVal.timeout(new TimeUtil.Time(timeout, TimeUnit.MILLISECONDS));
+            retVal.timeout(new TimeUtil.Time(ConfigUtil.getCachedConfig().getTimeout(), TimeUnit.MILLISECONDS));
             retVal.userAgent("egg82/AntiVPN");
             retVal.header("Accept", "application/json");
             retVal.throwOnStandardErrors(false);
@@ -53,7 +36,7 @@ public abstract class AbstractSource<T extends SourceModel> implements Source<T>
         }
     }
 
-    protected final @NonNull HttpURLConnection getConnection(@NonNull WebRequest request) throws APIException {
+    protected final @NotNull HttpURLConnection getConnection(@NotNull WebRequest request) throws APIException {
         try {
             HttpURLConnection conn = request.getConnection();
             int status = conn.getResponseCode();
@@ -81,7 +64,7 @@ public abstract class AbstractSource<T extends SourceModel> implements Source<T>
         }
     }
 
-    protected final @NonNull String getString(HttpURLConnection conn) throws APIException {
+    protected final @NotNull String getString(HttpURLConnection conn) throws APIException {
         try {
             return WebRequest.getString(conn);
         } catch (IOException ex) {

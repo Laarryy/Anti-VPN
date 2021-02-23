@@ -8,7 +8,7 @@ import java.time.Instant;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.Version;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 @MappedSuperclass
 public abstract class BaseModel extends Model implements Serializable {

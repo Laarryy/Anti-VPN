@@ -4,37 +4,37 @@ import java.io.IOException;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.NotNull;
 
 public class PlayerLookup {
     private PlayerLookup() { }
 
-    private static final boolean IS_PAPER;
+    private static final boolean HAS_PLAYERPROFILE_API;
 
     static {
-        boolean paper = true;
+        boolean api = true;
         try {
             Class.forName("com.destroystokyo.paper.profile.PlayerProfile");
         } catch (ClassNotFoundException ignored) {
-            paper = false;
+            api = false;
         }
-        IS_PAPER = paper;
+        HAS_PLAYERPROFILE_API = api;
     }
 
-    public static @NonNull CompletableFuture<PlayerInfo> get(@NonNull UUID uuid) {
+    public static @NotNull CompletableFuture<@NotNull PlayerInfo> get(@NotNull UUID uuid) {
         return CompletableFuture.supplyAsync(() -> {
             try {
-                return IS_PAPER ? new PaperPlayerInfo(uuid) : new BukkitPlayerInfo(uuid);
+                return HAS_PLAYERPROFILE_API ? new PaperPlayerInfo(uuid) : new BukkitPlayerInfo(uuid);
             } catch (IOException ex) {
                 throw new CompletionException(ex);
             }
         });
     }
 
-    public static @NonNull CompletableFuture<PlayerInfo> get(@NonNull String name) {
+    public static @NotNull CompletableFuture<@NotNull PlayerInfo> get(@NotNull String name) {
         return CompletableFuture.supplyAsync(() -> {
             try {
-                return IS_PAPER ? new PaperPlayerInfo(name) : new BukkitPlayerInfo(name);
+                return HAS_PLAYERPROFILE_API ? new PaperPlayerInfo(name) : new BukkitPlayerInfo(name);
             } catch (IOException ex) {
                 throw new CompletionException(ex);
             }

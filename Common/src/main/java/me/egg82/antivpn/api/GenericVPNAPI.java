@@ -11,7 +11,7 @@ import me.egg82.antivpn.api.platform.PluginMetadata;
 import me.egg82.antivpn.config.CachedConfig;
 import me.egg82.antivpn.utils.PacketUtil;
 import net.engio.mbassy.bus.MBassador;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.NotNull;
 
 public class GenericVPNAPI implements VPNAPI {
     private final Platform platform;
@@ -24,7 +24,7 @@ public class GenericVPNAPI implements VPNAPI {
 
     private final CachedConfig cachedConfig;
 
-    public GenericVPNAPI(@NonNull Platform platform, @NonNull PluginMetadata pluginMetadata, @NonNull IPManager ipManager, @NonNull PlayerManager playerManager, @NonNull SourceManager sourceManager, @NonNull CachedConfig cachedConfig, @NonNull MBassador<VPNEvent> eventBus) {
+    public GenericVPNAPI(@NotNull Platform platform, @NotNull PluginMetadata pluginMetadata, @NotNull IPManager ipManager, @NotNull PlayerManager playerManager, @NotNull SourceManager sourceManager, @NotNull CachedConfig cachedConfig, @NotNull MBassador<VPNEvent> eventBus) {
         this.platform = platform;
         this.pluginMetadata = pluginMetadata;
 
@@ -36,19 +36,19 @@ public class GenericVPNAPI implements VPNAPI {
         this.cachedConfig = cachedConfig;
     }
 
-    public @NonNull UUID getServerId() { return cachedConfig.getServerId(); }
+    public @NotNull UUID getServerId() { return cachedConfig.getServerId(); }
 
-    public @NonNull IPManager getIPManager() { return ipManager; }
+    public @NotNull IPManager getIPManager() { return ipManager; }
 
-    public @NonNull PlayerManager getPlayerManager() { return playerManager; }
+    public @NotNull PlayerManager getPlayerManager() { return playerManager; }
 
-    public @NonNull SourceManager getSourceManager() { return sourceManager; }
+    public @NotNull SourceManager getSourceManager() { return sourceManager; }
 
-    public @NonNull Platform getPlatform() { return platform; }
+    public @NotNull Platform getPlatform() { return platform; }
 
-    public @NonNull PluginMetadata getPluginMetadata() { return pluginMetadata; }
+    public @NotNull PluginMetadata getPluginMetadata() { return pluginMetadata; }
 
-    public @NonNull CompletableFuture<Void> runUpdateTask() { return CompletableFuture.runAsync(PacketUtil::trySendQueue); }
+    public @NotNull CompletableFuture<Void> runUpdateTask() { return CompletableFuture.runAsync(PacketUtil::trySendQueue); }
 
-    public @NonNull MBassador<VPNEvent> getEventBus() { return eventBus; }
+    public @NotNull MBassador<VPNEvent> getEventBus() { return eventBus; }
 }

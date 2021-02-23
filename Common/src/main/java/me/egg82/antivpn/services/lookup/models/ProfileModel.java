@@ -4,29 +4,27 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class ProfileModel implements Serializable {
-    private String id;
-    private String name;
-    private List<ProfilePropertyModel> properties;
+    private String id = null;
+    private String name = null;
+    private List<ProfilePropertyModel> properties = new ArrayList<>();
 
-    public ProfileModel() {
-        this.id = null;
-        this.name = null;
-        this.properties = new ArrayList<>();
-    }
+    public ProfileModel() { }
 
-    public String getId() { return id; }
+    public @Nullable String getId() { return id; }
 
-    public void setId(String id) { this.id = id; }
+    public void setId(@Nullable String id) { this.id = id; }
 
-    public String getName() { return name; }
+    public @Nullable String getName() { return name; }
 
-    public void setName(String name) { this.name = name; }
+    public void setName(@Nullable String name) { this.name = name; }
 
-    public List<ProfilePropertyModel> getProperties() { return properties; }
+    public @NotNull List<@NotNull ProfilePropertyModel> getProperties() { return properties; }
 
-    public void setProperties(List<ProfilePropertyModel> properties) { this.properties = properties; }
+    public void setProperties(@NotNull List<@NotNull ProfilePropertyModel> properties) { this.properties = properties; }
 
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -48,29 +46,25 @@ public class ProfileModel implements Serializable {
     }
 
     public static class ProfilePropertyModel implements Serializable {
-        private String name;
-        private String value;
-        private String signature;
+        private String name = null;
+        private String value = null;
+        private String signature = null;
 
-        public ProfilePropertyModel() {
-            this.name = null;
-            this.value = null;
-            this.signature = null;
-        }
+        public ProfilePropertyModel() { }
 
-        public String getName() { return name; }
+        public @Nullable String getName() { return name; }
 
-        public void setName(String name) { this.name = name; }
+        public void setName(@Nullable String name) { this.name = name; }
 
-        public String getValue() { return value; }
+        public @Nullable String getValue() { return value; }
 
-        public void setValue(String value) { this.value = value; }
+        public void setValue(@Nullable String value) { this.value = value; }
 
         public boolean hasSignature() { return signature != null; }
 
-        public String getSignature() { return signature; }
+        public @Nullable String getSignature() { return signature; }
 
-        public void setSignature(String signature) { this.signature = signature; }
+        public void setSignature(@Nullable String signature) { this.signature = signature; }
 
         public boolean equals(Object o) {
             if (this == o) return true;

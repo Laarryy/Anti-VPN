@@ -14,8 +14,10 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import javax.xml.xpath.XPathExpressionException;
+import me.egg82.antivpn.api.platform.Platform;
 import me.egg82.antivpn.bukkit.BukkitEnvironmentUtil;
-import me.egg82.antivpn.utils.BukkitLogUtil;
+import me.egg82.antivpn.bukkit.BukkitVersionUtil;
+import me.egg82.antivpn.logging.GELFLogger;
 import me.lucko.jarrelocator.JarRelocator;
 import me.lucko.jarrelocator.Relocation;
 import ninja.egg82.maven.Artifact;
@@ -27,7 +29,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.java.JavaPluginLoader;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
@@ -40,6 +42,9 @@ public class BukkitBootstrap extends JavaPlugin {
     private final boolean isBukkit;
 
     private final ExecutorService downloadPool = Executors.newWorkStealingPool(Math.max(4, Runtime.getRuntime().availableProcessors() / 2));
+
+    private final String platform = Platform.Type.BUKKIT.getFriendlyName();
+    private final String platformVersion = BukkitVersionUtil.getGameVersion();
 
     public BukkitBootstrap() {
         super();
@@ -60,26 +65,28 @@ public class BukkitBootstrap extends JavaPlugin {
             loadJars(new File(getDataFolder(), "external"), (URLClassLoader) getClass().getClassLoader());
         } catch (ClassCastException | IOException ex) {
             Thread.currentThread().setContextClassLoader(origClassLoader);
-            logger.error(ex.getMessage(), ex);
+            GELFLogger.exception(logger, ex, platform, platformVersion, true);
             throw new RuntimeException("Could not load required dependencies.");
         }
 
         downloadPool.shutdown();
         try {
             if (!downloadPool.awaitTermination(1L, TimeUnit.HOURS)) {
-                logger.error("Could not download all dependencies. Please try again later.");
+                GELFLogger.error(logger, "Could not download all dependencies. Please try again later.", platform, platformVersion, true);
                 Thread.currentThread().setContextClassLoader(origClassLoader);
                 return;
             }
         } catch (InterruptedException ex) {
             Thread.currentThread().setContextClassLoader(origClassLoader);
-            logger.error(ex.getMessage(), ex);
+            GELFLogger.exception(logger, ex, platform, platformVersion, true);
             Thread.currentThread().interrupt();
         }
 
         try {
             concrete = new AntiVPN(this);
             concrete.onLoad();
+        } catch (Exception ex) {
+            GELFLogger.exception(logger, ex, platform, platformVersion, true);
         } finally {
             Thread.currentThread().setContextClassLoader(origClassLoader);
         }
@@ -91,6 +98,8 @@ public class BukkitBootstrap extends JavaPlugin {
         Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
         try {
             concrete.onEnable();
+        } catch (Exception ex) {
+            GELFLogger.exception(logger, ex, platform, platformVersion, true);
         } finally {
             Thread.currentThread().setContextClassLoader(origClassLoader);
         }
@@ -102,12 +111,14 @@ public class BukkitBootstrap extends JavaPlugin {
         Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
         try {
             concrete.onDisable();
+        } catch (Exception ex) {
+            GELFLogger.exception(logger, ex, platform, platformVersion, true);
         } finally {
             Thread.currentThread().setContextClassLoader(origClassLoader);
         }
     }
 
-    private void loadJars(@NonNull File jarsDir, @NonNull URLClassLoader parentLoader) throws IOException {
+    private void loadJars(@NotNull File jarsDir, @NotNull URLClassLoader parentLoader) throws IOException {
         if (jarsDir.exists() && !jarsDir.isDirectory()) {
             Files.delete(jarsDir.toPath());
         }
@@ -118,16 +129,6 @@ public class BukkitBootstrap extends JavaPlugin {
         }
 
         File cacheDir = new File(jarsDir, "cache");
-
-        Artifact.Builder checkerframework = Artifact.builder(getCheckerFrameworkPackage(), "checker", "${checkerframework.version}", cacheDir)
-                .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
-        buildRelocateInject(checkerframework, jarsDir, Arrays.asList(
-                new Relocation(getAnnotatedJdkPackage(), "me.egg82.antivpn.external." + getAnnotatedJdkPackage()),
-                new Relocation(getAnnotatorPackage(), "me.egg82.antivpn.external." + getAnnotatorPackage()),
-                new Relocation(getCheckerFrameworkPackage(), "me.egg82.antivpn.external." + getCheckerFrameworkPackage()),
-                new Relocation(getJmlSpecsPackage(), "me.egg82.antivpn.external." + getJmlSpecsPackage()),
-                new Relocation(getSceneLibPackage(), "me.egg82.antivpn.external." + getSceneLibPackage())
-        ), parentLoader, "Checker Framework");
 
         Artifact.Builder caffeine = Artifact.builder("com.github.ben-manes.caffeine", "caffeine", "${caffeine.version}", cacheDir)
                 .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
@@ -177,14 +178,6 @@ public class BukkitBootstrap extends JavaPlugin {
                 .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
         buildRelocateInject(fastutil, jarsDir, Collections.singletonList(new Relocation(getFastUtilPackage(), "me.egg82.antivpn.external." + getFastUtilPackage())), parentLoader, "FastUtil");
 
-        Artifact.Builder mcleaks = Artifact.builder("me.gong", "mcleaks-api", "${mcleaks.version}", cacheDir)
-                .addRepository(Repository.builder("https://nexus.wesjd.net/repository/thirdparty/").addProxy("https://nexus.egg82.me/repository/wesjd/").build());
-        buildRelocateInject(mcleaks, jarsDir, Arrays.asList(
-                new Relocation(getMcLeaksPackage(), "me.egg82.antivpn.external." + getMcLeaksPackage()),
-                new Relocation(getOkhttp3Package(), "me.egg82.antivpn.external." + getOkhttp3Package()),
-                new Relocation(getOkioPackage(), "me.egg82.antivpn.external." + getOkioPackage())
-        ), parentLoader, "MC Leaks API");
-
         Artifact.Builder javassist = Artifact.builder("org.javassist", getJavassistPackage(), "${javassist.version}", cacheDir)
             .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
         buildRelocateInject(javassist, jarsDir, Collections.singletonList(new Relocation(getJavassistPackage(), "me.egg82.antivpn.external." + getJavassistPackage())), parentLoader, "Javassist");
@@ -211,53 +204,37 @@ public class BukkitBootstrap extends JavaPlugin {
     }
 
     // Prevent Maven from relocating these
-    private @NonNull String getAnnotatedJdkPackage() { return new String(new byte[] {'a', 'n', 'n', 'o', 't', 'a', 't', 'e', 'd', '-', 'j', 'd', 'k'}); }
+    private @NotNull String getCaffeinePackage() { return new String(new byte[] {'c', 'o', 'm', '.', 'g', 'i', 't', 'h', 'u', 'b', '.', 'b', 'e', 'n', 'm', 'a', 'n', 'e', 's', '.', 'c', 'a', 'f', 'f', 'e', 'i', 'n', 'e'}); }
 
-    private @NonNull String getAnnotatorPackage() { return new String(new byte[] {'a', 'n', 'n', 'o', 't', 'a', 't', 'o', 'r'}); }
+    private @NotNull String getInetIpaddrPackage() { return new String(new byte[] {'i', 'n', 'e', 't', '.', 'i', 'p', 'a', 'd', 'd', 'r'}); }
 
-    private @NonNull String getCheckerFrameworkPackage() { return new String(new byte[] {'o', 'r', 'g', '.', 'c', 'h', 'e', 'c', 'k', 'e', 'r', 'f', 'r', 'a', 'm', 'e', 'w', 'o', 'r', 'k'}); }
+    private @NotNull String getRabbitMqPackage() { return new String(new byte[] {'c', 'o', 'm', '.', 'r', 'a', 'b', 'b', 'i', 't', 'm', 'q'}); }
 
-    private @NonNull String getJmlSpecsPackage() { return new String(new byte[] {'o', 'r', 'g', '.', 'j', 'm', 'l', 's', 'p', 'e', 'c', 's'}); }
+    private @NotNull String getEbeanPackage() { return new String(new byte[] {'i', 'o', '.', 'e', 'b', 'e', 'a', 'n'}); }
 
-    private @NonNull String getSceneLibPackage() { return new String(new byte[] {'s', 'c', 'e', 'n', 'e', 'l', 'i', 'b'}); }
+    private @NotNull String getEbeanInternalPackage() { return new String(new byte[] {'i', 'o', '.', 'e', 'b', 'e', 'a', 'n', 'i', 'n', 't', 'e', 'r', 'n', 'a', 'l'}); }
 
-    private @NonNull String getCaffeinePackage() { return new String(new byte[] {'c', 'o', 'm', '.', 'g', 'i', 't', 'h', 'u', 'b', '.', 'b', 'e', 'n', 'm', 'a', 'n', 'e', 's', '.', 'c', 'a', 'f', 'f', 'e', 'i', 'n', 'e'}); }
+    private @NotNull String getEbeanServicePackage() { return new String(new byte[] {'i', 'o', '.', 'e', 'b', 'e', 'a', 'n', 's', 'e', 'r', 'v', 'i', 'c', 'e'}); }
 
-    private @NonNull String getInetIpaddrPackage() { return new String(new byte[] {'i', 'n', 'e', 't', '.', 'i', 'p', 'a', 'd', 'd', 'r'}); }
+    private @NotNull String getFastUtilPackage() { return new String(new byte[] {'i', 't', '.', 'u', 'n', 'i', 'm', 'i', '.', 'd', 's', 'i', '.', 'f', 'a', 's', 't', 'u', 't', 'i', 'l'}); }
 
-    private @NonNull String getRabbitMqPackage() { return new String(new byte[] {'c', 'o', 'm', '.', 'r', 'a', 'b', 'b', 'i', 't', 'm', 'q'}); }
+    private @NotNull String getJavassistPackage() { return new String(new byte[] {'j', 'a', 'v', 'a', 's', 's', 'i', 's', 't'}); }
 
-    private @NonNull String getEbeanPackage() { return new String(new byte[] {'i', 'o', '.', 'e', 'b', 'e', 'a', 'n'}); }
+    private @NotNull String getJedisPackage() { return new String(new byte[] {'r', 'e', 'd', 'i', 's', '.', 'c', 'l', 'i', 'e', 'n', 't', 's', '.', 'j', 'e', 'd', 'i', 's'}); }
 
-    private @NonNull String getEbeanInternalPackage() { return new String(new byte[] {'i', 'o', '.', 'e', 'b', 'e', 'a', 'n', 'i', 'n', 't', 'e', 'r', 'n', 'a', 'l'}); }
-
-    private @NonNull String getEbeanServicePackage() { return new String(new byte[] {'i', 'o', '.', 'e', 'b', 'e', 'a', 'n', 's', 'e', 'r', 'v', 'i', 'c', 'e'}); }
-
-    private @NonNull String getFastUtilPackage() { return new String(new byte[] {'i', 't', '.', 'u', 'n', 'i', 'm', 'i', '.', 'd', 's', 'i', '.', 'f', 'a', 's', 't', 'u', 't', 'i', 'l'}); }
-
-    private @NonNull String getMcLeaksPackage() { return new String(new byte[] {'m', 'e', '.', 'g', 'o', 'n', 'g', '.', 'm', 'c', 'l', 'e', 'a', 'k', 's'}); }
-
-    private @NonNull String getOkhttp3Package() { return new String(new byte[] {'o', 'k', 'h', 't', 't', 'p'}); }
-
-    private @NonNull String getOkioPackage() { return new String(new byte[] {'o', 'k', 'i', 'o'}); }
-
-    private @NonNull String getJavassistPackage() { return new String(new byte[] {'j', 'a', 'v', 'a', 's', 's', 'i', 's', 't'}); }
-
-    private @NonNull String getJedisPackage() { return new String(new byte[] {'r', 'e', 'd', 'i', 's', '.', 'c', 'l', 'i', 'e', 'n', 't', 's', '.', 'j', 'e', 'd', 'i', 's'}); }
-
-    private void printLatest(@NonNull String friendlyName) {
-        log(Level.INFO, BukkitLogUtil.HEADING + ChatColor.YELLOW + "Checking version of " + ChatColor.WHITE + friendlyName);
+    private void printLatest(@NotNull String friendlyName) {
+        log(Level.INFO, ChatColor.YELLOW + "Checking version of " + ChatColor.WHITE + friendlyName);
     }
 
-    private void buildInject(Artifact.Builder builder, @NonNull File jarsDir, @NonNull URLClassLoader classLoader, @NonNull String friendlyName) {
+    private void buildInject(Artifact.Builder builder, @NotNull File jarsDir, @NotNull URLClassLoader classLoader, @NotNull String friendlyName) {
         buildInject(builder, jarsDir, classLoader, friendlyName, 0);
     }
 
-    private void buildInject(Artifact.Builder builder, @NonNull File jarsDir, @NonNull URLClassLoader classLoader, @NonNull String friendlyName, int depth) {
+    private void buildInject(Artifact.Builder builder, @NotNull File jarsDir, @NotNull URLClassLoader classLoader, @NotNull String friendlyName, int depth) {
         downloadPool.submit(() -> buildInjectWait(builder, jarsDir, classLoader, friendlyName, depth));
     }
 
-    private void buildInjectWait(Artifact.Builder builder, @NonNull File jarsDir, @NonNull URLClassLoader classLoader, @NonNull String friendlyName, int depth) {
+    private void buildInjectWait(Artifact.Builder builder, @NotNull File jarsDir, @NotNull URLClassLoader classLoader, @NotNull String friendlyName, int depth) {
         Exception lastEx;
         try {
             injectArtifact(builder.build(), jarsDir, classLoader, friendlyName, depth, null);
@@ -265,16 +242,17 @@ public class BukkitBootstrap extends JavaPlugin {
         } catch (IOException ex) {
             lastEx = ex;
         } catch (IllegalAccessException | InvocationTargetException | URISyntaxException | XPathExpressionException | SAXException ex) {
-            logger.error(ex.getMessage(), ex);
+            GELFLogger.exception(logger, ex, platform, platformVersion, true);
             return;
         }
 
         if (depth > 0) {
-            logger.error(lastEx.getMessage(), lastEx);
+            GELFLogger.exception(logger, lastEx, platform, platformVersion, true);
             return;
         }
 
-        logger.warn("Failed to download/relocate " + builder.getGroupId() + ":" + builder.getArtifactId() + "-" + builder.getVersion() + ". Searching disk instead.", lastEx);
+        GELFLogger.warn(logger, "Failed to download/relocate " + builder.getGroupId() + ":" + builder.getArtifactId() + "-" + builder.getVersion() + ". Searching disk instead.", platform, platformVersion, true);
+        GELFLogger.exception(logger, lastEx, platform, platformVersion, true);
 
         try {
             injectArtifact(builder, jarsDir, classLoader, null);
@@ -283,15 +261,15 @@ public class BukkitBootstrap extends JavaPlugin {
         }
     }
 
-    private void buildRelocateInject(Artifact.Builder builder, @NonNull File jarsDir, @NonNull List<Relocation> rules, @NonNull URLClassLoader classLoader, @NonNull String friendlyName) {
+    private void buildRelocateInject(Artifact.Builder builder, @NotNull File jarsDir, @NotNull List<Relocation> rules, @NotNull URLClassLoader classLoader, @NotNull String friendlyName) {
         buildRelocateInject(builder, jarsDir, rules, classLoader, friendlyName, 0);
     }
 
-    private void buildRelocateInject(Artifact.Builder builder, @NonNull File jarsDir, @NonNull List<Relocation> rules, @NonNull URLClassLoader classLoader, @NonNull String friendlyName, int depth) {
+    private void buildRelocateInject(Artifact.Builder builder, @NotNull File jarsDir, @NotNull List<Relocation> rules, @NotNull URLClassLoader classLoader, @NotNull String friendlyName, int depth) {
         downloadPool.submit(() -> buildRelocateInjectWait(builder, jarsDir, rules, classLoader, friendlyName, depth));
     }
 
-    private void buildRelocateInjectWait(Artifact.Builder builder, @NonNull File jarsDir, @NonNull List<Relocation> rules, @NonNull URLClassLoader classLoader, @NonNull String friendlyName, int depth) {
+    private void buildRelocateInjectWait(Artifact.Builder builder, @NotNull File jarsDir, @NotNull List<Relocation> rules, @NotNull URLClassLoader classLoader, @NotNull String friendlyName, int depth) {
         Exception lastEx;
         try {
             injectArtifact(builder.build(), jarsDir, classLoader, friendlyName, depth, rules);
@@ -299,16 +277,17 @@ public class BukkitBootstrap extends JavaPlugin {
         } catch (IOException ex) {
             lastEx = ex;
         } catch (IllegalAccessException | InvocationTargetException | URISyntaxException | XPathExpressionException | SAXException ex) {
-            logger.error(ex.getMessage(), ex);
+            GELFLogger.exception(logger, ex, platform, platformVersion, true);
             return;
         }
 
         if (depth > 0) {
-            logger.error(lastEx.getMessage(), lastEx);
+            GELFLogger.exception(logger, lastEx, platform, platformVersion, true);
             return;
         }
 
-        logger.warn("Failed to download/relocate " + builder.getGroupId() + ":" + builder.getArtifactId() + "-" + builder.getVersion() + ". Searching disk instead.", lastEx);
+        GELFLogger.warn(logger, "Failed to download/relocate " + builder.getGroupId() + ":" + builder.getArtifactId() + "-" + builder.getVersion() + ". Searching disk instead.", platform, platformVersion, true);
+        GELFLogger.exception(logger, lastEx, platform, platformVersion, true);
 
         try {
             injectArtifact(builder, jarsDir, classLoader, rules);
@@ -317,14 +296,14 @@ public class BukkitBootstrap extends JavaPlugin {
         }
     }
 
-    private void injectArtifact(@NonNull Artifact artifact, @NonNull File jarsDir, @NonNull URLClassLoader classLoader, String friendlyName, int depth, List<Relocation> rules) throws IOException, IllegalAccessException, InvocationTargetException, URISyntaxException, XPathExpressionException, SAXException {
+    private void injectArtifact(@NotNull Artifact artifact, @NotNull File jarsDir, @NotNull URLClassLoader classLoader, String friendlyName, int depth, List<Relocation> rules) throws IOException, IllegalAccessException, InvocationTargetException, URISyntaxException, XPathExpressionException, SAXException {
         File output = new File(jarsDir, artifact.getGroupId()
                 + "-" + artifact.getArtifactId()
                 + "-" + artifact.getRealVersion() + ".jar"
         );
 
         if (friendlyName != null && !artifact.fileExists(output)) {
-            log(Level.INFO, BukkitLogUtil.HEADING + ChatColor.YELLOW + "Downloading " + ChatColor.WHITE + friendlyName);
+            log(Level.INFO, ChatColor.YELLOW + "Downloading " + ChatColor.WHITE + friendlyName);
         }
 
         if (rules == null) {
@@ -353,7 +332,7 @@ public class BukkitBootstrap extends JavaPlugin {
         }
     }
 
-    private void injectArtifact(Artifact.Builder builder, @NonNull File jarsDir, @NonNull URLClassLoader classLoader, List<Relocation> rules) throws IOException, IllegalAccessException, InvocationTargetException {
+    private void injectArtifact(Artifact.Builder builder, @NotNull File jarsDir, @NotNull URLClassLoader classLoader, List<Relocation> rules) throws IOException, IllegalAccessException, InvocationTargetException {
         File[] files = jarsDir.listFiles();
         if (files == null) {
             throw new IOException();
@@ -384,7 +363,7 @@ public class BukkitBootstrap extends JavaPlugin {
         }
     }
 
-    private void log(@NonNull Level level, @NonNull String message) {
+    private void log(@NotNull Level level, @NotNull String message) {
         getServer().getLogger().log(level, (isBukkit) ? ChatColor.stripColor(message) : message);
     }
 }

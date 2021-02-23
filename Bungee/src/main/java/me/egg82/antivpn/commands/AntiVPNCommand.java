@@ -2,20 +2,20 @@ package me.egg82.antivpn.commands;
 
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.CommandHelp;
-import co.aikar.commands.CommandIssuer;
 import co.aikar.commands.annotation.*;
 import me.egg82.antivpn.commands.internal.*;
+import me.egg82.antivpn.lang.LocalizedCommandSender;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.plugin.Plugin;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.NotNull;
 
 @CommandAlias("antivpn|avpn")
 public class AntiVPNCommand extends BaseCommand {
     private final Plugin plugin;
-    private final CommandIssuer console;
+    private final LocalizedCommandSender console;
 
-    public AntiVPNCommand(@NonNull Plugin plugin, @NonNull CommandIssuer console) {
+    public AntiVPNCommand(@NotNull Plugin plugin, @NotNull LocalizedCommandSender console) {
         this.plugin = plugin;
         this.console = console;
     }
@@ -23,7 +23,7 @@ public class AntiVPNCommand extends BaseCommand {
     @Subcommand("reload")
     @CommandPermission("avpn.admin")
     @Description("{@@description.reload}")
-    public void onReload(@NonNull CommandIssuer issuer) {
+    public void onReload(@NotNull LocalizedCommandSender issuer) {
         new ReloadCommand(issuer, plugin.getDataFolder(), console).run();
     }
 
@@ -32,7 +32,7 @@ public class AntiVPNCommand extends BaseCommand {
     @Description("{@@description.import}")
     @Syntax("<master> <slave> [batchSize]")
     @CommandCompletion("@storage @storage @nothing")
-    public void onImport(@NonNull CommandIssuer issuer, @NonNull @Conditions("storage") String master, @NonNull @Conditions("storage") String slave, @Default("50") String batchSize) {
+    public void onImport(@NotNull LocalizedCommandSender issuer, @NotNull @Conditions("storage") String master, @NotNull @Conditions("storage") String slave, @Default("50") String batchSize) {
         new ImportCommand(issuer, master, slave, batchSize).run();
     }
 
@@ -41,7 +41,7 @@ public class AntiVPNCommand extends BaseCommand {
     @Description("{@@description.kick}")
     @Syntax("<player> [type]")
     @CommandCompletion("@player @type")
-    public void onKick(@NonNull CommandIssuer issuer, @NonNull String player, @Default("vpn") String type) {
+    public void onKick(@NotNull LocalizedCommandSender issuer, @NotNull String player, @Default("vpn") String type) {
         new KickCommand(issuer, player, type).run();
     }
 
@@ -50,7 +50,7 @@ public class AntiVPNCommand extends BaseCommand {
     @Description("{@@description.test}")
     @Syntax("<ip>")
     @CommandCompletion("@nothing")
-    public void onTest(@NonNull CommandIssuer issuer, @NonNull @Conditions("ip") String ip) {
+    public void onTest(@NotNull LocalizedCommandSender issuer, @NotNull @Conditions("ip") String ip) {
         new TestCommand(issuer, ip).run();
     }
 
@@ -59,7 +59,7 @@ public class AntiVPNCommand extends BaseCommand {
     @Description("{@@description.score}")
     @Syntax("<source>")
     @CommandCompletion("@source @nothing")
-    public void onScore(@NonNull CommandIssuer issuer, @NonNull @Conditions("source") String source) {
+    public void onScore(@NotNull LocalizedCommandSender issuer, @NotNull @Conditions("source") String source) {
         new ScoreCommand(issuer, source).run();
     }
 
@@ -68,17 +68,17 @@ public class AntiVPNCommand extends BaseCommand {
     @Description("{@@description.check}")
     @Syntax("<ip|player>")
     @CommandCompletion("@player @nothing")
-    public void onCheck(@NonNull CommandIssuer issuer, @NonNull String type) {
+    public void onCheck(@NotNull LocalizedCommandSender issuer, @NotNull String type) {
         new CheckCommand(issuer, type).run();
     }
 
     @CatchUnknown @Default
     @CommandCompletion("@subcommand")
-    public void onDefault(@NonNull CommandSender sender, String[] args) {
+    public void onDefault(@NotNull CommandSender sender, String[] args) {
         ProxyServer.getInstance().getPluginManager().dispatchCommand(sender, "antivpn help");
     }
 
     @HelpCommand
     @Syntax("[command]")
-    public void onHelp(@NonNull CommandSender sender, @NonNull CommandHelp help) { help.showHelp(); }
+    public void onHelp(@NotNull CommandSender sender, @NotNull CommandHelp help) { help.showHelp(); }
 }

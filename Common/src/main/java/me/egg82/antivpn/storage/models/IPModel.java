@@ -2,18 +2,17 @@ package me.egg82.antivpn.storage.models;
 
 import io.ebean.annotation.Index;
 import io.ebean.annotation.Length;
-import io.ebean.annotation.NotNull;
 import javax.persistence.Entity;
 import javax.persistence.Table;
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 @Entity
 @Table(name = "avpn_6_ip")
 public class IPModel extends BaseModel {
-    @Index(unique = true) @NotNull @Length(45)
+    @Index(unique = true) @io.ebean.annotation.NotNull @Length(45)
     private String ip;
-    @NotNull
+    @io.ebean.annotation.NotNull
     private int type;
     private Boolean cascade;
     private Double consensus;
@@ -34,9 +33,9 @@ public class IPModel extends BaseModel {
         this.consensus = null;
     }
 
-    public @NonNull String getIp() { return ip; }
+    public @NotNull String getIp() { return ip; }
 
-    public void setIp(@NonNull String ip) { this.ip = ip; }
+    public void setIp(@NotNull String ip) { this.ip = ip; }
 
     public int getType() { return type; }
 
@@ -44,11 +43,11 @@ public class IPModel extends BaseModel {
 
     public @Nullable Boolean getCascade() { return cascade; }
 
-    public void setCascade(Boolean cascade) { this.cascade = cascade; }
+    public void setCascade(@Nullable Boolean cascade) { this.cascade = cascade; }
 
     public @Nullable Double getConsensus() { return consensus; }
 
-    public void setConsensus(Double consensus) { this.consensus = consensus; }
+    public void setConsensus(@Nullable Double consensus) { this.consensus = consensus; }
 
     public String toString() {
         return "IPModel{" +

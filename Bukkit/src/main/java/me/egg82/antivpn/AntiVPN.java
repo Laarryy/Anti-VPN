@@ -1,19 +1,13 @@
 package me.egg82.antivpn;
 
-import co.aikar.commands.*;
-import co.aikar.taskchain.BukkitTaskChainFactory;
-import co.aikar.taskchain.TaskChainFactory;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.SetMultimap;
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import java.io.File;
-import java.io.IOException;
-import java.util.*;
-import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.logging.Level;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.CompletionException;
 import me.egg82.antivpn.api.*;
 import me.egg82.antivpn.api.event.api.GenericAPIDisableEvent;
 import me.egg82.antivpn.api.event.api.GenericAPILoadedEvent;
@@ -21,152 +15,109 @@ import me.egg82.antivpn.api.event.api.GenericPublicationErrorHandler;
 import me.egg82.antivpn.api.model.ip.BukkitIPManager;
 import me.egg82.antivpn.api.model.player.BukkitPlayerManager;
 import me.egg82.antivpn.api.model.source.GenericSourceManager;
-import me.egg82.antivpn.api.model.source.Source;
-import me.egg82.antivpn.api.model.source.models.SourceModel;
 import me.egg82.antivpn.api.platform.BukkitPlatform;
 import me.egg82.antivpn.api.platform.BukkitPluginMetadata;
 import me.egg82.antivpn.api.platform.Platform;
 import me.egg82.antivpn.api.platform.PluginMetadata;
 import me.egg82.antivpn.bukkit.BukkitEnvironmentUtil;
 import me.egg82.antivpn.bukkit.BukkitVersionUtil;
-import me.egg82.antivpn.commands.AntiVPNCommand;
+import me.egg82.antivpn.commands.AntiVPNCommands;
+import me.egg82.antivpn.commands.CommandHolder;
 import me.egg82.antivpn.config.CachedConfig;
 import me.egg82.antivpn.config.ConfigUtil;
 import me.egg82.antivpn.config.ConfigurationFileUtil;
+import me.egg82.antivpn.events.EarlyCheckEvents;
 import me.egg82.antivpn.events.EventHolder;
-import me.egg82.antivpn.events.PlayerEvents;
-import me.egg82.antivpn.events.PlayerLoginUpdateNotifyHandler;
+import me.egg82.antivpn.events.ExtraPlayerEvents;
+import me.egg82.antivpn.events.LateCheckEvents;
 import me.egg82.antivpn.hooks.*;
-import me.egg82.antivpn.lang.LanguageFileUtil;
-import me.egg82.antivpn.lang.Message;
-import me.egg82.antivpn.lang.PluginMessageFormatter;
+import me.egg82.antivpn.lang.BukkitLocaleCommandUtil;
+import me.egg82.antivpn.lang.BukkitLocalizedCommandSender;
+import me.egg82.antivpn.lang.I18NManager;
+import me.egg82.antivpn.lang.MessageKey;
+import me.egg82.antivpn.logging.GELFLogger;
 import me.egg82.antivpn.messaging.GenericMessagingHandler;
 import me.egg82.antivpn.messaging.MessagingHandler;
 import me.egg82.antivpn.messaging.MessagingService;
 import me.egg82.antivpn.messaging.ServerIDUtil;
-import me.egg82.antivpn.services.GameAnalyticsErrorHandler;
 import me.egg82.antivpn.storage.StorageService;
-import me.egg82.antivpn.utils.ExceptionUtil;
-import me.egg82.antivpn.utils.ValidationUtil;
 import me.egg82.antivpn.utils.VersionUtil;
 import net.engio.mbassy.bus.MBassador;
-import ninja.egg82.events.BukkitEvents;
-import ninja.egg82.events.PriorityEventSubscriber;
-import ninja.egg82.service.ServiceLocator;
-import ninja.egg82.service.ServiceNotFoundException;
-import ninja.egg82.updater.SpigotUpdater;
-import org.bstats.bukkit.Metrics;
-import org.bstats.charts.AdvancedPie;
-import org.bstats.charts.SimplePie;
-import org.bstats.charts.SingleLineChart;
+import ninja.egg82.events.BukkitEventSubscriber;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.spongepowered.configurate.ConfigurationNode;
 
 public class AntiVPN {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger logger = LoggerFactory.getLogger(AntiVPN.class);
 
-    private final ExecutorService workPool = Executors.newFixedThreadPool(1, new ThreadFactoryBuilder().setNameFormat("AntiVPN-%d").build());
-
-    private TaskChainFactory taskFactory;
-    private PaperCommandManager commandManager;
-
+    private final List<CommandHolder> commandHolders = new ArrayList<>();
     private final List<EventHolder> eventHolders = new ArrayList<>();
-    private final List<PriorityEventSubscriber<EventPriority, ?>> events = new ArrayList<>();
+    private final List<BukkitEventSubscriber<?>> events = new ArrayList<>();
     private final IntList tasks = new IntArrayList();
 
     private final JavaPlugin plugin;
-    private final boolean isBukkit;
 
-    private CommandIssuer consoleCommandIssuer = null;
-
-    public AntiVPN(@NonNull JavaPlugin plugin) {
+    public AntiVPN(@NotNull JavaPlugin plugin) {
         this.plugin = plugin;
-        isBukkit = BukkitEnvironmentUtil.getEnvironment() == BukkitEnvironmentUtil.Environment.BUKKIT;
     }
 
-    public void onLoad() {
-        if (BukkitEnvironmentUtil.getEnvironment() != BukkitEnvironmentUtil.Environment.PAPER) {
-            log(Level.INFO, ChatColor.AQUA + "====================================");
-            log(Level.INFO, ChatColor.YELLOW + "Anti-VPN runs better on Paper!");
-            log(Level.INFO, ChatColor.YELLOW + "https://whypaper.emc.gs/");
-            log(Level.INFO, ChatColor.AQUA + "====================================");
-        }
-
-        if (!VersionUtil.isAtLeast("1.8", '.', BukkitVersionUtil.getGameVersion(), '.')) {
-            log(Level.INFO, ChatColor.GOLD + "====================================");
-            log(Level.INFO, ChatColor.DARK_RED + "Anti-VPN will likely not work on servers < 1.8");
-            log(Level.INFO, ChatColor.GOLD + "====================================");
-        }
-
-        if (BukkitVersionUtil.getGameVersion().startsWith("1.8")) {
-            log(Level.INFO, ChatColor.AQUA + "====================================");
-            log(Level.INFO, ChatColor.DARK_RED + "DEAR LORD why are you on 1.8???");
-            log(Level.INFO, ChatColor.DARK_RED + "Have you tried ViaVersion or ProtocolSupport lately?");
-            log(Level.INFO, ChatColor.AQUA + "====================================");
-        }
-    }
+    public void onLoad() { }
 
     public void onEnable() {
-        GameAnalyticsErrorHandler.open(ServerIDUtil.getId(new File(plugin.getDataFolder(), "stats-id.txt")), plugin.getDescription().getVersion(), Bukkit.getVersion());
+        GELFLogger.setData(ServerIDUtil.getId(new File(plugin.getDataFolder(), "stats-id.txt")), plugin.getDescription().getVersion(), Platform.Type.BUKKIT, Bukkit.getVersion());
 
-        taskFactory = BukkitTaskChainFactory.create(plugin);
-        taskFactory.setDefaultErrorHandler((ex, task) -> ExceptionUtil.handleException(ex, logger));
-        commandManager = new PaperCommandManager(plugin);
-        commandManager.enableUnstableAPI("help");
+        BukkitLocaleCommandUtil.create(plugin);
+        BukkitLocalizedCommandSender console = BukkitLocaleCommandUtil.getConsole();
 
-        setChatColors();
-
-        consoleCommandIssuer = commandManager.getCommandIssuer(plugin.getServer().getConsoleSender());
+        if (BukkitEnvironmentUtil.getEnvironment() != BukkitEnvironmentUtil.Environment.PAPER) {
+            console.sendMessage(MessageKey.BANNER__USE_PAPER);
+        }
+        if (!VersionUtil.isAtLeast("1.8", '.', BukkitVersionUtil.getGameVersion(), '.')) {
+            console.sendMessage(MessageKey.BANNER__PRE_18);
+        }
+        if (BukkitVersionUtil.getGameVersion().startsWith("1.8")) {
+            console.sendMessage(MessageKey.BANNER__IN_18);
+        }
 
         loadServices();
-        loadLanguages();
+        loadHooks();
         loadCommands();
         loadEvents();
         loadTasks();
-        loadHooks();
-        loadMetrics();
+
+        int numCommands = 0;
+        for (CommandHolder commandHolder : commandHolders) {
+            numCommands += commandHolder.numCommands();
+        }
 
         int numEvents = events.size();
         for (EventHolder eventHolder : eventHolders) {
             numEvents += eventHolder.numEvents();
         }
 
-        consoleCommandIssuer.sendInfo(Message.GENERAL__ENABLED);
-        consoleCommandIssuer.sendInfo(Message.GENERAL__LOAD,
+        console.sendMessage(MessageKey.GENERAL__ENABLE_MESSAGE);
+
+        console.sendMessage(MessageKey.GENERAL__LOAD_MESSAGE,
                 "{version}", plugin.getDescription().getVersion(),
                 "{apiversion}", VPNAPIProvider.getInstance().getPluginMetadata().getApiVersion(),
-                "{commands}", String.valueOf(commandManager.getRegisteredRootCommands().size()),
+                "{commands}", String.valueOf(numCommands),
                 "{events}", String.valueOf(numEvents),
                 "{tasks}", String.valueOf(tasks.size())
         );
-
-        workPool.execute(this::checkUpdate);
     }
 
     public void onDisable() {
-        workPool.shutdown();
-        try {
-            if (!workPool.awaitTermination(4L, TimeUnit.SECONDS)) {
-                workPool.shutdownNow();
-            }
-        } catch (InterruptedException ignored) {
-            Thread.currentThread().interrupt();
+        for (CommandHolder commandHolder : commandHolders) {
+            commandHolder.cancel();
         }
-
-        taskFactory.shutdown(2, TimeUnit.SECONDS);
-        commandManager.unregisterCommands();
+        commandHolders.clear();
 
         for (int task : tasks) {
             Bukkit.getScheduler().cancelTask(task);
@@ -176,14 +127,14 @@ public class AntiVPN {
         try {
             VPNAPIProvider.getInstance().runUpdateTask().join();
         } catch (CancellationException | CompletionException ex) {
-            ExceptionUtil.handleException(ex, logger);
+            GELFLogger.exception(logger, ex, BukkitLocaleCommandUtil.getConsole().getLocalizationManager());
         }
 
         for (EventHolder eventHolder : eventHolders) {
             eventHolder.cancel();
         }
         eventHolders.clear();
-        for (PriorityEventSubscriber<EventPriority, ?> event : events) {
+        for (BukkitEventSubscriber<?> event : events) {
             event.cancel();
         }
         events.clear();
@@ -191,72 +142,34 @@ public class AntiVPN {
         unloadHooks();
         unloadServices();
 
-        consoleCommandIssuer.sendInfo(Message.GENERAL__DISABLED);
+        BukkitLocaleCommandUtil.getConsole().sendMessage(MessageKey.GENERAL__DISABLE_MESSAGE);
 
-        GameAnalyticsErrorHandler.close();
-    }
-
-    private void loadLanguages() {
-        CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
-        if (cachedConfig == null) {
-            throw new RuntimeException("CachedConfig seems to be null.");
-        }
-
-        BukkitLocales locales = commandManager.getLocales();
-
-        try {
-            for (Locale locale : Locale.getAvailableLocales()) {
-                Optional<File> localeFile = LanguageFileUtil.getLanguage(plugin.getDataFolder(), locale);
-                if (localeFile.isPresent()) {
-                    commandManager.addSupportedLanguage(locale);
-                    locales.loadYamlLanguageFile(localeFile.get(), locale);
-                }
-            }
-        } catch (IOException | InvalidConfigurationException ex) {
-            logger.error(ex.getMessage(), ex);
-        }
-
-        locales.loadLanguages();
-        locales.setDefaultLocale(cachedConfig.getLanguage());
-        commandManager.usePerIssuerLocale(true, true);
-
-        commandManager.setFormat(MessageType.ERROR, new PluginMessageFormatter(commandManager, Message.GENERAL__HEADER));
-        commandManager.setFormat(MessageType.INFO, new PluginMessageFormatter(commandManager, Message.GENERAL__HEADER));
-        setChatColors();
-    }
-
-    private void setChatColors() {
-        commandManager.setFormat(MessageType.ERROR, ChatColor.DARK_RED, ChatColor.YELLOW, ChatColor.AQUA, ChatColor.WHITE);
-        commandManager.setFormat(MessageType.INFO, ChatColor.WHITE, ChatColor.YELLOW, ChatColor.AQUA, ChatColor.GREEN, ChatColor.RED, ChatColor.GOLD, ChatColor.BLUE, ChatColor.GRAY, ChatColor.DARK_RED);
+        BukkitLocaleCommandUtil.close();
     }
 
     private void loadServices() {
         GenericSourceManager sourceManager = new GenericSourceManager();
-
         MessagingHandler messagingHandler = new GenericMessagingHandler();
-        ServiceLocator.register(messagingHandler);
-
-        ConfigurationFileUtil.reloadConfig(plugin.getDataFolder(), consoleCommandIssuer, messagingHandler, sourceManager);
+        ConfigurationFileUtil.reloadConfig(plugin.getDataFolder(), BukkitLocaleCommandUtil.getConsole(), messagingHandler, sourceManager);
+        I18NManager.clearCaches();
 
         CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
+        BukkitLocaleCommandUtil.setConsoleLocale(plugin, cachedConfig.getLanguage());
 
         BukkitIPManager ipManager = new BukkitIPManager(plugin, sourceManager, cachedConfig.getCacheTime().getTime(), cachedConfig.getCacheTime().getUnit());
-        BukkitPlayerManager playerManager = new BukkitPlayerManager(plugin, cachedConfig.getThreads(), cachedConfig.getMcLeaksKey(), cachedConfig.getCacheTime().getTime(), cachedConfig.getCacheTime().getUnit());
+        BukkitPlayerManager playerManager = new BukkitPlayerManager(plugin, cachedConfig.getMcLeaksKey(), cachedConfig.getCacheTime());
         Platform platform = new BukkitPlatform(System.currentTimeMillis());
         PluginMetadata metadata = new BukkitPluginMetadata(plugin.getDescription().getVersion());
-        VPNAPI api = new GenericVPNAPI(platform, metadata, ipManager, playerManager, sourceManager, cachedConfig, new MBassador<>(new GenericPublicationErrorHandler()));
+        VPNAPI api = new GenericVPNAPI(platform, metadata, ipManager, playerManager, sourceManager, cachedConfig, new MBassador<>(new GenericPublicationErrorHandler(BukkitLocaleCommandUtil.getConsole().getLocalizationManager())));
 
         APIUtil.setManagers(ipManager, playerManager, sourceManager);
-
-        ServiceLocator.register(new SpigotUpdater(plugin, 58291));
-
         APIRegistrationUtil.register(api);
-
         api.getEventBus().post(new GenericAPILoadedEvent(api)).now();
     }
 
     private void loadCommands() {
-        commandManager.getCommandConditions().addCondition(String.class, "ip", (c, exec, value) -> {
+        // TODO: Clean up this mess
+        /*commandManager.getCommandConditions().addCondition(String.class, "ip", (c, exec, value) -> {
             if (!ValidationUtil.isValidIp(value)) {
                 throw new ConditionFailedException("Value must be a valid IP address.");
             }
@@ -290,10 +203,6 @@ public class AntiVPN {
         commandManager.getCommandConditions().addCondition(String.class, "storage", (c, exec, value) -> {
             String v = value.replace(" ", "_");
             CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
-            if (cachedConfig == null) {
-                logger.error("Cached config could not be fetched.");
-                return;
-            }
             for (StorageService service : cachedConfig.getStorage()) {
                 if (service.getName().equalsIgnoreCase(v)) {
                     return;
@@ -306,10 +215,6 @@ public class AntiVPN {
             String lower = c.getInput().toLowerCase().replace(" ", "_");
             Set<String> retVal = new LinkedHashSet<>();
             CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
-            if (cachedConfig == null) {
-                logger.error("Cached config could not be fetched.");
-                return ImmutableList.copyOf(retVal);
-            }
             for (StorageService service : cachedConfig.getStorage()) {
                 String ss = service.getName();
                 if (ss.toLowerCase().startsWith(lower)) {
@@ -355,14 +260,15 @@ public class AntiVPN {
                 }
             }
             return ImmutableList.copyOf(commands);
-        });
+        });*/
 
-        commandManager.registerCommand(new AntiVPNCommand(plugin, taskFactory, consoleCommandIssuer));
+        commandHolders.add(new AntiVPNCommands(plugin));
     }
 
     private void loadEvents() {
-        events.add(BukkitEvents.subscribe(plugin, PlayerLoginEvent.class, EventPriority.LOW).handler(e -> new PlayerLoginUpdateNotifyHandler(plugin, commandManager).accept(e)));
-        eventHolders.add(new PlayerEvents(plugin, consoleCommandIssuer));
+        eventHolders.add(new EarlyCheckEvents(plugin));
+        eventHolders.add(new LateCheckEvents(plugin));
+        eventHolders.add(new ExtraPlayerEvents(plugin));
     }
 
     private void loadTasks() {
@@ -370,270 +276,66 @@ public class AntiVPN {
             try {
                 VPNAPIProvider.getInstance().runUpdateTask().join();
             } catch (CancellationException | CompletionException ex) {
-                ExceptionUtil.handleException(ex, logger);
+                GELFLogger.exception(logger, ex, BukkitLocaleCommandUtil.getConsole().getLocalizationManager());
             }
         }, 1L, 20L).getTaskId());
     }
 
     private void loadHooks() {
+        BukkitLocalizedCommandSender console = BukkitLocaleCommandUtil.getConsole();
         PluginManager manager = plugin.getServer().getPluginManager();
+
+        console.sendMessage(MessageKey.GENERAL__ENABLE_HOOK, "{hook}", "BStats");
+        BStatsHook.create(plugin, 10438);
+
+        console.sendMessage(MessageKey.GENERAL__ENABLE_HOOK, "{hook}", "Updater");
+        UpdaterHook.create(plugin, 58291);
 
         Plugin plan;
         if ((plan = manager.getPlugin("Plan")) != null) {
-            consoleCommandIssuer.sendInfo(Message.GENERAL__HOOK_ENABLE, "{plugin}", "Plan");
+            console.sendMessage(MessageKey.GENERAL__ENABLE_HOOK, "{hook}", "Plan");
             PlayerAnalyticsHook.create(plugin, plan);
         } else {
-            consoleCommandIssuer.sendInfo(Message.GENERAL__HOOK_DISABLE, "{plugin}", "Plan");
+            console.sendMessage(MessageKey.GENERAL__NO_HOOK, "{hook}", "Plan");
         }
 
-        if (manager.getPlugin("PlaceholderAPI") != null) {
-            consoleCommandIssuer.sendInfo(Message.GENERAL__HOOK_ENABLE, "{plugin}", "PlaceholderAPI");
-            ServiceLocator.register(new PlaceholderAPIHook());
+        Plugin placeholderapi;
+        if ((placeholderapi = manager.getPlugin("PlaceholderAPI")) != null) {
+            console.sendMessage(MessageKey.GENERAL__ENABLE_HOOK, "{hook}", "PlaceholderAPI");
+            PlaceholderAPIHook.create(plugin, placeholderapi);
         } else {
-            consoleCommandIssuer.sendInfo(Message.GENERAL__HOOK_DISABLE, "{plugin}", "PlaceholderAPI");
+            console.sendMessage(MessageKey.GENERAL__NO_HOOK, "{hook}", "PlaceholderAPI");
         }
 
         Plugin luckperms;
         if ((luckperms = manager.getPlugin("LuckPerms")) != null) {
-            consoleCommandIssuer.sendInfo(Message.GENERAL__HOOK_ENABLE, "{plugin}", "LuckPerms");
+            console.sendMessage(MessageKey.GENERAL__ENABLE_HOOK, "{hook}", "LuckPerms");
             if (ConfigUtil.getDebugOrFalse()) {
-                consoleCommandIssuer.sendMessage("<c2>Running actions on async pre-login.</c2>");
+                console.sendMessage(MessageKey.GENERAL__ASYNC_ACTIONS);
             }
-            LuckPermsHook.create(plugin, luckperms, consoleCommandIssuer);
+            LuckPermsHook.create(plugin, luckperms);
         } else {
-            consoleCommandIssuer.sendInfo(Message.GENERAL__HOOK_DISABLE, "{plugin}", "LuckPerms");
+            console.sendMessage(MessageKey.GENERAL__NO_HOOK, "{hook}", "LuckPerms");
             Plugin vault;
             if ((vault = manager.getPlugin("Vault")) != null) {
-                consoleCommandIssuer.sendInfo(Message.GENERAL__HOOK_ENABLE, "{plugin}", "Vault");
+                console.sendMessage(MessageKey.GENERAL__ENABLE_HOOK, "{hook}", "Vault");
                 if (ConfigUtil.getDebugOrFalse()) {
-                    consoleCommandIssuer.sendMessage("<c2>Running actions on async pre-login.</c2>");
+                    console.sendMessage(MessageKey.GENERAL__ASYNC_ACTIONS);
                 }
-                VaultHook.create(plugin, vault, consoleCommandIssuer);
+                VaultHook.create(plugin, vault);
             } else {
-                consoleCommandIssuer.sendInfo(Message.GENERAL__HOOK_DISABLE, "{plugin}", "Vault");
+                console.sendMessage(MessageKey.GENERAL__NO_HOOK, "{hook}", "Vault");
                 if (ConfigUtil.getDebugOrFalse()) {
-                    consoleCommandIssuer.sendMessage("<c2>Running actions on sync login.</c2>");
+                    console.sendMessage(MessageKey.GENERAL__SYNC_ACTIONS);
                 }
             }
         }
-    }
-
-    private static final AtomicLong blockedVPNs = new AtomicLong(0L);
-
-    private static final AtomicLong blockedMCLeaks = new AtomicLong(0L);
-
-    public static void incrementBlockedVPNs() { blockedVPNs.getAndIncrement(); }
-
-    public static void incrementBlockedMCLeaks() { blockedMCLeaks.getAndIncrement(); }
-
-    private void loadMetrics() {
-        Metrics metrics = new Metrics(plugin, 3249); // TODO: Change ID when bStats finally allows multiple plugins of the same name
-        metrics.addCustomChart(new SingleLineChart("blocked_vpns", () -> {
-            ConfigurationNode config = ConfigUtil.getConfig();
-            if (config == null) {
-                return null;
-            }
-
-            if (!config.node("stats", "usage").getBoolean(true)) {
-                return null;
-            }
-
-            return (int) blockedVPNs.getAndSet(0L);
-        }));
-        metrics.addCustomChart(new SingleLineChart("blocked_mcleaks", () -> {
-            ConfigurationNode config = ConfigUtil.getConfig();
-            if (config == null) {
-                return null;
-            }
-
-            if (!config.node("stats", "usage").getBoolean(true)) {
-                return null;
-            }
-
-            return (int) blockedMCLeaks.getAndSet(0L);
-        }));
-        metrics.addCustomChart(new AdvancedPie("storage", () -> {
-            ConfigurationNode config = ConfigUtil.getConfig();
-            CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
-            if (config == null || cachedConfig == null) {
-                return null;
-            }
-
-            if (!config.node("stats", "usage").getBoolean(true)) {
-                return null;
-            }
-
-            Map<String, Integer> retVal = new HashMap<>();
-            for (StorageService service : cachedConfig.getStorage()) {
-                retVal.compute(service.getClass().getSimpleName(), (k, v) -> {
-                    if (v == null) {
-                        return 1;
-                    }
-                    return v + 1;
-                });
-            }
-            if (retVal.isEmpty()) {
-                retVal.put("None", 1);
-            }
-
-            return retVal;
-        }));
-        metrics.addCustomChart(new AdvancedPie("messaging", () -> {
-            ConfigurationNode config = ConfigUtil.getConfig();
-            CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
-            if (config == null || cachedConfig == null) {
-                return null;
-            }
-
-            if (!config.node("stats", "usage").getBoolean(true)) {
-                return null;
-            }
-
-            Map<String, Integer> retVal = new HashMap<>();
-            for (MessagingService service : cachedConfig.getMessaging()) {
-                retVal.compute(service.getClass().getSimpleName(), (k, v) -> {
-                    if (v == null) {
-                        return 1;
-                    }
-                    return v + 1;
-                });
-            }
-            if (retVal.isEmpty()) {
-                retVal.put("None", 1);
-            }
-
-            return retVal;
-        }));
-        metrics.addCustomChart(new AdvancedPie("sources", () -> {
-            ConfigurationNode config = ConfigUtil.getConfig();
-            CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
-            if (config == null || cachedConfig == null) {
-                return null;
-            }
-
-            if (!config.node("stats", "usage").getBoolean(true)) {
-                return null;
-            }
-
-            Map<String, Integer> retVal = new HashMap<>();
-            List<Source<? extends SourceModel>> sources = VPNAPIProvider.getInstance().getSourceManager().getSources();
-            for (Source<? extends SourceModel> source : sources) {
-                retVal.compute(source.getName(), (k, v) -> {
-                    if (v == null) {
-                        return 1;
-                    }
-                    return v + 1;
-                });
-            }
-            if (retVal.isEmpty()) {
-                retVal.put("None", 1);
-            }
-
-            return retVal;
-        }));
-        metrics.addCustomChart(new SimplePie("algorithm", () -> {
-            ConfigurationNode config = ConfigUtil.getConfig();
-            CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
-            if (config == null || cachedConfig == null) {
-                return null;
-            }
-
-            if (!config.node("stats", "usage").getBoolean(true)) {
-                return null;
-            }
-
-            return cachedConfig.getVPNAlgorithmMethod().getName();
-        }));
-        metrics.addCustomChart(new SimplePie("vpn_action", () -> {
-            ConfigurationNode config = ConfigUtil.getConfig();
-            CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
-            if (config == null || cachedConfig == null) {
-                return null;
-            }
-
-            if (!config.node("stats", "usage").getBoolean(true)) {
-                return null;
-            }
-
-            if (!cachedConfig.getVPNKickMessage().isEmpty() && !cachedConfig.getVPNActionCommands().isEmpty()) {
-                return "multi";
-            } else if (!cachedConfig.getVPNKickMessage().isEmpty()) {
-                return "kick";
-            } else if (!cachedConfig.getVPNActionCommands().isEmpty()) {
-                return "commands";
-            }
-            return "none";
-        }));
-        metrics.addCustomChart(new SimplePie("mcleaks_action", () -> {
-            ConfigurationNode config = ConfigUtil.getConfig();
-            CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
-            if (config == null || cachedConfig == null) {
-                return null;
-            }
-
-            if (!config.node("stats", "usage").getBoolean(true)) {
-                return null;
-            }
-
-            if (!cachedConfig.getMCLeaksKickMessage().isEmpty() && !cachedConfig.getMCLeaksActionCommands().isEmpty()) {
-                return "multi";
-            } else if (!cachedConfig.getMCLeaksKickMessage().isEmpty()) {
-                return "kick";
-            } else if (!cachedConfig.getMCLeaksActionCommands().isEmpty()) {
-                return "commands";
-            }
-            return "none";
-        }));
-    }
-
-    private void checkUpdate() {
-        ConfigurationNode config = ConfigUtil.getConfig();
-        if (config == null) {
-            return;
-        }
-
-        SpigotUpdater updater;
-        try {
-            updater = ServiceLocator.get(SpigotUpdater.class);
-        } catch (InstantiationException | IllegalAccessException | ServiceNotFoundException ex) {
-            logger.error(ex.getMessage(), ex);
-            return;
-        }
-
-        if (!config.node("update", "check").getBoolean(true)) {
-            return;
-        }
-
-        updater.isUpdateAvailable().thenAccept(v -> {
-            if (!v) {
-                return;
-            }
-
-            try {
-                consoleCommandIssuer.sendInfo(Message.GENERAL__UPDATE, "{version}", updater.getLatestVersion().get());
-            } catch (ExecutionException ex) {
-                logger.error(ex.getMessage(), ex);
-            } catch (InterruptedException ex) {
-                logger.error(ex.getMessage(), ex);
-                Thread.currentThread().interrupt();
-            }
-        });
-
-        try {
-            Thread.sleep(60L * 60L * 1000L);
-        } catch (InterruptedException ignored) {
-            Thread.currentThread().interrupt();
-        }
-
-        try {
-            workPool.execute(this::checkUpdate);
-        } catch (RejectedExecutionException ignored) { }
     }
 
     private void unloadHooks() {
-        Set<? extends PluginHook> hooks = ServiceLocator.remove(PluginHook.class);
-        for (PluginHook hook : hooks) {
-            hook.cancel();
+        for (Iterator<PluginHook> i = PluginHooks.getHooks().iterator(); i.hasNext();) {
+            i.next().cancel();
+            i.remove();
         }
     }
 
@@ -644,26 +346,15 @@ public class AntiVPN {
         APIRegistrationUtil.deregister();
 
         CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
-        if (cachedConfig != null) {
-            for (MessagingService service : cachedConfig.getMessaging()) {
-                service.close();
-            }
-            for (StorageService service : cachedConfig.getStorage()) {
-                service.close();
-            }
+        for (MessagingService service : cachedConfig.getMessaging()) {
+            service.close();
         }
-
-        Set<? extends MessagingHandler> messagingHandlers = ServiceLocator.remove(MessagingHandler.class);
-        for (MessagingHandler handler : messagingHandlers) {
-            handler.cancel();
+        for (StorageService service : cachedConfig.getStorage()) {
+            service.close();
         }
     }
 
-    private void log(@NonNull Level level, @NonNull String message) {
-        plugin.getServer().getLogger().log(level, (isBukkit) ? ChatColor.stripColor(message) : message);
-    }
-
-    private boolean isVanished(@NonNull Player player) {
+    private boolean isVanished(@NotNull Player player) {
         for (MetadataValue meta : player.getMetadata("vanished")) {
             if (meta.asBoolean()) return true;
         }
