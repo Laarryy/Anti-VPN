@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import me.egg82.antivpn.hooks.PlaceholderAPIHook;
-import ninja.egg82.service.ServiceLocator;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -21,13 +20,7 @@ public class BukkitTailorUtil {
     public static @NotNull List<String> tailorCommands(@NotNull List<String> commands, @NotNull String name, @NotNull UUID uuid, @NotNull String ip) {
         List<String> retVal = new ArrayList<>();
 
-        Optional<PlaceholderAPIHook> placeholderapi;
-        try {
-            placeholderapi = ServiceLocator.getOptional(PlaceholderAPIHook.class);
-        } catch (InstantiationException | IllegalAccessException ex) {
-            logger.error(ex.getMessage(), ex);
-            placeholderapi = Optional.empty();
-        }
+        PlaceholderAPIHook placeholderapi = PlaceholderAPIHook.get();
 
         for (String command : commands) {
             command = command.replace("%player%", name).replace("%uuid%", uuid.toString()).replace("%ip%", ip);
@@ -35,9 +28,9 @@ public class BukkitTailorUtil {
                 command = command.substring(1);
             }
 
-            if (placeholderapi.isPresent()) {
+            if (placeholderapi != null) {
                 Player p = Bukkit.getPlayer(uuid);
-                retVal.add(placeholderapi.get().withPlaceholders(p != null ? p : Bukkit.getOfflinePlayer(uuid), command));
+                retVal.add(placeholderapi.withPlaceholders(p != null ? p : Bukkit.getOfflinePlayer(uuid), command));
             } else {
                 retVal.add(command);
             }
@@ -47,18 +40,12 @@ public class BukkitTailorUtil {
     }
 
     public static @NotNull String tailorKickMessage(@NotNull String message, @NotNull String name, @NotNull UUID uuid, @NotNull String ip) {
-        Optional<PlaceholderAPIHook> placeholderapi;
-        try {
-            placeholderapi = ServiceLocator.getOptional(PlaceholderAPIHook.class);
-        } catch (InstantiationException | IllegalAccessException ex) {
-            logger.error(ex.getMessage(), ex);
-            placeholderapi = Optional.empty();
-        }
+        PlaceholderAPIHook placeholderapi = PlaceholderAPIHook.get();
 
         message = message.replace("%player%", name).replace("%uuid%", uuid.toString()).replace("%ip%", ip);
-        if (placeholderapi.isPresent()) {
+        if (placeholderapi != null) {
             Player p = Bukkit.getPlayer(uuid);
-            message = placeholderapi.get().withPlaceholders(p != null ? p : Bukkit.getOfflinePlayer(uuid), message);
+            message = placeholderapi.withPlaceholders(p != null ? p : Bukkit.getOfflinePlayer(uuid), message);
         }
         return ChatColor.translateAlternateColorCodes('&', message.replace("\\r", "").replace("\r", "").replace("\\n", "\n"));
     }

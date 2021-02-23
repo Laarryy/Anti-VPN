@@ -1,22 +1,21 @@
 package me.egg82.antivpn.commands.internal;
 
-import co.aikar.commands.CommandIssuer;
-import co.aikar.taskchain.TaskChain;
-import co.aikar.taskchain.TaskChainFactory;
-import java.util.*;
-import java.util.concurrent.*;
-import me.egg82.antivpn.api.VPNAPIProvider;
-import me.egg82.antivpn.api.model.source.Source;
-import me.egg82.antivpn.api.model.source.SourceManager;
-import me.egg82.antivpn.api.model.source.models.SourceModel;
-import me.egg82.antivpn.config.CachedConfig;
-import me.egg82.antivpn.config.ConfigUtil;
-import me.egg82.antivpn.lang.MessageKey;
-import me.egg82.antivpn.utils.ExceptionUtil;
+import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.paper.PaperCommandManager;
+import me.egg82.antivpn.lang.BukkitLocalizedCommandSender;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.NotNull;
 
 public class TestCommand extends AbstractCommand {
-    private final String ip;
+    public TestCommand(@NotNull PaperCommandManager<BukkitLocalizedCommandSender> commandManager) {
+        super(commandManager);
+    }
+
+    public void execute(@NonNull CommandContext<BukkitLocalizedCommandSender> commandContext) {
+
+    }
+
+    /*private final String ip;
 
     public TestCommand(@NotNull CommandIssuer issuer, @NotNull TaskChainFactory taskFactory, @NotNull String ip) {
         super(issuer, taskFactory);
@@ -90,5 +89,5 @@ public class TestCommand extends AbstractCommand {
                     issuer.sendInfo(MessageKey.TEST__END, "{ip}", ip);
                 })
                 .execute();
-    }
+    }*/
 }

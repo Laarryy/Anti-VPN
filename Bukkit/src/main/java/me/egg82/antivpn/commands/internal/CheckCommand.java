@@ -1,19 +1,20 @@
 package me.egg82.antivpn.commands.internal;
 
-import co.aikar.commands.CommandIssuer;
-import co.aikar.taskchain.TaskChain;
-import co.aikar.taskchain.TaskChainFactory;
-import me.egg82.antivpn.api.VPNAPIProvider;
-import me.egg82.antivpn.api.model.ip.AlgorithmMethod;
-import me.egg82.antivpn.api.model.ip.IPManager;
-import me.egg82.antivpn.api.model.player.PlayerManager;
-import me.egg82.antivpn.lang.MessageKey;
-import me.egg82.antivpn.utils.ExceptionUtil;
-import me.egg82.antivpn.utils.ValidationUtil;
+import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.paper.PaperCommandManager;
+import me.egg82.antivpn.lang.BukkitLocalizedCommandSender;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.NotNull;
 
 public class CheckCommand extends AbstractCommand {
-    private final String type;
+    public CheckCommand(@NotNull PaperCommandManager<BukkitLocalizedCommandSender> commandManager) {
+        super(commandManager);
+    }
+
+    public void execute(@NonNull CommandContext<BukkitLocalizedCommandSender> commandContext) {
+
+    }
+    /*private final String type;
 
     public CheckCommand(@NotNull CommandIssuer issuer, @NotNull TaskChainFactory taskFactory, @NotNull String type) {
         super(issuer, taskFactory);
@@ -64,5 +65,5 @@ public class CheckCommand extends AbstractCommand {
             .abortIfNull(this.handleAbort)
             .syncLast(v -> issuer.sendInfo(Boolean.TRUE.equals(v) ? MessageKey.CHECK__MCLEAKS_DETECTED : MessageKey.CHECK__NO_MCLEAKS_DETECTED))
             .execute();
-    }
+    }*/
 }

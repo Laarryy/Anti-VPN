@@ -54,7 +54,7 @@ public class ReloadCommand extends AbstractCommand {
                 cachedConfig = ConfigUtil.getCachedConfig();
                 BukkitLocaleCommandUtil.setConsoleLocale(plugin, cachedConfig.getLanguage());
 
-                BukkitIPManager ipManager = new BukkitIPManager(plugin, sourceManager, cachedConfig.getCacheTime().getTime(), cachedConfig.getCacheTime().getUnit());
+                BukkitIPManager ipManager = new BukkitIPManager(plugin, sourceManager, cachedConfig.getCacheTime());
                 BukkitPlayerManager playerManager = new BukkitPlayerManager(plugin, cachedConfig.getMcLeaksKey(), cachedConfig.getCacheTime());
                 VPNAPI api = VPNAPIProvider.getInstance();
                 api.getEventBus().post(new GenericAPIReloadEvent(api, ipManager, playerManager, sourceManager)).now();

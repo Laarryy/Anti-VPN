@@ -1,24 +1,21 @@
 package me.egg82.antivpn.commands.internal;
 
-import co.aikar.commands.CommandIssuer;
-import co.aikar.taskchain.TaskChainFactory;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import me.egg82.antivpn.api.VPNAPIProvider;
-import me.egg82.antivpn.api.model.ip.IPManager;
-import me.egg82.antivpn.api.model.player.PlayerManager;
-import me.egg82.antivpn.config.CachedConfig;
-import me.egg82.antivpn.config.ConfigUtil;
-import me.egg82.antivpn.lang.MessageKey;
-import me.egg82.antivpn.utils.BukkitCommandUtil;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
+import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.paper.PaperCommandManager;
+import me.egg82.antivpn.lang.BukkitLocalizedCommandSender;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public class KickCommand extends AbstractCommand {
-    private final String player;
+    public KickCommand(@NotNull PaperCommandManager<BukkitLocalizedCommandSender> commandManager) {
+        super(commandManager);
+    }
+
+    public void execute(@NonNull CommandContext<BukkitLocalizedCommandSender> commandContext) {
+
+    }
+
+    /*private final String player;
     private final String type;
     private final Plugin plugin;
 
@@ -86,5 +83,5 @@ public class KickCommand extends AbstractCommand {
             return null;
         }
         return host.getHostAddress();
-    }
+    }*/
 }

@@ -3,6 +3,7 @@ package me.egg82.antivpn.lang;
 import org.jetbrains.annotations.NotNull;
 
 public enum MessageKey {
+    COMMAND__DESC__HELP,
     COMMAND_DESC__RELOAD,
     COMMAND_DESC__IMPORT,
     COMMAND_DESC__KICK,

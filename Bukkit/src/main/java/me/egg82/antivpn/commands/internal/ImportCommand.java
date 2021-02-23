@@ -1,20 +1,21 @@
 package me.egg82.antivpn.commands.internal;
 
-import co.aikar.commands.CommandIssuer;
-import co.aikar.taskchain.TaskChain;
-import co.aikar.taskchain.TaskChainFactory;
-import java.util.Set;
-import me.egg82.antivpn.config.CachedConfig;
-import me.egg82.antivpn.config.ConfigUtil;
-import me.egg82.antivpn.lang.MessageKey;
-import me.egg82.antivpn.storage.StorageService;
-import me.egg82.antivpn.storage.models.IPModel;
-import me.egg82.antivpn.storage.models.PlayerModel;
-import me.egg82.antivpn.utils.ExceptionUtil;
+import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.paper.PaperCommandManager;
+import me.egg82.antivpn.lang.BukkitLocalizedCommandSender;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.NotNull;
 
 public class ImportCommand extends AbstractCommand {
-    private final String masterName;
+    public ImportCommand(@NotNull PaperCommandManager<BukkitLocalizedCommandSender> commandManager) {
+        super(commandManager);
+    }
+
+    public void execute(@NonNull CommandContext<BukkitLocalizedCommandSender> commandContext) {
+
+    }
+
+    /*private final String masterName;
     private final String slaveName;
     private final String batchMax;
 
@@ -98,5 +99,5 @@ public class ImportCommand extends AbstractCommand {
                 })
                 .syncLast(v -> issuer.sendInfo(MessageKey.IMPORT__END))
                 .execute();
-    }
+    }*/
 }

@@ -1,26 +1,21 @@
 package me.egg82.antivpn.commands.internal;
 
-import co.aikar.commands.CommandIssuer;
-import co.aikar.taskchain.TaskChain;
-import co.aikar.taskchain.TaskChainFactory;
-import java.text.DecimalFormat;
-import java.util.Set;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import me.egg82.antivpn.api.APIException;
-import me.egg82.antivpn.api.VPNAPIProvider;
-import me.egg82.antivpn.api.model.source.Source;
-import me.egg82.antivpn.api.model.source.SourceManager;
-import me.egg82.antivpn.api.model.source.models.SourceModel;
-import me.egg82.antivpn.config.ConfigUtil;
-import me.egg82.antivpn.lang.MessageKey;
-import me.egg82.antivpn.utils.DNSUtil;
-import me.egg82.antivpn.utils.ExceptionUtil;
+import cloud.commandframework.context.CommandContext;
+import cloud.commandframework.paper.PaperCommandManager;
+import me.egg82.antivpn.lang.BukkitLocalizedCommandSender;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.NotNull;
 
 public class ScoreCommand extends AbstractCommand {
-    private final String sourceName;
+    public ScoreCommand(@NotNull PaperCommandManager<BukkitLocalizedCommandSender> commandManager) {
+        super(commandManager);
+    }
+
+    public void execute(@NonNull CommandContext<BukkitLocalizedCommandSender> commandContext) {
+
+    }
+
+    /*private final String sourceName;
 
     private static final DecimalFormat format = new DecimalFormat("##0.00");
 
@@ -138,5 +133,5 @@ public class ScoreCommand extends AbstractCommand {
             issuer.sendInfo(MessageKey.SCORE__ERROR, "{source}", source.getName(), "{type}", vpnName, "{percent}", format.format((error / ips.size()) * 100.0d));
         }
         issuer.sendInfo(MessageKey.SCORE__SCORE, "{source}", source.getName(), "{type}", vpnName, "{percent}", format.format((good / ips.size()) * 100.0d));
-    }
+    }*/
 }

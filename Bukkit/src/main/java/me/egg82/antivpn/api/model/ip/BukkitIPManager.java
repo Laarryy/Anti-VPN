@@ -3,12 +3,13 @@ package me.egg82.antivpn.api.model.ip;
 import com.google.common.collect.ImmutableList;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 import me.egg82.antivpn.api.model.source.SourceManager;
 import me.egg82.antivpn.config.CachedConfig;
 import me.egg82.antivpn.config.ConfigUtil;
+import me.egg82.antivpn.lang.BukkitLocaleCommandUtil;
 import me.egg82.antivpn.utils.BukkitCommandUtil;
 import me.egg82.antivpn.utils.BukkitTailorUtil;
+import me.egg82.antivpn.utils.TimeUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -18,8 +19,8 @@ import org.jetbrains.annotations.Nullable;
 public class BukkitIPManager extends AbstractIPManager {
     private final Plugin plugin;
 
-    public BukkitIPManager(@NotNull Plugin plugin, @NotNull SourceManager sourceManager, long cacheTime, @NotNull TimeUnit cacheTimeUnit) {
-        super(sourceManager, cacheTime, cacheTimeUnit);
+    public BukkitIPManager(@NotNull Plugin plugin, @NotNull SourceManager sourceManager, @NotNull TimeUtil.Time cacheTime) {
+        super(sourceManager, cacheTime, BukkitLocaleCommandUtil.getConsole().getLocalizationManager());
         this.plugin = plugin;
     }
 
