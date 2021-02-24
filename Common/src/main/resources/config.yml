@@ -372,8 +372,6 @@ stats:
   # Whether or not to send anonymous errors to the author
   # True: Send errors anonymously to the author's Graylog so the author can fix them!
   # False: Do not send errors and wonder why any bugs you encounter haven't been fixed
-  # Note: A very small subsection of critical errors (enable, disable, dependency injection on startup) will be sent regardless of this option
-  # PRs are welcome if you'd like to find a way to change this behavior: https://github.com/egg82/Anti-VPN
   errors: true
 
 update:

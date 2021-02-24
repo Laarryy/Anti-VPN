@@ -42,6 +42,18 @@ public class ConfigurationFileUtil {
 
     private ConfigurationFileUtil() { }
 
+    public static boolean getAllowErrorStats(@NotNull File dataDirectory) {
+        ConfigurationNode config;
+        try {
+            config = getConfigSimple("config.yml", new File(dataDirectory, "config.yml"), null);
+        } catch (IOException ex) {
+            GELFLogger.exception(logger, ex);
+            return false;
+        }
+
+        return config.node("stats", "errors").getBoolean(true);
+    }
+
     public static <M extends LocalizedCommandSender<M, B>, B> @NotNull Locale getConsoleLocale(@NotNull File dataDirectory, @NotNull LocalizedCommandSender<M, B> console) {
         ConfigurationNode config;
         try {
@@ -616,14 +628,14 @@ public class ConfigurationFileUtil {
         }
     }
 
-    private static <M extends LocalizedCommandSender<M, B>, B> @NotNull CommentedConfigurationNode getConfigSimple(@NotNull String resourcePath, @NotNull File fileOnDisk, @NotNull LocalizedCommandSender<M, B> console) throws IOException {
+    private static <M extends LocalizedCommandSender<M, B>, B> @NotNull CommentedConfigurationNode getConfigSimple(@NotNull String resourcePath, @NotNull File fileOnDisk, @Nullable LocalizedCommandSender<M, B> console) throws IOException {
         File parentDir = fileOnDisk.getParentFile();
         if (parentDir.exists() && !parentDir.isDirectory()) {
             Files.delete(parentDir.toPath());
         }
         if (!parentDir.exists()) {
             if (!parentDir.mkdirs()) {
-                throw new IOException("Could not create parent directory structure.");
+                throw new IOException("Could not create parent directory structure."); // TODO: Localization, accounting for console = null
             }
         }
         if (fileOnDisk.exists() && fileOnDisk.isDirectory()) {
@@ -645,7 +657,7 @@ public class ConfigurationFileUtil {
         }
 
         ConfigurationLoader<CommentedConfigurationNode> loader = YamlConfigurationLoader.builder().nodeStyle(NodeStyle.BLOCK).indent(2).file(fileOnDisk).build();
-        return loader.load(ConfigurationOptions.defaults().header("Comments are gone because update :(. Click here for new config + comments: https://www.spigotmc.org/resources/anti-vpn.58291/"));
+        return loader.load(ConfigurationOptions.defaults().header("Comments are gone because update :(. Click here for new config + comments: https://www.spigotmc.org/resources/anti-vpn.58291/")); // TODO: Localization, accounting for console = null
     }
 
     private static <M extends LocalizedCommandSender<M, B>, B> @NotNull CommentedConfigurationNode getConfig(@NotNull String resourcePath, @NotNull File fileOnDisk, @NotNull LocalizedCommandSender<M, B> console) throws IOException {

@@ -65,7 +65,9 @@ public class WebRequest {
                 builder.append(line);
                 builder.append(sep);
             }
-            builder.delete(builder.length() - sep.length(), builder.length());
+            if (builder.length() > 0) {
+                builder.delete(builder.length() - sep.length(), builder.length());
+            }
             return builder.toString();
         }
     }

@@ -9,40 +9,30 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class GELFSubmissionModel implements Serializable {
-    private String version;
-    private UUID host;
+    private String version = "1.1";
+    private String host = new UUID(0L, 0L).toString();
     @JSON(name = "short_message")
-    private String shortMessage;
+    private String shortMessage = "";
     @JSON(name = "full_message")
-    private String fullMessage;
-    private Instant timestamp;
-    private int level;
+    private String fullMessage = null;
+    private long timestamp = Instant.now().getEpochSecond();
+    private int level = -1;
     @JSON(name = "_plugin_version")
-    private String pluginVersion;
+    private String pluginVersion = "unknown";
     @JSON(name = "_platform")
-    private String platform;
+    private String platform = "unknown";
     @JSON(name = "_platform_version")
-    private String platformVersion;
+    private String platformVersion = "unknown";
 
-    public GELFSubmissionModel() {
-        this.version = "1.1";
-        this.host = new UUID(0L, 0L);
-        this.shortMessage = "";
-        this.fullMessage = null;
-        this.timestamp = Instant.now();
-        this.level = 3;
-        this.pluginVersion = "";
-        this.platform = "";
-        this.platformVersion = "";
-    }
+    public GELFSubmissionModel() { }
 
     public @NotNull String getVersion() { return version; }
 
     public void setVersion(@NotNull String version) { this.version = version; }
 
-    public @NotNull UUID getHost() { return host; }
+    public @NotNull String getHost() { return host; }
 
-    public void setHost(@NotNull UUID host) { this.host = host; }
+    public void setHost(@NotNull String host) { this.host = host; }
 
     @JSON(name = "short_message")
     public @NotNull String getShortMessage() { return shortMessage; }
@@ -54,11 +44,11 @@ public class GELFSubmissionModel implements Serializable {
     public @Nullable String getFullMessage() { return fullMessage; }
 
     @JSON(name = "full_message")
-    public void setFullMessage(String fullMessage) { this.fullMessage = fullMessage; }
+    public void setFullMessage(@Nullable String fullMessage) { this.fullMessage = fullMessage; }
 
-    public @NotNull Instant getTimestamp() { return timestamp; }
+    public long getTimestamp() { return timestamp; }
 
-    public void setTimestamp(@NotNull Instant timestamp) { this.timestamp = timestamp; }
+    public void setTimestamp(long timestamp) { this.timestamp = timestamp; }
 
     public int getLevel() { return level; }
 
@@ -86,7 +76,7 @@ public class GELFSubmissionModel implements Serializable {
         if (this == o) return true;
         if (!(o instanceof GELFSubmissionModel)) return false;
         GELFSubmissionModel that = (GELFSubmissionModel) o;
-        return level == that.level && version.equals(that.version) && host.equals(that.host) && shortMessage.equals(that.shortMessage) && Objects.equals(fullMessage, that.fullMessage) && timestamp.equals(that.timestamp) && pluginVersion.equals(that.pluginVersion) && platform.equals(that.platform) && platformVersion.equals(that.platformVersion);
+        return timestamp == that.timestamp && level == that.level && version.equals(that.version) && host.equals(that.host) && shortMessage.equals(that.shortMessage) && Objects.equals(fullMessage, that.fullMessage) && pluginVersion.equals(that.pluginVersion) && platform.equals(that.platform) && platformVersion.equals(that.platformVersion);
     }
 
     public int hashCode() { return Objects.hash(version, host, shortMessage, fullMessage, timestamp, level, pluginVersion, platform, platformVersion); }
@@ -94,7 +84,7 @@ public class GELFSubmissionModel implements Serializable {
     public String toString() {
         return "GELFSubmissionModel{" +
             "version='" + version + '\'' +
-            ", host=" + host +
+            ", host='" + host + '\'' +
             ", shortMessage='" + shortMessage + '\'' +
             ", fullMessage='" + fullMessage + '\'' +
             ", timestamp=" + timestamp +

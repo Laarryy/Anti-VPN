@@ -2,9 +2,7 @@ package me.egg82.antivpn;
 
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
-import java.io.File;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletionException;
@@ -39,7 +37,6 @@ import me.egg82.antivpn.logging.GELFLogger;
 import me.egg82.antivpn.messaging.GenericMessagingHandler;
 import me.egg82.antivpn.messaging.MessagingHandler;
 import me.egg82.antivpn.messaging.MessagingService;
-import me.egg82.antivpn.messaging.ServerIDUtil;
 import me.egg82.antivpn.storage.StorageService;
 import me.egg82.antivpn.utils.VersionUtil;
 import net.engio.mbassy.bus.MBassador;
@@ -71,8 +68,6 @@ public class AntiVPN {
     public void onLoad() { }
 
     public void onEnable() {
-        GELFLogger.setData(ServerIDUtil.getId(new File(plugin.getDataFolder(), "stats-id.txt")), plugin.getDescription().getVersion(), Platform.Type.BUKKIT, Bukkit.getVersion());
-
         BukkitLocaleCommandUtil.create(plugin);
         BukkitLocalizedCommandSender console = BukkitLocaleCommandUtil.getConsole();
 
@@ -333,10 +328,10 @@ public class AntiVPN {
     }
 
     private void unloadHooks() {
-        for (Iterator<PluginHook> i = PluginHooks.getHooks().iterator(); i.hasNext();) {
-            i.next().cancel();
-            i.remove();
-        }
+        PluginHooks.getHooks().removeIf(h -> {
+            h.cancel();
+            return true;
+        });
     }
 
     public void unloadServices() {

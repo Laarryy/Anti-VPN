@@ -2,7 +2,6 @@ package me.egg82.antivpn.utils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import me.egg82.antivpn.hooks.PlaceholderAPIHook;
 import org.bukkit.Bukkit;

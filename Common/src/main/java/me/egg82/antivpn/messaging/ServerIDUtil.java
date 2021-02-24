@@ -4,7 +4,6 @@ import java.io.*;
 import java.nio.file.Files;
 import java.util.UUID;
 import me.egg82.antivpn.logging.GELFLogger;
-import me.egg82.antivpn.utils.ValidationUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -51,7 +50,11 @@ public class ServerIDUtil {
         }
         String retVal = builder.toString().trim();
 
-        return ValidationUtil.isValidUuid(retVal) ? UUID.fromString(retVal) : null;
+        try {
+            return UUID.fromString(retVal);
+        } catch (IllegalArgumentException ignored) { }
+
+        return null;
     }
 
     private static void writeId(@NotNull File idFile, @NotNull UUID id) throws IOException {
