@@ -21,9 +21,9 @@ import me.egg82.antivpn.storage.models.query.QPlayerModel;
 import me.egg82.antivpn.utils.VersionUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.reflections.Reflections;
-import org.reflections.ReflectionsException;
-import org.reflections.scanners.ResourcesScanner;
+import org.reflections8.Reflections;
+import org.reflections8.ReflectionsException;
+import org.reflections8.scanners.ResourcesScanner;
 
 public abstract class AbstractJDBCStorageService extends AbstractStorageService {
     protected Database connection;

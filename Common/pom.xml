@@ -140,10 +140,9 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.reflections</groupId>
-            <artifactId>reflections</artifactId>
+            <groupId>net.oneandone.reflections8</groupId>
+            <artifactId>reflections8</artifactId>
             <version>${reflections.version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.spongepowered</groupId>
