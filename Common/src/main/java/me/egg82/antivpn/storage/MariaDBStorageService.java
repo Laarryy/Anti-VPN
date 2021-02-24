@@ -22,7 +22,7 @@ public class MariaDBStorageService extends AbstractJDBCStorageService {
             service = new MariaDBStorageService(name);
 
             // Baseline
-            config.setPoolName("AntiVPN-MariaDB");
+            config.setPoolName("Anti-VPN_MariaDB");
             config.setDriverClassName("com.mysql.cj.jdbc.Driver");
             config.setConnectionTestQuery("SELECT 1;");
             config.addDataSourceProperty("useLegacyDatetimeCode", "false");

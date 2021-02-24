@@ -64,7 +64,7 @@ public class PlayerAnalyticsHook implements PluginHook {
     }
 
     @PluginInfo(
-            name = "AntiVPN",
+            name = "Anti-VPN",
             iconName = "shield-alt",
             iconFamily = Family.SOLID,
             color = Color.BLUE

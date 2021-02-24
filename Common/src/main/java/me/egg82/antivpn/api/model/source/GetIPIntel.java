@@ -18,7 +18,7 @@ import org.spongepowered.configurate.ConfigurationNode;
 public class GetIPIntel extends AbstractSource<GetIPIntelModel> {
     private static final AtomicInteger hourlyRequests = new AtomicInteger(0);
     private static final AtomicInteger minuteRequests = new AtomicInteger(0);
-    private static final ScheduledExecutorService threadPool = Executors.newSingleThreadScheduledExecutor(new ThreadFactoryBuilder().setNameFormat("AntiVPN-GetIPIntel-%d").build());
+    private static final ScheduledExecutorService threadPool = Executors.newSingleThreadScheduledExecutor(new ThreadFactoryBuilder().setNameFormat("Anti-VPN_GetIPIntel_%d").build());
 
     static {
         threadPool.scheduleAtFixedRate(() -> hourlyRequests.set(0), 0L, 24L, TimeUnit.HOURS);

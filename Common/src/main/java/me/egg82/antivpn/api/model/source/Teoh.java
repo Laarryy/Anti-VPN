@@ -20,7 +20,7 @@ public class Teoh extends AbstractSource<TeohModel> {
     public boolean isKeyRequired() { return false; }
 
     private static final AtomicInteger requests = new AtomicInteger(0);
-    private static final ScheduledExecutorService threadPool = Executors.newSingleThreadScheduledExecutor(new ThreadFactoryBuilder().setNameFormat("AntiVPN-TeohAPI-%d").build());
+    private static final ScheduledExecutorService threadPool = Executors.newSingleThreadScheduledExecutor(new ThreadFactoryBuilder().setNameFormat("Anti-VPN_TeohAPI_%d").build());
 
     static {
         threadPool.scheduleAtFixedRate(() -> requests.set(0), 0L, 24L, TimeUnit.HOURS);

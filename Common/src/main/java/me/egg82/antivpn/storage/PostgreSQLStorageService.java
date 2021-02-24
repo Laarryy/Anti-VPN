@@ -22,7 +22,7 @@ public class PostgreSQLStorageService extends AbstractJDBCStorageService {
             service = new PostgreSQLStorageService(name);
 
             // Baseline
-            config.setPoolName("AntiVPN-PostgreSQL");
+            config.setPoolName("Anti-VPN_PostgreSQL");
             config.setDriverClassName("org.postgresql.Driver");
             config.setConnectionTestQuery("SELECT 1;");
             config.addDataSourceProperty("useLegacyDatetimeCode", "false");

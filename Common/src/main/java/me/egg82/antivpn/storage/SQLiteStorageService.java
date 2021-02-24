@@ -23,7 +23,7 @@ public class SQLiteStorageService extends AbstractJDBCStorageService {
             service = new SQLiteStorageService(name);
 
             // Baseline
-            config.setPoolName("AntiVPN-SQLite");
+            config.setPoolName("Anti-VPN_SQLite");
             config.setDriverClassName("org.sqlite.JDBC");
             config.setConnectionTestQuery("SELECT 1;");
             config.addDataSourceProperty("useLegacyDatetimeCode", "false");

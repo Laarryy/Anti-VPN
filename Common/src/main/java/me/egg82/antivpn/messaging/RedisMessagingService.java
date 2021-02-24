@@ -25,7 +25,7 @@ import redis.clients.jedis.JedisPoolConfig;
 import redis.clients.jedis.exceptions.JedisException;
 
 public class RedisMessagingService extends AbstractMessagingService {
-    private final ExecutorService workPool = Executors.newFixedThreadPool(1, new ThreadFactoryBuilder().setNameFormat("AntiVPN-Redis-%d").build());
+    private final ExecutorService workPool = Executors.newFixedThreadPool(1, new ThreadFactoryBuilder().setNameFormat("Anti-VPN_Redis_%d").build());
 
     private JedisPool pool;
     private final PubSub pubSub = new PubSub(this);

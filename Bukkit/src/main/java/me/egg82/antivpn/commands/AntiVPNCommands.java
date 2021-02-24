@@ -1,5 +1,7 @@
 package me.egg82.antivpn.commands;
 
+import cloud.commandframework.arguments.standard.StringArgument;
+import cloud.commandframework.minecraft.extras.MinecraftHelp;
 import cloud.commandframework.paper.PaperCommandManager;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -80,7 +82,7 @@ public class AntiVPNCommands extends CommandHolder {
                 .argument(StringArgument.<BukkitLocalizedCommandSender>newBuilder("check").withParser(checkParser).build(), ArgumentDescription.of("<ip|player>")) // TODO: Localization
                 .handler(new CheckCommand(commandManager))
                 .build()
-        );
+        );*/
 
         MinecraftHelp<BukkitLocalizedCommandSender> help = new MinecraftHelp<>(
             "/antivpn help",
@@ -90,10 +92,10 @@ public class AntiVPNCommands extends CommandHolder {
 
         commandManager.command(
             commandManager.commandBuilder("antivpn", baseAliases)
-                .literal("help", LocalizedArgumentDescription.of(MessageKey.COMMAND__DESC__HELP), getAliases(config, "help")) // TODO: Localization
+                .literal("help", LocalizedArgumentDescription.of(BukkitLocaleCommandUtil.getConsole().getLocalizationManager(), MessageKey.COMMAND_DESC__HELP), getAliases(config, "help")) // TODO: Localization
                 .argument(StringArgument.optional("query", StringArgument.StringMode.GREEDY))
                 .handler(context -> help.queryCommands(context.getOrDefault("query", ""), context.getSender()))
-        );*/
+        );
 
         registerAll();
     }

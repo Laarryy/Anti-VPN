@@ -23,7 +23,7 @@ public class H2StorageService extends AbstractJDBCStorageService {
             service = new H2StorageService(name);
 
             // Baseline
-            config.setPoolName("AntiVPN-H2");
+            config.setPoolName("Anti-VPN_H2");
             config.setDriverClassName("org.h2.Driver");
             config.setConnectionTestQuery("SELECT 1;");
             config.addDataSourceProperty("useLegacyDatetimeCode", "false");

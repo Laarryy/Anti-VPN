@@ -1,4 +1,4 @@
-name: AntiVPN
+name: Anti-VPN
 main: me.egg82.antivpn.BukkitBootstrap
 version: ${plugin.version}
 author: egg82

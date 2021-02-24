@@ -3,6 +3,8 @@ package me.egg82.antivpn.messaging;
 import java.io.*;
 import java.nio.file.Files;
 import java.util.UUID;
+import me.egg82.antivpn.lang.Locales;
+import me.egg82.antivpn.lang.MessageKey;
 import me.egg82.antivpn.logging.GELFLogger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -58,13 +60,19 @@ public class ServerIDUtil {
     }
 
     private static void writeId(@NotNull File idFile, @NotNull UUID id) throws IOException {
+        File parent = idFile.getParentFile();
+        if (parent.exists() && !parent.isDirectory()) {
+            Files.delete(parent.toPath());
+        }
+        if (!parent.exists() && !parent.mkdirs()) {
+            throw new IOException(Locales.getUS().getText(MessageKey.ERROR__PARENT_DIR));
+        }
+
         if (idFile.exists() && idFile.isDirectory()) {
             Files.delete(idFile.toPath());
         }
-        if (!idFile.exists()) {
-            if (!idFile.createNewFile()) {
-                throw new IOException("Stats file could not be created.");
-            }
+        if (!idFile.exists() && !idFile.createNewFile()) {
+            throw new IOException(Locales.getUS().getText(MessageKey.ERROR__STATS_FILE));
         }
 
         try (FileWriter out = new FileWriter(idFile)) {

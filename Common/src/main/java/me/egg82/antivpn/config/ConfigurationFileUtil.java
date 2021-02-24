@@ -78,12 +78,12 @@ public class ConfigurationFileUtil {
 
         boolean debug = config.node("debug").getBoolean(false);
         if (debug) {
-            console.sendMessage("<c2>Debug</c2> <c1>enabled</c1>");
+            console.sendMessage(MessageKey.CONFIG__DEBUG);
         }
 
         UUID serverId = ServerIDUtil.getId(new File(dataDirectory, "server-id.txt"));
         if (debug) {
-            console.sendMessage("<c2>Server ID:</c2> <c1>" + serverId.toString() + "</c1>");
+            console.sendMessage(MessageKey.CONFIG__SERVER_ID, "{id}", serverId.toString());
         }
 
         AlgorithmMethod vpnAlgorithmMethod = getVpnAlgorithmMethod(config, debug, console);
@@ -123,15 +123,15 @@ public class ConfigurationFileUtil {
         setSources(config, debug, console, sourceManager);
 
         if (debug) {
-            console.sendMessage("<c2>Source threads:</c2> <c1>" + cachedConfig.getThreads() + "</c1>");
-            console.sendMessage("<c2>Source timeout:</c2> <c1>" + cachedConfig.getTimeout() + "ms</c1>");
-            console.sendMessage("<c2>VPN kick message:</c2> <c1>" + cachedConfig.getVPNKickMessage() + "</c1>");
-            console.sendMessage("<c2>MCLeaks kick message:</c2> <c1>" + cachedConfig.getMCLeaksKickMessage() + "</c1>");
+            console.sendMessage(MessageKey.CONFIG__SOURCE_THREADS, "{threads}", String.valueOf(cachedConfig.getThreads()));
+            console.sendMessage(MessageKey.CONFIG__SOURCE_TIMEOUT, "{timeout}", String.valueOf(cachedConfig.getTimeout()));
+            console.sendMessage(MessageKey.CONFIG__VPN_KICK_MESSAGE, "{message}", cachedConfig.getVPNKickMessage());
+            console.sendMessage(MessageKey.CONFIG__MCLEAKS_KICK_MESSAGE, "{message}", cachedConfig.getMCLeaksKickMessage());
             if (!cachedConfig.getMcLeaksKey().isEmpty()) {
-                console.sendMessage("<c2>MCLeaks key:</c2> <c1>****************</c1>");
+                console.sendMessage(MessageKey.CONFIG__MCLEAKS_KEY);
             }
-            console.sendMessage("<c2>Admin permission node:</c2> <c1>" + cachedConfig.getAdminPermissionNode() + "</c1>");
-            console.sendMessage("<c2>Bypass permission node:</c2> <c1>" + cachedConfig.getBypassPermissionNode() + "</c1>");
+            console.sendMessage(MessageKey.CONFIG__ADMIN_NODE, "{node}", cachedConfig.getAdminPermissionNode());
+            console.sendMessage(MessageKey.CONFIG__BYPASS_NODE, "{node}", cachedConfig.getBypassPermissionNode());
         }
     }
 
@@ -631,7 +631,7 @@ public class ConfigurationFileUtil {
         }
         if (!parentDir.exists()) {
             if (!parentDir.mkdirs()) {
-                throw new IOException("Could not create parent directory structure."); // TODO: Localization, accounting for console = null
+                throw new IOException(console != null ? console.getLocalizedText(MessageKey.ERROR__PARENT_DIR) : Locales.getUS().getText(MessageKey.ERROR__PARENT_DIR));
             }
         }
         if (fileOnDisk.exists() && fileOnDisk.isDirectory()) {
@@ -653,7 +653,7 @@ public class ConfigurationFileUtil {
         }
 
         ConfigurationLoader<CommentedConfigurationNode> loader = YamlConfigurationLoader.builder().nodeStyle(NodeStyle.BLOCK).indent(2).file(fileOnDisk).build();
-        return loader.load(ConfigurationOptions.defaults().header("Comments are gone because update :(. Click here for new config + comments: https://www.spigotmc.org/resources/anti-vpn.58291/")); // TODO: Localization, accounting for console = null
+        return loader.load(ConfigurationOptions.defaults().header(console != null ? console.getLocalizedText(MessageKey.CONFIG__COMMENTS_GONE) : Locales.getUS().getText(MessageKey.CONFIG__COMMENTS_GONE)));
     }
 
     private static <M extends LocalizedCommandSender<M, B>, B> @NotNull CommentedConfigurationNode getConfig(@NotNull String resourcePath, @NotNull File fileOnDisk, @NotNull LocalizedCommandSender<M, B> console) throws IOException {

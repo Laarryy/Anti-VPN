@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
 @Plugin(
-        id = "antivpn",
+        id = "anti-vpn",
         name = "Anti-VPN",
         version = "${plugin.version}",
         authors = "egg82",

@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
 public class PacketUtil {
     private static final Logger logger = LoggerFactory.getLogger(PacketUtil.class);
 
-    private static ExecutorService workPool = Executors.newFixedThreadPool(4, new ThreadFactoryBuilder().setNameFormat("AntiVPN-Messaging-%d").build());
+    private static ExecutorService workPool = Executors.newFixedThreadPool(4, new ThreadFactoryBuilder().setNameFormat("Anti-VPN_Messaging_%d").build());
 
     private PacketUtil() { }
 
@@ -60,7 +60,7 @@ public class PacketUtil {
             Thread.currentThread().interrupt();
         }
 
-        workPool = Executors.newFixedThreadPool(size, new ThreadFactoryBuilder().setNameFormat("AntiVPN-Messaging-%d").build());
+        workPool = Executors.newFixedThreadPool(size, new ThreadFactoryBuilder().setNameFormat("Anti-VPN_Messaging_%d").build());
     }
 
     public static @NotNull Byte2ObjectMap<Class<Packet>> getPacketCache() { return packetCache; }

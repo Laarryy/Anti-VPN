@@ -22,7 +22,7 @@ public class MySQL55StorageService extends AbstractJDBCStorageService {
             service = new MySQL55StorageService(name);
 
             // Baseline
-            config.setPoolName("AntiVPN-MySQL55");
+            config.setPoolName("Anti-VPN_MySQL55");
             config.setDriverClassName("com.mysql.cj.jdbc.Driver");
             config.setConnectionTestQuery("SELECT 1;");
             config.addDataSourceProperty("useLegacyDatetimeCode", "false");

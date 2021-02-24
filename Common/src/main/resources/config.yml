@@ -347,6 +347,21 @@ aliases:
   # The base reload command is "reload"
   reload:
     - ''
+  # The base import command is "import"
+  import:
+    - ''
+  # The base kick command is "kick"
+  kick:
+    - ''
+  # The base test command is "test"
+  test:
+    - ''
+  # The base score command is "score"
+  score:
+    - ''
+  # The base check command is "check"
+  check:
+    - ''
 
 connection:
   # The amount of time to cache lookups in-memory

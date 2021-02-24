@@ -27,7 +27,7 @@ public abstract class AbstractSource<T extends SourceModel> implements Source<T>
         try {
             WebRequest.Builder retVal = WebRequest.builder(new URL(url));
             retVal.timeout(new TimeUtil.Time(ConfigUtil.getCachedConfig().getTimeout(), TimeUnit.MILLISECONDS));
-            retVal.userAgent("egg82/AntiVPN");
+            retVal.userAgent("egg82/Anti-VPN");
             retVal.header("Accept", "application/json");
             retVal.throwOnStandardErrors(false);
             return retVal;

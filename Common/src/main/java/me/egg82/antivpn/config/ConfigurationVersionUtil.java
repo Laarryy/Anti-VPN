@@ -687,6 +687,16 @@ public class ConfigurationVersionUtil {
         config.node("permissions", "admin").set("avpn.admin");
         config.node("permissions", "bypass").set("avpn.bypass");
 
+        // Add aliases
+        config.node("aliases", "base").setList(String.class, Collections.singletonList("avpn"));
+        config.node("aliases", "help").setList(String.class, Collections.singletonList(""));
+        config.node("aliases", "reload").setList(String.class, Collections.singletonList(""));
+        config.node("aliases", "import").setList(String.class, Collections.singletonList(""));
+        config.node("aliases", "kick").setList(String.class, Collections.singletonList(""));
+        config.node("aliases", "test").setList(String.class, Collections.singletonList(""));
+        config.node("aliases", "score").setList(String.class, Collections.singletonList(""));
+        config.node("aliases", "check").setList(String.class, Collections.singletonList(""));
+
         // Version
         config.node("version").set(5.2d);
     }

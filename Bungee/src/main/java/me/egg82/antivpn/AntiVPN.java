@@ -72,7 +72,7 @@ import org.spongepowered.configurate.ConfigurationNode;
 public class AntiVPN {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private final ExecutorService workPool = Executors.newFixedThreadPool(1, new ThreadFactoryBuilder().setNameFormat("AntiVPN-%d").build());
+    private final ExecutorService workPool = Executors.newFixedThreadPool(1, new ThreadFactoryBuilder().setNameFormat("Anti-VPN_%d").build());
 
     private BungeeCommandManager commandManager;
 

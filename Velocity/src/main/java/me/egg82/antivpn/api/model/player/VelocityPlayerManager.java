@@ -32,7 +32,7 @@ public class VelocityPlayerManager extends AbstractPlayerManager {
         api = MCLeaksAPI.builder()
             .nocache()
             .threadCount(webThreads)
-            .userAgent("egg82/AntiVPN")
+            .userAgent("egg82/Anti-VPN")
             .apiKey(mcleaksKey)
             .build();
     }
