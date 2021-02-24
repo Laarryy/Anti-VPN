@@ -25,7 +25,7 @@ import me.egg82.antivpn.utils.TimeUtil;
 import me.egg82.antivpn.utils.ValidationUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.reflections.Reflections;
+import org.reflections8.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongepowered.configurate.CommentedConfigurationNode;
@@ -78,9 +78,6 @@ public class ConfigurationFileUtil {
         GELFLogger.doSendErrors(config.node("stats", "errors").getBoolean(true));
 
         boolean debug = config.node("debug").getBoolean(false);
-        if (!debug) {
-            Reflections.log = null;
-        }
         if (debug) {
             console.sendMessage("<c2>Debug</c2> <c1>enabled</c1>");
         }

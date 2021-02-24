@@ -7,14 +7,14 @@ import java.util.List;
 import java.util.Set;
 import me.egg82.antivpn.config.ConfigUtil;
 import org.jetbrains.annotations.NotNull;
-import org.reflections.ReflectionUtils;
-import org.reflections.Reflections;
-import org.reflections.scanners.ResourcesScanner;
-import org.reflections.scanners.SubTypesScanner;
-import org.reflections.scanners.TypeElementsScanner;
-import org.reflections.util.ClasspathHelper;
-import org.reflections.util.ConfigurationBuilder;
-import org.reflections.util.FilterBuilder;
+import org.reflections8.ReflectionUtils;
+import org.reflections8.Reflections;
+import org.reflections8.scanners.ResourcesScanner;
+import org.reflections8.scanners.SubTypesScanner;
+import org.reflections8.scanners.TypeElementsScanner;
+import org.reflections8.util.ClasspathHelper;
+import org.reflections8.util.ConfigurationBuilder;
+import org.reflections8.util.FilterBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,7 +46,7 @@ public class PackageFilter {
 
         Reflections ref = new Reflections(config);
 
-        Set<String> typeSet = ref.getStore().keys("TypeElementsScanner");
+        Set<String> typeSet = ref.getStore().get("TypeElementsScanner").keySet();
         Set<Class<?>> set = new HashSet<>(ReflectionUtils.forNames(typeSet, ref.getConfiguration().getClassLoaders()));
         ArrayList<Class<T>> list = new ArrayList<>();
 
@@ -125,7 +125,7 @@ public class PackageFilter {
 
         Reflections ref = new Reflections(config);
 
-        Set<String> typeSet = ref.getStore().keys("TypeElementsScanner");
+        Set<String> typeSet = ref.getStore().get("TypeElementsScanner").keySet();
         Set<Class<?>> set = new HashSet<>(ReflectionUtils.forNames(typeSet, ref.getConfiguration().getClassLoaders()));
         ArrayList<Class<? extends T>> list = new ArrayList<>();
 
