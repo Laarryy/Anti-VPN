@@ -5,6 +5,7 @@ import java.util.concurrent.ExecutionException;
 import me.egg82.antivpn.api.VPNAPIProvider;
 import me.egg82.antivpn.api.model.ip.IPManager;
 import me.egg82.antivpn.api.model.player.PlayerManager;
+import me.egg82.antivpn.bukkit.BukkitCapabilities;
 import me.egg82.antivpn.config.ConfigUtil;
 import me.egg82.antivpn.hooks.BStatsHook;
 import me.egg82.antivpn.hooks.LuckPermsHook;
@@ -13,6 +14,8 @@ import me.egg82.antivpn.lang.BukkitLocaleCommandUtil;
 import me.egg82.antivpn.lang.MessageKey;
 import me.egg82.antivpn.logging.GELFLogger;
 import me.egg82.antivpn.utils.BukkitCommandUtil;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.craftbukkit.BukkitComponentSerializer;
 import ninja.egg82.events.BukkitEvents;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventPriority;
@@ -99,10 +102,14 @@ public class EarlyCheckEvents extends EventHolder {
             BStatsHook.incrementBlockedVPNs();
             IPManager ipManager = VPNAPIProvider.getInstance().getIPManager();
             BukkitCommandUtil.dispatchCommands(ipManager.getVpnCommands(event.getName(), event.getUniqueId(), ip), Bukkit.getConsoleSender(), plugin, event.isAsynchronous());
-            String kickMessage = ipManager.getVpnKickMessage(event.getName(), event.getUniqueId(), ip);
+            Component kickMessage = ipManager.getVpnKickMessage(event.getName(), event.getUniqueId(), ip);
             if (kickMessage != null) {
                 event.setLoginResult(AsyncPlayerPreLoginEvent.Result.KICK_OTHER);
-                event.setKickMessage(kickMessage);
+                if (BukkitCapabilities.HAS_ADVENTURE) {
+                    event.kickMessage(kickMessage);
+                } else {
+                    event.setKickMessage(BukkitComponentSerializer.legacy().serialize(kickMessage));
+                }
             }
         }
 
@@ -110,10 +117,14 @@ public class EarlyCheckEvents extends EventHolder {
             BStatsHook.incrementBlockedMCLeaks();
             PlayerManager playerManager = VPNAPIProvider.getInstance().getPlayerManager();
             BukkitCommandUtil.dispatchCommands(playerManager.getMcLeaksCommands(event.getName(), event.getUniqueId(), ip), Bukkit.getConsoleSender(), plugin, event.isAsynchronous());
-            String kickMessage = playerManager.getMcLeaksKickMessage(event.getName(), event.getUniqueId(), ip);
+            Component kickMessage = playerManager.getMcLeaksKickMessage(event.getName(), event.getUniqueId(), ip);
             if (kickMessage != null) {
                 event.setLoginResult(AsyncPlayerPreLoginEvent.Result.KICK_OTHER);
-                event.setKickMessage(kickMessage);
+                if (BukkitCapabilities.HAS_ADVENTURE) {
+                    event.kickMessage(kickMessage);
+                } else {
+                    event.setKickMessage(BukkitComponentSerializer.legacy().serialize(kickMessage));
+                }
             }
         }
     }

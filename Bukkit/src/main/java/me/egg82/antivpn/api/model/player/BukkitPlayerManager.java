@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import me.egg82.antivpn.bukkit.BukkitCapabilities;
 import me.egg82.antivpn.config.CachedConfig;
 import me.egg82.antivpn.config.ConfigUtil;
 import me.egg82.antivpn.services.lookup.PlayerLookup;
@@ -12,6 +13,8 @@ import me.egg82.antivpn.storage.models.PlayerModel;
 import me.egg82.antivpn.utils.BukkitCommandUtil;
 import me.egg82.antivpn.utils.BukkitTailorUtil;
 import me.egg82.antivpn.utils.TimeUtil;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.craftbukkit.BukkitComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
@@ -64,12 +67,16 @@ public class BukkitPlayerManager extends AbstractPlayerManager {
 
         BukkitCommandUtil.dispatchCommands(BukkitTailorUtil.tailorCommands(cachedConfig.getMCLeaksActionCommands(), playerName, playerUuid, ip), Bukkit.getConsoleSender(), plugin);
         if (!cachedConfig.getMCLeaksKickMessage().isEmpty()) {
-            p.kickPlayer(BukkitTailorUtil.tailorKickMessage(cachedConfig.getMCLeaksKickMessage(), playerName, playerUuid, ip));
+            if (BukkitCapabilities.HAS_ADVENTURE) {
+                p.kick(BukkitTailorUtil.tailorKickMessage(cachedConfig.getMCLeaksKickMessage(), playerName, playerUuid, ip));
+            } else {
+                p.kickPlayer(BukkitComponentSerializer.legacy().serialize(BukkitTailorUtil.tailorKickMessage(cachedConfig.getMCLeaksKickMessage(), playerName, playerUuid, ip)));
+            }
         }
         return true;
     }
 
-    public @Nullable String getMcLeaksKickMessage(@NotNull String playerName, @NotNull UUID playerUuid, @NotNull String ip) {
+    public @Nullable Component getMcLeaksKickMessage(@NotNull String playerName, @NotNull UUID playerUuid, @NotNull String ip) {
         CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
 
         if (!cachedConfig.getMCLeaksKickMessage().isEmpty()) {

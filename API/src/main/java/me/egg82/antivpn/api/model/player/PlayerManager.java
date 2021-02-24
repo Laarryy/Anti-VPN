@@ -10,6 +10,7 @@ import java.util.concurrent.Executor;
 import java.util.function.Consumer;
 import me.egg82.antivpn.api.APIException;
 import me.egg82.antivpn.api.model.ip.IP;
+import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -194,7 +195,7 @@ public interface PlayerManager {
      * @return the MCLeaks kick message, as defined in Anti-VPN's config
      * @throws NullPointerException if player is null, player.getName() is null, or ip is null
      */
-    default @Nullable String getMcLeaksKickMessage(@NotNull Player player, @NotNull IP ip) { return getMcLeaksKickMessage(Objects.requireNonNull(player.getName()), player.getUuid(), ip.getIP().getHostAddress()); }
+    default @Nullable Component getMcLeaksKickMessage(@NotNull Player player, @NotNull IP ip) { return getMcLeaksKickMessage(Objects.requireNonNull(player.getName()), player.getUuid(), ip.getIP().getHostAddress()); }
 
     /**
      * Returns the MCLeaks kick message as defined
@@ -206,7 +207,7 @@ public interface PlayerManager {
      * @return the MCLeaks kick message, as defined in Anti-VPN's config
      * @throws NullPointerException if playerName, playerUuid, or ip is null
      */
-    default @Nullable String getMcLeaksKickMessage(@NotNull String playerName, @NotNull UUID playerUuid, @NotNull IP ip) { return getMcLeaksKickMessage(playerName, playerUuid, ip.getIP().getHostAddress()); }
+    default @Nullable Component getMcLeaksKickMessage(@NotNull String playerName, @NotNull UUID playerUuid, @NotNull IP ip) { return getMcLeaksKickMessage(playerName, playerUuid, ip.getIP().getHostAddress()); }
 
     /**
      * Returns the MCLeaks kick message as defined
@@ -217,7 +218,7 @@ public interface PlayerManager {
      * @return the MCLeaks kick message, as defined in Anti-VPN's config
      * @throws NullPointerException if player is null, player.getName() is null, or ip is null
      */
-    default @Nullable String getMcLeaksKickMessage(@NotNull Player player, @NotNull InetAddress ip) { return getMcLeaksKickMessage(Objects.requireNonNull(player.getName()), player.getUuid(), ip.getHostAddress()); }
+    default @Nullable Component getMcLeaksKickMessage(@NotNull Player player, @NotNull InetAddress ip) { return getMcLeaksKickMessage(Objects.requireNonNull(player.getName()), player.getUuid(), ip.getHostAddress()); }
 
     /**
      * Returns the MCLeaks kick message as defined
@@ -228,7 +229,7 @@ public interface PlayerManager {
      * @return the MCLeaks kick message, as defined in Anti-VPN's config
      * @throws NullPointerException if player is null, player.getName() is null, or ip is null
      */
-    default @Nullable String getMcLeaksKickMessage(@NotNull Player player, @NotNull String ip) { return getMcLeaksKickMessage(Objects.requireNonNull(player.getName()), player.getUuid(), ip); }
+    default @Nullable Component getMcLeaksKickMessage(@NotNull Player player, @NotNull String ip) { return getMcLeaksKickMessage(Objects.requireNonNull(player.getName()), player.getUuid(), ip); }
 
     /**
      * Returns the MCLeaks kick message as defined
@@ -240,7 +241,7 @@ public interface PlayerManager {
      * @return the MCLeaks kick message, as defined in Anti-VPN's config
      * @throws NullPointerException if playerName, playerUuid, or ip is null
      */
-    default @Nullable String getMcLeaksKickMessage(@NotNull String playerName, @NotNull UUID playerUuid, @NotNull InetAddress ip) { return getMcLeaksKickMessage(playerName, playerUuid, ip.getHostAddress()); }
+    default @Nullable Component getMcLeaksKickMessage(@NotNull String playerName, @NotNull UUID playerUuid, @NotNull InetAddress ip) { return getMcLeaksKickMessage(playerName, playerUuid, ip.getHostAddress()); }
 
     /**
      * Returns the MCLeaks kick message as defined
@@ -252,7 +253,7 @@ public interface PlayerManager {
      * @return the MCLeaks kick message, as defined in Anti-VPN's config
      * @throws NullPointerException if playerName, playerUuid, or ip is null
      */
-    @Nullable String getMcLeaksKickMessage(@NotNull String playerName, @NotNull UUID playerUuid, @NotNull String ip);
+    @Nullable Component getMcLeaksKickMessage(@NotNull String playerName, @NotNull UUID playerUuid, @NotNull String ip);
 
     /**
      * Returns the MCLeaks commands as defined

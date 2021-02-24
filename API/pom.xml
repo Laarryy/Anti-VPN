@@ -88,6 +88,7 @@
             <version>${jetbrains.version}</version>
             <scope>provided</scope>
         </dependency>
+
         <dependency>
             <groupId>net.sf.flexjson</groupId>
             <artifactId>flexjson</artifactId>
@@ -98,6 +99,12 @@
             <groupId>net.engio</groupId>
             <artifactId>mbassador</artifactId>
             <version>${mbassador.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.kyori</groupId>
+            <artifactId>adventure-api</artifactId>
+            <version>${adventure.api.version}</version>
             <scope>provided</scope>
         </dependency>
 

@@ -4,12 +4,15 @@ import com.google.common.collect.ImmutableList;
 import java.util.List;
 import java.util.UUID;
 import me.egg82.antivpn.api.model.source.SourceManager;
+import me.egg82.antivpn.bukkit.BukkitCapabilities;
 import me.egg82.antivpn.config.CachedConfig;
 import me.egg82.antivpn.config.ConfigUtil;
 import me.egg82.antivpn.lang.BukkitLocaleCommandUtil;
 import me.egg82.antivpn.utils.BukkitCommandUtil;
 import me.egg82.antivpn.utils.BukkitTailorUtil;
 import me.egg82.antivpn.utils.TimeUtil;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.craftbukkit.BukkitComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -33,12 +36,16 @@ public class BukkitIPManager extends AbstractIPManager {
         CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
         BukkitCommandUtil.dispatchCommands(BukkitTailorUtil.tailorCommands(cachedConfig.getVPNActionCommands(), playerName, playerUuid, ip), Bukkit.getConsoleSender(), plugin);
         if (!cachedConfig.getVPNKickMessage().isEmpty()) {
-            p.kickPlayer(BukkitTailorUtil.tailorKickMessage(cachedConfig.getVPNKickMessage(), playerName, playerUuid, ip));
+            if (BukkitCapabilities.HAS_ADVENTURE) {
+                p.kick(BukkitTailorUtil.tailorKickMessage(cachedConfig.getVPNKickMessage(), playerName, playerUuid, ip));
+            } else {
+                p.kickPlayer(BukkitComponentSerializer.legacy().serialize(BukkitTailorUtil.tailorKickMessage(cachedConfig.getVPNKickMessage(), playerName, playerUuid, ip)));
+            }
         }
         return true;
     }
 
-    public @Nullable String getVpnKickMessage(@NotNull String playerName, @NotNull UUID playerUuid, @NotNull String ip) {
+    public @Nullable Component getVpnKickMessage(@NotNull String playerName, @NotNull UUID playerUuid, @NotNull String ip) {
         CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
 
         if (!cachedConfig.getVPNKickMessage().isEmpty()) {

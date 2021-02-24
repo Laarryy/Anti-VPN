@@ -25,7 +25,6 @@ import me.egg82.antivpn.utils.TimeUtil;
 import me.egg82.antivpn.utils.ValidationUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.reflections8.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongepowered.configurate.CommentedConfigurationNode;

@@ -4,15 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import me.egg82.antivpn.hooks.PlaceholderAPIHook;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class BukkitTailorUtil {
-    private static final Logger logger = LoggerFactory.getLogger(BukkitTailorUtil.class);
+    private static MiniMessage miniMessage = MiniMessage.markdown();
 
     private BukkitTailorUtil() { }
 
@@ -38,7 +37,7 @@ public class BukkitTailorUtil {
         return retVal;
     }
 
-    public static @NotNull String tailorKickMessage(@NotNull String message, @NotNull String name, @NotNull UUID uuid, @NotNull String ip) {
+    public static @NotNull Component tailorKickMessage(@NotNull String message, @NotNull String name, @NotNull UUID uuid, @NotNull String ip) {
         PlaceholderAPIHook placeholderapi = PlaceholderAPIHook.get();
 
         message = message.replace("%player%", name).replace("%uuid%", uuid.toString()).replace("%ip%", ip);
@@ -46,6 +45,6 @@ public class BukkitTailorUtil {
             Player p = Bukkit.getPlayer(uuid);
             message = placeholderapi.withPlaceholders(p != null ? p : Bukkit.getOfflinePlayer(uuid), message);
         }
-        return ChatColor.translateAlternateColorCodes('&', message.replace("\\r", "").replace("\r", "").replace("\\n", "\n"));
+        return miniMessage.parse(message.replace("\\r", "").replace("\r", "").replace("\\n", "\n"));
     }
 }
