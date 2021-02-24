@@ -34,7 +34,7 @@ public class GELFLogger {
 
     private static final GZIPCompressionStream GZIP_COMPRESSION = new GZIPCompressionStream();
 
-    private static final String GELF_ADDRESS = "http://raw.egg82.ninja:12201/gelf"; // TODO: HTTPS
+    private static final String GELF_ADDRESS = "http://logs.egg82.me:8880/gelf"; // TODO: HTTPS
     private static final ScheduledExecutorService workPool = Executors.newSingleThreadScheduledExecutor(new ThreadFactoryBuilder().setNameFormat("AntiVPN-GELFLogger-%d").build());
 
     private static String serverId = null;
