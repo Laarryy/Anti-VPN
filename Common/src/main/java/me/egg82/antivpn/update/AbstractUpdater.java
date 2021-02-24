@@ -59,6 +59,11 @@ public abstract class AbstractUpdater implements Updater {
                 // eg. 1.12.2 -> 1.12
                 return false;
             }
+            if (current[i] > latest[i]) {
+                // The version we're at now is greater than the one we want
+                // eg. 1.11 -> 1.13
+                return false;
+            }
             if (current[i] < latest[i]) {
                 // The version we're at now is less than the one we want
                 // eg. 1.13 -> 1.11

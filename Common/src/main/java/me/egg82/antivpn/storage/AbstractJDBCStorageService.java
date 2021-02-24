@@ -353,6 +353,11 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
                     // eg. 1.12.2 -> 1.12
                     return 1;
                 }
+                if (v2[i] > v1[i]) {
+                    // The version we're at now is greater than the one we want
+                    // eg. 1.11 -> 1.13
+                    return 1;
+                }
                 if (v2[i] < v1[i]) {
                     // The version we're at now is less than the one we want
                     // eg. 1.13 -> 1.11

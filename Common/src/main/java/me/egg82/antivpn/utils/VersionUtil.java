@@ -22,7 +22,11 @@ public class VersionUtil {
                 equalOrGreater = false;
                 break;
             }
-
+            if (v2[i] > v1[i]) {
+                // The version we're at now is greater than the one we want
+                // eg. 1.11 -> 1.13
+                break;
+            }
             if (v2[i] < v1[i]) {
                 // The version we're at now is less than the one we want
                 // eg. 1.13 -> 1.11
