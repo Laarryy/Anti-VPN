@@ -28,7 +28,7 @@ public class AntiVPNCommands extends CommandHolder {
 
         commands.add(
             commandManager.commandBuilder("antivpn", baseAliases)
-                .literal("reload", LocalizedArgumentDescription.of(MessageKey.COMMAND_DESC__RELOAD), getAliases(config, "reload")) // TODO: Localization
+                .literal("reload", LocalizedArgumentDescription.of(BukkitLocaleCommandUtil.getConsole().getLocalizationManager(), MessageKey.COMMAND_DESC__RELOAD), getAliases(config, "reload")) // TODO: Localization
                 .permission(ConfigUtil.getCachedConfig().getAdminPermissionNode())
                 .handler(new ReloadCommand(commandManager, plugin.getDataFolder(), plugin))
                 .build()
