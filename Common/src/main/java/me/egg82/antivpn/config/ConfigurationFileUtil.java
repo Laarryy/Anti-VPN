@@ -155,10 +155,10 @@ public class ConfigurationFileUtil {
 
         if (retVal == null) {
             retVal = Locales.getUSLocale();
-            console.sendMessage("<c9>lang</c9> <c1>" + configLanguage + "</c1> <c9>is not a valid language. Using default value of</c9> <c1>" + (retVal.getCountry() == null || retVal.getCountry().isEmpty() ? retVal.getLanguage() : retVal.getLanguage() + "-" + retVal.getCountry()) + "</c1>");
+            console.sendMessage(MessageKey.CONFIG__INVALID_LOCALE, "{lang}", configLanguage, "{default}", retVal.getCountry() == null || retVal.getCountry().isEmpty() ? retVal.getLanguage() : retVal.getLanguage() + "-" + retVal.getCountry());
         }
         if (debug) {
-            console.sendMessage("<c2>Default language:</c2> <c1>" + (retVal.getCountry() == null || retVal.getCountry().isEmpty() ? retVal.getLanguage() : retVal.getLanguage() + "-" + retVal.getCountry()) + "</c1>");
+            console.sendMessage(MessageKey.CONFIG__CONSOLE_LOCALE, "{lang}", retVal.getCountry() == null || retVal.getCountry().isEmpty() ? retVal.getLanguage() : retVal.getLanguage() + "-" + retVal.getCountry());
         }
 
         return retVal;

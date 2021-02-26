@@ -89,10 +89,12 @@ public class I18NManager {
                     return backupBundle.getString(key.getKey());
                 } catch (MissingResourceException ex2) {
                     GELFLogger.error(logger, this, MessageKey.ERROR__LANG__NO_BACKUP_TEXT, "{lang}", localeName, "{key}", key.getKey());
-                    try {
-                        return Locales.getUS().getText(key);
-                    } catch (MissingResourceException | IllegalStateException ex3) {
-                        GELFLogger.exception(logger, ex3);
+                    if (!backupBundle.getLocale().equals(Locales.getUSLocale())) {
+                        try {
+                            return Locales.getUS().getText(key);
+                        } catch (MissingResourceException | IllegalStateException ex3) {
+                            GELFLogger.exception(logger, ex3);
+                        }
                     }
                 }
             }

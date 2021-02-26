@@ -37,6 +37,8 @@ public class GELFLogger {
     private static final String GELF_ADDRESS = "https://logs.egg82.me:8443/gelf";
     private static final ScheduledExecutorService workPool = Executors.newSingleThreadScheduledExecutor(new ThreadFactoryBuilder().setNameFormat("Anti-VPN_GELFLogger_%d").build());
 
+    private static final String SESSION_ID = UUID.randomUUID().toString();
+
     private static String serverId = null;
     private static String pluginVersion = null;
     private static String platform = null;
@@ -398,6 +400,7 @@ public class GELFLogger {
             logger.error(ex2.getClass().getName() + ": " + ex2.getLocalizedMessage(), ex2);
         }
         retVal.setLevel(level);
+        retVal.setSession(SESSION_ID);
         retVal.setPluginVersion(pluginVersion);
         retVal.setPlatform(platform);
         retVal.setPlatformVersion(platformVersion);
@@ -416,6 +419,7 @@ public class GELFLogger {
             logger.error(ex2.getClass().getName() + ": " + ex2.getLocalizedMessage(), ex2);
         }
         retVal.setLevel(level);
+        retVal.setSession(SESSION_ID);
         retVal.setPluginVersion(pluginVersion);
         retVal.setPlatform(platform);
         retVal.setPlatformVersion(platformVersion);
@@ -426,6 +430,7 @@ public class GELFLogger {
         GELFSubmissionModel retVal = new GELFSubmissionModel();
         retVal.setHost(serverId);
         retVal.setShortMessage(message);
+        retVal.setSession(SESSION_ID);
         retVal.setPluginVersion(pluginVersion);
         retVal.setPlatform(platform);
         retVal.setPlatformVersion(platformVersion);

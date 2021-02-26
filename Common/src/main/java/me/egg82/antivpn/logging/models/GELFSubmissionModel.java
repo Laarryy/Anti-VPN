@@ -17,12 +17,16 @@ public class GELFSubmissionModel implements Serializable {
     private String fullMessage = null;
     private long timestamp = Instant.now().getEpochSecond();
     private int level = -1;
+    @JSON(name = "_session")
+    private String session = new UUID(0L, 0L).toString();
     @JSON(name = "_plugin_version")
     private String pluginVersion = "unknown";
     @JSON(name = "_platform")
     private String platform = "unknown";
     @JSON(name = "_platform_version")
     private String platformVersion = "unknown";
+    @JSON(name = "_os")
+    private String os = System.getProperty("os.name");
 
     public GELFSubmissionModel() { }
 
@@ -54,6 +58,12 @@ public class GELFSubmissionModel implements Serializable {
 
     public void setLevel(int level) { this.level = level; }
 
+    @JSON(name = "_session")
+    public @NotNull String getSession() { return session; }
+
+    @JSON(name = "_session")
+    public void setSession(@NotNull String session) { this.session = session; }
+
     @JSON(name = "_plugin_version")
     public @NotNull String getPluginVersion() { return pluginVersion; }
 
@@ -72,14 +82,20 @@ public class GELFSubmissionModel implements Serializable {
     @JSON(name = "_platform_version")
     public void setPlatformVersion(@NotNull String platformVersion) { this.platformVersion = platformVersion; }
 
+    @JSON(name = "_os")
+    public @NotNull String getOs() { return os; }
+
+    @JSON(name = "_os")
+    public void setOs(@NotNull String os) { this.os = os; }
+
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof GELFSubmissionModel)) return false;
         GELFSubmissionModel that = (GELFSubmissionModel) o;
-        return timestamp == that.timestamp && level == that.level && version.equals(that.version) && host.equals(that.host) && shortMessage.equals(that.shortMessage) && Objects.equals(fullMessage, that.fullMessage) && pluginVersion.equals(that.pluginVersion) && platform.equals(that.platform) && platformVersion.equals(that.platformVersion);
+        return timestamp == that.timestamp && level == that.level && version.equals(that.version) && host.equals(that.host) && shortMessage.equals(that.shortMessage) && Objects.equals(fullMessage, that.fullMessage) && session.equals(that.session) && pluginVersion.equals(that.pluginVersion) && platform.equals(that.platform) && platformVersion.equals(that.platformVersion) && os.equals(that.os);
     }
 
-    public int hashCode() { return Objects.hash(version, host, shortMessage, fullMessage, timestamp, level, pluginVersion, platform, platformVersion); }
+    public int hashCode() { return Objects.hash(version, host, shortMessage, fullMessage, timestamp, level, session, pluginVersion, platform, platformVersion, os); }
 
     public String toString() {
         return "GELFSubmissionModel{" +
@@ -89,9 +105,11 @@ public class GELFSubmissionModel implements Serializable {
             ", fullMessage='" + fullMessage + '\'' +
             ", timestamp=" + timestamp +
             ", level=" + level +
+            ", session='" + session + '\'' +
             ", pluginVersion='" + pluginVersion + '\'' +
             ", platform='" + platform + '\'' +
             ", platformVersion='" + platformVersion + '\'' +
+            ", os='" + os + '\'' +
             '}';
     }
 }
