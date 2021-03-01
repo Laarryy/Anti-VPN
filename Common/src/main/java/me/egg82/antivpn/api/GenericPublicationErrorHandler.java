@@ -1,6 +1,5 @@
 package me.egg82.antivpn.api;
 
-import me.egg82.antivpn.config.ConfigUtil;
 import me.egg82.antivpn.lang.LocaleUtil;
 import me.egg82.antivpn.lang.MessageKey;
 import me.egg82.antivpn.logging.GELFLogger;

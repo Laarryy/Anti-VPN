@@ -2,7 +2,6 @@ package me.egg82.antivpn.api.model.player;
 
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import me.egg82.antivpn.lang.BukkitLocaleCommandUtil;
 import me.egg82.antivpn.services.lookup.PlayerInfo;
 import me.egg82.antivpn.services.lookup.PlayerLookup;
 import org.jetbrains.annotations.NotNull;

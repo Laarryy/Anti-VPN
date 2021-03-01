@@ -7,7 +7,6 @@ import me.egg82.antivpn.api.model.source.SourceManager;
 import me.egg82.antivpn.bukkit.BukkitCapabilities;
 import me.egg82.antivpn.config.CachedConfig;
 import me.egg82.antivpn.config.ConfigUtil;
-import me.egg82.antivpn.lang.BukkitLocaleCommandUtil;
 import me.egg82.antivpn.utils.BukkitCommandUtil;
 import me.egg82.antivpn.utils.BukkitTailorUtil;
 import me.egg82.antivpn.utils.TimeUtil;

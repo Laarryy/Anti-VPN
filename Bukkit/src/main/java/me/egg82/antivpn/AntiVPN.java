@@ -9,7 +9,6 @@ import java.util.concurrent.CompletionException;
 import me.egg82.antivpn.api.*;
 import me.egg82.antivpn.api.event.api.GenericAPIDisableEvent;
 import me.egg82.antivpn.api.event.api.GenericAPILoadedEvent;
-import me.egg82.antivpn.api.GenericPublicationErrorHandler;
 import me.egg82.antivpn.api.model.ip.BukkitIPManager;
 import me.egg82.antivpn.api.model.player.BukkitPlayerManager;
 import me.egg82.antivpn.api.model.source.GenericSourceManager;

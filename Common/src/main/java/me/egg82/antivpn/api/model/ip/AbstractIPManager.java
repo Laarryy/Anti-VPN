@@ -16,7 +16,6 @@ import me.egg82.antivpn.api.model.source.models.SourceModel;
 import me.egg82.antivpn.config.CachedConfig;
 import me.egg82.antivpn.config.ConfigUtil;
 import me.egg82.antivpn.core.Pair;
-import me.egg82.antivpn.lang.I18NManager;
 import me.egg82.antivpn.logging.GELFLogger;
 import me.egg82.antivpn.messaging.packets.DeleteIPPacket;
 import me.egg82.antivpn.messaging.packets.IPPacket;

@@ -18,7 +18,6 @@ import me.egg82.antivpn.api.platform.Platform;
 import me.egg82.antivpn.bukkit.BukkitEnvironmentUtil;
 import me.egg82.antivpn.config.ConfigUtil;
 import me.egg82.antivpn.config.ConfigurationFileUtil;
-import me.egg82.antivpn.logging.GELFLogger;
 import me.egg82.antivpn.logging.GELFLoggerUtil;
 import me.egg82.antivpn.messaging.ServerIDUtil;
 import me.lucko.jarrelocator.JarRelocator;

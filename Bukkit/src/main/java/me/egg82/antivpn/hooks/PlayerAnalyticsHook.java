@@ -20,7 +20,6 @@ import me.egg82.antivpn.api.VPNAPIProvider;
 import me.egg82.antivpn.api.model.ip.AlgorithmMethod;
 import me.egg82.antivpn.api.model.ip.IPManager;
 import me.egg82.antivpn.api.model.player.PlayerManager;
-import me.egg82.antivpn.lang.BukkitLocaleCommandUtil;
 import me.egg82.antivpn.lang.LocaleUtil;
 import me.egg82.antivpn.lang.MessageKey;
 import me.egg82.antivpn.logging.GELFLogger;

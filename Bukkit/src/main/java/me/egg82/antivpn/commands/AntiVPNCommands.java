@@ -12,7 +12,6 @@ import me.egg82.antivpn.lang.BukkitLocaleCommandUtil;
 import me.egg82.antivpn.lang.BukkitLocalizedCommandSender;
 import me.egg82.antivpn.lang.LocalizedArgumentDescription;
 import me.egg82.antivpn.lang.MessageKey;
-import me.egg82.antivpn.logging.GELFLogger;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.configurate.ConfigurationNode;

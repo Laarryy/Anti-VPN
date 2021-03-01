@@ -8,7 +8,6 @@ import me.egg82.antivpn.hooks.UpdaterHook;
 import me.egg82.antivpn.lang.BukkitLocaleCommandUtil;
 import me.egg82.antivpn.lang.LocaleUtil;
 import me.egg82.antivpn.lang.MessageKey;
-import me.egg82.antivpn.logging.GELFLogger;
 import ninja.egg82.events.BukkitEvents;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventPriority;

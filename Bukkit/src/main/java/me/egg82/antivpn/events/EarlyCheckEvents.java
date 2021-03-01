@@ -12,7 +12,6 @@ import me.egg82.antivpn.hooks.LuckPermsHook;
 import me.egg82.antivpn.hooks.VaultHook;
 import me.egg82.antivpn.lang.BukkitLocaleCommandUtil;
 import me.egg82.antivpn.lang.MessageKey;
-import me.egg82.antivpn.logging.GELFLogger;
 import me.egg82.antivpn.utils.BukkitCommandUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.craftbukkit.BukkitComponentSerializer;
