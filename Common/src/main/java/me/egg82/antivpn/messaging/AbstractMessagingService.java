@@ -5,12 +5,11 @@ import com.github.luben.zstd.ZstdException;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.PooledByteBufAllocator;
-import it.unimi.dsi.fastutil.ints.IntArrayList;
-import it.unimi.dsi.fastutil.ints.IntList;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.text.DecimalFormat;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import me.egg82.antivpn.config.ConfigUtil;
@@ -147,7 +146,8 @@ public abstract class AbstractMessagingService implements MessagingService {
         }
     }
 
-    private final IntList capacities = new IntArrayList();
+    private final int[] capacities = new int[150];
+    private final AtomicInteger currentCapacity = new AtomicInteger(0);
     private volatile int capacity = 2 * 1024; // Start at 2kb
     private final ReadWriteLock capacityLock = new ReentrantReadWriteLock();
 
@@ -161,17 +161,17 @@ public abstract class AbstractMessagingService implements MessagingService {
     }
 
     protected void addCapacity(int capacity) {
-        capacities.add(capacity);
-        if (capacities.size() >= 50) {
+        int current = currentCapacity.getAndIncrement();
+        if (current < 150) {
+            capacities[current] = capacity;
+        } else {
             capacityLock.writeLock().lock();
             try {
-                if (capacities.size() >= 50) {
-                    this.capacity = MathUtil.percentile(capacities, 80.0d);
-                    if (ConfigUtil.getDebugOrFalse()) {
-                        logger.info("Set initial capacity to " + ratioFormat.format((double) this.capacity / 1024.0d) + "kb");
-                    }
-                    capacities.clear();
+                this.capacity = MathUtil.percentile(capacities, 80.0d);
+                if (ConfigUtil.getDebugOrFalse()) {
+                    logger.info("Set initial capacity to " + ratioFormat.format((double) this.capacity / 1024.0d) + "kb");
                 }
+                currentCapacity.set(0);
             } finally {
                 capacityLock.writeLock().unlock();
             }
