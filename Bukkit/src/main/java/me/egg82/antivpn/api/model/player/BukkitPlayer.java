@@ -11,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
 public class BukkitPlayer extends AbstractPlayer {
     public BukkitPlayer(@NotNull UUID uuid, boolean mcleaks) { this(uuid, null, mcleaks); }
 
-    public BukkitPlayer(@NotNull UUID uuid, @Nullable String name, boolean mcleaks) { super(uuid, name, mcleaks, BukkitLocaleCommandUtil.getConsole().getLocalizationManager()); }
+    public BukkitPlayer(@NotNull UUID uuid, @Nullable String name, boolean mcleaks) { super(uuid, name, mcleaks); }
 
     protected @NotNull CompletableFuture<@NotNull String> fetchName(@NotNull UUID uuid) { return PlayerLookup.get(uuid).thenApply(PlayerInfo::getName); }
 }

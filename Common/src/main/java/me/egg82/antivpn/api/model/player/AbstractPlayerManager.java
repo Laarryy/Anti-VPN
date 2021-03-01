@@ -15,6 +15,7 @@ import java.util.concurrent.TimeUnit;
 import me.egg82.antivpn.api.APIException;
 import me.egg82.antivpn.config.CachedConfig;
 import me.egg82.antivpn.config.ConfigUtil;
+import me.egg82.antivpn.logging.GELFLogger;
 import me.egg82.antivpn.messaging.packets.DeletePlayerPacket;
 import me.egg82.antivpn.messaging.packets.PlayerPacket;
 import me.egg82.antivpn.storage.StorageService;
@@ -29,7 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class AbstractPlayerManager implements PlayerManager {
-    protected final Logger logger = LoggerFactory.getLogger(getClass());
+    protected final Logger logger = new GELFLogger(LoggerFactory.getLogger(getClass()));
 
     protected final LoadingCache<UUID, PlayerModel> playerCache;
     private final String mcleaksKey;

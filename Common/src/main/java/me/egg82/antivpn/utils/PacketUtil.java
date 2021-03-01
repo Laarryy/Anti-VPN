@@ -14,7 +14,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import me.egg82.antivpn.config.CachedConfig;
 import me.egg82.antivpn.config.ConfigUtil;
 import me.egg82.antivpn.core.DoubleBuffer;
-import me.egg82.antivpn.lang.Locales;
+import me.egg82.antivpn.lang.LocaleUtil;
 import me.egg82.antivpn.lang.MessageKey;
 import me.egg82.antivpn.logging.GELFLogger;
 import me.egg82.antivpn.messaging.GenericMessagingHandler;
@@ -28,7 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class PacketUtil {
-    private static final Logger logger = LoggerFactory.getLogger(PacketUtil.class);
+    private static final Logger logger = new GELFLogger(LoggerFactory.getLogger(PacketUtil.class));
 
     private static ExecutorService workPool = Executors.newFixedThreadPool(4, new ThreadFactoryBuilder().setNameFormat("Anti-VPN_Messaging_%d").build());
 
@@ -43,7 +43,7 @@ public class PacketUtil {
             try {
                 packet = clazz.newInstance();
             } catch (IllegalAccessException | InstantiationException | ExceptionInInitializerError | SecurityException ex) {
-                GELFLogger.exception(logger, ex, Locales.getUS(), MessageKey.ERROR__MESSAGING__BAD_PACKET, "{name}", clazz.getSimpleName());
+                logger.error(LocaleUtil.getDefaultI18N().getText(MessageKey.ERROR__MESSAGING__BAD_PACKET, "{name}", clazz.getSimpleName()), ex);
                 continue;
             }
             packetCache.put(packet.getPacketId(), clazz);

@@ -14,6 +14,7 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import me.egg82.antivpn.config.ConfigUtil;
 import me.egg82.antivpn.lang.I18NManager;
+import me.egg82.antivpn.logging.GELFLogger;
 import me.egg82.antivpn.utils.MathUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -21,7 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class AbstractMessagingService implements MessagingService {
-    protected final Logger logger = LoggerFactory.getLogger(getClass());
+    protected final Logger logger = new GELFLogger(LoggerFactory.getLogger(getClass()));
 
     private static final DecimalFormat ratioFormat = new DecimalFormat("0.#####");
 
@@ -34,11 +35,8 @@ public abstract class AbstractMessagingService implements MessagingService {
 
     protected MessagingHandler handler;
 
-    protected final I18NManager consoleLocalizationManager;
-
-    protected AbstractMessagingService(@NotNull String name, @NotNull I18NManager consoleLocalizationManager) {
+    protected AbstractMessagingService(@NotNull String name) {
         this.name = name;
-        this.consoleLocalizationManager = consoleLocalizationManager;
     }
 
     public @NotNull String getName() { return name; }

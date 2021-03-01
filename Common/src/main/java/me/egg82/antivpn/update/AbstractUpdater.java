@@ -11,7 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class AbstractUpdater implements Updater {
-    protected final Logger logger = LoggerFactory.getLogger(getClass());
+    protected final Logger logger = new GELFLogger(LoggerFactory.getLogger(getClass()));
 
     protected final String currentVersion;
     protected final long checkDelay;
@@ -37,7 +37,7 @@ public abstract class AbstractUpdater implements Updater {
                 try {
                     newVersion = getNewVersion();
                 } catch (IOException ex) {
-                    GELFLogger.exception(logger, ex);
+                    logger.error(ex.getMessage(), ex);
                 }
             }
             if (isNewVersion(newVersion, currentVersion)) {

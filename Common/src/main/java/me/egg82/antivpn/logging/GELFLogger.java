@@ -1,475 +1,380 @@
 package me.egg82.antivpn.logging;
 
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import flexjson.JSONSerializer;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
-import java.time.Instant;
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.*;
-import me.egg82.antivpn.api.APIException;
-import me.egg82.antivpn.api.platform.Platform;
-import me.egg82.antivpn.compress.GZIPCompressionStream;
 import me.egg82.antivpn.config.ConfigUtil;
-import me.egg82.antivpn.core.DoubleBuffer;
-import me.egg82.antivpn.lang.I18NManager;
-import me.egg82.antivpn.lang.Locales;
-import me.egg82.antivpn.lang.MessageKey;
-import me.egg82.antivpn.logging.models.GELFSubmissionModel;
-import me.egg82.antivpn.utils.TimeUtil;
-import me.egg82.antivpn.web.WebRequest;
-import me.egg82.antivpn.web.transformers.InstantTransformer;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.slf4j.Marker;
 
-public class GELFLogger {
-    private static final Logger logger = LoggerFactory.getLogger(GELFLogger.class);
+public class GELFLogger implements Logger {
+    private final Logger impl;
 
-    private static final GZIPCompressionStream GZIP_COMPRESSION = new GZIPCompressionStream();
-
-    private static final String GELF_ADDRESS = "https://logs.egg82.me:8443/gelf";
-    private static final ScheduledExecutorService workPool = Executors.newSingleThreadScheduledExecutor(new ThreadFactoryBuilder().setNameFormat("Anti-VPN_GELFLogger_%d").build());
-
-    private static final String SESSION_ID = UUID.randomUUID().toString();
-
-    private static String serverId = null;
-    private static String pluginVersion = null;
-    private static String platform = null;
-    private static String platformVersion = null;
-
-    private static volatile boolean initialized = false;
-    private static volatile boolean sendErrors = false;
-
-    private static final DoubleBuffer<GELFSubmissionModel> queue = new DoubleBuffer<>();
-
-    private GELFLogger() {
-        workPool.scheduleWithFixedDelay(GELFLogger::sendModels, 1L, 2L, TimeUnit.SECONDS);
+    public GELFLogger(@NotNull Logger impl) {
+        this.impl = impl;
     }
 
-    public static void setData(@NotNull UUID serverId, @NotNull String pluginVersion, @NotNull Platform.Type platform, @NotNull String platformVersion) {
-        GELFLogger.serverId = serverId.toString();
-        GELFLogger.pluginVersion = pluginVersion;
-        GELFLogger.platform = platform.getFriendlyName();
-        GELFLogger.platformVersion = platformVersion;
-    }
+    public String getName() { return impl.getName(); }
 
-    public static void doSendErrors(boolean sendErrors) {
-        GELFLogger.initialized = true;
-        GELFLogger.sendErrors = sendErrors;
-        if (!sendErrors) {
-            queue.getReadBuffer().clear();
-            queue.getWriteBuffer().clear();
-        }
-    }
+    public boolean isTraceEnabled() { return impl.isTraceEnabled(); }
 
-    public static void close() {
-        workPool.shutdown();
-        try {
-            if (!workPool.awaitTermination(4L, TimeUnit.SECONDS)) {
-                workPool.shutdownNow();
-            }
-        } catch (InterruptedException ignored) {
-            Thread.currentThread().interrupt();
-        }
-    }
+    public void trace(String msg) { impl.trace(msg); }
 
-    public static void exception(@NotNull Logger logger, @NotNull Throwable ex, @NotNull I18NManager localizationManager, @NotNull MessageKey key) { exception(logger, ex, localizationManager.getText(key), Locales.getUS().getText(key), localizationManager); }
+    public void trace(String format, Object arg) { impl.trace(format, arg); }
 
-    public static void exception(@NotNull Logger logger, @NotNull Throwable ex, @NotNull I18NManager localizationManager, @NotNull MessageKey key, String... placeholders) { exception(logger, ex, localizationManager.getText(key, placeholders), Locales.getUS().getText(key, placeholders), localizationManager); }
+    public void trace(String format, Object arg1, Object arg2) { impl.trace(format, arg1, arg2); }
 
-    public static void exception(@NotNull Logger logger, @NotNull Throwable ex, @NotNull I18NManager localizationManager, @NotNull MessageKey key, @NotNull Map<String, String> placeholders) { exception(logger, ex, localizationManager.getText(key, placeholders), Locales.getUS().getText(key, placeholders), localizationManager); }
+    public void trace(String format, Object... arguments) { impl.trace(format, arguments); }
 
-    public static void exception(@NotNull Logger logger, @NotNull String message, @NotNull Throwable ex, boolean sendNow) {
-        Throwable oldEx = null;
-        if (ex instanceof CompletionException || ex instanceof ExecutionException) {
-            oldEx = ex;
-            ex = ex.getCause();
-        }
-        while (ex instanceof CompletionException || ex instanceof ExecutionException) {
-            ex = ex.getCause();
-        }
-
-        if (ex instanceof APIException) {
-            String apiError = "[Hard: " + ((APIException) ex).isHard() + "] " + ex.getClass().getName() + ": " + ex.getLocalizedMessage();
-            if (ConfigUtil.getDebugOrFalse()) {
-                logger.error(apiError, oldEx != null ? oldEx : ex);
-            } else {
-                logger.error(apiError);
-            }
+    public void trace(String msg, Throwable t) {
+        if (ConfigUtil.getDebugOrFalse()) {
+            impl.trace(msg, t);
         } else {
-            if (ex instanceof CancellationException) {
-                if (ConfigUtil.getDebugOrFalse()) {
-                    logger.warn(message, oldEx != null ? oldEx : ex);
-                } else {
-                    logger.warn(message);
-                }
-            } else {
-                if (ConfigUtil.getDebugOrFalse()) {
-                    logger.error(message, oldEx != null ? oldEx : ex);
-                } else {
-                    logger.error(message);
-                }
-            }
+            impl.trace(msg);
         }
-
-        if (!sendNow) {
-            return;
-        }
-
-        sendModel(getModel(message, ex, ex instanceof CancellationException ? 4 : 3));
     }
 
-    private static void exception(@NotNull Logger logger, @NotNull Throwable ex, @NotNull String localizedMessage, @NotNull String sendMessage, @Nullable I18NManager localizationManager) {
-        if (localizationManager == null) {
-            localizationManager = Locales.getUS();
-        }
+    public boolean isTraceEnabled(Marker marker) { return impl.isTraceEnabled(marker); }
 
-        Throwable oldEx = null;
-        if (ex instanceof CompletionException || ex instanceof ExecutionException) {
-            oldEx = ex;
-            ex = ex.getCause();
-        }
-        while (ex instanceof CompletionException || ex instanceof ExecutionException) {
-            ex = ex.getCause();
-        }
+    public void trace(Marker marker, String msg) { impl.trace(marker, msg); }
 
-        if (ex instanceof APIException) {
-            String apiError = localizationManager.getText(MessageKey.ERROR__API_EXCEPTION, "{hard}", String.valueOf(((APIException) ex).isHard()), "{message}", ex.getClass().getName() + ": " + ex.getLocalizedMessage());
-            if (ConfigUtil.getDebugOrFalse()) {
-                logger.error(apiError, oldEx != null ? oldEx : ex);
-            } else {
-                logger.error(apiError);
-            }
+    public void trace(Marker marker, String format, Object arg) { impl.trace(marker, format, arg); }
+
+    public void trace(Marker marker, String format, Object arg1, Object arg2) { impl.trace(marker, format, arg1, arg2); }
+
+    public void trace(Marker marker, String format, Object... argArray) { impl.trace(marker, format, argArray); }
+
+    public void trace(Marker marker, String msg, Throwable t) {
+        if (ConfigUtil.getDebugOrFalse()) {
+            impl.trace(marker, msg, t);
         } else {
-            if (ex instanceof CancellationException) {
-                if (ConfigUtil.getDebugOrFalse()) {
-                    logger.warn(localizedMessage, oldEx != null ? oldEx : ex);
-                } else {
-                    logger.warn(localizedMessage);
-                }
-            } else {
-                if (ConfigUtil.getDebugOrFalse()) {
-                    logger.error(localizedMessage, oldEx != null ? oldEx : ex);
-                } else {
-                    logger.error(localizedMessage);
-                }
-            }
-        }
-
-        if (serverId == null || pluginVersion == null || platform == null || platformVersion == null) {
-            return;
-        }
-
-        if (!initialized || sendErrors) {
-            queue.getWriteBuffer().add(getModel(sendMessage, ex, ex instanceof CancellationException ? 4 : 3));
+            impl.trace(marker, msg);
         }
     }
 
-    public static void exception(@NotNull Logger logger, @NotNull Throwable ex, boolean sendNow) {
-        Throwable oldEx = null;
-        if (ex instanceof CompletionException || ex instanceof ExecutionException) {
-            oldEx = ex;
-            ex = ex.getCause();
-        }
-        while (ex instanceof CompletionException || ex instanceof ExecutionException) {
-            ex = ex.getCause();
-        }
+    public boolean isDebugEnabled() { return impl.isDebugEnabled(); }
 
-        if (ex instanceof APIException) {
-            String apiError = "[Hard: " + ((APIException) ex).isHard() + "] " + ex.getClass().getName() + ": " + ex.getLocalizedMessage();
-            if (ConfigUtil.getDebugOrFalse()) {
-                logger.error(apiError, oldEx != null ? oldEx : ex);
-            } else {
-                logger.error(apiError);
-            }
+    public void debug(String msg) {
+        impl.debug(msg);
+        if (impl.isDebugEnabled()) {
+            GELFLoggerUtil.queue(0, msg);
+        }
+    }
+
+    public void debug(String format, Object arg) {
+        impl.debug(format, arg);
+        if (impl.isDebugEnabled()) {
+            GELFLoggerUtil.queue(0, String.format(format, arg));
+        }
+    }
+
+    public void debug(String format, Object arg1, Object arg2) {
+        impl.debug(format, arg1, arg2);
+        if (impl.isDebugEnabled()) {
+            GELFLoggerUtil.queue(0, String.format(format, arg1, arg2));
+        }
+    }
+
+    public void debug(String format, Object... arguments) {
+        impl.debug(format, arguments);
+        if (impl.isDebugEnabled()) {
+            GELFLoggerUtil.queue(0, String.format(format, arguments));
+        }
+    }
+
+    public void debug(String msg, Throwable t) {
+        if (ConfigUtil.getDebugOrFalse()) {
+            impl.debug(msg, t);
         } else {
-            if (ex instanceof CancellationException) {
-                if (ConfigUtil.getDebugOrFalse()) {
-                    logger.warn(ex.getClass().getName() + ": " + ex.getLocalizedMessage(), oldEx != null ? oldEx : ex);
-                } else {
-                    logger.warn(ex.getClass().getName() + ": " + ex.getLocalizedMessage());
-                }
-            } else {
-                if (ConfigUtil.getDebugOrFalse()) {
-                    logger.error(ex.getClass().getName() + ": " + ex.getLocalizedMessage(), oldEx != null ? oldEx : ex);
-                } else {
-                    logger.error(ex.getClass().getName() + ": " + ex.getLocalizedMessage());
-                }
-            }
+            impl.debug(msg);
         }
-
-        if (!sendNow) {
-            return;
+        if (impl.isDebugEnabled()) {
+            GELFLoggerUtil.queue(0, msg, t);
         }
-
-        sendModel(getModel(ex, ex instanceof CancellationException ? 4 : 3));
     }
 
-    public static void exception(@NotNull Logger logger, @NotNull Throwable ex) { exception(logger, ex, null); }
+    public boolean isDebugEnabled(Marker marker) { return impl.isDebugEnabled(marker); }
 
-    public static void exception(@NotNull Logger logger, @NotNull Throwable ex, @Nullable I18NManager consoleLocalizationManager) {
-        if (consoleLocalizationManager == null) {
-            consoleLocalizationManager = Locales.getUS();
+    public void debug(Marker marker, String msg) {
+        impl.debug(marker, msg);
+        if (impl.isDebugEnabled(marker)) {
+            GELFLoggerUtil.queue(0, msg);
         }
+    }
 
-        Throwable oldEx = null;
-        if (ex instanceof CompletionException || ex instanceof ExecutionException) {
-            oldEx = ex;
-            ex = ex.getCause();
+    public void debug(Marker marker, String format, Object arg) {
+        impl.debug(marker, format, arg);
+        if (impl.isDebugEnabled(marker)) {
+            GELFLoggerUtil.queue(0, String.format(format, arg));
         }
-        while (ex instanceof CompletionException || ex instanceof ExecutionException) {
-            ex = ex.getCause();
-        }
+    }
 
-        if (ex instanceof APIException) {
-            String apiError = consoleLocalizationManager.getText(MessageKey.ERROR__API_EXCEPTION, "{hard}", String.valueOf(((APIException) ex).isHard()), "{message}", ex.getClass().getName() + ": " + ex.getLocalizedMessage());
-            if (ConfigUtil.getDebugOrFalse()) {
-                logger.error(apiError, oldEx != null ? oldEx : ex);
-            } else {
-                logger.error(apiError);
-            }
+    public void debug(Marker marker, String format, Object arg1, Object arg2) {
+        impl.debug(marker, format, arg1, arg2);
+        if (impl.isDebugEnabled(marker)) {
+            GELFLoggerUtil.queue(0, String.format(format, arg1, arg2));
+        }
+    }
+
+    public void debug(Marker marker, String format, Object... arguments) {
+        impl.debug(marker, format, arguments);
+        if (impl.isDebugEnabled(marker)) {
+            GELFLoggerUtil.queue(0, String.format(format, arguments));
+        }
+    }
+
+    public void debug(Marker marker, String msg, Throwable t) {
+        if (ConfigUtil.getDebugOrFalse()) {
+            impl.debug(marker, msg, t);
         } else {
-            if (ex instanceof CancellationException) {
-                if (ConfigUtil.getDebugOrFalse()) {
-                    logger.warn(ex.getClass().getName() + ": " + ex.getLocalizedMessage(), oldEx != null ? oldEx : ex);
-                } else {
-                    logger.warn(ex.getClass().getName() + ": " + ex.getLocalizedMessage());
-                }
-            } else {
-                if (ConfigUtil.getDebugOrFalse()) {
-                    logger.error(ex.getClass().getName() + ": " + ex.getLocalizedMessage(), oldEx != null ? oldEx : ex);
-                } else {
-                    logger.error(ex.getClass().getName() + ": " + ex.getLocalizedMessage());
-                }
-            }
+            impl.debug(marker, msg);
         }
-
-        if (serverId == null || pluginVersion == null || platform == null || platformVersion == null) {
-            return;
-        }
-
-        if (!initialized || sendErrors) {
-            queue.getWriteBuffer().add(getModel(ex, ex instanceof CancellationException ? 4 : 3));
+        if (impl.isDebugEnabled(marker)) {
+            GELFLoggerUtil.queue(0, msg, t);
         }
     }
 
-    public static void error(@NotNull Logger logger, @NotNull I18NManager localizationManager, @NotNull MessageKey key) { error(logger, localizationManager.getText(key), Locales.getUS().getText(key)); }
+    public boolean isInfoEnabled() { return impl.isInfoEnabled(); }
 
-    public static void error(@NotNull Logger logger, @NotNull I18NManager localizationManager, @NotNull MessageKey key, String... placeholders) { error(logger, localizationManager.getText(key, placeholders), Locales.getUS().getText(key, placeholders)); }
-
-    public static void error(@NotNull Logger logger, @NotNull I18NManager localizationManager, @NotNull MessageKey key, @NotNull Map<String, String> placeholders) { error(logger, localizationManager.getText(key, placeholders), Locales.getUS().getText(key, placeholders)); }
-
-    public static void error(@NotNull Logger logger, @NotNull String message, boolean sendNow) {
-        logger.error(message);
-
-        if (!sendNow) {
-            return;
-        }
-
-        GELFSubmissionModel model = getModel(message);
-        model.setLevel(3);
-        sendModel(model);
-    }
-
-    private static void error(@NotNull Logger logger, @NotNull String localizedMessage, @NotNull String sendMessage) {
-        logger.error(localizedMessage);
-
-        if (serverId == null || pluginVersion == null || platform == null || platformVersion == null) {
-            return;
-        }
-
-        if (!initialized || sendErrors) {
-            GELFSubmissionModel model = getModel(sendMessage);
-            model.setLevel(3);
-            queue.getWriteBuffer().add(model);
+    public void info(String msg) {
+        impl.info(msg);
+        if (impl.isInfoEnabled()) {
+            GELFLoggerUtil.queue(1, msg);
         }
     }
 
-    public static void warn(@NotNull Logger logger, @NotNull I18NManager localizationManager, @NotNull MessageKey key) { warn(logger, localizationManager.getText(key), Locales.getUS().getText(key)); }
-
-    public static void warn(@NotNull Logger logger, @NotNull I18NManager localizationManager, @NotNull MessageKey key, String... placeholders) { warn(logger, localizationManager.getText(key, placeholders), Locales.getUS().getText(key, placeholders)); }
-
-    public static void warn(@NotNull Logger logger, @NotNull I18NManager localizationManager, @NotNull MessageKey key, @NotNull Map<String, String> placeholders) { warn(logger, localizationManager.getText(key, placeholders), Locales.getUS().getText(key, placeholders)); }
-
-    public static void warn(@NotNull Logger logger, @NotNull String message, boolean sendNow) {
-        logger.warn(message);
-
-        if (!sendNow) {
-            return;
-        }
-
-        GELFSubmissionModel model = getModel(message);
-        model.setLevel(4);
-        sendModel(model);
-    }
-
-    private static void warn(@NotNull Logger logger, @NotNull String localizedMessage, @NotNull String sendMessage) {
-        logger.warn(localizedMessage);
-
-        if (serverId == null || pluginVersion == null || platform == null || platformVersion == null) {
-            return;
-        }
-
-        if (!initialized || sendErrors) {
-            GELFSubmissionModel model = getModel(sendMessage);
-            model.setLevel(4);
-            queue.getWriteBuffer().add(model);
+    public void info(String format, Object arg) {
+        impl.info(format, arg);
+        if (impl.isInfoEnabled()) {
+            GELFLoggerUtil.queue(1, String.format(format, arg));
         }
     }
 
-    public static void info(@NotNull Logger logger, @NotNull I18NManager localizationManager, @NotNull MessageKey key) { info(logger, localizationManager.getText(key), Locales.getUS().getText(key)); }
-
-    public static void info(@NotNull Logger logger, @NotNull I18NManager localizationManager, @NotNull MessageKey key, String... placeholders) { info(logger, localizationManager.getText(key, placeholders), Locales.getUS().getText(key, placeholders)); }
-
-    public static void info(@NotNull Logger logger, @NotNull I18NManager localizationManager, @NotNull MessageKey key, @NotNull Map<String, String> placeholders) { info(logger, localizationManager.getText(key, placeholders), Locales.getUS().getText(key, placeholders)); }
-
-    public static void info(@NotNull Logger logger, @NotNull String message, boolean sendNow) {
-        logger.info(message);
-
-        if (!sendNow) {
-            return;
-        }
-
-        GELFSubmissionModel model = getModel(message);
-        model.setLevel(6);
-        sendModel(model);
-    }
-
-    private static void info(@NotNull Logger logger, @NotNull String localizedMessage, @NotNull String sendMessage) {
-        logger.info(localizedMessage);
-
-        if (serverId == null || pluginVersion == null || platform == null || platformVersion == null) {
-            return;
-        }
-
-        if (!initialized || sendErrors) {
-            GELFSubmissionModel model = getModel(sendMessage);
-            model.setLevel(6);
-            queue.getWriteBuffer().add(model);
+    public void info(String format, Object arg1, Object arg2) {
+        impl.info(format, arg1, arg2);
+        if (impl.isInfoEnabled()) {
+            GELFLoggerUtil.queue(1, String.format(format, arg1, arg2));
         }
     }
 
-    public static void debug(@NotNull Logger logger, @NotNull I18NManager localizationManager, @NotNull MessageKey key) { debug(logger, localizationManager.getText(key), Locales.getUS().getText(key)); }
-
-    public static void debug(@NotNull Logger logger, @NotNull I18NManager localizationManager, @NotNull MessageKey key, String... placeholders) { debug(logger, localizationManager.getText(key, placeholders), Locales.getUS().getText(key, placeholders)); }
-
-    public static void debug(@NotNull Logger logger, @NotNull I18NManager localizationManager, @NotNull MessageKey key, @NotNull Map<String, String> placeholders) { debug(logger, localizationManager.getText(key, placeholders), Locales.getUS().getText(key, placeholders)); }
-
-    public static void debug(@NotNull Logger logger, @NotNull String message, boolean sendNow) {
-        logger.debug(message);
-
-        if (!sendNow) {
-            return;
-        }
-
-        GELFSubmissionModel model = getModel(message);
-        model.setLevel(7);
-        sendModel(model);
-    }
-
-    private static void debug(@NotNull Logger logger, @NotNull String localizedMessage, @NotNull String sendMessage) {
-        logger.debug(localizedMessage);
-
-        if (serverId == null || pluginVersion == null || platform == null || platformVersion == null) {
-            return;
-        }
-
-        if (!initialized || sendErrors) {
-            GELFSubmissionModel model = getModel(sendMessage);
-            model.setLevel(7);
-            queue.getWriteBuffer().add(model);
+    public void info(String format, Object... arguments) {
+        impl.info(format, arguments);
+        if (impl.isInfoEnabled()) {
+            GELFLoggerUtil.queue(1, String.format(format, arguments));
         }
     }
 
-    private static GELFSubmissionModel getModel(@NotNull String message, @NotNull Throwable ex, int level) {
-        GELFSubmissionModel retVal = new GELFSubmissionModel();
-        retVal.setHost(serverId);
-        retVal.setShortMessage(message);
-        try (StringWriter builder = new StringWriter(); PrintWriter writer = new PrintWriter(builder)) {
-            ex.printStackTrace(writer);
-            String str = builder.toString();
-            retVal.setFullMessage(str.substring(0, str.length() - System.lineSeparator().length()));
-        } catch (IOException ex2) {
-            logger.error(ex2.getClass().getName() + ": " + ex2.getLocalizedMessage(), ex2);
+    public void info(String msg, Throwable t) {
+        if (ConfigUtil.getDebugOrFalse()) {
+            impl.info(msg, t);
+        } else {
+            impl.info(msg);
         }
-        retVal.setLevel(level);
-        retVal.setSession(SESSION_ID);
-        retVal.setPluginVersion(pluginVersion);
-        retVal.setPlatform(platform);
-        retVal.setPlatformVersion(platformVersion);
-        return retVal;
-    }
-
-    private static GELFSubmissionModel getModel(@NotNull Throwable ex, int level) {
-        GELFSubmissionModel retVal = new GELFSubmissionModel();
-        retVal.setHost(serverId);
-        retVal.setShortMessage(ex.getClass().getName() + ": " + ex.getMessage());
-        try (StringWriter builder = new StringWriter(); PrintWriter writer = new PrintWriter(builder)) {
-            ex.printStackTrace(writer);
-            String str = builder.toString();
-            retVal.setFullMessage(str.substring(0, str.length() - System.lineSeparator().length()));
-        } catch (IOException ex2) {
-            logger.error(ex2.getClass().getName() + ": " + ex2.getLocalizedMessage(), ex2);
-        }
-        retVal.setLevel(level);
-        retVal.setSession(SESSION_ID);
-        retVal.setPluginVersion(pluginVersion);
-        retVal.setPlatform(platform);
-        retVal.setPlatformVersion(platformVersion);
-        return retVal;
-    }
-
-    private static GELFSubmissionModel getModel(@NotNull String message) {
-        GELFSubmissionModel retVal = new GELFSubmissionModel();
-        retVal.setHost(serverId);
-        retVal.setShortMessage(message);
-        retVal.setSession(SESSION_ID);
-        retVal.setPluginVersion(pluginVersion);
-        retVal.setPlatform(platform);
-        retVal.setPlatformVersion(platformVersion);
-        return retVal;
-    }
-
-    private static void sendModels() {
-        if (!initialized || !sendErrors) {
-            return;
-        }
-
-        queue.swapBuffers();
-
-        GELFSubmissionModel model;
-        while ((model = queue.getReadBuffer().poll()) != null) {
-            sendModel(model);
+        if (impl.isInfoEnabled()) {
+            GELFLoggerUtil.queue(1, msg, t);
         }
     }
 
-    private static void sendModel(@NotNull GELFSubmissionModel model) {
-        JSONSerializer modelSerializer = new JSONSerializer();
-        modelSerializer.prettyPrint(false);
-        modelSerializer.transform(new InstantTransformer(), Instant.class);
+    public boolean isInfoEnabled(Marker marker) { return impl.isInfoEnabled(marker); }
 
-        try {
-            WebRequest request = WebRequest.builder(new URL(GELF_ADDRESS))
-                .method(WebRequest.RequestMethod.POST)
-                .timeout(new TimeUtil.Time(5000L, TimeUnit.MILLISECONDS))
-                .userAgent("egg82/GELFLogger")
-                .header("Content-Type", "application/json")
-                .header("Content-Encoding", "gzip")
-                .outputData(GZIP_COMPRESSION.compress(modelSerializer.exclude("*.class").deepSerialize(model).getBytes(StandardCharsets.UTF_8)))
-                .build();
-            HttpURLConnection conn = request.getConnection();
-            if (conn.getResponseCode() != 202) {
-                throw new IOException("Did not get valid response from server (response code " + conn.getResponseCode() + "): \"" + WebRequest.getString(conn) + "\""); // TODO: Localization
-            }
-        } catch (IOException ex) {
-            logger.error(ex.getClass().getName() + ": " + ex.getLocalizedMessage(), ex);
+    public void info(Marker marker, String msg) {
+        impl.info(marker, msg);
+        if (impl.isInfoEnabled(marker)) {
+            GELFLoggerUtil.queue(1, msg);
+        }
+    }
+
+    public void info(Marker marker, String format, Object arg) {
+        impl.info(marker, format, arg);
+        if (impl.isInfoEnabled(marker)) {
+            GELFLoggerUtil.queue(1, String.format(format, arg));
+        }
+    }
+
+    public void info(Marker marker, String format, Object arg1, Object arg2) {
+        impl.info(marker, format, arg1, arg2);
+        if (impl.isInfoEnabled(marker)) {
+            GELFLoggerUtil.queue(1, String.format(format, arg1, arg2));
+        }
+    }
+
+    public void info(Marker marker, String format, Object... arguments) {
+        impl.info(marker, format, arguments);
+        if (impl.isInfoEnabled(marker)) {
+            GELFLoggerUtil.queue(1, String.format(format, arguments));
+        }
+    }
+
+    public void info(Marker marker, String msg, Throwable t) {
+        if (ConfigUtil.getDebugOrFalse()) {
+            impl.info(marker, msg, t);
+        } else {
+            impl.info(marker, msg);
+        }
+        if (impl.isInfoEnabled(marker)) {
+            GELFLoggerUtil.queue(1, msg, t);
+        }
+    }
+
+    public boolean isWarnEnabled() { return impl.isWarnEnabled(); }
+
+    public void warn(String msg) {
+        impl.warn(msg);
+        if (impl.isWarnEnabled()) {
+            GELFLoggerUtil.queue(2, msg);
+        }
+    }
+
+    public void warn(String format, Object arg) {
+        impl.warn(format, arg);
+        if (impl.isWarnEnabled()) {
+            GELFLoggerUtil.queue(2, String.format(format, arg));
+        }
+    }
+
+    public void warn(String format, Object... arguments) {
+        impl.warn(format, arguments);
+        if (impl.isWarnEnabled()) {
+            GELFLoggerUtil.queue(2, String.format(format, arguments));
+        }
+    }
+
+    public void warn(String format, Object arg1, Object arg2) {
+        impl.warn(format, arg1, arg2);
+        if (impl.isWarnEnabled()) {
+            GELFLoggerUtil.queue(2, String.format(format, arg1, arg2));
+        }
+    }
+
+    public void warn(String msg, Throwable t) {
+        if (ConfigUtil.getDebugOrFalse()) {
+            impl.warn(msg, t);
+        } else {
+            impl.warn(msg);
+        }
+        if (impl.isWarnEnabled()) {
+            GELFLoggerUtil.queue(2, msg, t);
+        }
+    }
+
+    public boolean isWarnEnabled(Marker marker) { return impl.isWarnEnabled(marker); }
+
+    public void warn(Marker marker, String msg) {
+        impl.warn(marker, msg);
+        if (impl.isWarnEnabled(marker)) {
+            GELFLoggerUtil.queue(2, msg);
+        }
+    }
+
+    public void warn(Marker marker, String format, Object arg) {
+        impl.warn(marker, format, arg);
+        if (impl.isWarnEnabled(marker)) {
+            GELFLoggerUtil.queue(2, String.format(format, arg));
+        }
+    }
+
+    public void warn(Marker marker, String format, Object arg1, Object arg2) {
+        impl.warn(marker, format, arg1, arg2);
+        if (impl.isWarnEnabled(marker)) {
+            GELFLoggerUtil.queue(2, String.format(format, arg1, arg2));
+        }
+    }
+
+    public void warn(Marker marker, String format, Object... arguments) {
+        impl.warn(marker, format, arguments);
+        if (impl.isWarnEnabled(marker)) {
+            GELFLoggerUtil.queue(2, String.format(format, arguments));
+        }
+    }
+
+    public void warn(Marker marker, String msg, Throwable t) {
+        if (ConfigUtil.getDebugOrFalse()) {
+            impl.warn(marker, msg, t);
+        } else {
+            impl.warn(marker, msg);
+        }
+        if (impl.isWarnEnabled(marker)) {
+            GELFLoggerUtil.queue(2, msg, t);
+        }
+    }
+
+    public boolean isErrorEnabled() { return impl.isErrorEnabled(); }
+
+    public void error(String msg) {
+        impl.error(msg);
+        if (impl.isErrorEnabled()) {
+            GELFLoggerUtil.queue(3, msg);
+        }
+    }
+
+    public void error(String format, Object arg) {
+        impl.error(format, arg);
+        if (impl.isErrorEnabled()) {
+            GELFLoggerUtil.queue(3, String.format(format, arg));
+        }
+    }
+
+    public void error(String format, Object arg1, Object arg2) {
+        impl.error(format, arg1, arg2);
+        if (impl.isErrorEnabled()) {
+            GELFLoggerUtil.queue(3, String.format(format, arg1, arg2));
+        }
+    }
+
+    public void error(String format, Object... arguments) {
+        impl.error(format, arguments);
+        if (impl.isErrorEnabled()) {
+            GELFLoggerUtil.queue(3, String.format(format, arguments));
+        }
+    }
+
+    public void error(String msg, Throwable t) {
+        if (ConfigUtil.getDebugOrFalse()) {
+            impl.error(msg, t);
+        } else {
+            impl.error(msg);
+        }
+        if (impl.isErrorEnabled()) {
+            GELFLoggerUtil.queue(3, msg, t);
+        }
+    }
+
+    public boolean isErrorEnabled(Marker marker) { return impl.isErrorEnabled(marker); }
+
+    public void error(Marker marker, String msg) {
+        impl.error(marker, msg);
+        if (impl.isErrorEnabled(marker)) {
+            GELFLoggerUtil.queue(3, msg);
+        }
+    }
+
+    public void error(Marker marker, String format, Object arg) {
+        impl.error(marker, format, arg);
+        if (impl.isErrorEnabled(marker)) {
+            GELFLoggerUtil.queue(3, String.format(format, arg));
+        }
+    }
+
+    public void error(Marker marker, String format, Object arg1, Object arg2) {
+        impl.error(marker, format, arg1, arg2);
+        if (impl.isErrorEnabled(marker)) {
+            GELFLoggerUtil.queue(3, String.format(format, arg1, arg2));
+        }
+    }
+
+    public void error(Marker marker, String format, Object... arguments) {
+        impl.error(marker, format, arguments);
+        if (impl.isErrorEnabled(marker)) {
+            GELFLoggerUtil.queue(3, String.format(format, arguments));
+        }
+    }
+
+    public void error(Marker marker, String msg, Throwable t) {
+        if (ConfigUtil.getDebugOrFalse()) {
+            impl.error(marker, msg, t);
+        } else {
+            impl.error(marker, msg);
+        }
+        if (impl.isErrorEnabled(marker)) {
+            GELFLoggerUtil.queue(3, msg, t);
         }
     }
 }

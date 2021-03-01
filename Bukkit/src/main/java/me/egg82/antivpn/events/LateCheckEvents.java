@@ -44,7 +44,7 @@ public class LateCheckEvents extends EventHolder {
                     return true;
                 })
                 .handler(this::checkPerms)
-                .exceptionHandler(ex -> GELFLogger.exception(logger, ex, BukkitLocaleCommandUtil.getConsole().getLocalizationManager()))
+                .exceptionHandler(ex -> logger.error(ex.getMessage(), ex))
         );
     }
 

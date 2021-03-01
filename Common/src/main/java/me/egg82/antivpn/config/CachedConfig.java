@@ -8,7 +8,6 @@ import java.util.Locale;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import me.egg82.antivpn.api.model.ip.AlgorithmMethod;
-import me.egg82.antivpn.lang.Locales;
 import me.egg82.antivpn.messaging.MessagingService;
 import me.egg82.antivpn.storage.StorageService;
 import me.egg82.antivpn.utils.TimeUtil;
@@ -38,7 +37,7 @@ public class CachedConfig {
     private boolean debug = false;
     public boolean getDebug() { return debug; }
 
-    private Locale language = Locales.getUSLocale();
+    private Locale language = Locale.US;
     public @NotNull Locale getLanguage() { return language; }
 
     private int threads = 4;

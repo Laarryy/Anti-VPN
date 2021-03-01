@@ -9,7 +9,7 @@ import java.util.concurrent.CompletionException;
 import me.egg82.antivpn.api.*;
 import me.egg82.antivpn.api.event.api.GenericAPIDisableEvent;
 import me.egg82.antivpn.api.event.api.GenericAPILoadedEvent;
-import me.egg82.antivpn.api.event.api.GenericPublicationErrorHandler;
+import me.egg82.antivpn.api.GenericPublicationErrorHandler;
 import me.egg82.antivpn.api.model.ip.BukkitIPManager;
 import me.egg82.antivpn.api.model.player.BukkitPlayerManager;
 import me.egg82.antivpn.api.model.source.GenericSourceManager;
@@ -29,10 +29,7 @@ import me.egg82.antivpn.events.EventHolder;
 import me.egg82.antivpn.events.ExtraPlayerEvents;
 import me.egg82.antivpn.events.LateCheckEvents;
 import me.egg82.antivpn.hooks.*;
-import me.egg82.antivpn.lang.BukkitLocaleCommandUtil;
-import me.egg82.antivpn.lang.BukkitLocalizedCommandSender;
-import me.egg82.antivpn.lang.I18NManager;
-import me.egg82.antivpn.lang.MessageKey;
+import me.egg82.antivpn.lang.*;
 import me.egg82.antivpn.logging.GELFLogger;
 import me.egg82.antivpn.messaging.GenericMessagingHandler;
 import me.egg82.antivpn.messaging.MessagingHandler;
@@ -52,7 +49,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class AntiVPN {
-    private static final Logger logger = LoggerFactory.getLogger(AntiVPN.class);
+    private static final Logger logger = new GELFLogger(LoggerFactory.getLogger(AntiVPN.class));
 
     private final List<CommandHolder> commandHolders = new ArrayList<>();
     private final List<EventHolder> eventHolders = new ArrayList<>();
@@ -122,7 +119,7 @@ public class AntiVPN {
         try {
             VPNAPIProvider.getInstance().runUpdateTask().join();
         } catch (CancellationException | CompletionException ex) {
-            GELFLogger.exception(logger, ex, BukkitLocaleCommandUtil.getConsole().getLocalizationManager());
+            logger.error(ex.getMessage(), ex);
         }
 
         for (EventHolder eventHolder : eventHolders) {
@@ -149,13 +146,13 @@ public class AntiVPN {
         I18NManager.clearCaches();
 
         CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
-        BukkitLocaleCommandUtil.setConsoleLocale(plugin, cachedConfig.getLanguage());
+        BukkitLocaleCommandUtil.setConsoleLocale(plugin, LocaleUtil.getDefaultI18N());
 
         BukkitIPManager ipManager = new BukkitIPManager(plugin, sourceManager, cachedConfig.getCacheTime());
         BukkitPlayerManager playerManager = new BukkitPlayerManager(plugin, cachedConfig.getMcLeaksKey(), cachedConfig.getCacheTime());
         Platform platform = new BukkitPlatform(System.currentTimeMillis());
         PluginMetadata metadata = new BukkitPluginMetadata(plugin.getDescription().getVersion());
-        VPNAPI api = new GenericVPNAPI(platform, metadata, ipManager, playerManager, sourceManager, cachedConfig, new MBassador<>(new GenericPublicationErrorHandler(BukkitLocaleCommandUtil.getConsole().getLocalizationManager())));
+        VPNAPI api = new GenericVPNAPI(platform, metadata, ipManager, playerManager, sourceManager, cachedConfig, new MBassador<>(new GenericPublicationErrorHandler()));
 
         APIUtil.setManagers(ipManager, playerManager, sourceManager);
         APIRegistrationUtil.register(api);
@@ -271,7 +268,7 @@ public class AntiVPN {
             try {
                 VPNAPIProvider.getInstance().runUpdateTask().join();
             } catch (CancellationException | CompletionException ex) {
-                GELFLogger.exception(logger, ex, BukkitLocaleCommandUtil.getConsole().getLocalizationManager());
+                logger.error(ex.getMessage(), ex);
             }
         }, 1L, 20L).getTaskId());
     }

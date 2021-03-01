@@ -5,6 +5,7 @@ import cloud.commandframework.paper.PaperCommandManager;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import me.egg82.antivpn.lang.BukkitLocalizedCommandSender;
+import me.egg82.antivpn.logging.GELFLogger;
 import me.egg82.antivpn.services.lookup.PlayerInfo;
 import me.egg82.antivpn.services.lookup.PlayerLookup;
 import org.jetbrains.annotations.NotNull;
@@ -12,7 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class AbstractCommand implements CommandExecutionHandler<BukkitLocalizedCommandSender> {
-    protected final Logger logger = LoggerFactory.getLogger(getClass());
+    protected final Logger logger = new GELFLogger(LoggerFactory.getLogger(getClass()));
 
     protected final PaperCommandManager<BukkitLocalizedCommandSender> commandManager;
 

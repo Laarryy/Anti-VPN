@@ -8,6 +8,7 @@ import cloud.commandframework.paper.PaperCommandManager;
 import java.io.IOException;
 import java.util.Locale;
 import java.util.UUID;
+import me.egg82.antivpn.bukkit.BukkitCapabilities;
 import me.egg82.antivpn.config.CachedConfig;
 import me.egg82.antivpn.config.ConfigUtil;
 import me.egg82.antivpn.config.ConfigurationFileUtil;
@@ -22,7 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class BukkitLocaleCommandUtil {
-    private static final Logger logger = LoggerFactory.getLogger(BukkitLocaleCommandUtil.class);
+    private static final Logger logger = new GELFLogger(LoggerFactory.getLogger(BukkitLocaleCommandUtil.class));
 
     private static BukkitAudiences adventure;
 
@@ -39,10 +40,8 @@ public class BukkitLocaleCommandUtil {
         consoleCommandSender = BukkitLocalizedCommandSender.getMappedCommandSender(
             plugin.getServer().getConsoleSender(),
             adventure.sender(plugin.getServer().getConsoleSender()),
-            getLanguage(plugin, plugin.getServer().getConsoleSender())
+            LocaleUtil.getDefaultI18N()
         );
-
-        setConsoleLocale(plugin, ConfigurationFileUtil.getConsoleLocale(plugin.getDataFolder(), consoleCommandSender));
 
         try {
             commandManager = new PaperCommandManager<>(
@@ -52,14 +51,14 @@ public class BukkitLocaleCommandUtil {
                 BukkitLocalizedCommandSender::getBaseCommandSender
             );
         } catch (Exception ex) {
-            GELFLogger.exception(logger, ex, consoleCommandSender.getLocalizationManager(), MessageKey.ERROR__COMMAND_MANAGER);
+            logger.error(LocaleUtil.getDefaultI18N().getText(MessageKey.ERROR__COMMAND_MANAGER), ex);
             return;
         }
 
         commandExceptionHandler
             .withInvalidSyntaxHandler()
             .withHandler(MinecraftExceptionHandler.ExceptionType.INVALID_SYNTAX, (sender, ex) -> {
-                GELFLogger.exception(logger, ex, consoleCommandSender.getLocalizationManager());
+                logger.error(ex.getMessage(), ex);
                 return sender.getComponent(MessageKey.ERROR__COMMAND__INVALID_SYNTAX, "{ex}", ex.getClass().getName() + ": " + ex.getLocalizedMessage());
             })
             .withInvalidSenderHandler()
@@ -68,12 +67,12 @@ public class BukkitLocaleCommandUtil {
             .withHandler(MinecraftExceptionHandler.ExceptionType.NO_PERMISSION, (sender, ex) -> sender.getComponent(MessageKey.ERROR__COMMAND__NO_PERMISSION, "{ex}", ex.getClass().getName() + ": " + ex.getLocalizedMessage()))
             .withArgumentParsingHandler()
             .withHandler(MinecraftExceptionHandler.ExceptionType.ARGUMENT_PARSING, (sender, ex) -> {
-                GELFLogger.exception(logger, ex, consoleCommandSender.getLocalizationManager());
+                logger.error(ex.getMessage(), ex);
                 return sender.getComponent(MessageKey.ERROR__COMMAND__INVALID_ARGS, "{ex}", ex.getClass().getName() + ": " + ex.getLocalizedMessage());
             })
             .withCommandExecutionHandler()
             .withHandler(MinecraftExceptionHandler.ExceptionType.COMMAND_EXECUTION, (sender, ex) -> {
-                GELFLogger.exception(logger, ex, consoleCommandSender.getLocalizationManager());
+                logger.error(ex.getMessage(), ex);
                 return sender.getComponent(MessageKey.ERROR__INTERNAL);
             })
             .withDecorator(component -> Component.text()
@@ -87,7 +86,7 @@ public class BukkitLocaleCommandUtil {
                 commandManager.registerBrigadier();
                 consoleCommandSender.sendMessage(MessageKey.GENERAL__ENABLE_HOOK, "{hook}", "Brigadier");
             } catch (BukkitCommandManager.BrigadierFailureException ex) {
-                GELFLogger.exception(logger, ex, consoleCommandSender.getLocalizationManager());
+                logger.error(ex.getMessage(), ex);
                 consoleCommandSender.sendMessage(MessageKey.GENERAL__NO_HOOK, "{hook}", "Brigadier");
             }
         } else {
@@ -130,44 +129,21 @@ public class BukkitLocaleCommandUtil {
 
     private static final UUID consoleUuid = new UUID(0L, 0L);
 
-    public static void setConsoleLocale(@NotNull Plugin plugin, @NotNull Locale locale) {
+    public static void setConsoleLocale(@NotNull Plugin plugin, @NotNull I18NManager manager) {
         consoleCommandSender = BukkitLocalizedCommandSender.getMappedCommandSender(
             plugin.getServer().getConsoleSender(),
             adventure.sender(plugin.getServer().getConsoleSender()),
-            I18NManager.getUserCache().compute(consoleUuid, (k, v) -> {
-                try {
-                    return I18NManager.getManager(
-                        plugin.getDataFolder(),
-                        locale,
-                        Locales.getUSLocale()
-                    );
-                } catch (IOException ex) {
-                    GELFLogger.exception(logger, ex, consoleCommandSender != null ? consoleCommandSender.getLocalizationManager() : Locales.getUS());
-                }
-                return Locales.getUS();
-            })
+            manager
         );
     }
 
     private static @NotNull I18NManager getLanguage(@NotNull Plugin plugin, @NotNull CommandSender sender) {
         if (sender instanceof Player) {
             return I18NManager.getUserCache().computeIfAbsent(((Player) sender).getUniqueId(), k -> {
-                CachedConfig cachedConfig;
-                try {
-                    cachedConfig = ConfigUtil.getCachedConfig();
-                } catch (IllegalStateException ignored) {
-                    cachedConfig = null;
-                }
-                try {
-                    return I18NManager.getManager(
-                        plugin.getDataFolder(),
-                        Locales.parseLocale(((Player) sender).getLocale(), consoleCommandSender != null ? consoleCommandSender.getLocalizationManager() : Locales.getUS()),
-                        cachedConfig != null ? cachedConfig.getLanguage() : Locales.getUSLocale()
-                    );
-                } catch (IOException ex) {
-                    GELFLogger.exception(logger, ex, consoleCommandSender != null ? consoleCommandSender.getLocalizationManager() : Locales.getUS());
-                }
-                return Locales.getUS();
+                return I18NManager.getManager(
+                    plugin.getDataFolder(),
+                    BukkitCapabilities.HAS_ADVENTURE ? ((Player) sender).locale() : LocaleUtil.parseLocale(((Player) sender).getLocale())
+                );
             });
         } else {
             return I18NManager.getUserCache().computeIfAbsent(consoleUuid, k -> {
@@ -177,16 +153,10 @@ public class BukkitLocaleCommandUtil {
                 } catch (IllegalStateException ignored) {
                     cachedConfig = null;
                 }
-                try {
-                    return I18NManager.getManager(
-                        plugin.getDataFolder(),
-                        cachedConfig != null ? cachedConfig.getLanguage() : Locales.getUSLocale(),
-                        Locales.getUSLocale()
-                    );
-                } catch (IOException ex) {
-                    GELFLogger.exception(logger, ex, consoleCommandSender != null ? consoleCommandSender.getLocalizationManager() : Locales.getUS());
-                }
-                return Locales.getUS();
+                return I18NManager.getManager(
+                    plugin.getDataFolder(),
+                    cachedConfig != null ? cachedConfig.getLanguage() : Locale.US
+                );
             });
         }
     }

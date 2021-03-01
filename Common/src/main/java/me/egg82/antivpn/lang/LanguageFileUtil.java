@@ -27,7 +27,7 @@ public class LanguageFileUtil {
         }
         if (!langDir.exists()) {
             if (!langDir.mkdirs()) {
-                throw new IOException("Could not create parent directory structure.");
+                throw new IOException(LocaleUtil.getDefaultI18N().getText(MessageKey.ERROR__PARENT_DIR));
             }
         }
         if (fileOnDisk.exists() && fileOnDisk.isDirectory()) {

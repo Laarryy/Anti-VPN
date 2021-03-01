@@ -21,7 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class DNSUtil {
-    private static final Logger logger = LoggerFactory.getLogger(DNSUtil.class);
+    private static final Logger logger = new GELFLogger(LoggerFactory.getLogger(DNSUtil.class));
 
     private DNSUtil() { }
 
@@ -133,7 +133,7 @@ public class DNSUtil {
                 retVal.add(attributeEnum.next().toString());
             }
         } catch (NamingException ex) {
-            GELFLogger.exception(logger, ex);
+            logger.error(ex.getMessage(), ex);
         }
         if (ConfigUtil.getDebugOrFalse()) {
             logger.info("Got " + retVal.size() + " record(s) for " + dns);

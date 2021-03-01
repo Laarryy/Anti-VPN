@@ -15,7 +15,7 @@ import java.util.logging.Level;
 import me.egg82.antivpn.api.*;
 import me.egg82.antivpn.api.event.api.GenericAPIDisableEvent;
 import me.egg82.antivpn.api.event.api.GenericAPILoadedEvent;
-import me.egg82.antivpn.api.event.api.GenericPublicationErrorHandler;
+import me.egg82.antivpn.api.GenericPublicationErrorHandler;
 import me.egg82.antivpn.api.model.ip.BungeeIPManager;
 import me.egg82.antivpn.api.model.player.BungeePlayerManager;
 import me.egg82.antivpn.api.model.source.GenericSourceManager;

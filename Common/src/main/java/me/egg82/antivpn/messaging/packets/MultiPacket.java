@@ -7,9 +7,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
-import me.egg82.antivpn.lang.Locales;
+import me.egg82.antivpn.lang.LocaleUtil;
 import me.egg82.antivpn.lang.MessageKey;
-import me.egg82.antivpn.logging.GELFLogger;
 import me.egg82.antivpn.utils.PacketUtil;
 import org.jetbrains.annotations.NotNull;
 
@@ -46,7 +45,7 @@ public class MultiPacket extends AbstractPacket {
                 try {
                     packets.add(packetClass.getConstructor(ByteBuf.class).newInstance(packetBuf));
                 } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException | InstantiationException | ExceptionInInitializerError | SecurityException ex) {
-                    GELFLogger.exception(logger, ex, Locales.getUS(), MessageKey.ERROR__MESSAGING__BAD_PACKET, "{name}", packetClass.getSimpleName());
+                    logger.error(LocaleUtil.getDefaultI18N().getText(MessageKey.ERROR__MESSAGING__BAD_PACKET, "{name}", packetClass.getSimpleName()), ex);
                 }
             } finally {
                 packetBuf.release();

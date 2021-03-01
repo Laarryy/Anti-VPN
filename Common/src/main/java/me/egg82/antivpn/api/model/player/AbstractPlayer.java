@@ -13,7 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class AbstractPlayer implements Player {
-    protected final transient Logger logger = LoggerFactory.getLogger(getClass());
+    protected final transient Logger logger = new GELFLogger(LoggerFactory.getLogger(getClass()));
 
     private final UUID uuid;
     private final String name;
@@ -21,7 +21,7 @@ public abstract class AbstractPlayer implements Player {
 
     private final int hc;
 
-    protected AbstractPlayer(@NotNull UUID uuid, String name, boolean mcleaks, @NotNull I18NManager consoleLocalizationManager) {
+    protected AbstractPlayer(@NotNull UUID uuid, String name, boolean mcleaks) {
         this.uuid = uuid;
         if (name == null) {
             try {
@@ -29,7 +29,7 @@ public abstract class AbstractPlayer implements Player {
             } catch (InterruptedException ignored) {
                 Thread.currentThread().interrupt();
             } catch (ExecutionException | CancellationException ex) {
-                GELFLogger.exception(logger, ex, consoleLocalizationManager);
+                logger.error(ex.getMessage(), ex);
             }
         }
         this.name = name;

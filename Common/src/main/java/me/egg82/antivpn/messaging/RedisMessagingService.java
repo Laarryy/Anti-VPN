@@ -13,6 +13,7 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import me.egg82.antivpn.config.ConfigUtil;
 import me.egg82.antivpn.lang.I18NManager;
+import me.egg82.antivpn.lang.LocaleUtil;
 import me.egg82.antivpn.lang.MessageKey;
 import me.egg82.antivpn.logging.GELFLogger;
 import me.egg82.antivpn.messaging.packets.Packet;
@@ -36,8 +37,8 @@ public class RedisMessagingService extends AbstractMessagingService {
     private static final String CHANNEL_NAME = "avpn-data";
     private static final byte[] CHANNEL_NAME_BYTES = CHANNEL_NAME.getBytes(StandardCharsets.UTF_8);
 
-    private RedisMessagingService(@NotNull String name, @NotNull I18NManager consoleLocalizationManager) {
-        super(name, consoleLocalizationManager);
+    private RedisMessagingService(@NotNull String name) {
+        super(name);
     }
 
     public void close() {
@@ -60,7 +61,7 @@ public class RedisMessagingService extends AbstractMessagingService {
 
     public boolean isClosed() { return closed || pool.isClosed(); }
 
-    public static @NotNull Builder builder(@NotNull String name, @NotNull UUID serverId, @NotNull MessagingHandler handler, @NotNull I18NManager consoleLocalizationManager) { return new Builder(name, serverId, handler, consoleLocalizationManager); }
+    public static @NotNull Builder builder(@NotNull String name, @NotNull UUID serverId, @NotNull MessagingHandler handler) { return new Builder(name, serverId, handler); }
 
     public static class Builder {
         private final RedisMessagingService service;
@@ -71,8 +72,8 @@ public class RedisMessagingService extends AbstractMessagingService {
         private int timeout = 5000;
         private String pass = "";
 
-        public Builder(@NotNull String name, @NotNull UUID serverId, @NotNull MessagingHandler handler, @NotNull I18NManager consoleLocalizationManager) {
-            service = new RedisMessagingService(name, consoleLocalizationManager);
+        public Builder(@NotNull String name, @NotNull UUID serverId, @NotNull MessagingHandler handler) {
+            service = new RedisMessagingService(name);
             service.serverId = serverId;
             service.serverIdString = serverId.toString();
             ByteBuf buffer = alloc.buffer(16, 16);
@@ -181,7 +182,7 @@ public class RedisMessagingService extends AbstractMessagingService {
                         break;
                 }
             } catch (IOException ex) {
-                GELFLogger.exception(service.logger, ex, service.consoleLocalizationManager, MessageKey.ERROR__MESSAGING__BAD_HANDLE);
+                service.logger.error(LocaleUtil.getDefaultI18N().getText(MessageKey.ERROR__MESSAGING__BAD_HANDLE), ex);
             }
         }
 
@@ -208,7 +209,7 @@ public class RedisMessagingService extends AbstractMessagingService {
                 try {
                     service.handler.handlePacket(messageId, service.getName(), packetClass.getConstructor(ByteBuf.class).newInstance(data));
                 } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException | InstantiationException | ExceptionInInitializerError | SecurityException ex) {
-                    GELFLogger.exception(service.logger, ex, service.consoleLocalizationManager, MessageKey.ERROR__MESSAGING__BAD_PACKET, "{name}", packetClass.getSimpleName());
+                    service.logger.error(LocaleUtil.getDefaultI18N().getText(MessageKey.ERROR__MESSAGING__BAD_PACKET, "{name}", packetClass.getSimpleName()), ex);
                 }
             } finally {
                 b.release();

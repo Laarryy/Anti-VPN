@@ -2,12 +2,13 @@ package me.egg82.antivpn.storage;
 
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import me.egg82.antivpn.logging.GELFLogger;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class AbstractStorageService implements StorageService {
-    protected final Logger logger = LoggerFactory.getLogger(getClass());
+    protected final Logger logger = new GELFLogger(LoggerFactory.getLogger(getClass()));
 
     protected AbstractStorageService(@NotNull String name) {
         this.name = name;

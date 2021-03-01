@@ -13,10 +13,11 @@ import me.egg82.antivpn.api.model.source.Source;
 import me.egg82.antivpn.api.model.source.SourceManager;
 import me.egg82.antivpn.api.model.source.models.SourceModel;
 import me.egg82.antivpn.lang.I18NManager;
-import me.egg82.antivpn.lang.Locales;
+import me.egg82.antivpn.lang.LocaleUtil;
 import me.egg82.antivpn.lang.LocalizedCommandSender;
 import me.egg82.antivpn.lang.MessageKey;
 import me.egg82.antivpn.logging.GELFLogger;
+import me.egg82.antivpn.logging.GELFLoggerUtil;
 import me.egg82.antivpn.messaging.*;
 import me.egg82.antivpn.reflect.PackageFilter;
 import me.egg82.antivpn.storage.*;
@@ -37,7 +38,7 @@ import org.spongepowered.configurate.yaml.YamlConfigurationLoader;
 import redis.clients.jedis.exceptions.JedisException;
 
 public class ConfigurationFileUtil {
-    private static final Logger logger = LoggerFactory.getLogger(ConfigurationFileUtil.class);
+    private static final Logger logger = new GELFLogger(LoggerFactory.getLogger(ConfigurationFileUtil.class));
 
     private ConfigurationFileUtil() { }
 
@@ -46,7 +47,7 @@ public class ConfigurationFileUtil {
         try {
             config = getConfigSimple("config.yml", new File(dataDirectory, "config.yml"), null);
         } catch (IOException ex) {
-            GELFLogger.exception(logger, ex);
+            logger.error(ex.getMessage(), ex);
             return false;
         }
 
@@ -58,11 +59,13 @@ public class ConfigurationFileUtil {
         try {
             config = getConfigSimple("config.yml", new File(dataDirectory, "config.yml"), console);
         } catch (IOException ex) {
-            GELFLogger.exception(logger, ex);
-            return Locales.getUSLocale();
+            logger.error(ex.getMessage(), ex);
+            return Locale.US;
         }
 
-        return getLanguage(config, false, console);
+        Locale retVal = getLanguage(config, false, console);
+        LocaleUtil.setLocale(I18NManager.getManager(dataDirectory, retVal));
+        return retVal;
     }
 
     public static <M extends LocalizedCommandSender<M, B>, B> void reloadConfig(@NotNull File dataDirectory, @NotNull LocalizedCommandSender<M, B> console, @NotNull MessagingHandler messagingHandler, @NotNull SourceManager sourceManager) {
@@ -70,16 +73,19 @@ public class ConfigurationFileUtil {
         try {
             config = getConfig("config.yml", new File(dataDirectory, "config.yml"), console);
         } catch (IOException ex) {
-            GELFLogger.exception(logger, ex);
+            logger.error(ex.getMessage(), ex);
             return;
         }
 
-        GELFLogger.doSendErrors(config.node("stats", "errors").getBoolean(true));
+        GELFLoggerUtil.doSendErrors(config.node("stats", "errors").getBoolean(true));
 
         boolean debug = config.node("debug").getBoolean(false);
         if (debug) {
             console.sendMessage(MessageKey.CONFIG__DEBUG);
         }
+
+        Locale language = getLanguage(config, debug, console);
+        LocaleUtil.setLocale(I18NManager.getManager(dataDirectory, language));
 
         UUID serverId = ServerIDUtil.getId(new File(dataDirectory, "server-id.txt"));
         if (debug) {
@@ -90,7 +96,7 @@ public class ConfigurationFileUtil {
 
         CachedConfig cachedConfig = CachedConfig.builder()
             .debug(debug)
-            .language(getLanguage(config, debug, console))
+            .language(language)
             .storage(getStorage(config, dataDirectory, debug, console))
             .messaging(getMessaging(config, serverId, messagingHandler, debug, console))
             .sourceCacheTime(getSourceCacheTime(config, debug, console))
@@ -113,12 +119,7 @@ public class ConfigurationFileUtil {
 
         PacketUtil.setPoolSize(cachedConfig.getMessaging().size() + 1);
 
-        try {
-            ConfigUtil.setConfiguration(config, cachedConfig, I18NManager.getManager(dataDirectory, cachedConfig.getLanguage(), Locales.getUSLocale()));
-        } catch (IOException ex) {
-            GELFLogger.exception(logger, ex, Locales.getUS());
-            ConfigUtil.setConfiguration(config, cachedConfig, Locales.getUS());
-        }
+        ConfigUtil.setConfiguration(config, cachedConfig);
 
         setSources(config, debug, console, sourceManager);
 
@@ -154,7 +155,7 @@ public class ConfigurationFileUtil {
         }
 
         if (retVal == null) {
-            retVal = Locales.getUSLocale();
+            retVal = Locale.US;
             console.sendMessage(MessageKey.CONFIG__INVALID_LOCALE, "{lang}", configLanguage, "{default}", retVal.getCountry() == null || retVal.getCountry().isEmpty() ? retVal.getLanguage() : retVal.getLanguage() + "-" + retVal.getCountry());
         }
         if (debug) {
@@ -215,7 +216,7 @@ public class ConfigurationFileUtil {
                             .life(poolSettings.maxLifetime, poolSettings.timeout)
                             .build();
                 } catch (Exception ex) {
-                    GELFLogger.exception(logger, ex, console.getLocalizationManager(), MessageKey.ERROR__CONFIG__NO_ENGINE, "{name}", name);
+                    logger.error(console.getLocalizedText(MessageKey.ERROR__CONFIG__NO_ENGINE, "{name}", name), ex);
                 }
                 break;
             }
@@ -240,7 +241,7 @@ public class ConfigurationFileUtil {
                             .life(poolSettings.maxLifetime, poolSettings.timeout)
                             .build();
                 } catch (Exception ex) {
-                    GELFLogger.exception(logger, ex, console.getLocalizationManager(), MessageKey.ERROR__CONFIG__NO_ENGINE, "{name}", name);
+                    logger.error(console.getLocalizedText(MessageKey.ERROR__CONFIG__NO_ENGINE, "{name}", name), ex);
                 }
                 break;
             }
@@ -265,7 +266,7 @@ public class ConfigurationFileUtil {
                             .life(poolSettings.maxLifetime, poolSettings.timeout)
                             .build();
                 } catch (Exception ex) {
-                    GELFLogger.exception(logger, ex, console.getLocalizationManager(), MessageKey.ERROR__CONFIG__NO_ENGINE, "{name}", name);
+                    logger.error(console.getLocalizedText(MessageKey.ERROR__CONFIG__NO_ENGINE, "{name}", name), ex);
                 }
                 break;
             }
@@ -290,7 +291,7 @@ public class ConfigurationFileUtil {
                         .life(poolSettings.maxLifetime, poolSettings.timeout)
                         .build();
                 } catch (Exception ex) {
-                    GELFLogger.exception(logger, ex, console.getLocalizationManager(), MessageKey.ERROR__CONFIG__NO_ENGINE, "{name}", name);
+                    logger.error(console.getLocalizedText(MessageKey.ERROR__CONFIG__NO_ENGINE, "{name}", name), ex);
                 }
                 break;
             }
@@ -313,7 +314,7 @@ public class ConfigurationFileUtil {
                         .life(poolSettings.maxLifetime, poolSettings.timeout)
                         .build();
                 } catch (Exception ex) {
-                    GELFLogger.exception(logger, ex, console.getLocalizationManager(), MessageKey.ERROR__CONFIG__NO_ENGINE, "{name}", name);
+                    logger.error(console.getLocalizedText(MessageKey.ERROR__CONFIG__NO_ENGINE, "{name}", name), ex);
                 }
                 break;
             }
@@ -336,7 +337,7 @@ public class ConfigurationFileUtil {
                             .life(poolSettings.maxLifetime, poolSettings.timeout)
                             .build();
                 } catch (Exception ex) {
-                    GELFLogger.exception(logger, ex, console.getLocalizationManager(), MessageKey.ERROR__CONFIG__NO_ENGINE, "{name}", name);
+                    logger.error(console.getLocalizedText(MessageKey.ERROR__CONFIG__NO_ENGINE, "{name}", name), ex);
                 }
                 break;
             }
@@ -384,13 +385,13 @@ public class ConfigurationFileUtil {
                     console.sendMessage("<c2>Creating engine</c2> <c1>" + name + "</c1> <c2>of type rabbitmq with address</c2> <c1>" + url.getAddress() + ":" + url.getPort() + connectionNode.node("v-host").getString("/") + "</c1>");
                 }
                 try {
-                    return RabbitMQMessagingService.builder(name, serverId, handler, console.getLocalizationManager())
+                    return RabbitMQMessagingService.builder(name, serverId, handler)
                             .url(url.address, url.port, connectionNode.node("v-host").getString("/"))
                             .credentials(connectionNode.node("username").getString("guest"), connectionNode.node("password").getString("guest"))
                             .timeout((int) poolSettings.timeout)
                             .build();
                 } catch (IOException | TimeoutException ex) {
-                    GELFLogger.exception(logger, ex, console.getLocalizationManager(), MessageKey.ERROR__CONFIG__NO_ENGINE, "{name}", name);
+                    logger.error(console.getLocalizedText(MessageKey.ERROR__CONFIG__NO_ENGINE, "{name}", name), ex);
                 }
                 break;
             }
@@ -400,14 +401,14 @@ public class ConfigurationFileUtil {
                     console.sendMessage("<c2>Creating engine</c2> <c1>" + name + "</c1> <c2>of type redis with address</c2> <c1>" + url.getAddress() + ":" + url.getPort() + "</c1>");
                 }
                 try {
-                    return RedisMessagingService.builder(name, serverId, handler, console.getLocalizationManager())
+                    return RedisMessagingService.builder(name, serverId, handler)
                             .url(url.address, url.port)
                             .credentials(connectionNode.node("password").getString(""))
                             .poolSize(poolSettings.minPoolSize, poolSettings.maxPoolSize)
                             .life(poolSettings.maxLifetime, (int) poolSettings.timeout)
                             .build();
                 } catch (JedisException ex) {
-                    GELFLogger.exception(logger, ex, console.getLocalizationManager(), MessageKey.ERROR__CONFIG__NO_ENGINE, "{name}", name);
+                    logger.error(console.getLocalizedText(MessageKey.ERROR__CONFIG__NO_ENGINE, "{name}", name), ex);
                 }
                 break;
             }
@@ -463,7 +464,7 @@ public class ConfigurationFileUtil {
         try {
             retVal = new HashSet<>(!config.node("action", "ignore").empty() ? config.node("action", "ignore").getList(String.class) : new ArrayList<>());
         } catch (SerializationException ex) {
-            GELFLogger.exception(logger, ex);
+            logger.error(ex.getMessage(), ex);
             retVal = new HashSet<>();
         }
 
@@ -489,7 +490,7 @@ public class ConfigurationFileUtil {
         try {
             retVal = new HashSet<>(!config.node("action", "vpn", "commands").empty() ? config.node("action", "vpn", "commands").getList(String.class) : new ArrayList<>());
         } catch (SerializationException ex) {
-            GELFLogger.exception(logger, ex);
+            logger.error(ex.getMessage(), ex);
             retVal = new HashSet<>();
         }
         retVal.removeIf(action -> action == null || action.isEmpty());
@@ -508,7 +509,7 @@ public class ConfigurationFileUtil {
         try {
             retVal = new HashSet<>(!config.node("action", "mcleaks", "commands").empty() ? config.node("action", "mcleaks", "commands").getList(String.class) : new ArrayList<>());
         } catch (SerializationException ex) {
-            GELFLogger.exception(logger, ex);
+            logger.error(ex.getMessage(), ex);
             retVal = new HashSet<>();
         }
         retVal.removeIf(action -> action == null || action.isEmpty());
@@ -560,7 +561,7 @@ public class ConfigurationFileUtil {
                 Source<? extends SourceModel> source = (Source<? extends SourceModel>) clazz.newInstance();
                 initializedSources.put(source.getName(), source);
             } catch (InstantiationException | IllegalAccessException | ClassCastException ex) {
-                GELFLogger.exception(logger, ex);
+                logger.error(ex.getMessage(), ex);
             }
         }
 
@@ -568,7 +569,7 @@ public class ConfigurationFileUtil {
         try {
             order = !config.node("sources", "order").empty() ? new ArrayList<>(config.node("sources", "order").getList(String.class)) : new ArrayList<>();
         } catch (SerializationException ex) {
-            GELFLogger.exception(logger, ex);
+            logger.error(ex.getMessage(), ex);
             order = new ArrayList<>();
         }
 
@@ -631,7 +632,7 @@ public class ConfigurationFileUtil {
         }
         if (!parentDir.exists()) {
             if (!parentDir.mkdirs()) {
-                throw new IOException(console != null ? console.getLocalizedText(MessageKey.ERROR__PARENT_DIR) : Locales.getUS().getText(MessageKey.ERROR__PARENT_DIR));
+                throw new IOException(LocaleUtil.getDefaultI18N().getText(MessageKey.ERROR__PARENT_DIR));
             }
         }
         if (fileOnDisk.exists() && fileOnDisk.isDirectory()) {
@@ -653,7 +654,7 @@ public class ConfigurationFileUtil {
         }
 
         ConfigurationLoader<CommentedConfigurationNode> loader = YamlConfigurationLoader.builder().nodeStyle(NodeStyle.BLOCK).indent(2).file(fileOnDisk).build();
-        return loader.load(ConfigurationOptions.defaults().header(console != null ? console.getLocalizedText(MessageKey.CONFIG__COMMENTS_GONE) : Locales.getUS().getText(MessageKey.CONFIG__COMMENTS_GONE)));
+        return loader.load(ConfigurationOptions.defaults().header(LocaleUtil.getDefaultI18N().getText(MessageKey.CONFIG__COMMENTS_GONE)));
     }
 
     private static <M extends LocalizedCommandSender<M, B>, B> @NotNull CommentedConfigurationNode getConfig(@NotNull String resourcePath, @NotNull File fileOnDisk, @NotNull LocalizedCommandSender<M, B> console) throws IOException {

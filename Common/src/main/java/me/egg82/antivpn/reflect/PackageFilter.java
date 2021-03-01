@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import me.egg82.antivpn.config.ConfigUtil;
+import me.egg82.antivpn.logging.GELFLogger;
 import org.jetbrains.annotations.NotNull;
 import org.reflections8.ReflectionUtils;
 import org.reflections8.Reflections;
@@ -19,7 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class PackageFilter {
-    private static final Logger logger = LoggerFactory.getLogger(PackageFilter.class);
+    private static final Logger logger = new GELFLogger(LoggerFactory.getLogger(PackageFilter.class));
 
     private PackageFilter() { }
 

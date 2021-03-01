@@ -11,6 +11,7 @@ import me.egg82.antivpn.api.model.player.AbstractPlayerManager;
 import me.egg82.antivpn.config.CachedConfig;
 import me.egg82.antivpn.config.ConfigUtil;
 import me.egg82.antivpn.core.Pair;
+import me.egg82.antivpn.logging.GELFLogger;
 import me.egg82.antivpn.messaging.packets.*;
 import me.egg82.antivpn.storage.StorageService;
 import me.egg82.antivpn.storage.models.IPModel;
@@ -21,7 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class GenericMessagingHandler implements MessagingHandler {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = new GELFLogger(LoggerFactory.getLogger(getClass()));
 
     public static final LoadingCache<UUID, Boolean> messageCache = Caffeine.newBuilder().expireAfterWrite(2L, TimeUnit.MINUTES).expireAfterAccess(30L, TimeUnit.SECONDS).build(k -> Boolean.FALSE);
     private final Object messageCacheLock = new Object();

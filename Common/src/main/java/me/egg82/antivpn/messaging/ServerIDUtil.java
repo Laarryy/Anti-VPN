@@ -3,7 +3,7 @@ package me.egg82.antivpn.messaging;
 import java.io.*;
 import java.nio.file.Files;
 import java.util.UUID;
-import me.egg82.antivpn.lang.Locales;
+import me.egg82.antivpn.lang.LocaleUtil;
 import me.egg82.antivpn.lang.MessageKey;
 import me.egg82.antivpn.logging.GELFLogger;
 import org.jetbrains.annotations.NotNull;
@@ -12,7 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ServerIDUtil {
-    private static final Logger logger = LoggerFactory.getLogger(ServerIDUtil.class);
+    private static final Logger logger = new GELFLogger(LoggerFactory.getLogger(ServerIDUtil.class));
 
     private ServerIDUtil() { }
 
@@ -22,7 +22,7 @@ public class ServerIDUtil {
         try {
             retVal = readId(idFile);
         } catch (IOException ex) {
-            GELFLogger.exception(logger, ex);
+            logger.error(ex.getMessage(), ex);
             retVal = null;
         }
 
@@ -31,7 +31,7 @@ public class ServerIDUtil {
             try {
                 writeId(idFile, retVal);
             } catch (IOException ex) {
-                GELFLogger.exception(logger, ex);
+                logger.error(ex.getMessage(), ex);
             }
         }
 
@@ -65,14 +65,14 @@ public class ServerIDUtil {
             Files.delete(parent.toPath());
         }
         if (!parent.exists() && !parent.mkdirs()) {
-            throw new IOException(Locales.getUS().getText(MessageKey.ERROR__PARENT_DIR));
+            throw new IOException(LocaleUtil.getDefaultI18N().getText(MessageKey.ERROR__PARENT_DIR));
         }
 
         if (idFile.exists() && idFile.isDirectory()) {
             Files.delete(idFile.toPath());
         }
         if (!idFile.exists() && !idFile.createNewFile()) {
-            throw new IOException(Locales.getUS().getText(MessageKey.ERROR__STATS_FILE));
+            throw new IOException(LocaleUtil.getDefaultI18N().getText(MessageKey.ERROR__STATS_FILE));
         }
 
         try (FileWriter out = new FileWriter(idFile)) {

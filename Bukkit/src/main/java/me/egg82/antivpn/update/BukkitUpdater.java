@@ -3,7 +3,7 @@ package me.egg82.antivpn.update;
 import java.io.IOException;
 import java.net.URL;
 import java.util.concurrent.TimeUnit;
-import me.egg82.antivpn.lang.Locales;
+import me.egg82.antivpn.lang.LocaleUtil;
 import me.egg82.antivpn.lang.MessageKey;
 import me.egg82.antivpn.utils.TimeUtil;
 import me.egg82.antivpn.web.WebRequest;
@@ -18,7 +18,7 @@ public class BukkitUpdater extends AbstractUpdater {
     public BukkitUpdater(@NotNull Plugin plugin, int resourceId, @NotNull TimeUtil.Time checkDelay) {
         super(plugin.getDescription().getVersion(), checkDelay);
         if (resourceId <= 0) {
-            throw new IllegalArgumentException(Locales.getUS().getText(MessageKey.ERROR__BAD_ID));
+            throw new IllegalArgumentException(LocaleUtil.getDefaultI18N().getText(MessageKey.ERROR__BAD_ID));
         }
         this.resourceId = resourceId;
     }

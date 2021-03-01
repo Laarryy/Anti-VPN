@@ -6,11 +6,12 @@ import java.util.ArrayList;
 import java.util.List;
 import me.egg82.antivpn.lang.BukkitLocaleCommandUtil;
 import me.egg82.antivpn.lang.BukkitLocalizedCommandSender;
+import me.egg82.antivpn.logging.GELFLogger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class CommandHolder {
-    protected final Logger logger = LoggerFactory.getLogger(getClass());
+    protected final Logger logger = new GELFLogger(LoggerFactory.getLogger(getClass()));
 
     protected final List<Command<BukkitLocalizedCommandSender>> commands = new ArrayList<>();
 

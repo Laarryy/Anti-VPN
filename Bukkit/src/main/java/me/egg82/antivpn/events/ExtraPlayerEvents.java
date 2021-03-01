@@ -6,6 +6,7 @@ import me.egg82.antivpn.api.platform.BukkitPlatform;
 import me.egg82.antivpn.config.ConfigUtil;
 import me.egg82.antivpn.hooks.UpdaterHook;
 import me.egg82.antivpn.lang.BukkitLocaleCommandUtil;
+import me.egg82.antivpn.lang.LocaleUtil;
 import me.egg82.antivpn.lang.MessageKey;
 import me.egg82.antivpn.logging.GELFLogger;
 import ninja.egg82.events.BukkitEvents;
@@ -21,7 +22,7 @@ public class ExtraPlayerEvents extends EventHolder {
         events.add(
             BukkitEvents.subscribe(plugin, PlayerJoinEvent.class, EventPriority.HIGH)
                 .handler(this::checkUpdate)
-                .exceptionHandler(ex -> GELFLogger.exception(logger, ex, BukkitLocaleCommandUtil.getConsole().getLocalizationManager()))
+                .exceptionHandler(ex -> logger.error(ex.getMessage(), ex))
         );
 
         events.add(
@@ -35,11 +36,11 @@ public class ExtraPlayerEvents extends EventHolder {
                         try {
                             BukkitPlatform.addUniqueIp(InetAddress.getByName(ip));
                         } catch (UnknownHostException ex) {
-                            GELFLogger.warn(logger, BukkitLocaleCommandUtil.getConsole().getLocalizationManager(), MessageKey.ERROR__NO_INET, "{ip}", ip);
+                            logger.warn(LocaleUtil.getDefaultI18N().getText(MessageKey.ERROR__NO_INET, "{ip}", ip), ex);
                         }
                     }
                 })
-                .exceptionHandler(ex -> GELFLogger.exception(logger, ex, BukkitLocaleCommandUtil.getConsole().getLocalizationManager()))
+                .exceptionHandler(ex -> logger.error(ex.getMessage(), ex))
         );
     }
 

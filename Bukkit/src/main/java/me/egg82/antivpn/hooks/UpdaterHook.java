@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 import org.spongepowered.configurate.ConfigurationNode;
 
 public class UpdaterHook implements PluginHook {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = new GELFLogger(LoggerFactory.getLogger(getClass()));
 
     public static void create(@NotNull Plugin plugin, int id) {
         hook = new UpdaterHook(new BukkitUpdater(plugin, id));
@@ -61,7 +61,7 @@ public class UpdaterHook implements PluginHook {
             .thenCombineAsync(updater.getLatestVersion(), Pair::new)
             .whenCompleteAsync((val, ex) -> {
                 if (ex != null) {
-                    GELFLogger.exception(logger, ex, BukkitLocaleCommandUtil.getConsole().getLocalizationManager());
+                    logger.error(ex.getMessage(), ex);
                     return;
                 }
 

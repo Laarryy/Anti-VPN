@@ -26,7 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class EventHolder {
-    protected final Logger logger = LoggerFactory.getLogger(getClass());
+    protected final Logger logger = new GELFLogger(LoggerFactory.getLogger(getClass()));
 
     protected final List<BukkitEventSubscriber<?>> events = new ArrayList<>();
 
@@ -99,7 +99,7 @@ public abstract class EventHolder {
             } catch (InterruptedException ignored) {
                 Thread.currentThread().interrupt();
             } catch (ExecutionException | CancellationException ex) {
-                GELFLogger.exception(logger, ex, BukkitLocaleCommandUtil.getConsole().getLocalizationManager());
+                logger.error(ex.getMessage(), ex);
             }
         } else {
             try {
@@ -107,7 +107,7 @@ public abstract class EventHolder {
             } catch (InterruptedException ignored) {
                 Thread.currentThread().interrupt();
             } catch (ExecutionException | CancellationException ex) {
-                GELFLogger.exception(logger, ex, BukkitLocaleCommandUtil.getConsole().getLocalizationManager());
+                logger.error(ex.getMessage(), ex);
             }
         }
 
@@ -121,7 +121,7 @@ public abstract class EventHolder {
         } catch (InterruptedException ignored) {
             Thread.currentThread().interrupt();
         } catch (ExecutionException | CancellationException ex) {
-            GELFLogger.exception(logger, ex, BukkitLocaleCommandUtil.getConsole().getLocalizationManager());
+            logger.error(ex.getMessage(), ex);
         }
 
         return false;

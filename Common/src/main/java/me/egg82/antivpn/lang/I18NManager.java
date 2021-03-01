@@ -5,56 +5,35 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import me.egg82.antivpn.core.Pair;
 import me.egg82.antivpn.logging.GELFLogger;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class I18NManager {
-    private static final Logger logger = LoggerFactory.getLogger(I18NManager.class);
+    private static final Logger logger = new GELFLogger(LoggerFactory.getLogger(I18NManager.class));
 
     private final ResourceBundle localeBundle;
     private final Locale locale;
     private final String localeName;
 
-    private final ResourceBundle backupBundle;
-    private final Locale backupLocale;
-    private final String backupLocaleName;
-
-    private boolean bundlesAreEqual = false;
-
     private static final ConcurrentMap<UUID, I18NManager> userCache = new ConcurrentHashMap<>();
     public static ConcurrentMap<UUID, I18NManager> getUserCache() { return userCache; }
 
     private static final ConcurrentMap<Locale, ResourceBundle> localeCache = new ConcurrentHashMap<>();
-    private static final ConcurrentMap<Pair<Locale, Locale>, I18NManager> managerCache = new ConcurrentHashMap<>();
+    private static final ConcurrentMap<Locale, I18NManager> managerCache = new ConcurrentHashMap<>();
 
-    public static @NotNull I18NManager getManager(@NotNull File dataDirectory, @Nullable Locale locale, @NotNull Locale backupLocale) throws IOException {
-        ResourceBundle localeBundle = locale == null ? null : localeCache.computeIfAbsent(locale, k -> {
+    public static @NotNull I18NManager getManager(@NotNull File dataDirectory, @NotNull Locale locale) {
+        ResourceBundle localeBundle = localeCache.computeIfAbsent(locale, k -> {
             try {
-                return LanguageFileUtil.getLanguage(dataDirectory, k);
+                ResourceBundle bundle = LanguageFileUtil.getLanguage(dataDirectory, k);
+                return bundle != null ? bundle : ResourceBundle.getBundle("", locale);
             } catch (IOException ex) {
-                GELFLogger.exception(logger, ex);
+                logger.error(ex.getMessage(), ex);
             }
-            return null;
+            return ResourceBundle.getBundle("", locale);
         });
-
-        ResourceBundle backupBundle = localeCache.computeIfAbsent(backupLocale, k -> {
-            try {
-                return LanguageFileUtil.getLanguage(dataDirectory, k);
-            } catch (IOException ex) {
-                GELFLogger.exception(logger, ex);
-            }
-            return null;
-        });
-
-        if (backupBundle == null) {
-            throw new IOException(Locales.getUS().getText(MessageKey.ERROR__LANG__NO_BACKUP_BUNDLE, "{lang}", getLocaleName(backupLocale)));
-        }
-
-        return managerCache.computeIfAbsent(new Pair<>(locale, backupLocale), k -> new I18NManager(localeBundle, backupBundle));
+        return managerCache.computeIfAbsent(locale, k -> new I18NManager(localeBundle));
     }
 
     public static void clearCaches() {
@@ -63,43 +42,23 @@ public class I18NManager {
         userCache.clear();
     }
 
-    public I18NManager(@Nullable ResourceBundle localeBundle, @NotNull ResourceBundle backupBundle) {
-        if (localeBundle == null || localeBundle.getLocale().equals(backupBundle.getLocale())) {
-            bundlesAreEqual = true;
-            this.localeBundle = backupBundle;
-        } else {
-            this.localeBundle = localeBundle;
-        }
+    public I18NManager(@NotNull ResourceBundle localeBundle) {
+        this.localeBundle = localeBundle;
         this.locale = this.localeBundle.getLocale();
         this.localeName = getLocaleName(this.locale);
-        this.backupBundle = backupBundle;
-        this.backupLocale = this.backupBundle.getLocale();
-        this.backupLocaleName = getLocaleName(this.backupLocale);
     }
 
     public @NotNull String getText(@NotNull MessageKey key) {
         try {
             return localeBundle.getString(key.getKey());
         } catch (MissingResourceException ex) {
-            if (bundlesAreEqual) {
-                GELFLogger.error(logger, this, MessageKey.ERROR__LANG__NO_BACKUP_TEXT, "{lang}", localeName, "{key}", key.getKey());
-            } else {
-                GELFLogger.error(logger, this, MessageKey.ERROR__LANG__NO_LOCALE_TEXT, "{lang}", localeName, "{key}", key.getKey());
-                try {
-                    return backupBundle.getString(key.getKey());
-                } catch (MissingResourceException ex2) {
-                    GELFLogger.error(logger, this, MessageKey.ERROR__LANG__NO_BACKUP_TEXT, "{lang}", localeName, "{key}", key.getKey());
-                    if (!backupBundle.getLocale().equals(Locales.getUSLocale())) {
-                        try {
-                            return Locales.getUS().getText(key);
-                        } catch (MissingResourceException | IllegalStateException ex3) {
-                            GELFLogger.exception(logger, ex3);
-                        }
-                    }
-                }
+            I18NManager defaultI18N = LocaleUtil.getDefaultI18N();
+            if (!locale.equals(defaultI18N.locale)) {
+                logger.error(getText(MessageKey.ERROR__LANG__NO_LOCALE_TEXT, "{lang}", localeName, "{key}", key.getKey()));
+                return defaultI18N.getText(key);
             }
         }
-        throw new IllegalStateException(Locales.getUS().getText(MessageKey.ERROR__LANG__NO_LOCALE_TEXT, "{lang}", localeName, "{key}", key.getKey()));
+        throw new IllegalStateException(LocaleUtil.getDefaultI18N().getText(MessageKey.ERROR__LANG__NO_LOCALE_TEXT, "{lang}", localeName, "{key}", key.getKey()));
     }
 
     public @NotNull String getText(@NotNull MessageKey key, String... placeholders) {
@@ -135,13 +94,7 @@ public class I18NManager {
 
     public @NotNull Locale getLocale() { return locale; }
 
-    public @NotNull Locale getBackupLocale() { return backupLocale; }
-
     public @NotNull String getLocaleName() { return localeName; }
-
-    public @NotNull String getBackupLocaleName() { return backupLocaleName; }
-
-    public boolean isBackupLocale() { return bundlesAreEqual; }
 
     private static @NotNull String getLocaleName(@NotNull Locale locale) { return locale.getCountry() == null || locale.getCountry().isEmpty() ? locale.getLanguage() : locale.getLanguage() + "_" + locale.getCountry(); }
 }

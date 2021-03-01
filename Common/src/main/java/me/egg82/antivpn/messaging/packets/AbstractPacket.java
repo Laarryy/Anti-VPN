@@ -4,12 +4,13 @@ import io.netty.buffer.ByteBuf;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 import me.egg82.antivpn.config.ConfigUtil;
+import me.egg82.antivpn.logging.GELFLogger;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class AbstractPacket implements Packet {
-    protected final transient Logger logger = LoggerFactory.getLogger(getClass());
+    protected final transient Logger logger = new GELFLogger(LoggerFactory.getLogger(getClass()));
 
     protected final int readVarInt(@NotNull ByteBuf input) { return readVarInt(input, 5); }
 

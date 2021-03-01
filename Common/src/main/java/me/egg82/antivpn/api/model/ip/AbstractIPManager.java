@@ -30,17 +30,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class AbstractIPManager implements IPManager {
-    protected final Logger logger = LoggerFactory.getLogger(getClass());
+    protected final Logger logger = new GELFLogger(LoggerFactory.getLogger(getClass()));
 
     private final LoadingCache<Pair<String, AlgorithmMethod>, IPModel> ipCache;
     private final LoadingCache<String, Boolean> sourceInvalidationCache;
 
     private final SourceManager sourceManager;
-    private final I18NManager consoleLocalizationManager;
 
-    protected AbstractIPManager(@NotNull SourceManager sourceManager, @NotNull TimeUtil.Time cacheTime, @NotNull I18NManager consoleLocalizationManager) {
+    protected AbstractIPManager(@NotNull SourceManager sourceManager, @NotNull TimeUtil.Time cacheTime) {
         this.sourceManager = sourceManager;
-        this.consoleLocalizationManager = consoleLocalizationManager;
 
         ipCache = Caffeine.newBuilder().expireAfterAccess(cacheTime.getTime(), cacheTime.getUnit()).expireAfterWrite(cacheTime.getTime(), cacheTime.getUnit()).build(k -> calculateIpResult(k.getT1(), k.getT2(), true));
         sourceInvalidationCache = Caffeine.newBuilder().expireAfterWrite(1L, TimeUnit.MINUTES).build(k -> Boolean.FALSE);
@@ -230,9 +228,8 @@ public abstract class AbstractIPManager implements IPManager {
                         sourceInvalidationCache.put(source.getName(), Boolean.TRUE);
                         Thread.currentThread().interrupt();
                     } catch (ExecutionException | CancellationException ex) {
-                        logger.error("Source " + source.getName() + " returned an error. Skipping.");
+                        logger.error("Source " + source.getName() + " returned an error. Skipping.", ex);
                         sourceInvalidationCache.put(source.getName(), Boolean.TRUE);
-                        GELFLogger.exception(logger, ex, consoleLocalizationManager);
                     }
                     latch.countDown();
                 });
@@ -242,8 +239,7 @@ public abstract class AbstractIPManager implements IPManager {
                 if (!latch.await(20L, TimeUnit.SECONDS)) {
                     logger.warn("Consensus timed out before all sources could be queried.");
                 }
-            } catch (InterruptedException ex) {
-                GELFLogger.exception(logger, ex);
+            } catch (InterruptedException ignored) {
                 Thread.currentThread().interrupt();
             }
             pool.shutdownNow(); // Kill it with fire
@@ -280,9 +276,8 @@ public abstract class AbstractIPManager implements IPManager {
                     sourceInvalidationCache.put(source.getName(), Boolean.TRUE);
                     Thread.currentThread().interrupt();
                 } catch (ExecutionException | CancellationException ex) {
-                    logger.error("Source " + source.getName() + " returned an error. Skipping.");
+                    logger.error("Source " + source.getName() + " returned an error. Skipping.", ex);
                     sourceInvalidationCache.put(source.getName(), Boolean.TRUE);
-                    GELFLogger.exception(logger, ex, consoleLocalizationManager);
                 }
             }
 

@@ -23,7 +23,7 @@ public class BukkitIPManager extends AbstractIPManager {
     private final Plugin plugin;
 
     public BukkitIPManager(@NotNull Plugin plugin, @NotNull SourceManager sourceManager, @NotNull TimeUtil.Time cacheTime) {
-        super(sourceManager, cacheTime, BukkitLocaleCommandUtil.getConsole().getLocalizationManager());
+        super(sourceManager, cacheTime);
         this.plugin = plugin;
     }
 

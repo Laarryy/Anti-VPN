@@ -12,6 +12,7 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import me.egg82.antivpn.config.ConfigUtil;
 import me.egg82.antivpn.lang.I18NManager;
+import me.egg82.antivpn.lang.LocaleUtil;
 import me.egg82.antivpn.lang.MessageKey;
 import me.egg82.antivpn.logging.GELFLogger;
 import me.egg82.antivpn.messaging.packets.Packet;
@@ -31,8 +32,8 @@ public class RabbitMQMessagingService extends AbstractMessagingService {
 
     private static final String EXCHANGE_NAME = "avpn-data";
 
-    private RabbitMQMessagingService(@NotNull String name, @NotNull I18NManager consoleLocalizationManager) {
-        super(name, consoleLocalizationManager);
+    private RabbitMQMessagingService(@NotNull String name) {
+        super(name);
     }
 
     public void close() {
@@ -49,14 +50,14 @@ public class RabbitMQMessagingService extends AbstractMessagingService {
 
     public boolean isClosed() { return closed || !connection.isOpen(); }
 
-    public static @NotNull Builder builder(@NotNull String name, @NotNull UUID serverId, @NotNull MessagingHandler handler, @NotNull I18NManager consoleLocalizationManager) { return new Builder(name, serverId, handler, consoleLocalizationManager); }
+    public static @NotNull Builder builder(@NotNull String name, @NotNull UUID serverId, @NotNull MessagingHandler handler) { return new Builder(name, serverId, handler); }
 
     public static class Builder {
         private final RabbitMQMessagingService service;
         private final ConnectionFactory config = new ConnectionFactory();
 
-        public Builder(@NotNull String name, @NotNull UUID serverId, @NotNull MessagingHandler handler, @NotNull I18NManager consoleLocalizationManager) {
-            service = new RabbitMQMessagingService(name, consoleLocalizationManager);
+        public Builder(@NotNull String name, @NotNull UUID serverId, @NotNull MessagingHandler handler) {
+            service = new RabbitMQMessagingService(name);
             service.serverId = serverId;
             service.serverIdString = serverId.toString();
             ByteBuf buffer = alloc.buffer(16, 16);
@@ -135,7 +136,7 @@ public class RabbitMQMessagingService extends AbstractMessagingService {
                     try {
                         handler.handlePacket(UUID.fromString(properties.getMessageId()), getName(), packetClass.getConstructor(ByteBuf.class).newInstance(data));
                     } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException | InstantiationException | ExceptionInInitializerError | SecurityException ex) {
-                        GELFLogger.exception(logger, ex, consoleLocalizationManager, MessageKey.ERROR__MESSAGING__BAD_PACKET, "{name}", packetClass.getSimpleName());
+                        logger.error(LocaleUtil.getDefaultI18N().getText(MessageKey.ERROR__MESSAGING__BAD_PACKET, "{name}", packetClass.getSimpleName()), ex);
                     }
                 } finally {
                     b.release();
@@ -149,7 +150,7 @@ public class RabbitMQMessagingService extends AbstractMessagingService {
             try {
                 bind();
             } catch (IOException ex) {
-                GELFLogger.exception(logger, ex, consoleLocalizationManager, MessageKey.ERROR__MESSAGING__NO_BIND);
+                logger.error(LocaleUtil.getDefaultI18N().getText(MessageKey.ERROR__MESSAGING__NO_BIND), ex);
             }
         });
         channel.basicConsume(queue, true, consumer);

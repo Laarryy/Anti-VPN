@@ -21,6 +21,7 @@ import me.egg82.antivpn.api.model.ip.AlgorithmMethod;
 import me.egg82.antivpn.api.model.ip.IPManager;
 import me.egg82.antivpn.api.model.player.PlayerManager;
 import me.egg82.antivpn.lang.BukkitLocaleCommandUtil;
+import me.egg82.antivpn.lang.LocaleUtil;
 import me.egg82.antivpn.lang.MessageKey;
 import me.egg82.antivpn.logging.GELFLogger;
 import ninja.egg82.events.BukkitEvents;
@@ -35,7 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class PlayerAnalyticsHook implements PluginHook {
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = new GELFLogger(LoggerFactory.getLogger(getClass()));
     private final CapabilityService capabilities;
 
     public static void create(@NotNull Plugin plugin, @NotNull Plugin plan) {
@@ -60,13 +61,13 @@ public class PlayerAnalyticsHook implements PluginHook {
                 ExtensionService.getInstance().register(new Data());
             } catch (NoClassDefFoundError ex) {
                 // Plan not installed
-                GELFLogger.exception(logger, ex, BukkitLocaleCommandUtil.getConsole().getLocalizationManager(), MessageKey.HOOK__PLAN__NOT_INSTALLED);
+                logger.error(LocaleUtil.getDefaultI18N().getText(MessageKey.HOOK__PLAN__NOT_INSTALLED), ex);
             } catch (IllegalStateException ex) {
                 // Plan not enabled
-                GELFLogger.exception(logger, ex, BukkitLocaleCommandUtil.getConsole().getLocalizationManager(), MessageKey.HOOK__PLAN__NOT_ENABLED);
+                logger.error(LocaleUtil.getDefaultI18N().getText(MessageKey.HOOK__PLAN__NOT_ENABLED), ex);
             } catch (IllegalArgumentException ex) {
                 // DataExtension impl error
-                GELFLogger.exception(logger, ex, BukkitLocaleCommandUtil.getConsole().getLocalizationManager(), MessageKey.HOOK__PLAN__DATA_EXCEPTION);
+                logger.error(LocaleUtil.getDefaultI18N().getText(MessageKey.HOOK__PLAN__DATA_EXCEPTION), ex);
             }
         }
 
@@ -127,7 +128,7 @@ public class PlayerAnalyticsHook implements PluginHook {
                         } catch (InterruptedException ignored) {
                             Thread.currentThread().interrupt();
                         } catch (ExecutionException | CancellationException ex) {
-                            GELFLogger.exception(logger, ex, BukkitLocaleCommandUtil.getConsole().getLocalizationManager());
+                            logger.error(ex.getMessage(), ex);
                         }
                     } else {
                         try {
@@ -137,7 +138,7 @@ public class PlayerAnalyticsHook implements PluginHook {
                         } catch (InterruptedException ignored) {
                             Thread.currentThread().interrupt();
                         } catch (ExecutionException | CancellationException ex) {
-                            GELFLogger.exception(logger, ex, BukkitLocaleCommandUtil.getConsole().getLocalizationManager());
+                            logger.error(ex.getMessage(), ex);
                         }
                     }
                     latch.countDown();
@@ -146,10 +147,10 @@ public class PlayerAnalyticsHook implements PluginHook {
 
             try {
                 if (!latch.await(40L, TimeUnit.SECONDS)) {
-                    GELFLogger.warn(logger, BukkitLocaleCommandUtil.getConsole().getLocalizationManager(), MessageKey.HOOK__PLAN__TIMEOUT);
+                    logger.warn(LocaleUtil.getDefaultI18N().getText(MessageKey.HOOK__PLAN__TIMEOUT));
                 }
             } catch (InterruptedException ex) {
-                GELFLogger.exception(logger, ex, BukkitLocaleCommandUtil.getConsole().getLocalizationManager());
+                logger.error(ex.getMessage(), ex);
                 Thread.currentThread().interrupt();
             }
             pool.shutdownNow(); // Kill it with fire
@@ -183,7 +184,7 @@ public class PlayerAnalyticsHook implements PluginHook {
                     } catch (InterruptedException ignored) {
                         Thread.currentThread().interrupt();
                     } catch (ExecutionException | CancellationException ex) {
-                        GELFLogger.exception(logger, ex, BukkitLocaleCommandUtil.getConsole().getLocalizationManager());
+                        logger.error(ex.getMessage(), ex);
                     }
                     latch.countDown();
                 });
@@ -191,10 +192,10 @@ public class PlayerAnalyticsHook implements PluginHook {
 
             try {
                 if (!latch.await(40L, TimeUnit.SECONDS)) {
-                    GELFLogger.warn(logger, BukkitLocaleCommandUtil.getConsole().getLocalizationManager(), MessageKey.HOOK__PLAN__TIMEOUT);
+                    logger.warn(LocaleUtil.getDefaultI18N().getText(MessageKey.HOOK__PLAN__TIMEOUT));
                 }
             } catch (InterruptedException ex) {
-                GELFLogger.exception(logger, ex, BukkitLocaleCommandUtil.getConsole().getLocalizationManager());
+                logger.error(ex.getMessage(), ex);
                 Thread.currentThread().interrupt();
             }
             pool.shutdownNow(); // Kill it with fire
@@ -228,7 +229,7 @@ public class PlayerAnalyticsHook implements PluginHook {
                 } catch (InterruptedException ignored) {
                     Thread.currentThread().interrupt();
                 } catch (ExecutionException | CancellationException ex) {
-                    GELFLogger.exception(logger, ex, BukkitLocaleCommandUtil.getConsole().getLocalizationManager());
+                    logger.error(ex.getMessage(), ex);
                 }
             } else {
                 try {
@@ -236,7 +237,7 @@ public class PlayerAnalyticsHook implements PluginHook {
                 } catch (InterruptedException ignored) {
                     Thread.currentThread().interrupt();
                 } catch (ExecutionException | CancellationException ex) {
-                    GELFLogger.exception(logger, ex, BukkitLocaleCommandUtil.getConsole().getLocalizationManager());
+                    logger.error(ex.getMessage(), ex);
                 }
             }
 
@@ -258,7 +259,7 @@ public class PlayerAnalyticsHook implements PluginHook {
             } catch (InterruptedException ignored) {
                 Thread.currentThread().interrupt();
             } catch (ExecutionException | CancellationException ex) {
-                GELFLogger.exception(logger, ex, BukkitLocaleCommandUtil.getConsole().getLocalizationManager());
+                logger.error(ex.getMessage(), ex);
             }
 
             return false;

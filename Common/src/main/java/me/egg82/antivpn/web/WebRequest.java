@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import me.egg82.antivpn.config.ConfigUtil;
+import me.egg82.antivpn.logging.GELFLogger;
 import me.egg82.antivpn.utils.TimeUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -19,7 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class WebRequest {
-    private static final Logger logger = LoggerFactory.getLogger(WebRequest.class);
+    private static final Logger logger = new GELFLogger(LoggerFactory.getLogger(WebRequest.class));
 
     private final URL url;
     private RequestMethod method = RequestMethod.GET;

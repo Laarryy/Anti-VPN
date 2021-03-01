@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 
 // https://github.com/lucko/LuckPerms/blob/master/common/src/main/java/me/lucko/luckperms/common/api/ApiRegistrationUtil.java
 public class APIRegistrationUtil {
-    private static final Logger logger = LoggerFactory.getLogger(APIRegistrationUtil.class);
+    private static final Logger logger = new GELFLogger(LoggerFactory.getLogger(APIRegistrationUtil.class));
 
     private static final Method REGISTER;
     private static final Method DEREGISTER;
@@ -32,7 +32,7 @@ public class APIRegistrationUtil {
         try {
             REGISTER.invoke(null, api);
         } catch (InvocationTargetException | IllegalAccessException ex) {
-            GELFLogger.exception(logger, ex);
+            logger.error(ex.getMessage(), ex);
         }
     }
 
@@ -40,7 +40,7 @@ public class APIRegistrationUtil {
         try {
             DEREGISTER.invoke(null);
         } catch (InvocationTargetException | IllegalAccessException ex) {
-            GELFLogger.exception(logger, ex);
+            logger.error(ex.getMessage(), ex);
         }
     }
 }
