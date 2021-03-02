@@ -1,9 +1,9 @@
 package me.egg82.antivpn.lang;
 
-import me.egg82.antivpn.api.model.player.Player;
 import net.kyori.adventure.audience.Audience;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 public class BukkitLocalizedCommandSender extends AbstractLocalizedCommandSender<BukkitLocalizedCommandSender, CommandSender> {

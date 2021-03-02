@@ -83,10 +83,10 @@ public class BukkitBootstrap extends JavaPlugin {
             }
         } catch (InterruptedException ex) {
             Thread.currentThread().setContextClassLoader(origClassLoader);
+            logger.error(ex.getMessage(), ex);
             if (getAllowErrorStats()) {
                 GELFLoggerUtil.send(3, ex.getMessage(), ex);
             }
-            logger.error(ex.getMessage(), ex);
             Thread.currentThread().interrupt();
         }
 
@@ -94,10 +94,10 @@ public class BukkitBootstrap extends JavaPlugin {
             concrete = new AntiVPN(this);
             concrete.onLoad();
         } catch (Exception ex) {
+            logger.error(ex.getMessage(), ex);
             if (getAllowErrorStats()) {
                 GELFLoggerUtil.send(3, ex.getMessage(), ex);
             }
-            logger.error(ex.getMessage(), ex);
             throw ex;
         } finally {
             Thread.currentThread().setContextClassLoader(origClassLoader);
@@ -111,10 +111,10 @@ public class BukkitBootstrap extends JavaPlugin {
         try {
             concrete.onEnable();
         } catch (Exception ex) {
+            logger.error(ex.getMessage(), ex);
             if (getAllowErrorStats()) {
                 GELFLoggerUtil.send(3, ex.getMessage(), ex);
             }
-            logger.error(ex.getMessage(), ex);
             throw ex;
         } finally {
             Thread.currentThread().setContextClassLoader(origClassLoader);
@@ -128,10 +128,10 @@ public class BukkitBootstrap extends JavaPlugin {
         try {
             concrete.onDisable();
         } catch (Exception ex) {
+            logger.error(ex.getMessage(), ex);
             if (getAllowErrorStats()) {
                 GELFLoggerUtil.send(3, ex.getMessage(), ex);
             }
-            logger.error(ex.getMessage(), ex);
             throw ex;
         } finally {
             Thread.currentThread().setContextClassLoader(origClassLoader);
@@ -262,25 +262,25 @@ public class BukkitBootstrap extends JavaPlugin {
         } catch (IOException ex) {
             lastEx = ex;
         } catch (IllegalAccessException | InvocationTargetException | URISyntaxException | XPathExpressionException | SAXException ex) {
+            logger.error(ex.getMessage(), ex);
             if (getAllowErrorStats()) {
                 GELFLoggerUtil.send(3, ex.getMessage(), ex);
             }
-            logger.error(ex.getMessage(), ex);
             return;
         }
 
         if (depth > 0) {
+            logger.error(lastEx.getMessage(), lastEx);
             if (getAllowErrorStats()) {
                 GELFLoggerUtil.send(3, lastEx.getMessage(), lastEx);
             }
-            logger.error(lastEx.getMessage(), lastEx);
             return;
         }
 
+        logger.warn("Failed to download/relocate " + builder.getGroupId() + ":" + builder.getArtifactId() + "-" + builder.getVersion() + ". Searching disk instead.");
         if (getAllowErrorStats()) {
             GELFLoggerUtil.send(2, "Failed to download/relocate " + builder.getGroupId() + ":" + builder.getArtifactId() + "-" + builder.getVersion() + ". Searching disk instead.", lastEx);
         }
-        logger.warn("Failed to download/relocate " + builder.getGroupId() + ":" + builder.getArtifactId() + "-" + builder.getVersion() + ". Searching disk instead.");
 
         try {
             injectArtifact(builder, jarsDir, classLoader, null);
@@ -305,25 +305,25 @@ public class BukkitBootstrap extends JavaPlugin {
         } catch (IOException ex) {
             lastEx = ex;
         } catch (IllegalAccessException | InvocationTargetException | URISyntaxException | XPathExpressionException | SAXException ex) {
+            logger.error(ex.getMessage(), ex);
             if (getAllowErrorStats()) {
                 GELFLoggerUtil.send(3, ex.getMessage(), ex);
             }
-            logger.error(ex.getMessage(), ex);
             return;
         }
 
         if (depth > 0) {
+            logger.error(lastEx.getMessage(), lastEx);
             if (getAllowErrorStats()) {
                 GELFLoggerUtil.send(3, lastEx.getMessage(), lastEx);
             }
-            logger.error(lastEx.getMessage(), lastEx);
             return;
         }
 
+        logger.warn("Failed to download/relocate " + builder.getGroupId() + ":" + builder.getArtifactId() + "-" + builder.getVersion() + ". Searching disk instead.");
         if (getAllowErrorStats()) {
             GELFLoggerUtil.send(2, "Failed to download/relocate " + builder.getGroupId() + ":" + builder.getArtifactId() + "-" + builder.getVersion() + ". Searching disk instead.", lastEx);
         }
-        logger.warn("Failed to download/relocate " + builder.getGroupId() + ":" + builder.getArtifactId() + "-" + builder.getVersion() + ". Searching disk instead.");
 
         try {
             injectArtifact(builder, jarsDir, classLoader, rules);
