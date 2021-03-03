@@ -1,4 +1,4 @@
-package me.egg82.antivpn.web.transformers;
+package me.egg82.antivpn.json.transformers;
 
 import flexjson.ObjectBinder;
 import flexjson.ObjectFactory;

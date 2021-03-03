@@ -21,7 +21,7 @@ import me.egg82.antivpn.locale.MessageKey;
 import me.egg82.antivpn.logging.models.GELFSubmissionModel;
 import me.egg82.antivpn.utils.TimeUtil;
 import me.egg82.antivpn.web.WebRequest;
-import me.egg82.antivpn.web.transformers.InstantTransformer;
+import me.egg82.antivpn.json.transformers.InstantTransformer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
