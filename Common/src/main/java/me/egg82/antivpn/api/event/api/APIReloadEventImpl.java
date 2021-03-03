@@ -24,4 +24,13 @@ public class APIReloadEventImpl extends AbstractEvent implements APIReloadEvent 
     public @NotNull PlayerManager getNewPlayerManager() { return newPlayerManager; }
 
     public @NotNull SourceManager getNewSourceManager() { return newSourceManager; }
+
+    public String toString() {
+        return "APIReloadEventImpl{" +
+            "api=" + api +
+            ", newIpManager=" + newIpManager +
+            ", newPlayerManager=" + newPlayerManager +
+            ", newSourceManager=" + newSourceManager +
+            '}';
+    }
 }

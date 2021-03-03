@@ -1,5 +1,6 @@
 package me.egg82.antivpn.api.event.source;
 
+import java.util.Objects;
 import me.egg82.antivpn.api.VPNAPI;
 import me.egg82.antivpn.api.event.type.AbstractCancellable;
 import me.egg82.antivpn.api.model.source.Source;
@@ -15,4 +16,21 @@ public class SourceRegisterEventImpl extends AbstractCancellable implements Sour
     }
 
     public @NotNull Source<? extends SourceModel> getSource() { return source; }
+
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof SourceRegisterEventImpl)) return false;
+        SourceRegisterEventImpl that = (SourceRegisterEventImpl) o;
+        return source.equals(that.source);
+    }
+
+    public int hashCode() { return Objects.hash(source); }
+
+    public String toString() {
+        return "SourceRegisterEventImpl{" +
+            "api=" + api +
+            ", source=" + source +
+            ", cancelState=" + cancelState +
+            '}';
+    }
 }

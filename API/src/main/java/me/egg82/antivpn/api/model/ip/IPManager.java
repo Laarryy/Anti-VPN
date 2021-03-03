@@ -57,7 +57,7 @@ public interface IPManager {
      * <p>You should call this after you make any changes to an IP.</p>
      *
      * @param ip the IP object to save
-     * @return a future to encapsulate the operation.
+     * @return a {@link CompletableFuture} to encapsulate the operation.
      * @throws NullPointerException if ip is null
      */
     @NotNull CompletableFuture<Void> saveIP(@NotNull IP ip);
@@ -66,7 +66,7 @@ public interface IPManager {
      * Deletes any data about a given IP from the system.
      *
      * @param ip the {@link IP} object to delete
-     * @return a future encapsulating the result of the operation
+     * @return a {@link CompletableFuture} encapsulating the result of the operation
      * @throws NullPointerException if ip is null
      */
     default @NotNull CompletableFuture<Void> deleteIP(@NotNull IP ip) { return deleteIP(ip.getIP().getHostAddress()); }
@@ -75,7 +75,7 @@ public interface IPManager {
      * Deletes any data about a given IP from the system.
      *
      * @param ip the IP
-     * @return a future encapsulating the result of the operation
+     * @return a {@link CompletableFuture} encapsulating the result of the operation
      * @throws IllegalArgumentException if the IP provided is invalid
      * @throws NullPointerException if ip is null
      */
@@ -85,7 +85,7 @@ public interface IPManager {
      * Deletes any data about a given IP from the system.
      *
      * @param ip the IP
-     * @return a future encapsulating the result of the operation
+     * @return a {@link CompletableFuture} encapsulating the result of the operation
      * @throws IllegalArgumentException if the IP provided is invalid
      * @throws NullPointerException if ip is null
      */
@@ -94,7 +94,7 @@ public interface IPManager {
     /**
      * Gets a set of all known IPs.
      *
-     * @return a set of IPs
+     * @return a {@link CompletableFuture} - a set of IPs
      */
     @NotNull CompletableFuture<@NotNull Set<@NotNull InetAddress>> getIPs();
 

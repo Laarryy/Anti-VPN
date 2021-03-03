@@ -55,7 +55,7 @@ public interface PlayerManager {
      * <p>You should call this after you make any changes to a player.</p>
      *
      * @param player the player to save
-     * @return a future to encapsulate the operation.
+     * @return a {@link CompletableFuture} to encapsulate the operation.
      * @throws NullPointerException if player is null
      */
     @NotNull CompletableFuture<Void> savePlayer(@NotNull Player player);
@@ -64,7 +64,7 @@ public interface PlayerManager {
      * Deletes any data about a given player from the system.
      *
      * @param player the {@link Player} object to delete
-     * @return a future encapsulating the result of the operation
+     * @return a {@link CompletableFuture} encapsulating the result of the operation
      * @throws NullPointerException if player is null
      */
     default @NotNull CompletableFuture<Void> deletePlayer(@NotNull Player player) { return deletePlayer(player.getUuid()); }
@@ -73,7 +73,7 @@ public interface PlayerManager {
      * Deletes any data about a given player from the system.
      *
      * @param uniqueId the player's {@link UUID}
-     * @return a future encapsulating the result of the operation
+     * @return a {@link CompletableFuture} encapsulating the result of the operation
      * @throws NullPointerException if the uuid is null
      */
     @NotNull CompletableFuture<Void> deletePlayer(@NotNull UUID uniqueId);
@@ -81,7 +81,7 @@ public interface PlayerManager {
     /**
      * Gets a set of all known player {@link UUID}s.
      *
-     * @return a set of UUIDs
+     * @return a {@link CompletableFuture} - a set of UUIDs
      */
     @NotNull CompletableFuture<@NotNull Set<@NotNull UUID>> getPlayers();
 

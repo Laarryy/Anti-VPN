@@ -8,4 +8,10 @@ public class APILoadedEventImpl extends AbstractEvent implements APILoadedEvent 
     public APILoadedEventImpl(@NotNull VPNAPI api) {
         super(api);
     }
+
+    public String toString() {
+        return "APILoadedEventImpl{" +
+            "api=" + api +
+            '}';
+    }
 }

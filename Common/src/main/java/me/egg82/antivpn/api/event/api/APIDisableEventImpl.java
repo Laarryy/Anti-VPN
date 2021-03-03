@@ -8,4 +8,10 @@ public class APIDisableEventImpl extends AbstractEvent implements APIDisableEven
     public APIDisableEventImpl(@NotNull VPNAPI api) {
         super(api);
     }
+
+    public String toString() {
+        return "APIDisableEventImpl{" +
+            "api=" + api +
+            '}';
+    }
 }

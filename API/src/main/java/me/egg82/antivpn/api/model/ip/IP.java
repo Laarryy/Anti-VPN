@@ -61,18 +61,4 @@ public interface IP extends Serializable {
      * @param status a number between 0 and 1 determining the likelihood that an IP is a VPN/proxy, or null if not calculated
      */
     void setConsensus(@Nullable Double status);
-
-    /**
-     * {@inheritDoc}
-     */
-    boolean equals(Object o);
-    /**
-     * {@inheritDoc}
-     */
-    int hashCode();
-
-    /**
-     * {@inheritDoc}
-     */
-    String toString();
 }

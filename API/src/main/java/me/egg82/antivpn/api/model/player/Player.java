@@ -38,19 +38,4 @@ public interface Player extends Serializable {
      * @param status true if the player is an MCLeaks account, false if not
      */
     void setMcLeaks(boolean status);
-
-    /**
-     * {@inheritDoc}
-     */
-    boolean equals(Object o);
-
-    /**
-     * {@inheritDoc}
-     */
-    int hashCode();
-
-    /**
-     * {@inheritDoc}
-     */
-    String toString();
 }
