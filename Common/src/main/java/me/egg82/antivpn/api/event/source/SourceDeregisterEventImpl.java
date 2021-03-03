@@ -6,10 +6,10 @@ import me.egg82.antivpn.api.model.source.Source;
 import me.egg82.antivpn.api.model.source.models.SourceModel;
 import org.jetbrains.annotations.NotNull;
 
-public class GenericSourceDeregisterEvent extends AbstractCancellable implements SourceDeregisterEvent {
+public class SourceDeregisterEventImpl extends AbstractCancellable implements SourceDeregisterEvent {
     private final Source<? extends SourceModel> source;
 
-    public GenericSourceDeregisterEvent(@NotNull VPNAPI api, @NotNull Source<? extends SourceModel> source) {
+    public SourceDeregisterEventImpl(@NotNull VPNAPI api, @NotNull Source<? extends SourceModel> source) {
         super(api);
         this.source = source;
     }

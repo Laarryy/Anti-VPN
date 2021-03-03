@@ -6,15 +6,16 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import me.egg82.antivpn.api.VPNAPI;
 import me.egg82.antivpn.api.VPNAPIProvider;
-import me.egg82.antivpn.api.event.source.GenericSourceDeregisterEvent;
-import me.egg82.antivpn.api.event.source.GenericSourceRegisterEvent;
-import me.egg82.antivpn.api.event.type.Cancellable;
+import me.egg82.antivpn.api.event.source.SourceDeregisterEvent;
+import me.egg82.antivpn.api.event.source.SourceDeregisterEventImpl;
+import me.egg82.antivpn.api.event.source.SourceRegisterEvent;
+import me.egg82.antivpn.api.event.source.SourceRegisterEventImpl;
 import me.egg82.antivpn.api.model.source.models.SourceModel;
-import net.engio.mbassy.bus.IMessagePublication;
+import me.egg82.antivpn.utils.EventUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class GenericSourceManager implements SourceManager {
+public class SourceManagerImpl implements SourceManager {
     private final List<Source<? extends SourceModel>> sources = new CopyOnWriteArrayList<>();
     private final Object sourceLock = new Object();
 
@@ -46,8 +47,9 @@ public class GenericSourceManager implements SourceManager {
 
             try {
                 VPNAPI api = VPNAPIProvider.getInstance();
-                IMessagePublication publication = api.getEventBus().post(new GenericSourceRegisterEvent(api, source)).now();
-                if (!publication.isDeadMessage() && ((Cancellable) publication.getMessage()).isCancelled()) {
+                SourceRegisterEvent event = new SourceRegisterEventImpl(api, source);
+                EventUtil.post(event, api.getEventBus());
+                if (event.isCancelled()) {
                     return false;
                 }
             } catch (IllegalStateException ignored) { }
@@ -64,8 +66,10 @@ public class GenericSourceManager implements SourceManager {
                 if (s.getName().equals(source.getName())) {
                     try {
                         VPNAPI api = VPNAPIProvider.getInstance();
-                        IMessagePublication publication = api.getEventBus().post(new GenericSourceDeregisterEvent(api, source)).now();
-                        if (!publication.isDeadMessage() && ((Cancellable) publication.getMessage()).isCancelled()) {
+
+                        SourceDeregisterEvent event = new SourceDeregisterEventImpl(api, source);
+                        EventUtil.post(event, api.getEventBus());
+                        if (event.isCancelled()) {
                             return false;
                         }
                     } catch (IllegalStateException ignored) { }
