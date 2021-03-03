@@ -1,4 +1,4 @@
-package me.egg82.antivpn.lang;
+package me.egg82.antivpn.locale;
 
 import cloud.commandframework.ArgumentDescription;
 import java.util.Map;

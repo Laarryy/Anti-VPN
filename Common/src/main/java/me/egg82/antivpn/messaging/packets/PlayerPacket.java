@@ -11,11 +11,19 @@ public class PlayerPacket extends AbstractPacket {
 
     public byte getPacketId() { return 0x02; }
 
-    public PlayerPacket(@NotNull ByteBuf data) { read(data); }
+    public PlayerPacket(@NotNull UUID sender, @NotNull ByteBuf data) {
+        super(sender);
+        read(data);
+    }
 
     public PlayerPacket() {
-        this.uuid = new UUID(0L, 0L);
-        this.value = false;
+        super(new UUID(0L, 0L));
+    }
+
+    public PlayerPacket(@NotNull UUID uuid, boolean value) {
+        super(new UUID(0L, 0L));
+        this.uuid = uuid;
+        this.value = value;
     }
 
     public void read(@NotNull ByteBuf buffer) {
@@ -55,7 +63,8 @@ public class PlayerPacket extends AbstractPacket {
 
     public String toString() {
         return "PlayerPacket{" +
-            "uuid=" + uuid +
+            "sender=" + sender +
+            ", uuid=" + uuid +
             ", value=" + value +
             '}';
     }

@@ -3,18 +3,18 @@ package me.egg82.antivpn.commands.internal;
 import co.aikar.commands.CommandIssuer;
 import java.io.File;
 import me.egg82.antivpn.api.*;
-import me.egg82.antivpn.api.event.api.GenericAPILoadedEvent;
-import me.egg82.antivpn.api.event.api.GenericAPIReloadEvent;
+import me.egg82.antivpn.api.event.api.APILoadedEventImpl;
+import me.egg82.antivpn.api.event.api.APIReloadEventImpl;
 import me.egg82.antivpn.api.model.ip.BungeeIPManager;
 import me.egg82.antivpn.api.model.player.BungeePlayerManager;
-import me.egg82.antivpn.api.model.source.GenericSourceManager;
+import me.egg82.antivpn.api.model.source.SourceManagerImpl;
 import me.egg82.antivpn.config.CachedConfig;
 import me.egg82.antivpn.config.ConfigUtil;
 import me.egg82.antivpn.config.ConfigurationFileUtil;
-import me.egg82.antivpn.lang.I18NManager;
-import me.egg82.antivpn.lang.MessageKey;
-import me.egg82.antivpn.messaging.GenericMessagingHandler;
-import me.egg82.antivpn.messaging.MessagingHandler;
+import me.egg82.antivpn.locale.I18NManager;
+import me.egg82.antivpn.locale.MessageKey;
+import me.egg82.antivpn.messaging.handler.MessagingHandlerImpl;
+import me.egg82.antivpn.messaging.handler.MessagingHandler;
 import me.egg82.antivpn.messaging.MessagingService;
 import me.egg82.antivpn.storage.StorageService;
 import ninja.egg82.service.ServiceLocator;
@@ -42,9 +42,9 @@ public class ReloadCommand extends AbstractCommand {
             service.close();
         }
 
-        GenericSourceManager sourceManager = new GenericSourceManager();
+        SourceManagerImpl sourceManager = new SourceManagerImpl();
 
-        MessagingHandler messagingHandler = new GenericMessagingHandler();
+        MessagingHandler messagingHandler = new MessagingHandlerImpl();
         ServiceLocator.register(messagingHandler);
 
         ConfigurationFileUtil.reloadConfig(dataFolder, console, messagingHandler, sourceManager);
@@ -53,14 +53,14 @@ public class ReloadCommand extends AbstractCommand {
         BungeeIPManager ipManager = new BungeeIPManager(sourceManager, cachedConfig.getCacheTime().getTime(), cachedConfig.getCacheTime().getUnit());
         BungeePlayerManager playerManager = new BungeePlayerManager(cachedConfig.getThreads(), cachedConfig.getMcLeaksKey(), cachedConfig.getCacheTime().getTime(), cachedConfig.getCacheTime().getUnit());
         VPNAPI api = VPNAPIProvider.getInstance();
-        api.getEventBus().post(new GenericAPIReloadEvent(api, ipManager, playerManager, sourceManager)).now();
-        api = new GenericVPNAPI(api.getPlatform(), api.getPluginMetadata(), ipManager, playerManager, sourceManager, cachedConfig, api.getEventBus());
+        api.getEventBus().post(new APIReloadEventImpl(api, ipManager, playerManager, sourceManager)).now();
+        api = new VPNAPIImpl(api.getPlatform(), api.getPluginMetadata(), ipManager, playerManager, sourceManager, cachedConfig, api.getEventBus());
 
         APIUtil.setManagers(ipManager, playerManager, sourceManager);
 
         APIRegistrationUtil.register(api);
 
-        api.getEventBus().post(new GenericAPILoadedEvent(api)).now();
+        api.getEventBus().post(new APILoadedEventImpl(api)).now();
 
         issuer.sendInfo(MessageKey.RELOAD__END);
     }

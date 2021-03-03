@@ -1,4 +1,4 @@
-package me.egg82.antivpn.messaging;
+package me.egg82.antivpn.messaging.handler;
 
 import java.util.UUID;
 import me.egg82.antivpn.messaging.packets.Packet;

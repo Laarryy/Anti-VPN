@@ -1,4 +1,4 @@
-package me.egg82.antivpn.lang;
+package me.egg82.antivpn.locale;
 
 import net.kyori.adventure.audience.Audience;
 import org.bukkit.command.CommandSender;

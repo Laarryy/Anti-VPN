@@ -5,7 +5,7 @@ import me.egg82.antivpn.api.VPNAPIProvider;
 import me.egg82.antivpn.api.model.ip.AlgorithmMethod;
 import me.egg82.antivpn.api.model.ip.IPManager;
 import me.egg82.antivpn.api.model.player.PlayerManager;
-import me.egg82.antivpn.lang.MessageKey;
+import me.egg82.antivpn.locale.MessageKey;
 import me.egg82.antivpn.utils.ExceptionUtil;
 import me.egg82.antivpn.utils.ValidationUtil;
 import org.jetbrains.annotations.NotNull;

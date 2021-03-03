@@ -1,8 +1,8 @@
 package me.egg82.antivpn.config;
 
-import me.egg82.antivpn.lang.I18NManager;
-import me.egg82.antivpn.lang.LocaleUtil;
-import me.egg82.antivpn.lang.MessageKey;
+import me.egg82.antivpn.locale.I18NManager;
+import me.egg82.antivpn.locale.LocaleUtil;
+import me.egg82.antivpn.locale.MessageKey;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.configurate.ConfigurationNode;

@@ -4,7 +4,7 @@ import co.aikar.commands.BaseCommand;
 import co.aikar.commands.CommandHelp;
 import co.aikar.commands.annotation.*;
 import me.egg82.antivpn.commands.internal.*;
-import me.egg82.antivpn.lang.LocalizedCommandSender;
+import me.egg82.antivpn.locale.LocalizedCommandSender;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.plugin.Plugin;

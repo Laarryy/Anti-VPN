@@ -2,25 +2,42 @@ package me.egg82.antivpn.messaging.packets;
 
 import io.netty.buffer.ByteBuf;
 import java.util.Objects;
+import java.util.UUID;
 import me.egg82.antivpn.api.model.ip.AlgorithmMethod;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class IPPacket extends AbstractPacket {
     private String ip;
-    private int type;
+    private AlgorithmMethod type;
     private Boolean cascade;
     private Double consensus;
 
     public byte getPacketId() { return 0x01; }
 
-    public IPPacket(@NotNull ByteBuf data) { read(data); }
+    public IPPacket(@NotNull UUID sender, @NotNull ByteBuf data) {
+        super(sender);
+        read(data);
+    }
 
     public IPPacket() {
-        this.ip = "";
-        this.type = -1;
-        this.cascade = null;
+        super(new UUID(0L, 0L));
+    }
+
+    public IPPacket(@NotNull String ip, @Nullable Boolean cascade) {
+        super(new UUID(0L, 0L));
+        this.ip = ip;
+        this.type = AlgorithmMethod.CASCADE;
+        this.cascade = cascade;
         this.consensus = null;
+    }
+
+    public IPPacket(@NotNull String ip, @Nullable Double consensus) {
+        super(new UUID(0L, 0L));
+        this.ip = ip;
+        this.type = AlgorithmMethod.CONSESNSUS;
+        this.cascade = null;
+        this.consensus = consensus;
     }
 
     public void read(@NotNull ByteBuf buffer) {
@@ -29,8 +46,7 @@ public class IPPacket extends AbstractPacket {
         }
 
         this.ip = readString(buffer);
-        this.type = readVarInt(buffer);
-        AlgorithmMethod method = AlgorithmMethod.values()[type];
+        AlgorithmMethod method = AlgorithmMethod.values()[readVarInt(buffer)];
         if (method == AlgorithmMethod.CASCADE) {
             this.cascade = buffer.readBoolean();
         } else {
@@ -44,9 +60,8 @@ public class IPPacket extends AbstractPacket {
         buffer.writeByte(VERSION);
 
         writeString(this.ip, buffer);
-        writeVarInt(this.type, buffer);
-        AlgorithmMethod method = AlgorithmMethod.values()[type];
-        if (method == AlgorithmMethod.CASCADE) {
+        writeVarInt(this.type.ordinal(), buffer);
+        if (this.type == AlgorithmMethod.CASCADE) {
             if (this.cascade == null) {
                 throw new RuntimeException("cascade was selected as type but value is null.");
             }
@@ -71,22 +86,23 @@ public class IPPacket extends AbstractPacket {
 
     public void setConsensus(@Nullable Double consensus) { this.consensus = consensus; }
 
-    public int getType() { return type; }
+    public @NotNull AlgorithmMethod getType() { return type; }
 
-    public void setType(int type) { this.type = type; }
+    public void setType(@NotNull AlgorithmMethod type) { this.type = type; }
 
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof IPPacket)) return false;
         IPPacket ipPacket = (IPPacket) o;
-        return type == ipPacket.type && ip.equals(ipPacket.ip) && Objects.equals(cascade, ipPacket.cascade) && Objects.equals(consensus, ipPacket.consensus);
+        return ip.equals(ipPacket.ip) && type == ipPacket.type && Objects.equals(cascade, ipPacket.cascade) && Objects.equals(consensus, ipPacket.consensus);
     }
 
     public int hashCode() { return Objects.hash(ip, type, cascade, consensus); }
 
     public String toString() {
         return "IPPacket{" +
-            "ip='" + ip + '\'' +
+            "sender=" + sender +
+            ", ip='" + ip + '\'' +
             ", type=" + type +
             ", cascade=" + cascade +
             ", consensus=" + consensus +

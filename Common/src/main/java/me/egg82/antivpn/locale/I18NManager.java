@@ -1,4 +1,4 @@
-package me.egg82.antivpn.lang;
+package me.egg82.antivpn.locale;
 
 import java.io.File;
 import java.io.IOException;

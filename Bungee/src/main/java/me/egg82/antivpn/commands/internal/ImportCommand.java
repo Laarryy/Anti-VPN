@@ -4,7 +4,7 @@ import co.aikar.commands.CommandIssuer;
 import java.util.Set;
 import me.egg82.antivpn.config.CachedConfig;
 import me.egg82.antivpn.config.ConfigUtil;
-import me.egg82.antivpn.lang.MessageKey;
+import me.egg82.antivpn.locale.MessageKey;
 import me.egg82.antivpn.storage.StorageService;
 import me.egg82.antivpn.storage.models.IPModel;
 import me.egg82.antivpn.storage.models.PlayerModel;

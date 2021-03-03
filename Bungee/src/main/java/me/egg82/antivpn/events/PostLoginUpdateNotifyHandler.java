@@ -4,7 +4,7 @@ import co.aikar.commands.CommandManager;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 import me.egg82.antivpn.config.ConfigUtil;
-import me.egg82.antivpn.lang.MessageKey;
+import me.egg82.antivpn.locale.MessageKey;
 import net.md_5.bungee.api.event.PostLoginEvent;
 import net.md_5.bungee.api.plugin.Plugin;
 import ninja.egg82.service.ServiceLocator;

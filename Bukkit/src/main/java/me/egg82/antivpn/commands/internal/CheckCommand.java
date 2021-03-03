@@ -2,7 +2,7 @@ package me.egg82.antivpn.commands.internal;
 
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.paper.PaperCommandManager;
-import me.egg82.antivpn.lang.BukkitLocalizedCommandSender;
+import me.egg82.antivpn.locale.BukkitLocalizedCommandSender;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.NotNull;
 

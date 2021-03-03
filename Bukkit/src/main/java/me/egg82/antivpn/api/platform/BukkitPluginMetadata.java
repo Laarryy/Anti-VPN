@@ -1,5 +1,6 @@
 package me.egg82.antivpn.api.platform;
 
+import me.egg82.avpn.api.platform.AbstractPluginMetadata;
 import org.jetbrains.annotations.NotNull;
 
 public class BukkitPluginMetadata extends AbstractPluginMetadata {

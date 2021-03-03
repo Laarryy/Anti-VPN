@@ -7,8 +7,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
-import me.egg82.antivpn.lang.LocaleUtil;
-import me.egg82.antivpn.lang.MessageKey;
+import java.util.UUID;
+import me.egg82.antivpn.locale.LocaleUtil;
+import me.egg82.antivpn.locale.MessageKey;
 import me.egg82.antivpn.utils.PacketUtil;
 import org.jetbrains.annotations.NotNull;
 
@@ -19,9 +20,14 @@ public class MultiPacket extends AbstractPacket {
 
     public byte getPacketId() { return 0x21; }
 
-    public MultiPacket(@NotNull ByteBuf data) { read(data); }
+    public MultiPacket(@NotNull UUID sender, @NotNull ByteBuf data) {
+        super(sender);
+        read(data);
+    }
 
-    public MultiPacket() { }
+    public MultiPacket() {
+        super(new UUID(0L, 0L));
+    }
 
     public void read(@NotNull ByteBuf buffer) {
         if (!checkVersion(buffer)) {
@@ -93,7 +99,8 @@ public class MultiPacket extends AbstractPacket {
 
     public String toString() {
         return "MultiPacket{" +
-            "packets=" + packets +
+            "sender=" + sender +
+            ", packets=" + packets +
             '}';
     }
 }

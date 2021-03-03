@@ -12,6 +12,14 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractPacket implements Packet {
     protected final transient Logger logger = new GELFLogger(LoggerFactory.getLogger(getClass()));
 
+    protected final UUID sender;
+
+    protected AbstractPacket(@NotNull UUID sender) {
+        this.sender = sender;
+    }
+
+    public @NotNull UUID getSender() { return sender; }
+
     protected final int readVarInt(@NotNull ByteBuf input) { return readVarInt(input, 5); }
 
     protected final int readVarInt(@NotNull ByteBuf input, int maxBytes) {

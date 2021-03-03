@@ -8,7 +8,7 @@ import com.velocitypowered.api.plugin.PluginDescription;
 import com.velocitypowered.api.proxy.ProxyServer;
 import java.io.File;
 import me.egg82.antivpn.commands.internal.*;
-import me.egg82.antivpn.lang.LocalizedCommandSender;
+import me.egg82.antivpn.locale.LocalizedCommandSender;
 import org.jetbrains.annotations.NotNull;
 
 @CommandAlias("antivpn|avpn")

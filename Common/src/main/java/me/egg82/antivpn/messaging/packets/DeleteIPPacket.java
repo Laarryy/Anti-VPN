@@ -2,6 +2,7 @@ package me.egg82.antivpn.messaging.packets;
 
 import io.netty.buffer.ByteBuf;
 import java.util.Objects;
+import java.util.UUID;
 import org.jetbrains.annotations.NotNull;
 
 public class DeleteIPPacket extends AbstractPacket {
@@ -9,10 +10,18 @@ public class DeleteIPPacket extends AbstractPacket {
 
     public byte getPacketId() { return 0x03; }
 
-    public DeleteIPPacket(@NotNull ByteBuf data) { read(data); }
+    public DeleteIPPacket(@NotNull UUID sender, @NotNull ByteBuf data) {
+        super(sender);
+        read(data);
+    }
 
     public DeleteIPPacket() {
-        this.ip = "";
+        super(new UUID(0L, 0L));
+    }
+
+    public DeleteIPPacket(@NotNull String ip) {
+        super(new UUID(0L, 0L));
+        this.ip = ip;
     }
 
     public void read(@NotNull ByteBuf buffer) {
@@ -46,7 +55,8 @@ public class DeleteIPPacket extends AbstractPacket {
 
     public String toString() {
         return "DeleteIPPacket{" +
-            "ip='" + ip + '\'' +
+            "sender=" + sender +
+            ", ip='" + ip + '\'' +
             '}';
     }
 }

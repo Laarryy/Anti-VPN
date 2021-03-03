@@ -11,7 +11,7 @@ import me.egg82.antivpn.api.model.source.Source;
 import me.egg82.antivpn.api.model.source.SourceManager;
 import me.egg82.antivpn.api.platform.Platform;
 import me.egg82.antivpn.api.platform.PluginMetadata;
-import net.engio.mbassy.bus.MBassador;
+import net.kyori.event.EventBus;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -101,18 +101,19 @@ public interface VPNAPI {
      *
      * <p>The exact actions performed in an update task remains an
      * implementation detail of the plugin, however, as a minimum, it is
-     * expected to perform a full reload of player and IP data, and
-     * ensure that any changes are fully applied and propagated.</p>
+     * expected to perform a full reload of player and IP data, run
+     * actions related to backend messaging, and ensure that any
+     * changes are fully applied and propagated.</p>
      *
      * @return a future
      */
     @NotNull CompletableFuture<Void> runUpdateTask();
 
     /**
-     * Gets the {@link MBassador} event bus, used for subscribing to internal Anti-VPN
+     * Gets the {@link EventBus}, used for subscribing to internal Anti-VPN
      * events.
      *
      * @return the event bus
      */
-    @NotNull MBassador<VPNEvent> getEventBus();
+    @NotNull EventBus<VPNEvent> getEventBus();
 }

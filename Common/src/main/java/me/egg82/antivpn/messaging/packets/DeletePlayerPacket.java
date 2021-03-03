@@ -10,10 +10,18 @@ public class DeletePlayerPacket extends AbstractPacket {
 
     public byte getPacketId() { return 0x04; }
 
-    public DeletePlayerPacket(@NotNull ByteBuf data) { read(data); }
+    public DeletePlayerPacket(@NotNull UUID sender, @NotNull ByteBuf data) {
+        super(sender);
+        read(data);
+    }
 
     public DeletePlayerPacket() {
-        this.uuid = new UUID(0L, 0L);
+        super(new UUID(0L, 0L));
+    }
+
+    public DeletePlayerPacket(@NotNull UUID uuid) {
+        super(new UUID(0L, 0L));
+        this.uuid = uuid;
     }
 
     public void read(@NotNull ByteBuf buffer) {
@@ -47,7 +55,8 @@ public class DeletePlayerPacket extends AbstractPacket {
 
     public String toString() {
         return "DeletePlayerPacket{" +
-            "uuid=" + uuid +
+            "sender=" + sender +
+            ", uuid=" + uuid +
             '}';
     }
 }

@@ -14,10 +14,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import me.egg82.antivpn.config.CachedConfig;
 import me.egg82.antivpn.config.ConfigUtil;
 import me.egg82.antivpn.core.DoubleBuffer;
-import me.egg82.antivpn.lang.LocaleUtil;
-import me.egg82.antivpn.lang.MessageKey;
+import me.egg82.antivpn.locale.LocaleUtil;
+import me.egg82.antivpn.locale.MessageKey;
 import me.egg82.antivpn.logging.GELFLogger;
-import me.egg82.antivpn.messaging.GenericMessagingHandler;
+import me.egg82.antivpn.messaging.handler.MessagingHandlerImpl;
 import me.egg82.antivpn.messaging.MessagingService;
 import me.egg82.antivpn.messaging.packets.MultiPacket;
 import me.egg82.antivpn.messaging.packets.Packet;
@@ -83,7 +83,7 @@ public class PacketUtil {
         packetQueue.swapBuffers();
 
         UUID messageId = UUID.randomUUID();
-        GenericMessagingHandler.messageCache.put(messageId, Boolean.TRUE); // Tight coupling, but it's probably fine
+        MessagingHandlerImpl.messageCache.put(messageId, Boolean.TRUE); // Tight coupling, but it's probably fine
 
         if (packetQueue.getReadBuffer().size() > 1) {
             MultiPacket multi = new MultiPacket();

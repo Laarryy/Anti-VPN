@@ -1,5 +1,6 @@
 package me.egg82.antivpn.api.event.api;
 
+import me.egg82.antivpn.api.event.VPNEvent;
 import me.egg82.antivpn.api.model.ip.IPManager;
 import me.egg82.antivpn.api.model.player.PlayerManager;
 import me.egg82.antivpn.api.model.source.SourceManager;
@@ -8,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Called when the API is about to be reloaded.
  */
-public interface APIReloadEvent {
+public interface APIReloadEvent extends VPNEvent {
     /**
      * Gets the new {@link IPManager} instance
      *

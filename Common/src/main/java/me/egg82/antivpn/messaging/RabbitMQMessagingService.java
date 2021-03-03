@@ -11,12 +11,14 @@ import java.util.concurrent.TimeoutException;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import me.egg82.antivpn.config.ConfigUtil;
-import me.egg82.antivpn.lang.LocaleUtil;
-import me.egg82.antivpn.lang.MessageKey;
+import me.egg82.antivpn.locale.LocaleUtil;
+import me.egg82.antivpn.locale.MessageKey;
+import me.egg82.antivpn.messaging.handler.MessagingHandler;
 import me.egg82.antivpn.messaging.packets.Packet;
 import me.egg82.antivpn.utils.PacketUtil;
 import me.egg82.antivpn.utils.ValidationUtil;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class RabbitMQMessagingService extends AbstractMessagingService {
     // https://www.rabbitmq.com/api-guide.html#recovery
@@ -114,7 +116,9 @@ public class RabbitMQMessagingService extends AbstractMessagingService {
                 if (ConfigUtil.getDebugOrFalse()) {
                     logger.info("Got message from exchange: " + envelope.getExchange());
                 }
-                if (!validateProperties(properties)) {
+
+                UUID sender = validateProperties(properties);
+                if (sender == null) {
                     return;
                 }
 
@@ -132,7 +136,7 @@ public class RabbitMQMessagingService extends AbstractMessagingService {
                     }
 
                     try {
-                        handler.handlePacket(UUID.fromString(properties.getMessageId()), getName(), packetClass.getConstructor(ByteBuf.class).newInstance(data));
+                        handler.handlePacket(UUID.fromString(properties.getMessageId()), getName(), packetClass.getConstructor(UUID.class, ByteBuf.class).newInstance(sender, data));
                     } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException | InstantiationException | ExceptionInInitializerError | SecurityException ex) {
                         logger.error(LocaleUtil.getDefaultI18N().getText(MessageKey.ERROR__MESSAGING__BAD_PACKET, "{name}", packetClass.getSimpleName()), ex);
                     }
@@ -186,7 +190,7 @@ public class RabbitMQMessagingService extends AbstractMessagingService {
         return retVal.build();
     }
 
-    private boolean validateProperties(@NotNull AMQP.BasicProperties properties) {
+    private @Nullable UUID validateProperties(@NotNull AMQP.BasicProperties properties) {
         byte[] data = (byte[]) properties.getHeaders().get("sender");
         ByteBuf buffer = alloc.buffer(16, 16);
         UUID sender;
@@ -197,13 +201,13 @@ public class RabbitMQMessagingService extends AbstractMessagingService {
             buffer.release();
         }
         if (serverId.equals(sender)) {
-            return false;
+            return null;
         }
         if (!ValidationUtil.isValidUuid(properties.getMessageId())) {
             logger.warn("Non-valid message ID received: \"" + properties.getMessageId() + "\".");
-            return false;
+            return null;
         }
-        return true;
+        return sender;
     }
 
     private @NotNull RecoverableConnection getConnection() throws IOException, TimeoutException { return (RecoverableConnection) factory.newConnection(); }

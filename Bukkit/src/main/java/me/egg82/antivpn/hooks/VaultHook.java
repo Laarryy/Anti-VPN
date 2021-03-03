@@ -1,9 +1,9 @@
 package me.egg82.antivpn.hooks;
 
 import me.egg82.antivpn.config.ConfigUtil;
-import me.egg82.antivpn.lang.BukkitLocaleCommandUtil;
-import me.egg82.antivpn.lang.BukkitLocalizedCommandSender;
-import me.egg82.antivpn.lang.MessageKey;
+import me.egg82.antivpn.locale.BukkitLocaleCommandUtil;
+import me.egg82.antivpn.locale.BukkitLocalizedCommandSender;
+import me.egg82.antivpn.locale.MessageKey;
 import net.milkbowl.vault.permission.Permission;
 import ninja.egg82.events.BukkitEvents;
 import org.bukkit.Bukkit;

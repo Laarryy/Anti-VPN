@@ -17,11 +17,11 @@ import java.util.concurrent.CompletionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import me.egg82.antivpn.api.*;
-import me.egg82.antivpn.api.event.api.GenericAPIDisableEvent;
-import me.egg82.antivpn.api.event.api.GenericAPILoadedEvent;
+import me.egg82.antivpn.api.event.api.APIDisableEventImpl;
+import me.egg82.antivpn.api.event.api.APILoadedEventImpl;
 import me.egg82.antivpn.api.model.ip.VelocityIPManager;
 import me.egg82.antivpn.api.model.player.VelocityPlayerManager;
-import me.egg82.antivpn.api.model.source.GenericSourceManager;
+import me.egg82.antivpn.api.model.source.SourceManagerImpl;
 import me.egg82.antivpn.api.model.source.Source;
 import me.egg82.antivpn.api.model.source.models.SourceModel;
 import me.egg82.antivpn.api.platform.Platform;
@@ -37,11 +37,11 @@ import me.egg82.antivpn.events.PlayerEvents;
 import me.egg82.antivpn.hooks.LuckPermsHook;
 import me.egg82.antivpn.hooks.PlayerAnalyticsHook;
 import me.egg82.antivpn.hooks.PluginHook;
-import me.egg82.antivpn.lang.LanguageFileUtil;
-import me.egg82.antivpn.lang.MessageKey;
-import me.egg82.antivpn.lang.PluginMessageFormatter;
-import me.egg82.antivpn.messaging.GenericMessagingHandler;
-import me.egg82.antivpn.messaging.MessagingHandler;
+import me.egg82.antivpn.locale.LanguageFileUtil;
+import me.egg82.antivpn.locale.MessageKey;
+import me.egg82.antivpn.locale.PluginMessageFormatter;
+import me.egg82.antivpn.messaging.handler.MessagingHandlerImpl;
+import me.egg82.antivpn.messaging.handler.MessagingHandler;
 import me.egg82.antivpn.messaging.MessagingService;
 import me.egg82.antivpn.messaging.ServerIDUtil;
 import me.egg82.antivpn.services.GameAnalyticsErrorHandler;
@@ -178,9 +178,9 @@ public class AntiVPN {
     }
 
     private void loadServices() {
-        GenericSourceManager sourceManager = new GenericSourceManager();
+        SourceManagerImpl sourceManager = new SourceManagerImpl();
 
-        MessagingHandler messagingHandler = new GenericMessagingHandler();
+        MessagingHandler messagingHandler = new MessagingHandlerImpl();
         ServiceLocator.register(messagingHandler);
 
         ConfigurationFileUtil.reloadConfig(new File(description.getSource().get().getParent().toFile(), description.getName().get()), consoleCommandIssuer, messagingHandler, sourceManager);
@@ -191,13 +191,13 @@ public class AntiVPN {
         VelocityPlayerManager playerManager = new VelocityPlayerManager(proxy, cachedConfig.getThreads(), cachedConfig.getMcLeaksKey(), cachedConfig.getCacheTime().getTime(), cachedConfig.getCacheTime().getUnit());
         Platform platform = new VelocityPlatform(System.currentTimeMillis());
         PluginMetadata metadata = new VelocityPluginMetadata(proxy.getVersion().getVersion());
-        VPNAPI api = new GenericVPNAPI(platform, metadata, ipManager, playerManager, sourceManager, cachedConfig, new MBassador<>(new GenericPublicationErrorHandler()));
+        VPNAPI api = new VPNAPIImpl(platform, metadata, ipManager, playerManager, sourceManager, cachedConfig, new MBassador<>(new GenericPublicationErrorHandler()));
 
         APIUtil.setManagers(ipManager, playerManager, sourceManager);
 
         APIRegistrationUtil.register(api);
 
-        api.getEventBus().post(new GenericAPILoadedEvent(api)).now();
+        api.getEventBus().post(new APILoadedEventImpl(api)).now();
     }
 
     private void loadCommands() {
@@ -349,7 +349,7 @@ public class AntiVPN {
 
     public void unloadServices() {
         VPNAPI api = VPNAPIProvider.getInstance();
-        api.getEventBus().post(new GenericAPIDisableEvent(api)).now();
+        api.getEventBus().post(new APIDisableEventImpl(api)).now();
         api.getEventBus().shutdown();
         APIRegistrationUtil.deregister();
 

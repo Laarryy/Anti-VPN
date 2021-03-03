@@ -114,10 +114,6 @@
             <id>sponge</id>
             <url>https://repo.spongepowered.org/maven/</url>
         </repository>
-        <repository>
-            <id>aikar</id>
-            <url>https://repo.aikar.co/content/groups/aikar/</url>
-        </repository>
     </repositories>
 
     <dependencies>
@@ -260,9 +256,9 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>net.engio</groupId>
-            <artifactId>mbassador</artifactId>
-            <version>${mbassador.version}</version>
+            <groupId>net.kyori</groupId>
+            <artifactId>event-api</artifactId>
+            <version>${kyori-event.version}</version>
             <scope>provided</scope>
         </dependency>
 

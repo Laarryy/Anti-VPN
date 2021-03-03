@@ -9,7 +9,7 @@ import me.egg82.antivpn.api.model.source.SourceManager;
 import me.egg82.antivpn.api.model.source.models.SourceModel;
 import me.egg82.antivpn.config.CachedConfig;
 import me.egg82.antivpn.config.ConfigUtil;
-import me.egg82.antivpn.lang.MessageKey;
+import me.egg82.antivpn.locale.MessageKey;
 import me.egg82.antivpn.utils.ExceptionUtil;
 import org.jetbrains.annotations.NotNull;
 

@@ -261,10 +261,6 @@
             <id>sponge</id>
             <url>https://repo.spongepowered.org/maven/</url>
         </repository>
-        <repository>
-            <id>aikar</id>
-            <url>https://repo.aikar.co/content/groups/aikar/</url>
-        </repository>
 
         <repository>
             <id>github-rjenkinsjr</id>
@@ -520,9 +516,9 @@
             <version>${flexjson.version}</version>
         </dependency>
         <dependency>
-            <groupId>net.engio</groupId>
-            <artifactId>mbassador</artifactId>
-            <version>${mbassador.version}</version>
+            <groupId>net.kyori</groupId>
+            <artifactId>event-api</artifactId>
+            <version>${kyori-event.version}</version>
         </dependency>
 
         <!-- testing -->

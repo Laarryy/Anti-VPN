@@ -7,11 +7,12 @@ import java.util.List;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletionException;
 import me.egg82.antivpn.api.*;
-import me.egg82.antivpn.api.event.api.GenericAPIDisableEvent;
-import me.egg82.antivpn.api.event.api.GenericAPILoadedEvent;
+import me.egg82.antivpn.api.event.VPNEvent;
+import me.egg82.antivpn.api.event.api.APIDisableEventImpl;
+import me.egg82.antivpn.api.event.api.APILoadedEventImpl;
 import me.egg82.antivpn.api.model.ip.BukkitIPManager;
 import me.egg82.antivpn.api.model.player.BukkitPlayerManager;
-import me.egg82.antivpn.api.model.source.GenericSourceManager;
+import me.egg82.antivpn.api.model.source.SourceManagerImpl;
 import me.egg82.antivpn.api.platform.BukkitPlatform;
 import me.egg82.antivpn.api.platform.BukkitPluginMetadata;
 import me.egg82.antivpn.api.platform.Platform;
@@ -28,14 +29,16 @@ import me.egg82.antivpn.events.EventHolder;
 import me.egg82.antivpn.events.ExtraPlayerEvents;
 import me.egg82.antivpn.events.LateCheckEvents;
 import me.egg82.antivpn.hooks.*;
-import me.egg82.antivpn.lang.*;
+import me.egg82.antivpn.locale.*;
 import me.egg82.antivpn.logging.GELFLogger;
-import me.egg82.antivpn.messaging.GenericMessagingHandler;
-import me.egg82.antivpn.messaging.MessagingHandler;
+import me.egg82.antivpn.messaging.handler.MessagingHandlerImpl;
+import me.egg82.antivpn.messaging.handler.MessagingHandler;
 import me.egg82.antivpn.messaging.MessagingService;
 import me.egg82.antivpn.storage.StorageService;
+import me.egg82.antivpn.utils.EventUtil;
 import me.egg82.antivpn.utils.VersionUtil;
-import net.engio.mbassy.bus.MBassador;
+import me.egg82.avpn.api.platform.AbstractPluginMetadata;
+import net.kyori.event.SimpleEventBus;
 import ninja.egg82.events.BukkitEventSubscriber;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -139,8 +142,8 @@ public class AntiVPN {
     }
 
     private void loadServices() {
-        GenericSourceManager sourceManager = new GenericSourceManager();
-        MessagingHandler messagingHandler = new GenericMessagingHandler();
+        SourceManagerImpl sourceManager = new SourceManagerImpl();
+        MessagingHandler messagingHandler = new MessagingHandlerImpl();
         ConfigurationFileUtil.reloadConfig(plugin.getDataFolder(), BukkitLocaleCommandUtil.getConsole(), messagingHandler, sourceManager);
         I18NManager.clearCaches();
 
@@ -150,12 +153,11 @@ public class AntiVPN {
         BukkitIPManager ipManager = new BukkitIPManager(plugin, sourceManager, cachedConfig.getCacheTime());
         BukkitPlayerManager playerManager = new BukkitPlayerManager(plugin, cachedConfig.getMcLeaksKey(), cachedConfig.getCacheTime());
         Platform platform = new BukkitPlatform(System.currentTimeMillis());
-        PluginMetadata metadata = new BukkitPluginMetadata(plugin.getDescription().getVersion());
-        VPNAPI api = new GenericVPNAPI(platform, metadata, ipManager, playerManager, sourceManager, cachedConfig, new MBassador<>(new GenericPublicationErrorHandler()));
+        AbstractPluginMetadata metadata = new BukkitPluginMetadata(plugin.getDescription().getVersion());
+        VPNAPI api = new VPNAPIImpl(platform, metadata, ipManager, playerManager, sourceManager, new SimpleEventBus<>(VPNEvent.class));
 
-        APIUtil.setManagers(ipManager, playerManager, sourceManager);
         APIRegistrationUtil.register(api);
-        api.getEventBus().post(new GenericAPILoadedEvent(api)).now();
+        EventUtil.post(new APILoadedEventImpl(api), api.getEventBus());
     }
 
     private void loadCommands() {
@@ -332,8 +334,8 @@ public class AntiVPN {
 
     public void unloadServices() {
         VPNAPI api = VPNAPIProvider.getInstance();
-        api.getEventBus().post(new GenericAPIDisableEvent(api)).now();
-        api.getEventBus().shutdown();
+        EventUtil.post(new APIDisableEventImpl(api), api.getEventBus());
+        api.getEventBus().unregisterAll();
         APIRegistrationUtil.deregister();
 
         CachedConfig cachedConfig = ConfigUtil.getCachedConfig();

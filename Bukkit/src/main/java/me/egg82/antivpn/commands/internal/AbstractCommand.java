@@ -4,7 +4,7 @@ import cloud.commandframework.execution.CommandExecutionHandler;
 import cloud.commandframework.paper.PaperCommandManager;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import me.egg82.antivpn.lang.BukkitLocalizedCommandSender;
+import me.egg82.antivpn.locale.BukkitLocalizedCommandSender;
 import me.egg82.antivpn.logging.GELFLogger;
 import me.egg82.antivpn.services.lookup.PlayerInfo;
 import me.egg82.antivpn.services.lookup.PlayerLookup;

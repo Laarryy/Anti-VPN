@@ -76,7 +76,7 @@ public abstract class AbstractIPManager implements IPManager {
 
             IPPacket packet = new IPPacket();
             packet.setIp(ip.getIP().getHostAddress());
-            packet.setType(ip.getType().ordinal());
+            packet.setType(ip.getType());
             packet.setCascade(ip.getCascade());
             packet.setConsensus(ip.getConsensus());
             PacketUtil.queuePacket(packet);
@@ -306,7 +306,7 @@ public abstract class AbstractIPManager implements IPManager {
     private void sendResult(@NotNull IPModel model, @NotNull CachedConfig cachedConfig) {
         IPPacket packet = new IPPacket();
         packet.setIp(model.getIp());
-        packet.setType(model.getType());
+        packet.setType(AlgorithmMethod.values()[model.getType()]);
         packet.setCascade(model.getCascade());
         packet.setConsensus(model.getConsensus());
         PacketUtil.queuePacket(packet);

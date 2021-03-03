@@ -12,8 +12,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import me.egg82.antivpn.config.ConfigUtil;
-import me.egg82.antivpn.lang.LocaleUtil;
-import me.egg82.antivpn.lang.MessageKey;
+import me.egg82.antivpn.locale.LocaleUtil;
+import me.egg82.antivpn.locale.MessageKey;
+import me.egg82.antivpn.messaging.handler.MessagingHandler;
 import me.egg82.antivpn.messaging.packets.Packet;
 import me.egg82.antivpn.utils.PacketUtil;
 import org.jetbrains.annotations.NotNull;
@@ -205,7 +206,7 @@ public class RedisMessagingService extends AbstractMessagingService {
                 }
 
                 try {
-                    service.handler.handlePacket(messageId, service.getName(), packetClass.getConstructor(ByteBuf.class).newInstance(data));
+                    service.handler.handlePacket(messageId, service.getName(), packetClass.getConstructor(UUID.class, ByteBuf.class).newInstance(sender, data));
                 } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException | InstantiationException | ExceptionInInitializerError | SecurityException ex) {
                     service.logger.error(LocaleUtil.getDefaultI18N().getText(MessageKey.ERROR__MESSAGING__BAD_PACKET, "{name}", packetClass.getSimpleName()), ex);
                 }
