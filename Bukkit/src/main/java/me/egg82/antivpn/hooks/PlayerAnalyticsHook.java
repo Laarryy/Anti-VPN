@@ -58,6 +58,11 @@ public class PlayerAnalyticsHook implements PluginHook {
         if (isCapabilityAvailable("DATA_EXTENSION_VALUES") && isCapabilityAvailable("DATA_EXTENSION_TABLES")) {
             try {
                 ExtensionService.getInstance().register(new Data());
+                capabilities.registerEnableListener(enabled -> {
+                    if (Boolean.TRUE.equals(enabled)) {
+                        ExtensionService.getInstance().register(new Data());
+                    }
+                });
             } catch (NoClassDefFoundError ex) {
                 // Plan not installed
                 logger.error(LocaleUtil.getDefaultI18N().getText(MessageKey.HOOK__PLAN__NOT_INSTALLED), ex);

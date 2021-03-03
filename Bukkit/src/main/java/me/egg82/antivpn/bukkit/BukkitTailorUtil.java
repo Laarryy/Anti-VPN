@@ -1,4 +1,4 @@
-package me.egg82.antivpn.utils;
+package me.egg82.antivpn.bukkit;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +11,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 public class BukkitTailorUtil {
-    private static MiniMessage miniMessage = MiniMessage.markdown();
+    private static final MiniMessage miniMessage = MiniMessage.markdown();
 
     private BukkitTailorUtil() { }
 

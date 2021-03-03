@@ -1,4 +1,4 @@
-package me.egg82.antivpn.utils;
+package me.egg82.antivpn.bukkit;
 
 import java.util.Collection;
 import org.bukkit.Bukkit;
