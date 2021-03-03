@@ -12,7 +12,6 @@ import me.egg82.antivpn.config.CachedConfig;
 import me.egg82.antivpn.config.ConfigUtil;
 import me.egg82.antivpn.core.Pair;
 import me.egg82.antivpn.logging.GELFLogger;
-import me.egg82.antivpn.messaging.handler.MessagingHandler;
 import me.egg82.antivpn.messaging.packets.*;
 import me.egg82.antivpn.storage.StorageService;
 import me.egg82.antivpn.storage.models.IPModel;
