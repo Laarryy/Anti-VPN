@@ -4,6 +4,7 @@ import java.util.Map;
 import me.egg82.antivpn.api.event.VPNEvent;
 import me.egg82.antivpn.locale.LocaleUtil;
 import me.egg82.antivpn.locale.MessageKey;
+import me.egg82.antivpn.logging.GELFLogger;
 import net.kyori.event.EventBus;
 import net.kyori.event.EventSubscriber;
 import net.kyori.event.PostResult;
@@ -12,7 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class EventUtil {
-    private static final Logger logger = LoggerFactory.getLogger(EventUtil.class);
+    private static final Logger logger = new GELFLogger(LoggerFactory.getLogger(EventUtil.class));
 
     private EventUtil() { }
 

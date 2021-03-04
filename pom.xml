@@ -33,7 +33,7 @@
         <nats.version>2.8.0</nats.version>
         <zstd.version>1.4.8-5</zstd.version>
         <guava.version>30.1-jre</guava.version>
-        <fastutil.version>8.5.2</fastutil.version>
+        <fastutil.version>8.2.2</fastutil.version> <!-- keep updated with Paper: https://github.com/PaperMC/Paper/blob/master/Spigot-API-Patches/0002-Add-FastUtil-to-Bukkit.patch -->
         <caffeine.version>2.9.0</caffeine.version>
         <ipaddress.version>5.3.3</ipaddress.version>
         <slf4j.version>1.7.30</slf4j.version>
@@ -43,8 +43,9 @@
 
         <cloud.version>1.4.0</cloud.version>
         <commodore.version>1.9</commodore.version>
-        <adventure.api.version>4.4.0</adventure.api.version>
-        <adventure.version>4.0.0-SNAPSHOT</adventure.version>
+        <adventure.version>4.6.0</adventure.version> <!-- keep updated with Paper: https://github.com/PaperMC/Paper/blob/master/Spigot-API-Patches/0005-Adventure.patch -->
+        <adventure.bukkit.version>4.0.0-SNAPSHOT</adventure.bukkit.version>
+        <minimessage.version>4.1.0-SNAPSHOT</minimessage.version>
         <eventchain.api.version>2.0.0</eventchain.api.version>
         <eventchain.version>3.0.0</eventchain.version>
         <depdownloader.version>2.2.16</depdownloader.version>

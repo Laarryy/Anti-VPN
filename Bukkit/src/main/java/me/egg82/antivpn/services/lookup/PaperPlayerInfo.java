@@ -33,7 +33,7 @@ public class PaperPlayerInfo extends MojangPlayerInfo {
         }
 
         // Network lookup
-        if (profile.complete(false) && profile.getName() != null && profile.getId() != null) {
+        if (profile.complete(true) && profile.getName() != null && profile.getId() != null) {
             nameCache.put(profile.getName(), profile.getId());
             return profile.getName();
         }
@@ -58,7 +58,7 @@ public class PaperPlayerInfo extends MojangPlayerInfo {
         }
 
         // Network lookup
-        if (profile.complete(false) && profile.getName() != null && profile.getId() != null) {
+        if (profile.complete(true) && profile.getName() != null && profile.getId() != null) {
             uuidCache.put(profile.getId(), profile.getName());
             return profile.getId();
         }
@@ -70,12 +70,12 @@ public class PaperPlayerInfo extends MojangPlayerInfo {
     protected @NotNull List<ProfileModel.@NotNull ProfilePropertyModel> propertiesExpensive(@NotNull UUID uuid) throws IOException {
         // Cached profile lookup
         PlayerProfile profile = Bukkit.createProfile(uuid);
-        if ((profile.isComplete() || profile.completeFromCache()) && profile.getName() != null && profile.getId() != null) {
+        if ((profile.isComplete() || profile.completeFromCache()) && profile.getName() != null && profile.getId() != null && profile.hasTextures()) {
             return toPropertiesModel(profile.getProperties());
         }
 
         // Network lookup
-        if (profile.complete(false) && profile.getName() != null && profile.getId() != null) {
+        if (profile.complete(true) && profile.getName() != null && profile.getId() != null) {
             return toPropertiesModel(profile.getProperties());
         }
 

@@ -317,7 +317,7 @@
         <dependency>
             <groupId>net.kyori</groupId>
             <artifactId>adventure-platform-bukkit</artifactId>
-            <version>${adventure.version}</version>
+            <version>${adventure.bukkit.version}</version>
         </dependency>
         <dependency>
             <groupId>ninja.egg82</groupId>
@@ -385,7 +385,7 @@
         <dependency>
             <groupId>net.kyori</groupId>
             <artifactId>adventure-text-minimessage</artifactId>
-            <version>${adventure.version}</version>
+            <version>${minimessage.version}</version>
         </dependency>
         <dependency>
             <groupId>net.oneandone.reflections8</groupId>
