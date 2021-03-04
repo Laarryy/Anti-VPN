@@ -94,7 +94,7 @@ messaging:
         # Address and port
         address: '127.0.0.1:6379'
         # Credentials
-        file: ''
+        password: ''
     # Engine name. Can be anything
     engine3:
       # Engine type. Can be "rabbitmq", "redis", or "nats"
@@ -108,7 +108,7 @@ messaging:
         # Address and port
         address: '127.0.0.1:4222'
         # Credentials
-        password: ''
+        file: ''
   settings:
     # The maximum size of the messaging engine connection pool
     # Determines the max number of connections to messaging engines
