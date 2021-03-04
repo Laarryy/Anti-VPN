@@ -66,9 +66,10 @@ messaging:
   engines:
     # Engine name. Can be anything
     engine1:
-      # Engine type. Can be "rabbitmq" or "redis"
+      # Engine type. Can be "rabbitmq", "redis", or "nats"
       # https://www.rabbitmq.com/
       # https://redis.io/
+      # https://nats.io/
       type: 'rabbitmq'
       # Whether or not to use this engine
       enabled: false
@@ -82,15 +83,30 @@ messaging:
         password: 'guest'
     # Engine name. Can be anything
     engine2:
-      # Engine type. Can be "rabbitmq" or "redis"
+      # Engine type. Can be "rabbitmq", "redis", or "nats"
       # https://www.rabbitmq.com/
       # https://redis.io/
+      # https://nats.io/
       type: 'redis'
       # Whether or not to use this engine
       enabled: false
       connection:
         # Address and port
         address: '127.0.0.1:6379'
+        # Credentials
+        file: ''
+    # Engine name. Can be anything
+    engine3:
+      # Engine type. Can be "rabbitmq", "redis", or "nats"
+      # https://www.rabbitmq.com/
+      # https://redis.io/
+      # https://nats.io/
+      type: 'nats'
+      # Whether or not to use this engine
+      enabled: false
+      connection:
+        # Address and port
+        address: '127.0.0.1:4222'
         # Credentials
         password: ''
   settings:
@@ -327,6 +343,7 @@ action:
   - '::1/128'
   - 'fd00::/8'
 
+# Plugin permissions
 permissions:
   # The admin permission
   # This is used to verify command usage and send update alerts

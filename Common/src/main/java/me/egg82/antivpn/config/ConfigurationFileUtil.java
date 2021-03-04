@@ -18,10 +18,7 @@ import me.egg82.antivpn.locale.LocalizedCommandSender;
 import me.egg82.antivpn.locale.MessageKey;
 import me.egg82.antivpn.logging.GELFLogger;
 import me.egg82.antivpn.logging.GELFLoggerUtil;
-import me.egg82.antivpn.messaging.MessagingService;
-import me.egg82.antivpn.messaging.RabbitMQMessagingService;
-import me.egg82.antivpn.messaging.RedisMessagingService;
-import me.egg82.antivpn.messaging.ServerIDUtil;
+import me.egg82.antivpn.messaging.*;
 import me.egg82.antivpn.messaging.handler.MessagingHandler;
 import me.egg82.antivpn.reflect.PackageFilter;
 import me.egg82.antivpn.storage.*;
@@ -412,6 +409,25 @@ public class ConfigurationFileUtil {
                             .life(poolSettings.maxLifetime, (int) poolSettings.timeout)
                             .build();
                 } catch (JedisException ex) {
+                    logger.error(console.getLocalizedText(MessageKey.ERROR__CONFIG__NO_ENGINE, "{name}", name), ex);
+                }
+                break;
+            }
+            case "nats": {
+                AddressPort url = new AddressPort(connectionNode.key() + ".address", connectionNode.node("address").getString("127.0.0.1:4222"), 4222, console);
+                if (debug) {
+                    console.sendMessage("<c2>Creating engine</c2> <c1>" + name + "</c1> <c2>of type NATS with address</c2> <c1>" + url.getAddress() + ":" + url.getPort() + "</c1>");
+                }
+                try {
+                    return NATSMessagingService.builder(name, serverId, handler)
+                        .url(url.address, url.port)
+                        .credentials(connectionNode.node("file").getString(""))
+                        .life((int) poolSettings.timeout)
+                        .build();
+                } catch (InterruptedException ex) {
+                    logger.error(console.getLocalizedText(MessageKey.ERROR__CONFIG__NO_ENGINE, "{name}", name), ex);
+                    Thread.currentThread().interrupt();
+                } catch (IOException | IllegalStateException ex) {
                     logger.error(console.getLocalizedText(MessageKey.ERROR__CONFIG__NO_ENGINE, "{name}", name), ex);
                 }
                 break;
