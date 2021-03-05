@@ -18,7 +18,7 @@ public class MultiPacket extends AbstractPacket {
 
     private Set<Packet> packets = new LinkedHashSet<>();
 
-    public byte getPacketId() { return 0x21; }
+    public byte getPacketId() { return (byte) 100; }
 
     public MultiPacket(@NotNull UUID sender, @NotNull ByteBuf data) {
         super(sender);

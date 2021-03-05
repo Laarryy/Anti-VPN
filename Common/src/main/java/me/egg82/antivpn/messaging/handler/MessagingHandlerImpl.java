@@ -13,6 +13,7 @@ import me.egg82.antivpn.config.ConfigUtil;
 import me.egg82.antivpn.core.Pair;
 import me.egg82.antivpn.logging.GELFLogger;
 import me.egg82.antivpn.messaging.packets.*;
+import me.egg82.antivpn.services.CollectionProvider;
 import me.egg82.antivpn.storage.StorageService;
 import me.egg82.antivpn.storage.models.IPModel;
 import me.egg82.antivpn.storage.models.PlayerModel;
@@ -24,13 +25,10 @@ import org.slf4j.LoggerFactory;
 public class MessagingHandlerImpl implements MessagingHandler {
     private final Logger logger = new GELFLogger(LoggerFactory.getLogger(getClass()));
 
-    public static final LoadingCache<UUID, Boolean> messageCache = Caffeine.newBuilder().expireAfterWrite(2L, TimeUnit.MINUTES).expireAfterAccess(30L, TimeUnit.SECONDS).build(k -> Boolean.FALSE);
-    private final Object messageCacheLock = new Object();
-
     public MessagingHandlerImpl() { }
 
     public void handlePacket(@NotNull UUID messageId, @NotNull String fromService, @NotNull Packet packet) {
-        if (isDuplicate(messageId)) {
+        if (CollectionProvider.isDuplicateMessage(messageId)) {
             return;
         }
 
@@ -164,19 +162,5 @@ public class MessagingHandlerImpl implements MessagingHandler {
         } else if (packet instanceof MultiPacket) {
             handleMulti((MultiPacket) packet);
         }
-    }
-
-    private boolean isDuplicate(@NotNull UUID messageId) {
-        if (Boolean.TRUE.equals(messageCache.getIfPresent(messageId))) {
-            return true;
-        }
-        // Double-checked locking
-        synchronized (messageCacheLock) {
-            if (Boolean.TRUE.equals(messageCache.getIfPresent(messageId))) {
-                return true;
-            }
-            messageCache.put(messageId, Boolean.TRUE);
-        }
-        return false;
     }
 }

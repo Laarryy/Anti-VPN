@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
 public class DeletePlayerPacket extends AbstractPacket {
     private UUID uuid;
 
-    public byte getPacketId() { return 0x04; }
+    public byte getPacketId() { return (byte) 4; }
 
     public DeletePlayerPacket(@NotNull UUID sender, @NotNull ByteBuf data) {
         super(sender);

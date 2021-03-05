@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
 public class DeleteIPPacket extends AbstractPacket {
     private String ip;
 
-    public byte getPacketId() { return 0x03; }
+    public byte getPacketId() { return (byte) 3; }
 
     public DeleteIPPacket(@NotNull UUID sender, @NotNull ByteBuf data) {
         super(sender);

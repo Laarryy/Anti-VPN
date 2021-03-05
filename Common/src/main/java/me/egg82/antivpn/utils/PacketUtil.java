@@ -23,6 +23,7 @@ import me.egg82.antivpn.messaging.handler.MessagingHandlerImpl;
 import me.egg82.antivpn.messaging.packets.MultiPacket;
 import me.egg82.antivpn.messaging.packets.Packet;
 import me.egg82.antivpn.reflect.PackageFilter;
+import me.egg82.antivpn.services.CollectionProvider;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -96,7 +97,7 @@ public class PacketUtil {
         packetQueue.swapBuffers();
 
         UUID messageId = UUID.randomUUID();
-        MessagingHandlerImpl.messageCache.put(messageId, Boolean.TRUE); // Tight coupling, but it's probably fine
+        CollectionProvider.getMessageCache().put(messageId, Boolean.TRUE);
 
         if (packetQueue.getReadBuffer().size() > 1) {
             MultiPacket multi = new MultiPacket();

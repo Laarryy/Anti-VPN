@@ -98,17 +98,4 @@ public class AntiVPNCommands extends CommandHolder {
 
         registerAll();
     }
-
-    private @NotNull String @NotNull [] getAliases(@NotNull ConfigurationNode config, @NotNull String command) {
-        Set<String> retVal;
-        try {
-            retVal = new HashSet<>(!config.node("aliases", command).empty() ? config.node("aliases", command).getList(String.class) : new ArrayList<>());
-        } catch (SerializationException ex) {
-            logger.error(ex.getMessage(), ex);
-            retVal = new HashSet<>();
-        }
-        retVal.removeIf(action -> action == null || action.isEmpty());
-
-        return retVal.toArray(new String[0]);
-    }
 }

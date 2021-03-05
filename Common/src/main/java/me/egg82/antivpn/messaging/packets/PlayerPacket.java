@@ -9,7 +9,7 @@ public class PlayerPacket extends AbstractPacket {
     private UUID uuid;
     private boolean value;
 
-    public byte getPacketId() { return 0x02; }
+    public byte getPacketId() { return (byte) 2; }
 
     public PlayerPacket(@NotNull UUID sender, @NotNull ByteBuf data) {
         super(sender);
