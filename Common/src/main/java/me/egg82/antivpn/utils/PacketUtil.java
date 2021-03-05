@@ -4,6 +4,7 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import it.unimi.dsi.fastutil.bytes.Byte2ObjectArrayMap;
 import it.unimi.dsi.fastutil.bytes.Byte2ObjectMap;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
@@ -67,6 +68,18 @@ public class PacketUtil {
 
     private static final DoubleBuffer<Packet> packetQueue = new DoubleBuffer<>();
     private static final AtomicBoolean requiresSending = new AtomicBoolean(false);
+
+    public static void queuePackets(@NotNull Collection<@NotNull Packet> packets) {
+        packetQueue.getWriteBuffer().addAll(packets);
+        requiresSending.set(true);
+    }
+
+    public static void queuePackets(@NotNull Packet @NotNull ... packets) {
+        for (Packet packet : packets) {
+            packetQueue.getWriteBuffer().add(packet);
+        }
+        requiresSending.set(true);
+    }
 
     public static void queuePacket(@NotNull Packet packet) {
         packetQueue.getWriteBuffer().add(packet);

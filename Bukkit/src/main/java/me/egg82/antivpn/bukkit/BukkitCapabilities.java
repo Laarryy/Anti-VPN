@@ -13,4 +13,6 @@ public class BukkitCapabilities {
         }
         HAS_ADVENTURE = hasAdventure;
     }
+
+    private BukkitCapabilities() { }
 }
