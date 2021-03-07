@@ -13,8 +13,6 @@ public class IPPacket extends AbstractPacket {
     private Boolean cascade;
     private Double consensus;
 
-    public byte getPacketId() { return (byte) 1; }
-
     public IPPacket(@NotNull UUID sender, @NotNull ByteBuf data) {
         super(sender);
         read(data);

@@ -6,9 +6,7 @@ import java.util.UUID;
 import org.jetbrains.annotations.NotNull;
 
 public interface Packet extends Serializable {
-    byte VERSION = 0x02;
-
-    byte getPacketId();
+    byte VERSION = 0x03;
 
     void read(@NotNull ByteBuf buffer);
 

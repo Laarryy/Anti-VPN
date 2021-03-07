@@ -34,6 +34,8 @@ public class MessagingHandlerImpl implements MessagingHandler {
 
         try {
             handleGenericPacket(packet);
+        } catch (Exception ex) {
+            logger.error(ex.getMessage(), ex);
         } finally {
             PacketUtil.repeatPacket(messageId, packet, fromService);
         }

@@ -34,8 +34,10 @@ import me.egg82.antivpn.hooks.*;
 import me.egg82.antivpn.locale.*;
 import me.egg82.antivpn.logging.GELFLogger;
 import me.egg82.antivpn.messaging.MessagingService;
+import me.egg82.antivpn.messaging.PacketManager;
 import me.egg82.antivpn.messaging.handler.MessagingHandler;
 import me.egg82.antivpn.messaging.handler.MessagingHandlerImpl;
+import me.egg82.antivpn.messaging.packets.*;
 import me.egg82.antivpn.storage.StorageService;
 import me.egg82.antivpn.utils.EventUtil;
 import me.egg82.antivpn.utils.VersionUtil;
@@ -64,6 +66,7 @@ public class AntiVPN {
 
     public AntiVPN(@NotNull JavaPlugin plugin) {
         this.plugin = plugin;
+        loadPackets();
     }
 
     public void onLoad() { }
@@ -141,6 +144,15 @@ public class AntiVPN {
         BukkitLocaleCommandUtil.getConsole().sendMessage(MessageKey.GENERAL__DISABLE_MESSAGE);
 
         BukkitLocaleCommandUtil.close();
+    }
+
+    private void loadPackets() {
+        PacketManager.register(MultiPacket.class, MultiPacket::new);
+
+        PacketManager.register(DeleteIPPacket.class, DeleteIPPacket::new);
+        PacketManager.register(DeletePlayerPacket.class, DeletePlayerPacket::new);
+        PacketManager.register(IPPacket.class, IPPacket::new);
+        PacketManager.register(PlayerPacket.class, PlayerPacket::new);
     }
 
     private void loadServices() {

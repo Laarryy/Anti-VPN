@@ -129,17 +129,20 @@ public class RabbitMQMessagingService extends AbstractMessagingService {
                     data = decompressData(b);
 
                     byte packetId = data.readByte();
-                    Class<Packet> packetClass = PacketUtil.getPacketCache().get(packetId);
-                    if (packetClass == null) {
-                        logger.warn("Got packet ID that doesn't exist: " + packetId);
+                    Packet packet;
+                    try {
+                        packet = PacketManager.read(packetId, sender, data);
+                        if (packet == null) {
+                            logger.warn("Received packet ID that doesn't exist: " + packetId);
+                            return;
+                        }
+                    } catch (Exception ex) {
+                        Class<? extends Packet> clazz = PacketManager.getPacket(packetId);
+                        logger.error(LocaleUtil.getDefaultI18N().getText(MessageKey.ERROR__MESSAGING__BAD_PACKET, "{name}", clazz != null ? clazz.getName() : "null"), ex);
                         return;
                     }
 
-                    try {
-                        handler.handlePacket(UUID.fromString(properties.getMessageId()), getName(), packetClass.getConstructor(UUID.class, ByteBuf.class).newInstance(sender, data));
-                    } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException | InstantiationException | ExceptionInInitializerError | SecurityException ex) {
-                        logger.error(LocaleUtil.getDefaultI18N().getText(MessageKey.ERROR__MESSAGING__BAD_PACKET, "{name}", packetClass.getSimpleName()), ex);
-                    }
+                    handler.handlePacket(UUID.fromString(properties.getMessageId()), getName(), packet);
                 } finally {
                     b.release();
                     if (data != null) {
@@ -163,7 +166,7 @@ public class RabbitMQMessagingService extends AbstractMessagingService {
         try (RecoverableChannel channel = getChannel()) {
             ByteBuf buffer = alloc.buffer(getInitialCapacity());
             try {
-                buffer.writeByte(packet.getPacketId());
+                buffer.writeByte(PacketManager.getId(packet.getClass()));
                 packet.write(buffer);
                 addCapacity(buffer.writerIndex());
 

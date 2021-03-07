@@ -36,22 +36,6 @@ public class PacketUtil {
 
     private PacketUtil() { }
 
-    private static final Byte2ObjectMap<Class<Packet>> packetCache = new Byte2ObjectArrayMap<>();
-
-    static {
-        List<Class<Packet>> packetClasses = PackageFilter.getClasses(Packet.class, "me.egg82.antivpn.messaging.packets", false, false, false);
-        for (Class<Packet> clazz : packetClasses) {
-            Packet packet;
-            try {
-                packet = clazz.newInstance();
-            } catch (IllegalAccessException | InstantiationException | ExceptionInInitializerError | SecurityException ex) {
-                logger.error(LocaleUtil.getDefaultI18N().getText(MessageKey.ERROR__MESSAGING__BAD_PACKET, "{name}", clazz.getSimpleName()), ex);
-                continue;
-            }
-            packetCache.put(packet.getPacketId(), clazz);
-        }
-    }
-
     public static void setPoolSize(int size) {
         workPool.shutdown();
         try {
@@ -64,8 +48,6 @@ public class PacketUtil {
 
         workPool = Executors.newFixedThreadPool(size, new ThreadFactoryBuilder().setNameFormat("Anti-VPN_Messaging_%d").build());
     }
-
-    public static @NotNull Byte2ObjectMap<Class<Packet>> getPacketCache() { return packetCache; }
 
     private static final DoubleBuffer<Packet> packetQueue = new DoubleBuffer<>();
     private static final AtomicBoolean requiresSending = new AtomicBoolean(false);

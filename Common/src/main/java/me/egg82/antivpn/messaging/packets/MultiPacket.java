@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.UUID;
 import me.egg82.antivpn.locale.LocaleUtil;
 import me.egg82.antivpn.locale.MessageKey;
+import me.egg82.antivpn.messaging.PacketManager;
 import me.egg82.antivpn.utils.PacketUtil;
 import org.jetbrains.annotations.NotNull;
 
@@ -17,8 +18,6 @@ public class MultiPacket extends AbstractPacket {
     private static final ByteBufAllocator alloc = PooledByteBufAllocator.DEFAULT;
 
     private Set<Packet> packets = new LinkedHashSet<>();
-
-    public byte getPacketId() { return (byte) 100; }
 
     public MultiPacket(@NotNull UUID sender, @NotNull ByteBuf data) {
         super(sender);
@@ -38,20 +37,22 @@ public class MultiPacket extends AbstractPacket {
 
         byte nextPacket;
         while (buffer.readableBytes() > 0 && (nextPacket = buffer.readByte()) != 0x00) { // Seek end of multi-packet or end of buffer
-            Class<Packet> packetClass = PacketUtil.getPacketCache().get(nextPacket);
-            if (packetClass == null) {
-                logger.warn("Got packet ID that doesn't exist: " + nextPacket);
-                continue;
-            }
-
             int packetLen = buffer.readInt();
             ByteBuf packetBuf = alloc.buffer(packetLen, packetLen);
             try {
                 buffer.readBytes(packetBuf);
+
+                Packet packet;
                 try {
-                    packets.add(packetClass.getConstructor(ByteBuf.class).newInstance(packetBuf));
-                } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException | InstantiationException | ExceptionInInitializerError | SecurityException ex) {
-                    logger.error(LocaleUtil.getDefaultI18N().getText(MessageKey.ERROR__MESSAGING__BAD_PACKET, "{name}", packetClass.getSimpleName()), ex);
+                    packet = PacketManager.read(nextPacket, sender, packetBuf);
+                    if (packet == null) {
+                        logger.warn("Received packet ID that doesn't exist: " + nextPacket);
+                    } else {
+                        packets.add(packet);
+                    }
+                } catch (Exception ex) {
+                    Class<? extends Packet> clazz = PacketManager.getPacket(nextPacket);
+                    logger.error(LocaleUtil.getDefaultI18N().getText(MessageKey.ERROR__MESSAGING__BAD_PACKET, "{name}", clazz != null ? clazz.getName() : "null"), ex);
                 }
             } finally {
                 packetBuf.release();
@@ -74,7 +75,7 @@ public class MultiPacket extends AbstractPacket {
                 continue;
             }
 
-            buffer.writeByte(packet.getPacketId()); // Write packet ID
+            buffer.writeByte(PacketManager.getId(packet.getClass())); // Write packet ID
             int start = buffer.writerIndex();
             buffer.writeInt(0); // Make room for an int at the head
             packet.write(buffer);
