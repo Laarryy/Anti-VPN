@@ -99,19 +99,12 @@ public abstract class AbstractPacket implements Packet {
         buf.writeBytes(b);
     }
 
-    protected final void checkReadPacket(@NotNull ByteBuf buffer) {
+    public boolean verifyFullRead(@NotNull ByteBuf buffer) {
         if (buffer.readableBytes() > 0) {
             logger.warn(buffer.readableBytes() + " bytes remain in the packet ByteBuf after being parsed.");
             if (ConfigUtil.getDebugOrFalse()) {
                 printBytes(buffer);
             }
-        }
-    }
-
-    protected final boolean checkVersion(@NotNull ByteBuf buffer) {
-        byte packetVersion = buffer.readByte();
-        if (packetVersion != VERSION) {
-            logger.warn("Received packet version " + String.format("0x%02X ", packetVersion) + " does not match current packet version " + String.format("0x%02X ", VERSION) + ". Skipping packet.");
             return false;
         }
         return true;

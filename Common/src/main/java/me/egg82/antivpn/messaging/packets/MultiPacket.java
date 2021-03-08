@@ -3,7 +3,6 @@ package me.egg82.antivpn.messaging.packets;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.PooledByteBufAllocator;
-import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -11,7 +10,6 @@ import java.util.UUID;
 import me.egg82.antivpn.locale.LocaleUtil;
 import me.egg82.antivpn.locale.MessageKey;
 import me.egg82.antivpn.messaging.PacketManager;
-import me.egg82.antivpn.utils.PacketUtil;
 import org.jetbrains.annotations.NotNull;
 
 public class MultiPacket extends AbstractPacket {
@@ -29,10 +27,6 @@ public class MultiPacket extends AbstractPacket {
     }
 
     public void read(@NotNull ByteBuf buffer) {
-        if (!checkVersion(buffer)) {
-            return;
-        }
-
         this.packets.clear();
 
         byte nextPacket;
@@ -48,7 +42,9 @@ public class MultiPacket extends AbstractPacket {
                     if (packet == null) {
                         logger.warn("Received packet ID that doesn't exist: " + nextPacket);
                     } else {
-                        packets.add(packet);
+                        if (packet.verifyFullRead(buffer)) {
+                            packets.add(packet);
+                        }
                     }
                 } catch (Exception ex) {
                     Class<? extends Packet> clazz = PacketManager.getPacket(nextPacket);
@@ -58,13 +54,9 @@ public class MultiPacket extends AbstractPacket {
                 packetBuf.release();
             }
         }
-
-        checkReadPacket(buffer);
     }
 
     public void write(@NotNull ByteBuf buffer) {
-        buffer.writeByte(VERSION);
-
         if (packets.isEmpty()) {
             buffer.writeByte((byte) 0x00); // End of multi-packet
             return;

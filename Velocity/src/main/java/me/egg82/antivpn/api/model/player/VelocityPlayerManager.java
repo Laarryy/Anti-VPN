@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit;
 import me.egg82.antivpn.api.APIException;
 import me.egg82.antivpn.config.CachedConfig;
 import me.egg82.antivpn.config.ConfigUtil;
-import me.egg82.antivpn.messaging.packets.PlayerPacket;
+import me.egg82.antivpn.messaging.packets.vpn.PlayerPacket;
 import me.egg82.antivpn.services.lookup.PlayerLookup;
 import me.egg82.antivpn.storage.StorageService;
 import me.egg82.antivpn.storage.models.PlayerModel;

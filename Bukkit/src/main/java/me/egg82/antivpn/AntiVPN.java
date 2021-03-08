@@ -37,9 +37,17 @@ import me.egg82.antivpn.messaging.MessagingService;
 import me.egg82.antivpn.messaging.PacketManager;
 import me.egg82.antivpn.messaging.handler.MessagingHandler;
 import me.egg82.antivpn.messaging.handler.MessagingHandlerImpl;
-import me.egg82.antivpn.messaging.packets.*;
+import me.egg82.antivpn.messaging.packets.MultiPacket;
+import me.egg82.antivpn.messaging.packets.Packet;
+import me.egg82.antivpn.messaging.packets.server.InitializationPacket;
+import me.egg82.antivpn.messaging.packets.server.ShutdownPacket;
+import me.egg82.antivpn.messaging.packets.vpn.DeleteIPPacket;
+import me.egg82.antivpn.messaging.packets.vpn.DeletePlayerPacket;
+import me.egg82.antivpn.messaging.packets.vpn.IPPacket;
+import me.egg82.antivpn.messaging.packets.vpn.PlayerPacket;
 import me.egg82.antivpn.storage.StorageService;
 import me.egg82.antivpn.utils.EventUtil;
+import me.egg82.antivpn.utils.PacketUtil;
 import me.egg82.antivpn.utils.VersionUtil;
 import me.egg82.avpn.api.platform.AbstractPluginMetadata;
 import net.kyori.event.SimpleEventBus;
@@ -123,12 +131,6 @@ public class AntiVPN {
         }
         tasks.clear();
 
-        try {
-            VPNAPIProvider.getInstance().runUpdateTask().join();
-        } catch (CancellationException | CompletionException ex) {
-            logger.error(ex.getMessage(), ex);
-        }
-
         for (EventHolder eventHolder : eventHolders) {
             eventHolder.cancel();
         }
@@ -148,6 +150,9 @@ public class AntiVPN {
 
     private void loadPackets() {
         PacketManager.register(MultiPacket.class, MultiPacket::new);
+
+        PacketManager.register(InitializationPacket.class, InitializationPacket::new);
+        PacketManager.register(ShutdownPacket.class, ShutdownPacket::new);
 
         PacketManager.register(DeleteIPPacket.class, DeleteIPPacket::new);
         PacketManager.register(DeletePlayerPacket.class, DeletePlayerPacket::new);
@@ -172,6 +177,8 @@ public class AntiVPN {
 
         APIRegistrationUtil.register(api);
         EventUtil.post(new APILoadedEventImpl(api), api.getEventBus());
+
+        PacketUtil.queuePacket(new InitializationPacket(ConfigUtil.getCachedConfig().getServerId(), Packet.VERSION));
     }
 
     private void loadCommands() {
@@ -351,6 +358,15 @@ public class AntiVPN {
         EventUtil.post(new APIDisableEventImpl(api), api.getEventBus());
         api.getEventBus().unregisterAll();
         APIRegistrationUtil.deregister();
+
+        // Needs to be done before the final runUpdateTask()
+        PacketUtil.queuePacket(new ShutdownPacket(ConfigUtil.getCachedConfig().getServerId()));
+
+        try {
+            VPNAPIProvider.getInstance().runUpdateTask().join();
+        } catch (CancellationException | CompletionException ex) {
+            logger.error(ex.getMessage(), ex);
+        }
 
         CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
         for (MessagingService service : cachedConfig.getMessaging()) {

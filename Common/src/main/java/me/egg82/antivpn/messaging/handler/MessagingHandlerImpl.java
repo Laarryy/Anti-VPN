@@ -1,31 +1,35 @@
 package me.egg82.antivpn.messaging.handler;
 
-import com.github.benmanes.caffeine.cache.Caffeine;
-import com.github.benmanes.caffeine.cache.LoadingCache;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
-import me.egg82.antivpn.api.VPNAPIImpl;
-import me.egg82.antivpn.api.model.ip.AbstractIPManager;
-import me.egg82.antivpn.api.model.ip.AlgorithmMethod;
-import me.egg82.antivpn.api.model.player.AbstractPlayerManager;
-import me.egg82.antivpn.config.CachedConfig;
 import me.egg82.antivpn.config.ConfigUtil;
-import me.egg82.antivpn.core.Pair;
 import me.egg82.antivpn.logging.GELFLogger;
-import me.egg82.antivpn.messaging.packets.*;
+import me.egg82.antivpn.messaging.packets.MultiPacket;
+import me.egg82.antivpn.messaging.packets.Packet;
+import me.egg82.antivpn.reflect.PackageFilter;
 import me.egg82.antivpn.services.CollectionProvider;
-import me.egg82.antivpn.storage.StorageService;
-import me.egg82.antivpn.storage.models.IPModel;
-import me.egg82.antivpn.storage.models.PlayerModel;
 import me.egg82.antivpn.utils.PacketUtil;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class MessagingHandlerImpl implements MessagingHandler {
-    private final Logger logger = new GELFLogger(LoggerFactory.getLogger(getClass()));
+public class MessagingHandlerImpl extends AbstractMessagingHandler implements MessagingHandler {
+    private static final Logger logger = new GELFLogger(LoggerFactory.getLogger(MessagingHandlerImpl.class));
 
-    public MessagingHandlerImpl() { }
+    private static final List<AbstractMessagingHandler> handlers = new ArrayList<>();
+
+    static {
+        List<Class<AbstractMessagingHandler>> classes = PackageFilter.getClasses(AbstractMessagingHandler.class, "me.egg82.antivpn.messaging.handler", false, false, false);
+
+        for (Class<AbstractMessagingHandler> clazz : classes) {
+            try {
+                handlers.add(clazz.newInstance());
+            } catch (InstantiationException | IllegalAccessException ex) {
+                logger.error("Could not create new handler instance.", ex);
+            }
+        }
+    }
 
     public void handlePacket(@NotNull UUID messageId, @NotNull String fromService, @NotNull Packet packet) {
         if (CollectionProvider.isDuplicateMessage(messageId)) {
@@ -33,7 +37,9 @@ public class MessagingHandlerImpl implements MessagingHandler {
         }
 
         try {
-            handleGenericPacket(packet);
+            if (!handlePacket(packet)) {
+                logger.warn("Did not handle packet: " + packet.getClass().getName());
+            }
         } catch (Exception ex) {
             logger.error(ex.getMessage(), ex);
         } finally {
@@ -41,105 +47,19 @@ public class MessagingHandlerImpl implements MessagingHandler {
         }
     }
 
-    private void handleIp(@NotNull IPPacket packet) {
-        if (ConfigUtil.getDebugOrFalse()) {
-            logger.info("Handling packet for " + packet.getIp() + ".");
+    protected boolean handlePacket(@NotNull Packet packet) {
+        if (packet instanceof MultiPacket) {
+            handleMulti((MultiPacket) packet);
+            return true;
         }
 
-        VPNAPIImpl api = VPNAPIImpl.get();
-        AbstractIPManager ipManager = api != null ? api.getIPManager() : null;
-        if (ipManager == null) {
-            logger.error("IP manager could not be fetched.");
-            return;
+        for (AbstractMessagingHandler handler : handlers) {
+            if (handler.handlePacket(packet)) {
+                return true;
+            }
         }
 
-        IPModel m = new IPModel();
-        m.setIp(packet.getIp());
-        m.setType(packet.getType().ordinal());
-        m.setCascade(packet.getCascade());
-        m.setConsensus(packet.getConsensus());
-        ipManager.getIpCache().put(new Pair<>(packet.getIp(), packet.getType()), m);
-
-        CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
-
-        for (StorageService service : cachedConfig.getStorage()) {
-            IPModel model = service.getOrCreateIpModel(packet.getIp(), packet.getType().ordinal());
-            model.setCascade(packet.getCascade());
-            model.setConsensus(packet.getConsensus());
-            service.storeModel(model);
-        }
-    }
-
-    private void handleDeleteIp(@NotNull DeleteIPPacket packet) {
-        if (ConfigUtil.getDebugOrFalse()) {
-            logger.info("Handling deletion packet for " + packet.getIp() + ".");
-        }
-
-        VPNAPIImpl api = VPNAPIImpl.get();
-        AbstractIPManager ipManager = api != null ? api.getIPManager() : null;
-        if (ipManager == null) {
-            logger.error("IP manager could not be fetched.");
-            return;
-        }
-
-        ipManager.getIpCache().invalidate(new Pair<>(packet.getIp(), AlgorithmMethod.CASCADE));
-        ipManager.getIpCache().invalidate(new Pair<>(packet.getIp(), AlgorithmMethod.CONSESNSUS));
-
-        CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
-
-        for (StorageService service : cachedConfig.getStorage()) {
-            IPModel model = new IPModel();
-            model.setIp(packet.getIp());
-            service.deleteModel(model);
-        }
-    }
-
-    private void handlePlayer(@NotNull PlayerPacket packet) {
-        if (ConfigUtil.getDebugOrFalse()) {
-            logger.info("Handling packet for " + packet.getUuid() + ".");
-        }
-
-        VPNAPIImpl api = VPNAPIImpl.get();
-        AbstractPlayerManager playerManager = api != null ? api.getPlayerManager() : null;
-        if (playerManager == null) {
-            logger.error("Player manager could not be fetched.");
-            return;
-        }
-
-        PlayerModel m = new PlayerModel();
-        m.setUuid(packet.getUuid());
-        m.setMcleaks(packet.getValue());
-        playerManager.getPlayerCache().put(packet.getUuid(), m);
-
-        CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
-
-        for (StorageService service : cachedConfig.getStorage()) {
-            PlayerModel model = service.getOrCreatePlayerModel(packet.getUuid(), packet.getValue());
-            service.storeModel(model);
-        }
-    }
-
-    private void handleDeletePlayer(@NotNull DeletePlayerPacket packet) {
-        if (ConfigUtil.getDebugOrFalse()) {
-            logger.info("Handling deletion packet for " + packet.getUuid() + ".");
-        }
-
-        VPNAPIImpl api = VPNAPIImpl.get();
-        AbstractPlayerManager playerManager = api != null ? api.getPlayerManager() : null;
-        if (playerManager == null) {
-            logger.error("Player manager could not be fetched.");
-            return;
-        }
-
-        playerManager.getPlayerCache().invalidate(packet.getUuid());
-
-        CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
-
-        for (StorageService service : cachedConfig.getStorage()) {
-            PlayerModel model = new PlayerModel();
-            model.setUuid(packet.getUuid());
-            service.deleteModel(model);
-        }
+        return false;
     }
 
     private void handleMulti(@NotNull MultiPacket packet) {
@@ -148,21 +68,9 @@ public class MessagingHandlerImpl implements MessagingHandler {
         }
 
         for (Packet p : packet.getPackets()) {
-            handleGenericPacket(p);
-        }
-    }
-
-    private void handleGenericPacket(@NotNull Packet packet) {
-        if (packet instanceof IPPacket) {
-            handleIp((IPPacket) packet);
-        } else if (packet instanceof PlayerPacket) {
-            handlePlayer((PlayerPacket) packet);
-        } else if (packet instanceof DeleteIPPacket) {
-            handleDeleteIp((DeleteIPPacket) packet);
-        } else if (packet instanceof DeletePlayerPacket) {
-            handleDeletePlayer((DeletePlayerPacket) packet);
-        } else if (packet instanceof MultiPacket) {
-            handleMulti((MultiPacket) packet);
+            if (!handlePacket(p)) {
+                logger.warn("Did not handle packet: " + packet.getClass().getName());
+            }
         }
     }
 }

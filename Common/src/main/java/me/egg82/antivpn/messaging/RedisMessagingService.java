@@ -3,7 +3,6 @@ package me.egg82.antivpn.messaging;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.netty.buffer.ByteBuf;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
@@ -16,7 +15,8 @@ import me.egg82.antivpn.locale.LocaleUtil;
 import me.egg82.antivpn.locale.MessageKey;
 import me.egg82.antivpn.messaging.handler.MessagingHandler;
 import me.egg82.antivpn.messaging.packets.Packet;
-import me.egg82.antivpn.utils.PacketUtil;
+import me.egg82.antivpn.messaging.packets.server.InitializationPacket;
+import me.egg82.antivpn.services.CollectionProvider;
 import org.jetbrains.annotations.NotNull;
 import redis.clients.jedis.BinaryJedisPubSub;
 import redis.clients.jedis.Jedis;
@@ -196,6 +196,13 @@ public class RedisMessagingService extends AbstractMessagingService {
                 if (service.serverId.equals(sender)) {
                     return;
                 }
+
+                byte packetVersion = CollectionProvider.getServerVersions().getOrDefault(sender, (byte) -1);
+                if (packetVersion > -1 && packetVersion != Packet.VERSION) {
+                    service.logger.warn("Server " + sender + " packet version " + String.format("0x%02X ", packetVersion) + " does not match current packet version " + String.format("0x%02X ", Packet.VERSION) + ". Skipping packet.");
+                    return;
+                }
+
                 UUID messageId = new UUID(data.readLong(), data.readLong());
 
                 byte packetId = data.readByte();
@@ -212,7 +219,14 @@ public class RedisMessagingService extends AbstractMessagingService {
                     return;
                 }
 
-                service.handler.handlePacket(messageId, service.getName(), packet);
+                if (packetVersion == -1 && !(packet instanceof InitializationPacket)) {
+                    service.logger.warn("Server " + sender + " packet version is unknown, and packet type is of " + packet.getClass().getName() + ". Skipping packet.");
+                    return;
+                }
+
+                if (packet.verifyFullRead(data)) {
+                    service.handler.handlePacket(messageId, service.getName(), packet);
+                }
             } finally {
                 b.release();
                 if (data != null) {

@@ -6,11 +6,13 @@ import java.util.UUID;
 import org.jetbrains.annotations.NotNull;
 
 public interface Packet extends Serializable {
-    byte VERSION = 0x03;
+    byte VERSION = (byte) 3;
 
     void read(@NotNull ByteBuf buffer);
 
     void write(@NotNull ByteBuf buffer);
 
     @NotNull UUID getSender();
+
+    boolean verifyFullRead(@NotNull ByteBuf buffer);
 }

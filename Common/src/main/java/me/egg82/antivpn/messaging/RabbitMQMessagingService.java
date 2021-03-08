@@ -3,7 +3,6 @@ package me.egg82.antivpn.messaging;
 import com.rabbitmq.client.*;
 import io.netty.buffer.ByteBuf;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -15,7 +14,8 @@ import me.egg82.antivpn.locale.LocaleUtil;
 import me.egg82.antivpn.locale.MessageKey;
 import me.egg82.antivpn.messaging.handler.MessagingHandler;
 import me.egg82.antivpn.messaging.packets.Packet;
-import me.egg82.antivpn.utils.PacketUtil;
+import me.egg82.antivpn.messaging.packets.server.InitializationPacket;
+import me.egg82.antivpn.services.CollectionProvider;
 import me.egg82.antivpn.utils.ValidationUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -122,6 +122,12 @@ public class RabbitMQMessagingService extends AbstractMessagingService {
                     return;
                 }
 
+                byte packetVersion = CollectionProvider.getServerVersions().getOrDefault(sender, (byte) -1);
+                if (packetVersion > -1 && packetVersion != Packet.VERSION) {
+                    logger.warn("Server " + sender + " packet version " + String.format("0x%02X ", packetVersion) + " does not match current packet version " + String.format("0x%02X ", Packet.VERSION) + ". Skipping packet.");
+                    return;
+                }
+
                 ByteBuf b = alloc.buffer(body.length, body.length);
                 ByteBuf data = null;
                 try {
@@ -142,7 +148,14 @@ public class RabbitMQMessagingService extends AbstractMessagingService {
                         return;
                     }
 
-                    handler.handlePacket(UUID.fromString(properties.getMessageId()), getName(), packet);
+                    if (packetVersion == -1 && !(packet instanceof InitializationPacket)) {
+                        logger.warn("Server " + sender + " packet version is unknown, and packet type is of " + packet.getClass().getName() + ". Skipping packet.");
+                        return;
+                    }
+
+                    if (packet.verifyFullRead(data)) {
+                        handler.handlePacket(UUID.fromString(properties.getMessageId()), getName(), packet);
+                    }
                 } finally {
                     b.release();
                     if (data != null) {

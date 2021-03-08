@@ -3,9 +3,6 @@ package me.egg82.antivpn.commands;
 import cloud.commandframework.arguments.standard.StringArgument;
 import cloud.commandframework.minecraft.extras.MinecraftHelp;
 import cloud.commandframework.paper.PaperCommandManager;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
 import me.egg82.antivpn.commands.internal.ReloadCommand;
 import me.egg82.antivpn.config.ConfigUtil;
 import me.egg82.antivpn.locale.BukkitLocaleCommandUtil;
@@ -15,7 +12,6 @@ import me.egg82.antivpn.locale.MessageKey;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.configurate.ConfigurationNode;
-import org.spongepowered.configurate.serialize.SerializationException;
 
 public class AntiVPNCommands extends CommandHolder {
     public AntiVPNCommands(@NotNull Plugin plugin) {

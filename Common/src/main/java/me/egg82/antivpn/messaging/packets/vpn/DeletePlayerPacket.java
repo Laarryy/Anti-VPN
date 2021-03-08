@@ -1,8 +1,9 @@
-package me.egg82.antivpn.messaging.packets;
+package me.egg82.antivpn.messaging.packets.vpn;
 
 import io.netty.buffer.ByteBuf;
 import java.util.Objects;
 import java.util.UUID;
+import me.egg82.antivpn.messaging.packets.AbstractPacket;
 import org.jetbrains.annotations.NotNull;
 
 public class DeletePlayerPacket extends AbstractPacket {
@@ -23,18 +24,10 @@ public class DeletePlayerPacket extends AbstractPacket {
     }
 
     public void read(@NotNull ByteBuf buffer) {
-        if (!checkVersion(buffer)) {
-            return;
-        }
-
         this.uuid = readUUID(buffer);
-
-        checkReadPacket(buffer);
     }
 
     public void write(@NotNull ByteBuf buffer) {
-        buffer.writeByte(VERSION);
-
         writeUUID(this.uuid, buffer);
     }
 
