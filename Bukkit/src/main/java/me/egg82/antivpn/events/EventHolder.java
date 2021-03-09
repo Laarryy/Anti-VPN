@@ -99,7 +99,7 @@ public abstract class EventHolder {
             } catch (InterruptedException ignored) {
                 Thread.currentThread().interrupt();
             } catch (ExecutionException | CancellationException ex) {
-                logger.error(ex.getMessage(), ex);
+                logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex);
             }
         } else {
             try {
@@ -107,7 +107,7 @@ public abstract class EventHolder {
             } catch (InterruptedException ignored) {
                 Thread.currentThread().interrupt();
             } catch (ExecutionException | CancellationException ex) {
-                logger.error(ex.getMessage(), ex);
+                logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex);
             }
         }
 
@@ -121,7 +121,7 @@ public abstract class EventHolder {
         } catch (InterruptedException ignored) {
             Thread.currentThread().interrupt();
         } catch (ExecutionException | CancellationException ex) {
-            logger.error(ex.getMessage(), ex);
+            logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex);
         }
 
         return false;

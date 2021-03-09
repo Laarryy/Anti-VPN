@@ -48,7 +48,7 @@ public class ConfigurationFileUtil {
         try {
             config = getConfigSimple("config.yml", new File(dataDirectory, "config.yml"), null);
         } catch (IOException ex) {
-            logger.error(ex.getMessage(), ex);
+            logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex);
             return false;
         }
 
@@ -60,7 +60,7 @@ public class ConfigurationFileUtil {
         try {
             config = getConfigSimple("config.yml", new File(dataDirectory, "config.yml"), console);
         } catch (IOException ex) {
-            logger.error(ex.getMessage(), ex);
+            logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex);
             return Locale.US;
         }
 
@@ -74,7 +74,7 @@ public class ConfigurationFileUtil {
         try {
             config = getConfig("config.yml", new File(dataDirectory, "config.yml"), console);
         } catch (IOException ex) {
-            logger.error(ex.getMessage(), ex);
+            logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex);
             return;
         }
 
@@ -484,7 +484,7 @@ public class ConfigurationFileUtil {
         try {
             retVal = new HashSet<>(!config.node("action", "ignore").empty() ? config.node("action", "ignore").getList(String.class) : new ArrayList<>());
         } catch (SerializationException ex) {
-            logger.error(ex.getMessage(), ex);
+            logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex);
             retVal = new HashSet<>();
         }
 
@@ -510,7 +510,7 @@ public class ConfigurationFileUtil {
         try {
             retVal = new HashSet<>(!config.node("action", "vpn", "commands").empty() ? config.node("action", "vpn", "commands").getList(String.class) : new ArrayList<>());
         } catch (SerializationException ex) {
-            logger.error(ex.getMessage(), ex);
+            logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex);
             retVal = new HashSet<>();
         }
         retVal.removeIf(action -> action == null || action.isEmpty());
@@ -529,7 +529,7 @@ public class ConfigurationFileUtil {
         try {
             retVal = new HashSet<>(!config.node("action", "mcleaks", "commands").empty() ? config.node("action", "mcleaks", "commands").getList(String.class) : new ArrayList<>());
         } catch (SerializationException ex) {
-            logger.error(ex.getMessage(), ex);
+            logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex);
             retVal = new HashSet<>();
         }
         retVal.removeIf(action -> action == null || action.isEmpty());
@@ -581,7 +581,7 @@ public class ConfigurationFileUtil {
                 Source<? extends SourceModel> source = (Source<? extends SourceModel>) clazz.newInstance();
                 initializedSources.put(source.getName(), source);
             } catch (InstantiationException | IllegalAccessException | ClassCastException ex) {
-                logger.error(ex.getMessage(), ex);
+                logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex);
             }
         }
 
@@ -589,7 +589,7 @@ public class ConfigurationFileUtil {
         try {
             order = !config.node("sources", "order").empty() ? new ArrayList<>(config.node("sources", "order").getList(String.class)) : new ArrayList<>();
         } catch (SerializationException ex) {
-            logger.error(ex.getMessage(), ex);
+            logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex);
             order = new ArrayList<>();
         }
 

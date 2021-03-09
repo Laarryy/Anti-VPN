@@ -23,7 +23,7 @@ public class ClassFilter {
                 try {
                     returns.add(field.get(null));
                 } catch (IllegalAccessException ex) {
-                    logger.warn(ex.getMessage(), ex);
+                    logger.warn(ex.getClass().getName() + ": " + ex.getMessage(), ex);
                 }
             }
         }

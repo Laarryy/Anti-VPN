@@ -4,6 +4,7 @@ import io.ebean.annotation.Index;
 import java.util.UUID;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import me.egg82.antivpn.utils.UUIDUtil;
 import org.jetbrains.annotations.NotNull;
 
 @Entity
@@ -16,13 +17,13 @@ public class PlayerModel extends BaseModel {
 
     public PlayerModel() {
         super();
-        this.uuid = new UUID(0L, 0L);
+        this.uuid = UUIDUtil.EMPTY_UUID;
         this.mcleaks = false;
     }
 
     public PlayerModel(@NotNull String dbName) {
         super(dbName);
-        this.uuid = new UUID(0L, 0L);
+        this.uuid = UUIDUtil.EMPTY_UUID;
         this.mcleaks = false;
     }
 

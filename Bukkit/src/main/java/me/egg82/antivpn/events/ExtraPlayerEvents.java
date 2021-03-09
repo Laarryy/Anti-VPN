@@ -21,7 +21,7 @@ public class ExtraPlayerEvents extends EventHolder {
         events.add(
             BukkitEvents.subscribe(plugin, PlayerJoinEvent.class, EventPriority.HIGH)
                 .handler(this::checkUpdate)
-                .exceptionHandler(ex -> logger.error(ex.getMessage(), ex))
+                .exceptionHandler(ex -> logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex))
         );
 
         events.add(
@@ -39,7 +39,7 @@ public class ExtraPlayerEvents extends EventHolder {
                         }
                     }
                 })
-                .exceptionHandler(ex -> logger.error(ex.getMessage(), ex))
+                .exceptionHandler(ex -> logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex))
         );
     }
 

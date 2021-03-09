@@ -68,9 +68,9 @@ public class BukkitBootstrap extends JavaPlugin {
         } catch (ClassCastException | IOException ex) {
             Thread.currentThread().setContextClassLoader(origClassLoader);
             if (getAllowErrorStats()) {
-                GELFLoggerUtil.send(3, ex.getMessage(), ex);
+                GELFLoggerUtil.send(3, ex.getClass().getName() + ": " + ex.getMessage(), ex);
             }
-            logger.error(ex.getMessage(), ex);
+            logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex);
             throw new RuntimeException("Could not load required dependencies.");
         }
 
@@ -83,9 +83,9 @@ public class BukkitBootstrap extends JavaPlugin {
             }
         } catch (InterruptedException ex) {
             Thread.currentThread().setContextClassLoader(origClassLoader);
-            logger.error(ex.getMessage(), ex);
+            logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex);
             if (getAllowErrorStats()) {
-                GELFLoggerUtil.send(3, ex.getMessage(), ex);
+                GELFLoggerUtil.send(3, ex.getClass().getName() + ": " + ex.getMessage(), ex);
             }
             Thread.currentThread().interrupt();
         }
@@ -93,10 +93,10 @@ public class BukkitBootstrap extends JavaPlugin {
         try {
             concrete = new AntiVPN(this);
             concrete.onLoad();
-        } catch (Exception ex) {
-            logger.error(ex.getMessage(), ex);
+        } catch (Throwable ex) {
+            logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex);
             if (getAllowErrorStats()) {
-                GELFLoggerUtil.send(3, ex.getMessage(), ex);
+                GELFLoggerUtil.send(3, ex.getClass().getName() + ": " + ex.getMessage(), ex);
             }
             throw ex;
         } finally {
@@ -106,14 +106,18 @@ public class BukkitBootstrap extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        if (concrete == null) {
+            return;
+        }
+
         ClassLoader origClassLoader = Thread.currentThread().getContextClassLoader();
         Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
         try {
             concrete.onEnable();
-        } catch (Exception ex) {
-            logger.error(ex.getMessage(), ex);
+        } catch (Throwable ex) {
+            logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex);
             if (getAllowErrorStats()) {
-                GELFLoggerUtil.send(3, ex.getMessage(), ex);
+                GELFLoggerUtil.send(3, ex.getClass().getName() + ": " + ex.getMessage(), ex);
             }
             throw ex;
         } finally {
@@ -123,14 +127,18 @@ public class BukkitBootstrap extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        if (concrete == null) {
+            return;
+        }
+
         ClassLoader origClassLoader = Thread.currentThread().getContextClassLoader();
         Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
         try {
             concrete.onDisable();
-        } catch (Exception ex) {
-            logger.error(ex.getMessage(), ex);
+        } catch (Throwable ex) {
+            logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex);
             if (getAllowErrorStats()) {
-                GELFLoggerUtil.send(3, ex.getMessage(), ex);
+                GELFLoggerUtil.send(3, ex.getClass().getName() + ": " + ex.getMessage(), ex);
             }
             throw ex;
         } finally {
@@ -262,9 +270,9 @@ public class BukkitBootstrap extends JavaPlugin {
         } catch (IOException ex) {
             lastEx = ex;
         } catch (IllegalAccessException | InvocationTargetException | URISyntaxException | XPathExpressionException | SAXException ex) {
-            logger.error(ex.getMessage(), ex);
+            logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex);
             if (getAllowErrorStats()) {
-                GELFLoggerUtil.send(3, ex.getMessage(), ex);
+                GELFLoggerUtil.send(3, ex.getClass().getName() + ": " + ex.getMessage(), ex);
             }
             return;
         }
@@ -305,9 +313,9 @@ public class BukkitBootstrap extends JavaPlugin {
         } catch (IOException ex) {
             lastEx = ex;
         } catch (IllegalAccessException | InvocationTargetException | URISyntaxException | XPathExpressionException | SAXException ex) {
-            logger.error(ex.getMessage(), ex);
+            logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex);
             if (getAllowErrorStats()) {
-                GELFLoggerUtil.send(3, ex.getMessage(), ex);
+                GELFLoggerUtil.send(3, ex.getClass().getName() + ": " + ex.getMessage(), ex);
             }
             return;
         }

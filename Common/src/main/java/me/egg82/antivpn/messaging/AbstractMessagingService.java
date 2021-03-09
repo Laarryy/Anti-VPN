@@ -15,6 +15,10 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import me.egg82.antivpn.config.ConfigUtil;
 import me.egg82.antivpn.logging.GELFLogger;
 import me.egg82.antivpn.messaging.handler.MessagingHandler;
+import me.egg82.antivpn.messaging.packets.MultiPacket;
+import me.egg82.antivpn.messaging.packets.Packet;
+import me.egg82.antivpn.messaging.packets.server.InitializationPacket;
+import me.egg82.antivpn.messaging.packets.server.PacketVersionPacket;
 import me.egg82.antivpn.utils.MathUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -174,6 +178,22 @@ public abstract class AbstractMessagingService implements MessagingService {
                 capacityLock.writeLock().unlock();
             }
         }
+    }
+
+    protected static boolean hasVersion(@NotNull Packet packet) {
+        if (packet instanceof InitializationPacket || packet instanceof PacketVersionPacket) {
+            return true;
+        }
+
+        if (packet instanceof MultiPacket) {
+            MultiPacket mult = (MultiPacket) packet;
+            for (Packet p : mult.getPackets()) {
+                if (p instanceof InitializationPacket || p instanceof PacketVersionPacket) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     private void printBytes(@NotNull ByteBuf buffer) {

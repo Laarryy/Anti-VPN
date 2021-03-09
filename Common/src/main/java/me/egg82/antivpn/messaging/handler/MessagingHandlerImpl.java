@@ -23,6 +23,10 @@ public class MessagingHandlerImpl extends AbstractMessagingHandler implements Me
         List<Class<AbstractMessagingHandler>> classes = PackageFilter.getClasses(AbstractMessagingHandler.class, "me.egg82.antivpn.messaging.handler", false, false, false);
 
         for (Class<AbstractMessagingHandler> clazz : classes) {
+            if (clazz.equals(MessagingHandlerImpl.class)) {
+                continue;
+            }
+
             try {
                 handlers.add(clazz.newInstance());
             } catch (InstantiationException | IllegalAccessException ex) {
@@ -41,7 +45,7 @@ public class MessagingHandlerImpl extends AbstractMessagingHandler implements Me
                 logger.warn("Did not handle packet: " + packet.getClass().getName());
             }
         } catch (Exception ex) {
-            logger.error(ex.getMessage(), ex);
+            logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex);
         } finally {
             PacketUtil.repeatPacket(messageId, packet, fromService);
         }

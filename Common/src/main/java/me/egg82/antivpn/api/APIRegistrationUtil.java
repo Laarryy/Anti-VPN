@@ -32,7 +32,7 @@ public class APIRegistrationUtil {
         try {
             REGISTER.invoke(null, api);
         } catch (InvocationTargetException | IllegalAccessException ex) {
-            logger.error(ex.getMessage(), ex);
+            logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex);
         }
     }
 
@@ -40,7 +40,7 @@ public class APIRegistrationUtil {
         try {
             DEREGISTER.invoke(null);
         } catch (InvocationTargetException | IllegalAccessException ex) {
-            logger.error(ex.getMessage(), ex);
+            logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex);
         }
     }
 }

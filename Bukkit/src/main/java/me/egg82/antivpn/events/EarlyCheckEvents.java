@@ -44,7 +44,7 @@ public class EarlyCheckEvents extends EventHolder {
                     return true;
                 })
                 .handler(this::checkPerms)
-                .exceptionHandler(ex -> logger.error(ex.getMessage(), ex))
+                .exceptionHandler(ex -> logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex))
         );
     }
 
@@ -65,7 +65,7 @@ public class EarlyCheckEvents extends EventHolder {
             } catch (InterruptedException ignored) {
                 Thread.currentThread().interrupt();
             } catch (ExecutionException | CancellationException ex) {
-                logger.error(ex.getMessage(), ex);
+                logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex);
             }
             tryActOnPlayer(ip, event, val);
         } else {

@@ -71,7 +71,7 @@ public class PlayerEvents extends EventHolder {
         try {
             luckPermsHook = ServiceLocator.getOptional(LuckPermsHook.class);
         } catch (InstantiationException | IllegalAccessException ex) {
-            logger.error(ex.getMessage(), ex);
+            logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex);
             luckPermsHook = Optional.empty();
         }
 
@@ -239,7 +239,7 @@ public class PlayerEvents extends EventHolder {
         try {
             luckPermsHook = ServiceLocator.getOptional(LuckPermsHook.class);
         } catch (InstantiationException | IllegalAccessException ex) {
-            logger.error(ex.getMessage(), ex);
+            logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex);
             luckPermsHook = Optional.empty();
         }
 

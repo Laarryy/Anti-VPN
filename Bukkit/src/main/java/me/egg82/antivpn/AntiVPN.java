@@ -149,9 +149,9 @@ public class AntiVPN {
     }
 
     private void loadPackets() {
-        PacketManager.register(MultiPacket.class, MultiPacket::new);
+        PacketManager.register(InitializationPacket.class, InitializationPacket::new); // Ensure InitializationPacket always has a packet ID of 1
+        PacketManager.register(MultiPacket.class, MultiPacket::new); // Ensure MultiPacket always has a packet ID of 2
 
-        PacketManager.register(InitializationPacket.class, InitializationPacket::new);
         PacketManager.register(ShutdownPacket.class, ShutdownPacket::new);
 
         PacketManager.register(DeleteIPPacket.class, DeleteIPPacket::new);
@@ -290,7 +290,7 @@ public class AntiVPN {
             try {
                 VPNAPIProvider.getInstance().runUpdateTask().join();
             } catch (CancellationException | CompletionException ex) {
-                logger.error(ex.getMessage(), ex);
+                logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex);
             }
         }, 1L, 20L).getTaskId());
     }
@@ -365,7 +365,7 @@ public class AntiVPN {
         try {
             VPNAPIProvider.getInstance().runUpdateTask().join();
         } catch (CancellationException | CompletionException ex) {
-            logger.error(ex.getMessage(), ex);
+            logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex);
         }
 
         CachedConfig cachedConfig = ConfigUtil.getCachedConfig();

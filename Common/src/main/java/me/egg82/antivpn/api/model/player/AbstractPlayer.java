@@ -28,7 +28,7 @@ public abstract class AbstractPlayer implements Player {
             } catch (InterruptedException ignored) {
                 Thread.currentThread().interrupt();
             } catch (ExecutionException | CancellationException ex) {
-                logger.error(ex.getMessage(), ex);
+                logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex);
             }
         }
         this.name = name;

@@ -38,7 +38,7 @@ public class PostLoginUpdateNotifyHandler implements Consumer<PostLoginEvent> {
         try {
             updater = ServiceLocator.get(BungeeUpdater.class);
         } catch (InstantiationException | IllegalAccessException | ServiceNotFoundException ex) {
-            logger.error(ex.getMessage(), ex);
+            logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex);
             return;
         }
 
@@ -56,9 +56,9 @@ public class PostLoginUpdateNotifyHandler implements Consumer<PostLoginEvent> {
                     String version = updater.getLatestVersion().get();
                     commandManager.getCommandIssuer(event.getPlayer()).sendInfo(MessageKey.GENERAL__UPDATE, "{version}", version);
                 } catch (ExecutionException ex) {
-                    logger.error(ex.getMessage(), ex);
+                    logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex);
                 } catch (InterruptedException ex) {
-                    logger.error(ex.getMessage(), ex);
+                    logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex);
                     Thread.currentThread().interrupt();
                 }
             }

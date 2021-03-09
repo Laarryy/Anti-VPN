@@ -132,7 +132,7 @@ public class PlayerAnalyticsHook implements PluginHook {
                         } catch (InterruptedException ignored) {
                             Thread.currentThread().interrupt();
                         } catch (ExecutionException | CancellationException ex) {
-                            logger.error(ex.getMessage(), ex);
+                            logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex);
                         }
                     } else {
                         try {
@@ -142,7 +142,7 @@ public class PlayerAnalyticsHook implements PluginHook {
                         } catch (InterruptedException ignored) {
                             Thread.currentThread().interrupt();
                         } catch (ExecutionException | CancellationException ex) {
-                            logger.error(ex.getMessage(), ex);
+                            logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex);
                         }
                     }
                     latch.countDown();
@@ -154,7 +154,7 @@ public class PlayerAnalyticsHook implements PluginHook {
                     logger.warn(LocaleUtil.getDefaultI18N().getText(MessageKey.HOOK__PLAN__TIMEOUT));
                 }
             } catch (InterruptedException ex) {
-                logger.error(ex.getMessage(), ex);
+                logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex);
                 Thread.currentThread().interrupt();
             }
             pool.shutdownNow(); // Kill it with fire
@@ -188,7 +188,7 @@ public class PlayerAnalyticsHook implements PluginHook {
                     } catch (InterruptedException ignored) {
                         Thread.currentThread().interrupt();
                     } catch (ExecutionException | CancellationException ex) {
-                        logger.error(ex.getMessage(), ex);
+                        logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex);
                     }
                     latch.countDown();
                 });
@@ -199,7 +199,7 @@ public class PlayerAnalyticsHook implements PluginHook {
                     logger.warn(LocaleUtil.getDefaultI18N().getText(MessageKey.HOOK__PLAN__TIMEOUT));
                 }
             } catch (InterruptedException ex) {
-                logger.error(ex.getMessage(), ex);
+                logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex);
                 Thread.currentThread().interrupt();
             }
             pool.shutdownNow(); // Kill it with fire
@@ -233,7 +233,7 @@ public class PlayerAnalyticsHook implements PluginHook {
                 } catch (InterruptedException ignored) {
                     Thread.currentThread().interrupt();
                 } catch (ExecutionException | CancellationException ex) {
-                    logger.error(ex.getMessage(), ex);
+                    logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex);
                 }
             } else {
                 try {
@@ -241,7 +241,7 @@ public class PlayerAnalyticsHook implements PluginHook {
                 } catch (InterruptedException ignored) {
                     Thread.currentThread().interrupt();
                 } catch (ExecutionException | CancellationException ex) {
-                    logger.error(ex.getMessage(), ex);
+                    logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex);
                 }
             }
 
@@ -263,7 +263,7 @@ public class PlayerAnalyticsHook implements PluginHook {
             } catch (InterruptedException ignored) {
                 Thread.currentThread().interrupt();
             } catch (ExecutionException | CancellationException ex) {
-                logger.error(ex.getMessage(), ex);
+                logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex);
             }
 
             return false;

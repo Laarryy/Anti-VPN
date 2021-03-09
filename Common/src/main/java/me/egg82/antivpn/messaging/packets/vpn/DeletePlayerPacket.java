@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf;
 import java.util.Objects;
 import java.util.UUID;
 import me.egg82.antivpn.messaging.packets.AbstractPacket;
+import me.egg82.antivpn.utils.UUIDUtil;
 import org.jetbrains.annotations.NotNull;
 
 public class DeletePlayerPacket extends AbstractPacket {
@@ -15,11 +16,11 @@ public class DeletePlayerPacket extends AbstractPacket {
     }
 
     public DeletePlayerPacket() {
-        super(new UUID(0L, 0L));
+        super(UUIDUtil.EMPTY_UUID);
     }
 
     public DeletePlayerPacket(@NotNull UUID uuid) {
-        super(new UUID(0L, 0L));
+        super(UUIDUtil.EMPTY_UUID);
         this.uuid = uuid;
     }
 

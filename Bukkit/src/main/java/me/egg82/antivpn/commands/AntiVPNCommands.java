@@ -31,6 +31,8 @@ public class AntiVPNCommands extends CommandHolder {
                 .build()
         );
 
+        // TODO: Commands + argument suggestions
+
         /*commands.add(
             commandManager.commandBuilder("antivpn", baseAliases)
                 .literal("import", LocalizedArgumentDescription.of(MessageKey.COMMAND_DESC__IMPORT), getAliases(config, "import")) // TODO: Localization

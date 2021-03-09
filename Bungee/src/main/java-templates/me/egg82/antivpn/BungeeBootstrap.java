@@ -44,7 +44,7 @@ public class BungeeBootstrap extends Plugin {
             loadJars(new File(getDataFolder(), "external"), (URLClassLoader) getClass().getClassLoader());
         } catch (ClassCastException | IOException ex) {
             Thread.currentThread().setContextClassLoader(origClassLoader);
-            logger.error(ex.getMessage(), ex);
+            logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex);
             throw new RuntimeException("Could not load required dependencies.");
         }
 
@@ -57,7 +57,7 @@ public class BungeeBootstrap extends Plugin {
             }
         } catch (InterruptedException ex) {
             Thread.currentThread().setContextClassLoader(origClassLoader);
-            logger.error(ex.getMessage(), ex);
+            logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex);
             Thread.currentThread().interrupt();
         }
 
@@ -215,7 +215,7 @@ public class BungeeBootstrap extends Plugin {
         } catch (IOException ex) {
             lastEx = ex;
         } catch (IllegalAccessException | InvocationTargetException | URISyntaxException | XPathExpressionException | SAXException ex) {
-            logger.error(ex.getMessage(), ex);
+            logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex);
             return;
         }
 
@@ -249,7 +249,7 @@ public class BungeeBootstrap extends Plugin {
         } catch (IOException ex) {
             lastEx = ex;
         } catch (IllegalAccessException | InvocationTargetException | URISyntaxException | XPathExpressionException | SAXException ex) {
-            logger.error(ex.getMessage(), ex);
+            logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex);
             return;
         }
 

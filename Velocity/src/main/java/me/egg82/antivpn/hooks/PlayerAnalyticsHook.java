@@ -134,7 +134,7 @@ public class PlayerAnalyticsHook implements PluginHook {
                 }
             } catch (InterruptedException ex) {
                 if (ConfigUtil.getDebugOrFalse()) {
-                    logger.error(ex.getMessage(), ex);
+                    logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex);
                 } else {
                     logger.error(ex.getMessage());
                 }
@@ -183,7 +183,7 @@ public class PlayerAnalyticsHook implements PluginHook {
                 }
             } catch (InterruptedException ex) {
                 if (ConfigUtil.getDebugOrFalse()) {
-                    logger.error(ex.getMessage(), ex);
+                    logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex);
                 } else {
                     logger.error(ex.getMessage());
                 }

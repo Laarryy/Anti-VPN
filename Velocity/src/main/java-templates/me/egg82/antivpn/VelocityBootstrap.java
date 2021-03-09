@@ -78,7 +78,7 @@ public class VelocityBootstrap {
             Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
             loadJars(new File(new File(description.getSource().get().getParent().toFile(), description.getName().get()), "external"), proxy.getPluginManager());
         } catch (ClassCastException | IOException ex) {
-            logger.error(ex.getMessage(), ex);
+            logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex);
             throw new RuntimeException("Could not load required dependencies.");
         }
 
@@ -89,7 +89,7 @@ public class VelocityBootstrap {
                 return;
             }
         } catch (InterruptedException ex) {
-            logger.error(ex.getMessage(), ex);
+            logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex);
             Thread.currentThread().interrupt();
         }
 
@@ -234,7 +234,7 @@ public class VelocityBootstrap {
         } catch (IOException ex) {
             lastEx = ex;
         } catch (IllegalAccessException | InvocationTargetException | URISyntaxException | XPathExpressionException | SAXException ex) {
-            logger.error(ex.getMessage(), ex);
+            logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex);
             return;
         }
 
@@ -268,7 +268,7 @@ public class VelocityBootstrap {
         } catch (IOException ex) {
             lastEx = ex;
         } catch (IllegalAccessException | InvocationTargetException | URISyntaxException | XPathExpressionException | SAXException ex) {
-            logger.error(ex.getMessage(), ex);
+            logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex);
             return;
         }
 

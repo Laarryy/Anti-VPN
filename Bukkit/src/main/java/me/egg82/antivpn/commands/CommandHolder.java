@@ -43,7 +43,7 @@ public abstract class CommandHolder {
         try {
             retVal = new HashSet<>(!config.node("aliases", command).empty() ? config.node("aliases", command).getList(String.class) : new ArrayList<>());
         } catch (SerializationException ex) {
-            logger.error(ex.getMessage(), ex);
+            logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex);
             retVal = new HashSet<>();
         }
         retVal.removeIf(action -> action == null || action.isEmpty());

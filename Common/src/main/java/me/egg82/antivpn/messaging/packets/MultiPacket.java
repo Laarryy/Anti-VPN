@@ -10,6 +10,7 @@ import java.util.UUID;
 import me.egg82.antivpn.locale.LocaleUtil;
 import me.egg82.antivpn.locale.MessageKey;
 import me.egg82.antivpn.messaging.PacketManager;
+import me.egg82.antivpn.utils.UUIDUtil;
 import org.jetbrains.annotations.NotNull;
 
 public class MultiPacket extends AbstractPacket {
@@ -23,7 +24,7 @@ public class MultiPacket extends AbstractPacket {
     }
 
     public MultiPacket() {
-        super(new UUID(0L, 0L));
+        super(UUIDUtil.EMPTY_UUID);
     }
 
     public void read(@NotNull ByteBuf buffer) {
@@ -42,7 +43,7 @@ public class MultiPacket extends AbstractPacket {
                     if (packet == null) {
                         logger.warn("Received packet ID that doesn't exist: " + nextPacket);
                     } else {
-                        if (packet.verifyFullRead(buffer)) {
+                        if (packet.verifyFullRead(packetBuf)) {
                             packets.add(packet);
                         }
                     }

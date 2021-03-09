@@ -5,12 +5,13 @@ import java.io.Serializable;
 import java.time.Instant;
 import java.util.Objects;
 import java.util.UUID;
+import me.egg82.antivpn.utils.UUIDUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class GELFSubmissionModel implements Serializable {
     private String version = "1.1";
-    private String host = new UUID(0L, 0L).toString();
+    private String host = UUIDUtil.EMPTY_UUID.toString();
     @JSON(name = "short_message")
     private String shortMessage = "";
     @JSON(name = "full_message")
@@ -18,7 +19,7 @@ public class GELFSubmissionModel implements Serializable {
     private long timestamp = Instant.now().getEpochSecond();
     private int level = -1;
     @JSON(name = "_session")
-    private String session = new UUID(0L, 0L).toString();
+    private String session = UUIDUtil.EMPTY_UUID.toString();
     @JSON(name = "_plugin_version")
     private String pluginVersion = "unknown";
     @JSON(name = "_platform")

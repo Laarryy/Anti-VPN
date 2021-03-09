@@ -37,7 +37,7 @@ public abstract class AbstractUpdater implements Updater {
                 try {
                     newVersion = getNewVersion();
                 } catch (IOException ex) {
-                    logger.error(ex.getMessage(), ex);
+                    logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex);
                 }
             }
             if (isNewVersion(newVersion, currentVersion)) {

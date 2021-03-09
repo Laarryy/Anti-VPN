@@ -61,7 +61,7 @@ public class UpdaterHook implements PluginHook {
             .thenCombineAsync(updater.getLatestVersion(), Pair::new)
             .whenCompleteAsync((val, ex) -> {
                 if (ex != null) {
-                    logger.error(ex.getMessage(), ex);
+                    logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex);
                     return;
                 }
 

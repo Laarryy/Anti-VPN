@@ -5,6 +5,7 @@ import java.util.Objects;
 import java.util.UUID;
 import me.egg82.antivpn.api.model.ip.AlgorithmMethod;
 import me.egg82.antivpn.messaging.packets.AbstractPacket;
+import me.egg82.antivpn.utils.UUIDUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -20,11 +21,11 @@ public class IPPacket extends AbstractPacket {
     }
 
     public IPPacket() {
-        super(new UUID(0L, 0L));
+        super(UUIDUtil.EMPTY_UUID);
     }
 
     public IPPacket(@NotNull String ip, @Nullable Boolean cascade) {
-        super(new UUID(0L, 0L));
+        super(UUIDUtil.EMPTY_UUID);
         this.ip = ip;
         this.type = AlgorithmMethod.CASCADE;
         this.cascade = cascade;
@@ -32,7 +33,7 @@ public class IPPacket extends AbstractPacket {
     }
 
     public IPPacket(@NotNull String ip, @Nullable Double consensus) {
-        super(new UUID(0L, 0L));
+        super(UUIDUtil.EMPTY_UUID);
         this.ip = ip;
         this.type = AlgorithmMethod.CONSESNSUS;
         this.cascade = null;

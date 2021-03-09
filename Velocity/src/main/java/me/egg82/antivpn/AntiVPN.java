@@ -163,7 +163,7 @@ public class AntiVPN {
                 }
             }
         } catch (IOException ex) {
-            logger.error(ex.getMessage(), ex);
+            logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex);
         }
 
         locales.loadLanguages();

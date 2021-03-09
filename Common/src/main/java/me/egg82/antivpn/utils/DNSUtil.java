@@ -133,7 +133,7 @@ public class DNSUtil {
                 retVal.add(attributeEnum.next().toString());
             }
         } catch (NamingException ex) {
-            logger.error(ex.getMessage(), ex);
+            logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex);
         }
         if (ConfigUtil.getDebugOrFalse()) {
             logger.info("Got " + retVal.size() + " record(s) for " + dns);

@@ -83,9 +83,9 @@ public class ScoreCommand extends AbstractCommand {
                     Thread.sleep(1000L);
                 }
             } catch (IllegalArgumentException ex) {
-                logger.error(ex.getMessage(), ex);
+                logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex);
             } catch (InterruptedException ex) {
-                logger.error(ex.getMessage(), ex);
+                logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex);
                 Thread.currentThread().interrupt();
             }
 

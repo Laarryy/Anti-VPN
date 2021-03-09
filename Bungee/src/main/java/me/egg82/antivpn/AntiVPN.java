@@ -186,7 +186,7 @@ public class AntiVPN {
                 }
             }
         } catch (IOException ex) {
-            logger.error(ex.getMessage(), ex);
+            logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex);
         }
 
         locales.loadLanguages();
@@ -512,7 +512,7 @@ public class AntiVPN {
         try {
             updater = ServiceLocator.get(BungeeUpdater.class);
         } catch (InstantiationException | IllegalAccessException | ServiceNotFoundException ex) {
-            logger.error(ex.getMessage(), ex);
+            logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex);
             return;
         }
 
@@ -528,9 +528,9 @@ public class AntiVPN {
             try {
                 consoleCommandIssuer.sendInfo(MessageKey.GENERAL__UPDATE, "{version}", updater.getLatestVersion().get());
             } catch (ExecutionException ex) {
-                logger.error(ex.getMessage(), ex);
+                logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex);
             } catch (InterruptedException ex) {
-                logger.error(ex.getMessage(), ex);
+                logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex);
                 Thread.currentThread().interrupt();
             }
         });

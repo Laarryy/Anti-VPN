@@ -148,7 +148,7 @@ public class RabbitMQMessagingService extends AbstractMessagingService {
                         return;
                     }
 
-                    if (packetVersion == -1 && !(packet instanceof InitializationPacket)) {
+                    if (packetVersion == -1 && !hasVersion(packet)) {
                         logger.warn("Server " + sender + " packet version is unknown, and packet type is of " + packet.getClass().getName() + ". Skipping packet.");
                         return;
                     }

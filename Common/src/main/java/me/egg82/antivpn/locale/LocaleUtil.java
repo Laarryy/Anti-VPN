@@ -53,11 +53,11 @@ public class LocaleUtil {
         try (InputStream inStream = LanguageFileUtil.class.getResourceAsStream(resourcePath)) {
             return new LocalePropertyResourceBundle(inStream, locale);
         } catch (IOException ex) {
-            logger.error(ex.getMessage(), ex);
+            logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex);
             try {
                 return new LocalePropertyResourceBundle(locale);
             } catch (IOException ex2) {
-                logger.error(ex2.getMessage(), ex2);
+                logger.error(ex2.getClass().getName() + ": " + ex2.getMessage(), ex2);
                 throw new IllegalStateException("LocalePropertyResourceBundle could not be created.", ex2);
             }
         }

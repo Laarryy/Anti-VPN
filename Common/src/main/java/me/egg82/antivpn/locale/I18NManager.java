@@ -29,7 +29,7 @@ public class I18NManager {
                 ResourceBundle bundle = LanguageFileUtil.getLanguage(dataDirectory, k);
                 return bundle != null ? bundle : ResourceBundle.getBundle("", locale);
             } catch (IOException ex) {
-                logger.error(ex.getMessage(), ex);
+                logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex);
             }
             return ResourceBundle.getBundle("", locale);
         });

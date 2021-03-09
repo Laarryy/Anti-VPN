@@ -43,7 +43,7 @@ public class LateCheckEvents extends EventHolder {
                     return true;
                 })
                 .handler(this::checkPerms)
-                .exceptionHandler(ex -> logger.error(ex.getMessage(), ex))
+                .exceptionHandler(ex -> logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex))
         );
     }
 

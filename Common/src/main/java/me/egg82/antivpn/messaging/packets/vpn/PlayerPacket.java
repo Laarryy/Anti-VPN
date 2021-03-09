@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf;
 import java.util.Objects;
 import java.util.UUID;
 import me.egg82.antivpn.messaging.packets.AbstractPacket;
+import me.egg82.antivpn.utils.UUIDUtil;
 import org.jetbrains.annotations.NotNull;
 
 public class PlayerPacket extends AbstractPacket {
@@ -16,11 +17,11 @@ public class PlayerPacket extends AbstractPacket {
     }
 
     public PlayerPacket() {
-        super(new UUID(0L, 0L));
+        super(UUIDUtil.EMPTY_UUID);
     }
 
     public PlayerPacket(@NotNull UUID uuid, boolean value) {
-        super(new UUID(0L, 0L));
+        super(UUIDUtil.EMPTY_UUID);
         this.uuid = uuid;
         this.value = value;
     }

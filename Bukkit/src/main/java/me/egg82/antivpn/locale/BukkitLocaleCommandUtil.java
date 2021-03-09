@@ -11,6 +11,7 @@ import me.egg82.antivpn.bukkit.BukkitCapabilities;
 import me.egg82.antivpn.config.CachedConfig;
 import me.egg82.antivpn.config.ConfigUtil;
 import me.egg82.antivpn.logging.GELFLogger;
+import me.egg82.antivpn.utils.UUIDUtil;
 import net.kyori.adventure.platform.bukkit.BukkitAudiences;
 import net.kyori.adventure.text.Component;
 import org.bukkit.command.CommandSender;
@@ -56,7 +57,7 @@ public class BukkitLocaleCommandUtil {
         commandExceptionHandler
             .withInvalidSyntaxHandler()
             .withHandler(MinecraftExceptionHandler.ExceptionType.INVALID_SYNTAX, (sender, ex) -> {
-                logger.error(ex.getMessage(), ex);
+                logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex);
                 return sender.getComponent(MessageKey.ERROR__COMMAND__INVALID_SYNTAX, "{ex}", ex.getClass().getName() + ": " + ex.getLocalizedMessage());
             })
             .withInvalidSenderHandler()
@@ -65,12 +66,12 @@ public class BukkitLocaleCommandUtil {
             .withHandler(MinecraftExceptionHandler.ExceptionType.NO_PERMISSION, (sender, ex) -> sender.getComponent(MessageKey.ERROR__COMMAND__NO_PERMISSION, "{ex}", ex.getClass().getName() + ": " + ex.getLocalizedMessage()))
             .withArgumentParsingHandler()
             .withHandler(MinecraftExceptionHandler.ExceptionType.ARGUMENT_PARSING, (sender, ex) -> {
-                logger.error(ex.getMessage(), ex);
+                logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex);
                 return sender.getComponent(MessageKey.ERROR__COMMAND__INVALID_ARGS, "{ex}", ex.getClass().getName() + ": " + ex.getLocalizedMessage());
             })
             .withCommandExecutionHandler()
             .withHandler(MinecraftExceptionHandler.ExceptionType.COMMAND_EXECUTION, (sender, ex) -> {
-                logger.error(ex.getMessage(), ex);
+                logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex);
                 return sender.getComponent(MessageKey.ERROR__INTERNAL);
             })
             .withDecorator(component -> Component.text()
@@ -84,7 +85,7 @@ public class BukkitLocaleCommandUtil {
                 commandManager.registerBrigadier();
                 consoleCommandSender.sendMessage(MessageKey.GENERAL__ENABLE_HOOK, "{hook}", "Brigadier");
             } catch (BukkitCommandManager.BrigadierFailureException ex) {
-                logger.error(ex.getMessage(), ex);
+                logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex);
                 consoleCommandSender.sendMessage(MessageKey.GENERAL__NO_HOOK, "{hook}", "Brigadier");
             }
         } else {
@@ -125,7 +126,7 @@ public class BukkitLocaleCommandUtil {
         return commandManager.getCommandSenderMapper().apply(sender);
     }
 
-    private static final UUID consoleUuid = new UUID(0L, 0L);
+    private static final UUID consoleUuid = UUIDUtil.EMPTY_UUID;
 
     public static void setConsoleLocale(@NotNull Plugin plugin, @NotNull I18NManager manager) {
         consoleCommandSender = BukkitLocalizedCommandSender.getMappedCommandSender(

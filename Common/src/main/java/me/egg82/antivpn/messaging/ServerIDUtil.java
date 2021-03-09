@@ -22,7 +22,7 @@ public class ServerIDUtil {
         try {
             retVal = readId(idFile);
         } catch (IOException ex) {
-            logger.error(ex.getMessage(), ex);
+            logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex);
             retVal = null;
         }
 
@@ -31,7 +31,7 @@ public class ServerIDUtil {
             try {
                 writeId(idFile, retVal);
             } catch (IOException ex) {
-                logger.error(ex.getMessage(), ex);
+                logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex);
             }
         }
 
