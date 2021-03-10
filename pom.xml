@@ -37,7 +37,7 @@
         <caffeine.version>3.0.0</caffeine.version>
         <ipaddress.version>5.3.3</ipaddress.version>
         <slf4j.version>1.7.30</slf4j.version>
-        <netty.version>4.1.60.Final</netty.version>
+        <netty.version>4.1.50.Final</netty.version> <!-- keep this updated with Paper: https://github.com/PaperMC/Paper/blob/d3dc24999e0a1e8f3e8d9d59a36f32261a52a498/Spigot-Server-Patches/0001-POM-Changes.patch -->
         <jetbrains.version>20.1.0</jetbrains.version>
         <junit.version>5.8.0-M1</junit.version>
 
