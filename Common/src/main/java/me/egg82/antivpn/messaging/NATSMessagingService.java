@@ -5,6 +5,7 @@ import io.nats.client.Dispatcher;
 import io.nats.client.Nats;
 import io.nats.client.Options;
 import io.netty.buffer.ByteBuf;
+import java.io.File;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.UUID;
@@ -15,7 +16,6 @@ import me.egg82.antivpn.locale.LocaleUtil;
 import me.egg82.antivpn.locale.MessageKey;
 import me.egg82.antivpn.messaging.handler.MessagingHandler;
 import me.egg82.antivpn.messaging.packets.Packet;
-import me.egg82.antivpn.messaging.packets.server.InitializationPacket;
 import me.egg82.antivpn.services.CollectionProvider;
 import org.jetbrains.annotations.NotNull;
 
@@ -28,8 +28,8 @@ public class NATSMessagingService extends AbstractMessagingService {
 
     private static final String SUBJECT_NAME = "avpn-data";
 
-    private NATSMessagingService(@NotNull String name) {
-        super(name);
+    private NATSMessagingService(@NotNull String name, @NotNull File packetDirectory) {
+        super(name, packetDirectory);
     }
 
     public void close() {
@@ -49,14 +49,14 @@ public class NATSMessagingService extends AbstractMessagingService {
 
     public boolean isClosed() { return closed || connection.getConnectedUrl() == null; }
 
-    public static @NotNull Builder builder(@NotNull String name, @NotNull UUID serverId, @NotNull MessagingHandler handler) { return new Builder(name, serverId, handler); }
+    public static @NotNull Builder builder(@NotNull String name, @NotNull UUID serverId, @NotNull MessagingHandler handler, @NotNull File packetDirectory) { return new Builder(name, serverId, handler, packetDirectory); }
 
     public static class Builder {
         private final NATSMessagingService service;
         private final Options.Builder config = new Options.Builder();
 
-        public Builder(@NotNull String name, @NotNull UUID serverId, @NotNull MessagingHandler handler) {
-            service = new NATSMessagingService(name);
+        public Builder(@NotNull String name, @NotNull UUID serverId, @NotNull MessagingHandler handler, @NotNull File packetDirectory) {
+            service = new NATSMessagingService(name, packetDirectory);
             service.serverId = serverId;
             service.serverIdString = serverId.toString();
             ByteBuf buffer = alloc.buffer(16, 16);
@@ -128,6 +128,10 @@ public class NATSMessagingService extends AbstractMessagingService {
                 b.writeBytes(body);
                 data = service.decompressData(b);
 
+                if (ConfigUtil.getHiddenConfig().doPacketDump()) {
+                    service.dumpReceivedPacket(data);
+                }
+
                 UUID sender = new UUID(data.readLong(), data.readLong());
                 if (service.serverId.equals(sender)) {
                     return;
@@ -183,6 +187,10 @@ public class NATSMessagingService extends AbstractMessagingService {
                 buffer.writeByte(PacketManager.getId(packet.getClass()));
                 packet.write(buffer);
                 addCapacity(buffer.writerIndex());
+
+                if (ConfigUtil.getHiddenConfig().doPacketDump()) {
+                    dumpSentPacket(buffer);
+                }
 
                 connection.publish(SUBJECT_NAME, compressData(buffer));
             } finally {

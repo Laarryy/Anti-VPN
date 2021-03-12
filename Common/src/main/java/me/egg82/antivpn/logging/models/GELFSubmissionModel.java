@@ -4,7 +4,6 @@ import flexjson.JSON;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.Objects;
-import java.util.UUID;
 import me.egg82.antivpn.utils.UUIDUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

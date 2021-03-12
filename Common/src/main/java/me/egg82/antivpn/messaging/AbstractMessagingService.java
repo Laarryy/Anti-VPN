@@ -5,14 +5,20 @@ import com.github.luben.zstd.ZstdException;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.PooledByteBufAllocator;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.file.Files;
 import java.text.DecimalFormat;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import me.egg82.antivpn.config.ConfigUtil;
+import me.egg82.antivpn.locale.LocaleUtil;
+import me.egg82.antivpn.locale.MessageKey;
 import me.egg82.antivpn.logging.GELFLogger;
 import me.egg82.antivpn.messaging.handler.MessagingHandler;
 import me.egg82.antivpn.messaging.packets.MultiPacket;
@@ -39,8 +45,13 @@ public abstract class AbstractMessagingService implements MessagingService {
 
     protected MessagingHandler handler;
 
-    protected AbstractMessagingService(@NotNull String name) {
+    protected final File sentPacketDirectory;
+    protected final File receivedPacketDirectory;
+
+    protected AbstractMessagingService(@NotNull String name, @NotNull File packetDirectory) {
         this.name = name;
+        this.sentPacketDirectory = new File(packetDirectory, "sent");
+        this.receivedPacketDirectory = new File(packetDirectory, "received");
     }
 
     public @NotNull String getName() { return name; }
@@ -178,6 +189,86 @@ public abstract class AbstractMessagingService implements MessagingService {
                 capacityLock.writeLock().unlock();
             }
         }
+    }
+
+    protected final AtomicLong currentSendPacket = new AtomicLong(0L);
+
+    protected final void dumpSentPacket(@NotNull ByteBuf buffer) throws IOException {
+        long current = currentSendPacket.getAndIncrement();
+
+        if (sentPacketDirectory.exists() && !sentPacketDirectory.isDirectory()) {
+            Files.delete(sentPacketDirectory.toPath());
+        }
+        if (!sentPacketDirectory.exists()) {
+            if (!sentPacketDirectory.mkdirs()) {
+                throw new IOException(LocaleUtil.getDefaultI18N().getText(MessageKey.ERROR__PARENT_DIR));
+            }
+        }
+        if (current == 0L && sentPacketDirectory.exists()) {
+            Files.delete(sentPacketDirectory.toPath());
+            if (!sentPacketDirectory.mkdirs()) {
+                throw new IOException(LocaleUtil.getDefaultI18N().getText(MessageKey.ERROR__PARENT_DIR));
+            }
+        }
+        File fileOnDisk = new File(sentPacketDirectory, "packet-" + current + ".taco");
+        if (fileOnDisk.exists() && fileOnDisk.isDirectory()) {
+            Files.delete(fileOnDisk.toPath());
+        }
+
+        int cap = Math.min(getInitialCapacity(), 4096);
+
+        int index = buffer.readerIndex();
+        try (FileOutputStream outputStream = new FileOutputStream(fileOnDisk)) {
+            byte[] buf = new byte[cap];
+            while (buffer.readableBytes() > 0) {
+                int read = Math.min(buf.length, buffer.readableBytes());
+                buffer.readBytes(buf, 0, read);
+                outputStream.write(buf, 0, read);
+            }
+        } catch (IOException ex) {
+            logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex);
+        }
+        buffer.readerIndex(index);
+    }
+
+    protected final AtomicLong currentReceivePacket = new AtomicLong(0L);
+
+    protected final void dumpReceivedPacket(@NotNull ByteBuf buffer) throws IOException {
+        long current = currentReceivePacket.getAndIncrement();
+
+        if (receivedPacketDirectory.exists() && !receivedPacketDirectory.isDirectory()) {
+            Files.delete(receivedPacketDirectory.toPath());
+        }
+        if (!receivedPacketDirectory.exists()) {
+            if (!receivedPacketDirectory.mkdirs()) {
+                throw new IOException(LocaleUtil.getDefaultI18N().getText(MessageKey.ERROR__PARENT_DIR));
+            }
+        }
+        if (current == 0L && receivedPacketDirectory.exists()) {
+            Files.delete(receivedPacketDirectory.toPath());
+            if (!receivedPacketDirectory.mkdirs()) {
+                throw new IOException(LocaleUtil.getDefaultI18N().getText(MessageKey.ERROR__PARENT_DIR));
+            }
+        }
+        File fileOnDisk = new File(receivedPacketDirectory, "packet-" + current + ".taco");
+        if (fileOnDisk.exists() && fileOnDisk.isDirectory()) {
+            Files.delete(fileOnDisk.toPath());
+        }
+
+        int cap = Math.min(getInitialCapacity(), 4096);
+
+        int index = buffer.readerIndex();
+        try (FileOutputStream outputStream = new FileOutputStream(fileOnDisk)) {
+            byte[] buf = new byte[cap];
+            while (buffer.readableBytes() > 0) {
+                int read = Math.min(buf.length, buffer.readableBytes());
+                buffer.readBytes(buf, 0, read);
+                outputStream.write(buf, 0, read);
+            }
+        } catch (IOException ex) {
+            logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex);
+        }
+        buffer.readerIndex(index);
     }
 
     protected static boolean hasVersion(@NotNull Packet packet) {

@@ -2,6 +2,7 @@ package me.egg82.antivpn.messaging;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.netty.buffer.ByteBuf;
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
@@ -15,7 +16,6 @@ import me.egg82.antivpn.locale.LocaleUtil;
 import me.egg82.antivpn.locale.MessageKey;
 import me.egg82.antivpn.messaging.handler.MessagingHandler;
 import me.egg82.antivpn.messaging.packets.Packet;
-import me.egg82.antivpn.messaging.packets.server.InitializationPacket;
 import me.egg82.antivpn.services.CollectionProvider;
 import org.jetbrains.annotations.NotNull;
 import redis.clients.jedis.BinaryJedisPubSub;
@@ -36,8 +36,8 @@ public class RedisMessagingService extends AbstractMessagingService {
     private static final String CHANNEL_NAME = "avpn-data";
     private static final byte[] CHANNEL_NAME_BYTES = CHANNEL_NAME.getBytes(StandardCharsets.UTF_8);
 
-    private RedisMessagingService(@NotNull String name) {
-        super(name);
+    private RedisMessagingService(@NotNull String name, @NotNull File packetDirectory) {
+        super(name, packetDirectory);
     }
 
     public void close() {
@@ -60,7 +60,7 @@ public class RedisMessagingService extends AbstractMessagingService {
 
     public boolean isClosed() { return closed || pool.isClosed(); }
 
-    public static @NotNull Builder builder(@NotNull String name, @NotNull UUID serverId, @NotNull MessagingHandler handler) { return new Builder(name, serverId, handler); }
+    public static @NotNull Builder builder(@NotNull String name, @NotNull UUID serverId, @NotNull MessagingHandler handler, @NotNull File packetDirectory) { return new Builder(name, serverId, handler, packetDirectory); }
 
     public static class Builder {
         private final RedisMessagingService service;
@@ -71,8 +71,8 @@ public class RedisMessagingService extends AbstractMessagingService {
         private int timeout = 5000;
         private String pass = "";
 
-        public Builder(@NotNull String name, @NotNull UUID serverId, @NotNull MessagingHandler handler) {
-            service = new RedisMessagingService(name);
+        public Builder(@NotNull String name, @NotNull UUID serverId, @NotNull MessagingHandler handler, @NotNull File packetDirectory) {
+            service = new RedisMessagingService(name, packetDirectory);
             service.serverId = serverId;
             service.serverIdString = serverId.toString();
             ByteBuf buffer = alloc.buffer(16, 16);
@@ -192,6 +192,10 @@ public class RedisMessagingService extends AbstractMessagingService {
                 b.writeBytes(body);
                 data = service.decompressData(b);
 
+                if (ConfigUtil.getHiddenConfig().doPacketDump()) {
+                    service.dumpReceivedPacket(data);
+                }
+
                 UUID sender = new UUID(data.readLong(), data.readLong());
                 if (service.serverId.equals(sender)) {
                     return;
@@ -247,6 +251,10 @@ public class RedisMessagingService extends AbstractMessagingService {
                 buffer.writeByte(PacketManager.getId(packet.getClass()));
                 packet.write(buffer);
                 addCapacity(buffer.writerIndex());
+
+                if (ConfigUtil.getHiddenConfig().doPacketDump()) {
+                    dumpSentPacket(buffer);
+                }
 
                 redis.publish(CHANNEL_NAME_BYTES, compressData(buffer));
             } finally {

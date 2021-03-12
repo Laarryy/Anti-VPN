@@ -2,6 +2,7 @@ package me.egg82.antivpn.messaging;
 
 import com.rabbitmq.client.*;
 import io.netty.buffer.ByteBuf;
+import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -14,7 +15,6 @@ import me.egg82.antivpn.locale.LocaleUtil;
 import me.egg82.antivpn.locale.MessageKey;
 import me.egg82.antivpn.messaging.handler.MessagingHandler;
 import me.egg82.antivpn.messaging.packets.Packet;
-import me.egg82.antivpn.messaging.packets.server.InitializationPacket;
 import me.egg82.antivpn.services.CollectionProvider;
 import me.egg82.antivpn.utils.ValidationUtil;
 import org.jetbrains.annotations.NotNull;
@@ -32,8 +32,8 @@ public class RabbitMQMessagingService extends AbstractMessagingService {
 
     private static final String EXCHANGE_NAME = "avpn-data";
 
-    private RabbitMQMessagingService(@NotNull String name) {
-        super(name);
+    private RabbitMQMessagingService(@NotNull String name, @NotNull File packetDirectory) {
+        super(name, packetDirectory);
     }
 
     public void close() {
@@ -50,14 +50,14 @@ public class RabbitMQMessagingService extends AbstractMessagingService {
 
     public boolean isClosed() { return closed || !connection.isOpen(); }
 
-    public static @NotNull Builder builder(@NotNull String name, @NotNull UUID serverId, @NotNull MessagingHandler handler) { return new Builder(name, serverId, handler); }
+    public static @NotNull Builder builder(@NotNull String name, @NotNull UUID serverId, @NotNull MessagingHandler handler, @NotNull File packetDirectory) { return new Builder(name, serverId, handler, packetDirectory); }
 
     public static class Builder {
         private final RabbitMQMessagingService service;
         private final ConnectionFactory config = new ConnectionFactory();
 
-        public Builder(@NotNull String name, @NotNull UUID serverId, @NotNull MessagingHandler handler) {
-            service = new RabbitMQMessagingService(name);
+        public Builder(@NotNull String name, @NotNull UUID serverId, @NotNull MessagingHandler handler, @NotNull File packetDirectory) {
+            service = new RabbitMQMessagingService(name, packetDirectory);
             service.serverId = serverId;
             service.serverIdString = serverId.toString();
             ByteBuf buffer = alloc.buffer(16, 16);
@@ -134,6 +134,10 @@ public class RabbitMQMessagingService extends AbstractMessagingService {
                     b.writeBytes(body);
                     data = decompressData(b);
 
+                    if (ConfigUtil.getHiddenConfig().doPacketDump()) {
+                        dumpReceivedPacket(data);
+                    }
+
                     byte packetId = data.readByte();
                     Packet packet;
                     try {
@@ -182,6 +186,10 @@ public class RabbitMQMessagingService extends AbstractMessagingService {
                 buffer.writeByte(PacketManager.getId(packet.getClass()));
                 packet.write(buffer);
                 addCapacity(buffer.writerIndex());
+
+                if (ConfigUtil.getHiddenConfig().doPacketDump()) {
+                    dumpSentPacket(buffer);
+                }
 
                 AMQP.BasicProperties properties = getProperties(DeliveryMode.PERSISTENT, messageId);
                 channel.exchangeDeclare(EXCHANGE_NAME, ExchangeType.FANOUT.getType(), true);

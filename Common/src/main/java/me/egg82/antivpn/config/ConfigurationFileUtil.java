@@ -99,7 +99,7 @@ public class ConfigurationFileUtil {
             .debug(debug)
             .language(language)
             .storage(getStorage(config, dataDirectory, debug, console))
-            .messaging(getMessaging(config, serverId, messagingHandler, debug, console))
+            .messaging(getMessaging(config, serverId, messagingHandler, new File(dataDirectory, "packets"), debug, console))
             .sourceCacheTime(getSourceCacheTime(config, debug, console))
             .mcleaksCacheTime(getMcLeaksCacheTime(config, debug, console))
             .cacheTime(getCacheTime(config, debug, console))
@@ -120,7 +120,11 @@ public class ConfigurationFileUtil {
 
         PacketUtil.setPoolSize(cachedConfig.getMessaging().size() + 1);
 
-        ConfigUtil.setConfiguration(config, cachedConfig);
+        HiddenConfig hiddenConfig = HiddenConfig.builder()
+            .doPacketDump(config.node("debug", "packet-dump").getBoolean(false))
+            .build();
+
+        ConfigUtil.setConfiguration(config, cachedConfig, hiddenConfig);
 
         setSources(config, debug, console, sourceManager);
 
@@ -350,12 +354,12 @@ public class ConfigurationFileUtil {
         return null;
     }
 
-    private static <M extends LocalizedCommandSender<M, B>, B> @NotNull List<MessagingService> getMessaging(@NotNull ConfigurationNode config, @NotNull UUID serverId, @NotNull MessagingHandler handler, boolean debug, @NotNull LocalizedCommandSender<M, B> console) {
+    private static <M extends LocalizedCommandSender<M, B>, B> @NotNull List<MessagingService> getMessaging(@NotNull ConfigurationNode config, @NotNull UUID serverId, @NotNull MessagingHandler handler, @NotNull File packetDirectory, boolean debug, @NotNull LocalizedCommandSender<M, B> console) {
         List<MessagingService> retVal = new ArrayList<>();
 
         PoolSettings poolSettings = new PoolSettings(config.node("messaging", "settings"));
         for (Map.Entry<Object, ? extends ConfigurationNode> kvp : config.node("messaging", "engines").childrenMap().entrySet()) {
-            MessagingService service = getMessagingOf((String) kvp.getKey(), kvp.getValue(), serverId, handler, poolSettings, debug, console);
+            MessagingService service = getMessagingOf((String) kvp.getKey(), kvp.getValue(), serverId, handler, packetDirectory, poolSettings, debug, console);
             if (service == null) {
                 continue;
             }
@@ -369,7 +373,7 @@ public class ConfigurationFileUtil {
         return retVal;
     }
 
-    private static <M extends LocalizedCommandSender<M, B>, B> @Nullable MessagingService getMessagingOf(@NotNull String name, @NotNull ConfigurationNode engineNode, @NotNull UUID serverId, @NotNull MessagingHandler handler, @NotNull PoolSettings poolSettings, boolean debug, @NotNull LocalizedCommandSender<M, B> console) {
+    private static <M extends LocalizedCommandSender<M, B>, B> @Nullable MessagingService getMessagingOf(@NotNull String name, @NotNull ConfigurationNode engineNode, @NotNull UUID serverId, @NotNull MessagingHandler handler, @NotNull File packetDirectory, @NotNull PoolSettings poolSettings, boolean debug, @NotNull LocalizedCommandSender<M, B> console) {
         if (!engineNode.node("enabled").getBoolean()) {
             if (debug) {
                 console.sendMessage("<c9>Messaging engine</c9> <c1>" + name + "</c1> <c9>is disabled. Removing.</c9>");
@@ -386,7 +390,7 @@ public class ConfigurationFileUtil {
                     console.sendMessage("<c2>Creating engine</c2> <c1>" + name + "</c1> <c2>of type rabbitmq with address</c2> <c1>" + url.getAddress() + ":" + url.getPort() + connectionNode.node("v-host").getString("/") + "</c1>");
                 }
                 try {
-                    return RabbitMQMessagingService.builder(name, serverId, handler)
+                    return RabbitMQMessagingService.builder(name, serverId, handler, packetDirectory)
                             .url(url.address, url.port, connectionNode.node("v-host").getString("/"))
                             .credentials(connectionNode.node("username").getString("guest"), connectionNode.node("password").getString("guest"))
                             .timeout((int) poolSettings.timeout)
@@ -402,7 +406,7 @@ public class ConfigurationFileUtil {
                     console.sendMessage("<c2>Creating engine</c2> <c1>" + name + "</c1> <c2>of type redis with address</c2> <c1>" + url.getAddress() + ":" + url.getPort() + "</c1>");
                 }
                 try {
-                    return RedisMessagingService.builder(name, serverId, handler)
+                    return RedisMessagingService.builder(name, serverId, handler, packetDirectory)
                             .url(url.address, url.port)
                             .credentials(connectionNode.node("password").getString(""))
                             .poolSize(poolSettings.minPoolSize, poolSettings.maxPoolSize)
@@ -419,7 +423,7 @@ public class ConfigurationFileUtil {
                     console.sendMessage("<c2>Creating engine</c2> <c1>" + name + "</c1> <c2>of type NATS with address</c2> <c1>" + url.getAddress() + ":" + url.getPort() + "</c1>");
                 }
                 try {
-                    return NATSMessagingService.builder(name, serverId, handler)
+                    return NATSMessagingService.builder(name, serverId, handler, packetDirectory)
                         .url(url.address, url.port)
                         .credentials(connectionNode.node("file").getString(""))
                         .life((int) poolSettings.timeout)
