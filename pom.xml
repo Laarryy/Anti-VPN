@@ -47,7 +47,7 @@
         <adventure.bukkit.version>4.0.0-SNAPSHOT</adventure.bukkit.version>
         <minimessage.version>4.1.0-SNAPSHOT</minimessage.version>
         <eventchain.api.version>2.0.0</eventchain.api.version>
-        <eventchain.version>3.0.0</eventchain.version>
+        <eventchain.version>3.1.0</eventchain.version>
         <depdownloader.version>2.2.16</depdownloader.version>
         <relocator.version>1.4</relocator.version>
         <reflections.version>0.11.7</reflections.version>
