@@ -1,50 +1,24 @@
 pipeline {
     agent none
-    stages {
-        stage('Build-8') {
-            agent {
-                docker {
-                    image 'maven:3-amazoncorretto-8'
-                }
+
+    node {
+        docker.image('maven:3-amazoncorretto-8').inside {
+            stage('Build') {
+                sh 'mvn -B -T 1C -DskipTests clean package'
+                archiveArtifacts artifacts: '**/target/antivpn-*.jar', fingerprint: true
             }
-            steps {
-                sh 'mvn -B -DskipTests clean package'
-            }
-        }
-        stage('Test-8') {
-            agent {
-                docker {
-                    image 'maven:3-amazoncorretto-8'
-                }
-            }
-            steps {
-                sh 'mvn test'
+            stage('Test') {
+                sh 'mvn -B test'
             }
         }
-        stage('Build-11') {
-            agent {
-                docker {
-                    image 'maven:3-amazoncorretto-11'
-                }
+        docker.image('maven:3-amazoncorretto-11').inside {
+            stage('Build') {
+                sh 'mvn -B -T 1C -DskipTests clean package'
+                archiveArtifacts artifacts: '**/target/antivpn-*.jar', fingerprint: true
             }
-            steps {
-                sh 'mvn -B -DskipTests clean package'
+            stage('Test') {
+                sh 'mvn -B test'
             }
-        }
-        stage('Test-11') {
-            agent {
-                docker {
-                    image 'maven:3-amazoncorretto-11'
-                }
-            }
-            steps {
-                sh 'mvn test'
-            }
-        }
-    }
-	post {
-        always {
-            archiveArtifacts artifacts: '**/target/antivpn-*.jar', fingerprint: true
         }
     }
 }
