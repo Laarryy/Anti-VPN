@@ -36,9 +36,7 @@ public class DeleteIPPacket extends AbstractPacket {
         writeString(this.ip, buffer);
     }
 
-    public @NotNull String getIp() {
-        return ip;
-    }
+    public @NotNull String getIp() { return ip; }
 
     public void setIp(@NotNull String ip) {
         this.ip = ip;
@@ -55,9 +53,7 @@ public class DeleteIPPacket extends AbstractPacket {
         return ip.equals(that.ip);
     }
 
-    public int hashCode() {
-        return Objects.hash(ip);
-    }
+    public int hashCode() { return Objects.hash(ip); }
 
     public String toString() {
         return "DeleteIPPacket{" +

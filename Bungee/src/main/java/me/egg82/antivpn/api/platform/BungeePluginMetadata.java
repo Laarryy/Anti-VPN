@@ -11,7 +11,5 @@ public class BungeePluginMetadata extends AbstractPluginMetadata {
     }
 
     @Override
-    public @NotNull String getVersion() {
-        return pluginVersion;
-    }
+    public @NotNull String getVersion() { return pluginVersion; }
 }

@@ -9,8 +9,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class TimeUtil {
-    private TimeUtil() {
-    }
+    private TimeUtil() { }
 
     private static final Pattern timePattern = Pattern.compile("^(\\d+)\\s*(?:seconds?|s|minutes?|m|hours?|h|days?|d)$");
     private static final Pattern unitPattern = Pattern.compile("^(?:\\d+)\\s*(seconds?|s|minutes?|m|hours?|h|days?|d)$");
@@ -69,17 +68,11 @@ public class TimeUtil {
             this.hc = Objects.hash(time, unit);
         }
 
-        public long getTime() {
-            return time;
-        }
+        public long getTime() { return time; }
 
-        public @NotNull TimeUnit getUnit() {
-            return unit;
-        }
+        public @NotNull TimeUnit getUnit() { return unit; }
 
-        public long getMillis() {
-            return unit.toMillis(time);
-        }
+        public long getMillis() { return unit.toMillis(time); }
 
         public boolean equals(Object o) {
             if (this == o) {
@@ -93,8 +86,6 @@ public class TimeUtil {
                     unit == time1.unit;
         }
 
-        public int hashCode() {
-            return hc;
-        }
+        public int hashCode() { return hc; }
     }
 }

@@ -9,8 +9,7 @@ public class BukkitVersionUtil {
     private static final Object versionLock = new Object();
     private static String gameVersion = null;
 
-    private BukkitVersionUtil() {
-    }
+    private BukkitVersionUtil() { }
 
     public static @NotNull String getGameVersion() {
         String localVersion = gameVersion;
@@ -79,6 +78,8 @@ public class BukkitVersionUtil {
     }
 
     private static @NotNull String getVersionFromServerPackageString(@NotNull String versionString) {
-        return versionString.substring(versionString.lastIndexOf('.') + 1).trim().replace('_', '.');
+        return versionString.substring(versionString.lastIndexOf('.') + 1)
+                .trim()
+                .replace('_', '.');
     }
 }

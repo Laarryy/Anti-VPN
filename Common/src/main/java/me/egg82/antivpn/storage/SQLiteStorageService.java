@@ -15,9 +15,7 @@ public class SQLiteStorageService extends AbstractJDBCStorageService {
         super(name);
     }
 
-    public static @NotNull SQLiteStorageService.Builder builder(@NotNull String name) {
-        return new SQLiteStorageService.Builder(name);
-    }
+    public static @NotNull SQLiteStorageService.Builder builder(@NotNull String name) { return new SQLiteStorageService.Builder(name); }
 
     public static class Builder {
         private final SQLiteStorageService service;

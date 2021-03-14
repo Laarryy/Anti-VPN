@@ -36,9 +36,7 @@ public interface Source<T extends SourceModel> {
      * @throws NullPointerException if the IP is null
      * @throws APIException in the result if the source returned an error
      */
-    default @NotNull CompletableFuture<@NotNull Boolean> getResult(@NotNull IP ip) {
-        return getResult(ip.getIP().getHostAddress());
-    }
+    default @NotNull CompletableFuture<@NotNull Boolean> getResult(@NotNull IP ip) { return getResult(ip.getIP().getHostAddress()); }
 
     /**
      * Returns the result from the source given its configuration.
@@ -51,9 +49,7 @@ public interface Source<T extends SourceModel> {
      * @throws IllegalArgumentException if the IP provided is invalid
      * @throws APIException in the result if the source returned an error
      */
-    default @NotNull CompletableFuture<@NotNull Boolean> getResult(@NotNull InetAddress ip) {
-        return getResult(ip.getHostAddress());
-    }
+    default @NotNull CompletableFuture<@NotNull Boolean> getResult(@NotNull InetAddress ip) { return getResult(ip.getHostAddress()); }
 
     /**
      * Returns the result from the source given its configuration.
@@ -79,9 +75,7 @@ public interface Source<T extends SourceModel> {
      * @throws IllegalArgumentException if the IP provided is invalid
      * @throws APIException in the result if the source returned an error
      */
-    default @NotNull CompletableFuture<@NotNull T> getRawResponse(@NotNull IP ip) {
-        return getRawResponse(ip.getIP().getHostAddress());
-    }
+    default @NotNull CompletableFuture<@NotNull T> getRawResponse(@NotNull IP ip) { return getRawResponse(ip.getIP().getHostAddress()); }
 
     /**
      * Returns the raw response from the source given its configuration.
@@ -94,9 +88,7 @@ public interface Source<T extends SourceModel> {
      * @throws IllegalArgumentException if the IP provided is invalid
      * @throws APIException in the result if the source returned an error
      */
-    default @NotNull CompletableFuture<@NotNull T> getRawResponse(@NotNull InetAddress ip) {
-        return getRawResponse(ip.getHostAddress());
-    }
+    default @NotNull CompletableFuture<@NotNull T> getRawResponse(@NotNull InetAddress ip) { return getRawResponse(ip.getHostAddress()); }
 
     /**
      * Returns the raw response from the source given its configuration.

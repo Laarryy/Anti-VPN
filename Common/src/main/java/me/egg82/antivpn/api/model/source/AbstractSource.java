@@ -21,13 +21,9 @@ public abstract class AbstractSource<T extends SourceModel> implements Source<T>
     }
 
     @Override
-    public @NotNull Class<T> getModelClass() {
-        return modelClass;
-    }
+    public @NotNull Class<T> getModelClass() { return modelClass; }
 
-    protected final @NotNull ConfigurationNode getSourceConfigNode() {
-        return ConfigUtil.getConfig().node("sources", getName());
-    }
+    protected final @NotNull ConfigurationNode getSourceConfigNode() { return ConfigUtil.getConfig().node("sources", getName()); }
 
     protected final @NotNull WebRequest.Builder getDefaultBuilder(@NotNull String url) throws APIException {
         try {

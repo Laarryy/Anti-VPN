@@ -7,29 +7,39 @@ import java.util.Map;
 import org.jetbrains.annotations.NotNull;
 
 public class LocalizedArgumentDescription implements ArgumentDescription {
-    public static ArgumentDescription of(@NotNull MessageKey key) {
-        return new LocalizedArgumentDescription(LocaleUtil.getDefaultI18N(), key);
-    }
+    public static ArgumentDescription of(@NotNull MessageKey key) { return new LocalizedArgumentDescription(LocaleUtil.getDefaultI18N(), key); }
 
     public static ArgumentDescription of(@NotNull MessageKey key, String... placeholders) {
-        return new LocalizedArgumentDescription(LocaleUtil.getDefaultI18N(), key, placeholders);
+        return new LocalizedArgumentDescription(
+                LocaleUtil.getDefaultI18N(),
+                key,
+                placeholders
+        );
     }
 
-    public static ArgumentDescription of(@NotNull MessageKey key, @NotNull Map<String, String> placeholders) {
-        return new LocalizedArgumentDescription(LocaleUtil.getDefaultI18N(), key, placeholders);
-    }
+    public static ArgumentDescription of(
+            @NotNull MessageKey key,
+            @NotNull Map<String, String> placeholders
+    ) { return new LocalizedArgumentDescription(LocaleUtil.getDefaultI18N(), key, placeholders); }
 
     public static ArgumentDescription of(@NotNull I18NManager localizationManager, @NotNull MessageKey key) {
-        return new LocalizedArgumentDescription(localizationManager, key);
+        return new LocalizedArgumentDescription(
+                localizationManager,
+                key
+        );
     }
 
-    public static ArgumentDescription of(@NotNull I18NManager localizationManager, @NotNull MessageKey key, String... placeholders) {
-        return new LocalizedArgumentDescription(localizationManager, key, placeholders);
-    }
+    public static ArgumentDescription of(
+            @NotNull I18NManager localizationManager,
+            @NotNull MessageKey key,
+            String... placeholders
+    ) { return new LocalizedArgumentDescription(localizationManager, key, placeholders); }
 
-    public static ArgumentDescription of(@NotNull I18NManager localizationManager, @NotNull MessageKey key, @NotNull Map<String, String> placeholders) {
-        return new LocalizedArgumentDescription(localizationManager, key, placeholders);
-    }
+    public static ArgumentDescription of(
+            @NotNull I18NManager localizationManager,
+            @NotNull MessageKey key,
+            @NotNull Map<String, String> placeholders
+    ) { return new LocalizedArgumentDescription(localizationManager, key, placeholders); }
 
     private final String description;
 
@@ -46,12 +56,8 @@ public class LocalizedArgumentDescription implements ArgumentDescription {
     }
 
     @Override
-    public @NotNull String getDescription() {
-        return description;
-    }
+    public @NotNull String getDescription() { return description; }
 
     @Override
-    public boolean isEmpty() {
-        return false;
-    }
+    public boolean isEmpty() { return false; }
 }

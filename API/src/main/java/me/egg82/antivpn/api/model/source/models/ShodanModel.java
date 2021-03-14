@@ -37,39 +37,30 @@ public class ShodanModel implements SourceModel {
     private List<String> hostnames = null;
     private List<String> domains = null;
 
-    public ShodanModel() {
-    }
+    public ShodanModel() { }
 
-    public @Nullable String getError() {
-        return error;
-    }
+    public @Nullable String getError() { return error; }
 
     public void setError(@Nullable String error) {
         this.error = error;
     }
 
     @JSON(name = "region_code")
-    public @Nullable String getRegionCode() {
-        return regionCode;
-    }
+    public @Nullable String getRegionCode() { return regionCode; }
 
     @JSON(name = "region_code")
     public void setRegionCode(@Nullable String regionCode) {
         this.regionCode = regionCode;
     }
 
-    public long getIp() {
-        return ip;
-    }
+    public long getIp() { return ip; }
 
     public void setIp(long ip) {
         this.ip = ip;
     }
 
     @JSON(name = "ip_str")
-    public @Nullable String getIpString() {
-        return ipString;
-    }
+    public @Nullable String getIpString() { return ipString; }
 
     @JSON(name = "ip_str")
     public void setIpString(@Nullable String ipString) {
@@ -77,9 +68,7 @@ public class ShodanModel implements SourceModel {
     }
 
     @JSON(name = "area_code")
-    public @Nullable String getAreaCode() {
-        return areaCode;
-    }
+    public @Nullable String getAreaCode() { return areaCode; }
 
     @JSON(name = "area_code")
     public void setAreaCode(@Nullable String areaCode) {
@@ -87,9 +76,7 @@ public class ShodanModel implements SourceModel {
     }
 
     @JSON(name = "country_code")
-    public @Nullable String getCountryCode() {
-        return countryCode;
-    }
+    public @Nullable String getCountryCode() { return countryCode; }
 
     @JSON(name = "country_code")
     public void setCountryCode(@Nullable String countryCode) {
@@ -97,9 +84,7 @@ public class ShodanModel implements SourceModel {
     }
 
     @JSON(name = "country_code3")
-    public @Nullable String getCountryCode3() {
-        return countryCode3;
-    }
+    public @Nullable String getCountryCode3() { return countryCode3; }
 
     @JSON(name = "country_code3")
     public void setCountryCode3(@Nullable String countryCode3) {
@@ -107,9 +92,7 @@ public class ShodanModel implements SourceModel {
     }
 
     @JSON(name = "country_name")
-    public @Nullable String getCountry() {
-        return country;
-    }
+    public @Nullable String getCountry() { return country; }
 
     @JSON(name = "country_name")
     public void setCountry(@Nullable String country) {
@@ -117,9 +100,7 @@ public class ShodanModel implements SourceModel {
     }
 
     @JSON(name = "postal_code")
-    public @Nullable String getPostalCode() {
-        return postalCode;
-    }
+    public @Nullable String getPostalCode() { return postalCode; }
 
     @JSON(name = "postal_code")
     public void setPostalCode(@Nullable String postalCode) {
@@ -127,106 +108,80 @@ public class ShodanModel implements SourceModel {
     }
 
     @JSON(name = "dma_code")
-    public @Nullable String getDmaCode() {
-        return dmaCode;
-    }
+    public @Nullable String getDmaCode() { return dmaCode; }
 
     @JSON(name = "dma_code")
     public void setDmaCode(@Nullable String dmaCode) {
         this.dmaCode = dmaCode;
     }
 
-    public @Nullable String getAsn() {
-        return asn;
-    }
+    public @Nullable String getAsn() { return asn; }
 
     public void setAsn(@Nullable String asn) {
         this.asn = asn;
     }
 
-    public @Nullable String getOrg() {
-        return org;
-    }
+    public @Nullable String getOrg() { return org; }
 
     public void setOrg(@Nullable String org) {
         this.org = org;
     }
 
-    public @Nullable String getIsp() {
-        return isp;
-    }
+    public @Nullable String getIsp() { return isp; }
 
     public void setIsp(@Nullable String isp) {
         this.isp = isp;
     }
 
-    public @Nullable String getCity() {
-        return city;
-    }
+    public @Nullable String getCity() { return city; }
 
     public void setCity(@Nullable String city) {
         this.city = city;
     }
 
-    public double getLatitude() {
-        return latitude;
-    }
+    public double getLatitude() { return latitude; }
 
     public void setLatitude(double latitude) {
         this.latitude = latitude;
     }
 
-    public double getLongitude() {
-        return longitude;
-    }
+    public double getLongitude() { return longitude; }
 
     public void setLongitude(double longitude) {
         this.longitude = longitude;
     }
 
-    public @Nullable String getOs() {
-        return os;
-    }
+    public @Nullable String getOs() { return os; }
 
     public void setOs(@Nullable String os) {
         this.os = os;
     }
 
-    public @Nullable List<Integer> getPorts() {
-        return ports;
-    }
+    public @Nullable List<Integer> getPorts() { return ports; }
 
     public void setPorts(@Nullable List<Integer> ports) {
         this.ports = ports;
     }
 
-    public @Nullable List<String> getTags() {
-        return tags;
-    }
+    public @Nullable List<String> getTags() { return tags; }
 
     public void setTags(@Nullable List<String> tags) {
         this.tags = tags;
     }
 
-    public @Nullable List<String> getHotnames() {
-        return hostnames;
-    }
+    public @Nullable List<String> getHotnames() { return hostnames; }
 
     public void setHotnames(@Nullable List<String> hostnames) {
         this.hostnames = hostnames;
     }
 
-    public @Nullable List<String> getHostnames() {
-        return hostnames;
-    }
+    public @Nullable List<String> getHostnames() { return hostnames; }
 
     public void setHostnames(@Nullable List<String> hostnames) {
         this.hostnames = hostnames;
     }
 
-    public @Nullable List<String> getDomains() {
-        return domains;
-    }
+    public @Nullable List<String> getDomains() { return domains; }
 
     public void setDomains(@Nullable List<String> domains) {
         this.domains = domains;

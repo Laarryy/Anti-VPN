@@ -13,14 +13,10 @@ import java.util.concurrent.CompletableFuture;
 
 public class IPHunter extends AbstractSource<IPHunterModel> {
     @Override
-    public @NotNull String getName() {
-        return "iphunter";
-    }
+    public @NotNull String getName() { return "iphunter"; }
 
     @Override
-    public boolean isKeyRequired() {
-        return true;
-    }
+    public boolean isKeyRequired() { return true; }
 
     public IPHunter() {
         super(IPHunterModel.class);

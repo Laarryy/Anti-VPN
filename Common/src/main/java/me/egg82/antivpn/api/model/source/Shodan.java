@@ -13,14 +13,10 @@ import java.util.concurrent.CompletableFuture;
 
 public class Shodan extends AbstractSource<ShodanModel> {
     @Override
-    public @NotNull String getName() {
-        return "shodan";
-    }
+    public @NotNull String getName() { return "shodan"; }
 
     @Override
-    public boolean isKeyRequired() {
-        return true;
-    }
+    public boolean isKeyRequired() { return true; }
 
     public Shodan() {
         super(ShodanModel.class);

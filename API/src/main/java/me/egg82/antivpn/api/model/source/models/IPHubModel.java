@@ -15,62 +15,47 @@ public class IPHubModel implements SourceModel {
     private String isp = null;
     private int block = -1;
 
-    public IPHubModel() {
-    }
+    public IPHubModel() { }
 
-    public @Nullable String getError() {
-        return error;
-    }
+    public @Nullable String getError() { return error; }
 
     public void setError(@Nullable String error) {
         this.error = error;
     }
 
-    public @Nullable String getIp() {
-        return ip;
-    }
+    public @Nullable String getIp() { return ip; }
 
     public void setIp(@Nullable String ip) {
         this.ip = ip;
     }
 
-    public @Nullable String getCountryCode() {
-        return countryCode;
-    }
+    public @Nullable String getCountryCode() { return countryCode; }
 
     public void setCountryCode(@Nullable String countryCode) {
         this.countryCode = countryCode;
     }
 
     @JSON(name = "countryName")
-    public @Nullable String getCountry() {
-        return country;
-    }
+    public @Nullable String getCountry() { return country; }
 
     @JSON(name = "countryName")
     public void setCountry(@Nullable String country) {
         this.country = country;
     }
 
-    public int getAsn() {
-        return asn;
-    }
+    public int getAsn() { return asn; }
 
     public void setAsn(int asn) {
         this.asn = asn;
     }
 
-    public @Nullable String getIsp() {
-        return isp;
-    }
+    public @Nullable String getIsp() { return isp; }
 
     public void setIsp(@Nullable String isp) {
         this.isp = isp;
     }
 
-    public int getBlock() {
-        return block;
-    }
+    public int getBlock() { return block; }
 
     public void setBlock(int block) {
         this.block = block;
@@ -90,9 +75,7 @@ public class IPHubModel implements SourceModel {
         ) && Objects.equals(country, that.country) && Objects.equals(isp, that.isp);
     }
 
-    public int hashCode() {
-        return Objects.hash(error, ip, countryCode, country, asn, isp, block);
-    }
+    public int hashCode() { return Objects.hash(error, ip, countryCode, country, asn, isp, block); }
 
     public String toString() {
         return "IPHubModel{" +

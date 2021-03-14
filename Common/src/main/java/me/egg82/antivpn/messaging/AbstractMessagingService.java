@@ -57,9 +57,7 @@ public abstract class AbstractMessagingService implements MessagingService {
     }
 
     @Override
-    public @NotNull String getName() {
-        return name;
-    }
+    public @NotNull String getName() { return name; }
 
     private static final double TOLERANCE = 1.1; // Compression ratio tolerance. Determines when compression should happen
 

@@ -26,9 +26,7 @@ public class VPNAPIImpl implements VPNAPI {
 
     private static VPNAPIImpl instance = null;
 
-    public static @Nullable VPNAPIImpl get() {
-        return instance;
-    }
+    public static @Nullable VPNAPIImpl get() { return instance; }
 
     public VPNAPIImpl(
             @NotNull Platform platform,
@@ -50,42 +48,26 @@ public class VPNAPIImpl implements VPNAPI {
     }
 
     @Override
-    public @NotNull UUID getServerId() {
-        return ConfigUtil.getCachedConfig().getServerId();
-    }
+    public @NotNull UUID getServerId() { return ConfigUtil.getCachedConfig().getServerId(); }
 
     @Override
-    public @NotNull AbstractIPManager getIPManager() {
-        return ipManager;
-    }
+    public @NotNull AbstractIPManager getIPManager() { return ipManager; }
 
     @Override
-    public @NotNull AbstractPlayerManager getPlayerManager() {
-        return playerManager;
-    }
+    public @NotNull AbstractPlayerManager getPlayerManager() { return playerManager; }
 
     @Override
-    public @NotNull SourceManagerImpl getSourceManager() {
-        return sourceManager;
-    }
+    public @NotNull SourceManagerImpl getSourceManager() { return sourceManager; }
 
     @Override
-    public @NotNull Platform getPlatform() {
-        return platform;
-    }
+    public @NotNull Platform getPlatform() { return platform; }
 
     @Override
-    public @NotNull AbstractPluginMetadata getPluginMetadata() {
-        return pluginMetadata;
-    }
+    public @NotNull AbstractPluginMetadata getPluginMetadata() { return pluginMetadata; }
 
     @Override
-    public @NotNull CompletableFuture<Void> runUpdateTask() {
-        return CompletableFuture.runAsync(PacketUtil::trySendQueue);
-    }
+    public @NotNull CompletableFuture<Void> runUpdateTask() { return CompletableFuture.runAsync(PacketUtil::trySendQueue); }
 
     @Override
-    public @NotNull EventBus<VPNEvent> getEventBus() {
-        return eventBus;
-    }
+    public @NotNull EventBus<VPNEvent> getEventBus() { return eventBus; }
 }

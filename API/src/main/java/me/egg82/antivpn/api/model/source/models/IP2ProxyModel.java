@@ -13,29 +13,22 @@ public class IP2ProxyModel implements SourceModel {
     @JSON(name = "isProxy")
     private String proxy = null;
 
-    public IP2ProxyModel() {
-    }
+    public IP2ProxyModel() { }
 
-    public @Nullable String getResponse() {
-        return response;
-    }
+    public @Nullable String getResponse() { return response; }
 
     public void setResponse(@Nullable String response) {
         this.response = response;
     }
 
-    public @Nullable String getCountryCode() {
-        return countryCode;
-    }
+    public @Nullable String getCountryCode() { return countryCode; }
 
     public void setCountryCode(@Nullable String countryCode) {
         this.countryCode = countryCode;
     }
 
     @JSON(name = "countryName")
-    public @Nullable String getCountry() {
-        return country;
-    }
+    public @Nullable String getCountry() { return country; }
 
     @JSON(name = "countryName")
     public void setCountry(@Nullable String country) {
@@ -43,9 +36,7 @@ public class IP2ProxyModel implements SourceModel {
     }
 
     @JSON(name = "isProxy")
-    public @Nullable String getProxy() {
-        return proxy;
-    }
+    public @Nullable String getProxy() { return proxy; }
 
     @JSON(name = "isProxy")
     public void setProxy(@Nullable String proxy) {
@@ -66,9 +57,7 @@ public class IP2ProxyModel implements SourceModel {
         );
     }
 
-    public int hashCode() {
-        return Objects.hash(response, countryCode, country, proxy);
-    }
+    public int hashCode() { return Objects.hash(response, countryCode, country, proxy); }
 
     public String toString() {
         return "IP2ProxyModel{" +

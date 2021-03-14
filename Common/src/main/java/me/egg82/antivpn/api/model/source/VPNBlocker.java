@@ -13,14 +13,10 @@ import java.util.concurrent.CompletableFuture;
 
 public class VPNBlocker extends AbstractSource<VPNBlockerModel> {
     @Override
-    public @NotNull String getName() {
-        return "vpnblocker";
-    }
+    public @NotNull String getName() { return "vpnblocker"; }
 
     @Override
-    public boolean isKeyRequired() {
-        return false;
-    }
+    public boolean isKeyRequired() { return false; }
 
     public VPNBlocker() {
         super(VPNBlockerModel.class);

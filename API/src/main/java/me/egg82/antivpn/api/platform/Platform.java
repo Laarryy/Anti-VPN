@@ -58,8 +58,6 @@ public interface Platform {
          *
          * @return a readable name
          */
-        public @NotNull String getFriendlyName() {
-            return this.friendlyName;
-        }
+        public @NotNull String getFriendlyName() { return this.friendlyName; }
     }
 }

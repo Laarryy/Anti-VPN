@@ -12,9 +12,7 @@ public class ImportCommand extends AbstractCommand {
     }
 
     @Override
-    public void execute(@NonNull CommandContext<BukkitLocalizedCommandSender> commandContext) {
-
-    }
+    public void execute(@NonNull CommandContext<BukkitLocalizedCommandSender> commandContext) { }
 
     /*private final String masterName;
     private final String slaveName;

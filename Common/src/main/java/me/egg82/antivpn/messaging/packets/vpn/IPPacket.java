@@ -70,33 +70,25 @@ public class IPPacket extends AbstractPacket {
         }
     }
 
-    public @NotNull String getIp() {
-        return ip;
-    }
+    public @NotNull String getIp() { return ip; }
 
     public void setIp(@NotNull String ip) {
         this.ip = ip;
     }
 
-    public @Nullable Boolean getCascade() {
-        return cascade;
-    }
+    public @Nullable Boolean getCascade() { return cascade; }
 
     public void setCascade(@Nullable Boolean cascade) {
         this.cascade = cascade;
     }
 
-    public @Nullable Double getConsensus() {
-        return consensus;
-    }
+    public @Nullable Double getConsensus() { return consensus; }
 
     public void setConsensus(@Nullable Double consensus) {
         this.consensus = consensus;
     }
 
-    public @NotNull AlgorithmMethod getType() {
-        return type;
-    }
+    public @NotNull AlgorithmMethod getType() { return type; }
 
     public void setType(@NotNull AlgorithmMethod type) {
         this.type = type;
@@ -113,9 +105,7 @@ public class IPPacket extends AbstractPacket {
         return ip.equals(ipPacket.ip) && type == ipPacket.type && Objects.equals(cascade, ipPacket.cascade) && Objects.equals(consensus, ipPacket.consensus);
     }
 
-    public int hashCode() {
-        return Objects.hash(ip, type, cascade, consensus);
-    }
+    public int hashCode() { return Objects.hash(ip, type, cascade, consensus); }
 
     public String toString() {
         return "IPPacket{" +

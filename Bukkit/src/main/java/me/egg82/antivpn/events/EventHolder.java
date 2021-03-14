@@ -31,9 +31,7 @@ public abstract class EventHolder {
 
     protected final List<BukkitEventSubscriber<?>> events = new ArrayList<>();
 
-    public final int numEvents() {
-        return events.size();
-    }
+    public final int numEvents() { return events.size(); }
 
     public final void cancel() {
         for (BukkitEventSubscriber<?> event : events) {
@@ -60,9 +58,7 @@ public abstract class EventHolder {
         return false;
     }
 
-    protected final boolean rangeContains(@NotNull String range, @NotNull String ip) {
-        return new IPAddressString(range).contains(new IPAddressString(ip));
-    }
+    protected final boolean rangeContains(@NotNull String range, @NotNull String ip) { return new IPAddressString(range).contains(new IPAddressString(ip)); }
 
     protected final boolean isIgnoredIp(@NotNull String ip, @NotNull String playerName, @NotNull UUID playerId) {
         CachedConfig cachedConfig = ConfigUtil.getCachedConfig();

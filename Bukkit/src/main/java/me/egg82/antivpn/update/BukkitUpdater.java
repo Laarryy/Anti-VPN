@@ -37,7 +37,5 @@ public class BukkitUpdater extends AbstractUpdater {
     }
 
     @Override
-    public @NotNull String getDownloadLink() {
-        return "https://api.spiget.org/v2/resources/" + resourceId + "/versions/latest/download";
-    }
+    public @NotNull String getDownloadLink() { return "https://api.spiget.org/v2/resources/" + resourceId + "/versions/latest/download"; }
 }

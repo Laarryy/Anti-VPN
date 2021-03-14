@@ -14,9 +14,7 @@ public class PostgreSQLStorageService extends AbstractJDBCStorageService {
         super(name);
     }
 
-    public static @NotNull Builder builder(@NotNull String name) {
-        return new PostgreSQLStorageService.Builder(name);
-    }
+    public static @NotNull Builder builder(@NotNull String name) { return new PostgreSQLStorageService.Builder(name); }
 
     public static class Builder {
         private final PostgreSQLStorageService service;

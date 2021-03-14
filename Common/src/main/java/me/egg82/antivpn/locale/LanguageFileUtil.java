@@ -9,11 +9,14 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class LanguageFileUtil {
-    private LanguageFileUtil() {
-    }
+    private LanguageFileUtil() { }
 
     public static @Nullable ResourceBundle getLanguage(@NotNull File dataDirectory, @NotNull Locale locale) throws IOException {
-        return getLanguage(dataDirectory, locale, false);
+        return getLanguage(
+                dataDirectory,
+                locale,
+                false
+        );
     }
 
     public static @Nullable ResourceBundle getLanguage(@NotNull File dataDirectory, @NotNull Locale locale, boolean ignoreCountry) throws IOException {

@@ -37,33 +37,25 @@ public class IPModel extends BaseModel {
         this.consensus = null;
     }
 
-    public @NotNull String getIp() {
-        return ip;
-    }
+    public @NotNull String getIp() { return ip; }
 
     public void setIp(@NotNull String ip) {
         this.ip = ip;
     }
 
-    public int getType() {
-        return type;
-    }
+    public int getType() { return type; }
 
     public void setType(int type) {
         this.type = type;
     }
 
-    public @Nullable Boolean getCascade() {
-        return cascade;
-    }
+    public @Nullable Boolean getCascade() { return cascade; }
 
     public void setCascade(@Nullable Boolean cascade) {
         this.cascade = cascade;
     }
 
-    public @Nullable Double getConsensus() {
-        return consensus;
-    }
+    public @Nullable Double getConsensus() { return consensus; }
 
     public void setConsensus(@Nullable Double consensus) {
         this.consensus = consensus;

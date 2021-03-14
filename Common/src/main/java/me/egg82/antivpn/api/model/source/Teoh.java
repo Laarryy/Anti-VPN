@@ -17,14 +17,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class Teoh extends AbstractSource<TeohModel> {
     @Override
-    public @NotNull String getName() {
-        return "teoh";
-    }
+    public @NotNull String getName() { return "teoh"; }
 
     @Override
-    public boolean isKeyRequired() {
-        return false;
-    }
+    public boolean isKeyRequired() { return false; }
 
     private static final AtomicInteger requests = new AtomicInteger(0);
     private static final ScheduledExecutorService threadPool = Executors.newSingleThreadScheduledExecutor(new ThreadFactoryBuilder().setNameFormat("Anti-VPN_TeohAPI_%d")

@@ -17,37 +17,28 @@ public class GetIPIntelModel implements SourceModel {
     private String format = null;
     private String contact = null;
 
-    public GetIPIntelModel() {
-    }
+    public GetIPIntelModel() { }
 
-    public @Nullable String getStatus() {
-        return status;
-    }
+    public @Nullable String getStatus() { return status; }
 
     public void setStatus(@Nullable String status) {
         this.status = status;
     }
 
-    public @Nullable String getResult() {
-        return result;
-    }
+    public @Nullable String getResult() { return result; }
 
     public void setResult(@Nullable String result) {
         this.result = result;
     }
 
-    public @Nullable String getMessage() {
-        return message;
-    }
+    public @Nullable String getMessage() { return message; }
 
     public void setMessage(@Nullable String message) {
         this.message = message;
     }
 
     @JSON(name = "queryIP")
-    public @Nullable String getIp() {
-        return ip;
-    }
+    public @Nullable String getIp() { return ip; }
 
     @JSON(name = "queryIP")
     public void setIp(@Nullable String ip) {
@@ -55,9 +46,7 @@ public class GetIPIntelModel implements SourceModel {
     }
 
     @JSON(name = "queryFlags")
-    public @Nullable String getFlags() {
-        return flags;
-    }
+    public @Nullable String getFlags() { return flags; }
 
     @JSON(name = "queryFlags")
     public void setFlags(@Nullable String flags) {
@@ -65,18 +54,14 @@ public class GetIPIntelModel implements SourceModel {
     }
 
     @JSON(name = "queryFormat")
-    public @Nullable String getFormat() {
-        return format;
-    }
+    public @Nullable String getFormat() { return format; }
 
     @JSON(name = "queryFormat")
     public void setFormat(@Nullable String format) {
         this.format = format;
     }
 
-    public @Nullable String getContact() {
-        return contact;
-    }
+    public @Nullable String getContact() { return contact; }
 
     public void setContact(@Nullable String contact) {
         this.contact = contact;
@@ -96,9 +81,7 @@ public class GetIPIntelModel implements SourceModel {
         ) && Objects.equals(flags, that.flags) && Objects.equals(format, that.format) && Objects.equals(contact, that.contact);
     }
 
-    public int hashCode() {
-        return Objects.hash(status, result, message, ip, flags, format, contact);
-    }
+    public int hashCode() { return Objects.hash(status, result, message, ip, flags, format, contact); }
 
     public String toString() {
         return "GetIPIntelModel{" +

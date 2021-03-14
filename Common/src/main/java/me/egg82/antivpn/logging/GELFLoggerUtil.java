@@ -39,8 +39,7 @@ public class GELFLoggerUtil {
         workPool.scheduleWithFixedDelay(GELFLoggerUtil::sendModels, 1L, 2L, TimeUnit.SECONDS);
     }
 
-    private GELFLoggerUtil() {
-    }
+    private GELFLoggerUtil() { }
 
     private static final GZIPCompressionStream GZIP_COMPRESSION = new GZIPCompressionStream();
 
@@ -97,17 +96,9 @@ public class GELFLoggerUtil {
 
         if (ex instanceof APIException) {
             String apiError = LocaleUtil.getDefaultI18N().getText(MessageKey.ERROR__API_EXCEPTION, "{hard}", String.valueOf(((APIException) ex).isHard()), "{message}", ex.getClass().getName() + ": " + ex.getMessage());
-            if (ConfigUtil.getDebugOrFalse()) {
-                return new Pair<>(apiError, oldEx != null ? oldEx : ex);
-            } else {
-                return new Pair<>(apiError, null);
-            }
+            if (ConfigUtil.getDebugOrFalse()) { return new Pair<>(apiError, oldEx != null ? oldEx : ex); } else { return new Pair<>(apiError, null); }
         } else {
-            if (ConfigUtil.getDebugOrFalse()) {
-                return new Pair<>(null, oldEx != null ? oldEx : ex);
-            } else {
-                return new Pair<>(null, null);
-            }
+            if (ConfigUtil.getDebugOrFalse()) { return new Pair<>(null, oldEx != null ? oldEx : ex); } else { return new Pair<>(null, null); }
         }
     }*/
 
@@ -192,11 +183,12 @@ public class GELFLoggerUtil {
             HttpURLConnection conn = request.getConnection();
             if (conn.getResponseCode() != 202) {
                 throw new IOException(LocaleUtil.getDefaultI18N()
-                                              .getText(MessageKey.ERROR__LOGGER__SEND,
-                                                       "{code}",
-                                                       String.valueOf(conn.getResponseCode()),
-                                                       "{message}",
-                                                       WebRequest.getString(conn)
+                                              .getText(
+                                                      MessageKey.ERROR__LOGGER__SEND,
+                                                      "{code}",
+                                                      String.valueOf(conn.getResponseCode()),
+                                                      "{message}",
+                                                      WebRequest.getString(conn)
                                               ));
             }
         } catch (IOException ex) {

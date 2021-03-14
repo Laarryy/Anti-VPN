@@ -22,8 +22,7 @@ public class PacketManager {
     private static final Int2ObjectMap<PacketSupplier<? extends Packet>> suppliersById = new Int2ObjectArrayMap<>();
     private static final AtomicInteger currentId = new AtomicInteger(0);
 
-    private PacketManager() {
-    }
+    private PacketManager() { }
 
     public static <T extends Packet> void register(@NotNull Class<T> clazz, @NotNull PacketSupplier<T> supplier) {
         if (!registeredPackets.add(clazz)) {
@@ -36,13 +35,9 @@ public class PacketManager {
         suppliersById.put(id, supplier);
     }
 
-    public static @Nullable Class<? extends Packet> getPacket(int id) {
-        return packetsById.get(id);
-    }
+    public static @Nullable Class<? extends Packet> getPacket(int id) { return packetsById.get(id); }
 
-    public static int getId(Class<? extends Packet> clazz) {
-        return packets.getOrDefault(clazz, -1);
-    }
+    public static int getId(Class<? extends Packet> clazz) { return packets.getOrDefault(clazz, -1); }
 
     public static <T extends Packet> @Nullable T read(int id, @NotNull UUID sender, @NotNull ByteBuf buffer) {
         PacketSupplier<? extends Packet> retVal = suppliersById.get(id);

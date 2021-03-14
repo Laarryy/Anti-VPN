@@ -92,9 +92,7 @@ public interface SourceManager {
      *
      * @throws NullPointerException if the source is null
      */
-    default boolean registerSource(@NotNull Source<? extends SourceModel> source) {
-        return registerSource(source, getSources().size());
-    }
+    default boolean registerSource(@NotNull Source<? extends SourceModel> source) { return registerSource(source, getSources().size()); }
 
     /**
      * Registers and enables a new, unique {@link Source}, inserting

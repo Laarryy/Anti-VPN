@@ -39,33 +39,25 @@ public abstract class BaseModel extends Model implements Serializable {
         this.modified = null;
     }
 
-    public @Nullable Long getId() {
-        return id;
-    }
+    public @Nullable Long getId() { return id; }
 
     public void setId(Long id) {
         this.id = id;
     }
 
-    public @Nullable Long getVersion() {
-        return version;
-    }
+    public @Nullable Long getVersion() { return version; }
 
     public void setVersion(Long version) {
         this.version = version;
     }
 
-    public @Nullable Instant getCreated() {
-        return created;
-    }
+    public @Nullable Instant getCreated() { return created; }
 
     public void setCreated(Instant created) {
         this.created = created;
     }
 
-    public @Nullable Instant getModified() {
-        return modified;
-    }
+    public @Nullable Instant getModified() { return modified; }
 
     public void setModified(Instant modified) {
         this.modified = modified;

@@ -62,13 +62,14 @@ public class RedisMessagingService extends AbstractMessagingService {
     }
 
     @Override
-    public boolean isClosed() {
-        return closed || pool.isClosed();
-    }
+    public boolean isClosed() { return closed || pool.isClosed(); }
 
-    public static @NotNull Builder builder(@NotNull String name, @NotNull UUID serverId, @NotNull MessagingHandler handler, @NotNull File packetDirectory) {
-        return new Builder(name, serverId, handler, packetDirectory);
-    }
+    public static @NotNull Builder builder(
+            @NotNull String name,
+            @NotNull UUID serverId,
+            @NotNull MessagingHandler handler,
+            @NotNull File packetDirectory
+    ) { return new Builder(name, serverId, handler, packetDirectory); }
 
     public static class Builder {
         private final RedisMessagingService service;

@@ -28,22 +28,14 @@ public class BungeePlatform implements Platform {
     }
 
     @Override
-    public @NotNull Type getType() {
-        return Type.BUNGEECORD;
-    }
+    public @NotNull Type getType() { return Type.BUNGEECORD; }
 
     @Override
-    public @NotNull Set<UUID> getUniquePlayers() {
-        return ImmutableSet.copyOf(uniquePlayers);
-    }
+    public @NotNull Set<UUID> getUniquePlayers() { return ImmutableSet.copyOf(uniquePlayers); }
 
     @Override
-    public @NotNull Set<InetAddress> getUniqueIPs() {
-        return ImmutableSet.copyOf(uniqueIps);
-    }
+    public @NotNull Set<InetAddress> getUniqueIPs() { return ImmutableSet.copyOf(uniqueIps); }
 
     @Override
-    public @NotNull Instant getStartTime() {
-        return startTime;
-    }
+    public @NotNull Instant getStartTime() { return startTime; }
 }

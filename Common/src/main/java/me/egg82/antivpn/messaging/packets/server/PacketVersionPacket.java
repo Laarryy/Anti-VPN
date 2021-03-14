@@ -44,25 +44,19 @@ public class PacketVersionPacket extends AbstractPacket {
         buffer.writeByte(this.packetVersion);
     }
 
-    public @NotNull UUID getIntendedRecipient() {
-        return intendedRecipient;
-    }
+    public @NotNull UUID getIntendedRecipient() { return intendedRecipient; }
 
     public void setIntendedRecipient(@NotNull UUID intendedRecipient) {
         this.intendedRecipient = intendedRecipient;
     }
 
-    public @NotNull UUID getServer() {
-        return server;
-    }
+    public @NotNull UUID getServer() { return server; }
 
     public void setServer(@NotNull UUID server) {
         this.server = server;
     }
 
-    public byte getPacketVersion() {
-        return packetVersion;
-    }
+    public byte getPacketVersion() { return packetVersion; }
 
     public void setPacketVersion(byte packetVersion) {
         this.packetVersion = packetVersion;
@@ -79,9 +73,7 @@ public class PacketVersionPacket extends AbstractPacket {
         return packetVersion == that.packetVersion && intendedRecipient.equals(that.intendedRecipient) && server.equals(that.server);
     }
 
-    public int hashCode() {
-        return Objects.hash(intendedRecipient, server, packetVersion);
-    }
+    public int hashCode() { return Objects.hash(intendedRecipient, server, packetVersion); }
 
     public String toString() {
         return "PacketVersionPacket{" +

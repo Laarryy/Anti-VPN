@@ -14,8 +14,7 @@ import org.spongepowered.configurate.loader.ConfigurationLoader;
 import org.spongepowered.configurate.serialize.SerializationException;
 
 public class ConfigurationVersionUtil {
-    private ConfigurationVersionUtil() {
-    }
+    private ConfigurationVersionUtil() { }
 
     public static void conformVersion(
             @NotNull ConfigurationLoader<CommentedConfigurationNode> loader,

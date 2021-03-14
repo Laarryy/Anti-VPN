@@ -29,30 +29,23 @@ public interface LocalizedCommandSender<M extends LocalizedCommandSender<M, B>, 
         sendMessage(getLocalizedText(key, placeholders));
     }
 
-    default @NotNull String getLocalizedText(@NotNull MessageKey key) {
-        return getLocalizationManager().getText(key);
-    }
+    default @NotNull String getLocalizedText(@NotNull MessageKey key) { return getLocalizationManager().getText(key); }
 
-    default @NotNull String getLocalizedText(@NotNull MessageKey key, String... placeholders) {
-        return getLocalizationManager().getText(key, placeholders);
-    }
+    default @NotNull String getLocalizedText(@NotNull MessageKey key, String... placeholders) { return getLocalizationManager().getText(key, placeholders); }
 
-    default @NotNull String getLocalizedText(@NotNull MessageKey key, Map<String, String> placeholders) {
-        return getLocalizationManager().getText(key, placeholders);
-    }
+    default @NotNull String getLocalizedText(@NotNull MessageKey key, Map<String, String> placeholders) { return getLocalizationManager().getText(key, placeholders); }
 
     @NotNull Component getComponent(@NotNull String message);
 
-    default @NotNull Component getComponent(@NotNull MessageKey key) {
-        return getComponent(getLocalizedText(key));
-    }
+    default @NotNull Component getComponent(@NotNull MessageKey key) { return getComponent(getLocalizedText(key)); }
 
-    default @NotNull Component getComponent(@NotNull MessageKey key, String... placeholders) {
-        return getComponent(getLocalizedText(key, placeholders));
-    }
+    default @NotNull Component getComponent(@NotNull MessageKey key, String... placeholders) { return getComponent(getLocalizedText(key, placeholders)); }
 
     default @NotNull Component getComponent(@NotNull MessageKey key, @NotNull Map<String, String> placeholders) {
-        return getComponent(getLocalizedText(key, placeholders));
+        return getComponent(getLocalizedText(
+                key,
+                placeholders
+        ));
     }
 
     @NotNull I18NManager getLocalizationManager();

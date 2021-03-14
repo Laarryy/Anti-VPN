@@ -13,14 +13,10 @@ import java.util.concurrent.CompletableFuture;
 
 public class IPQualityScore extends AbstractSource<IPQualityScoreModel> {
     @Override
-    public @NotNull String getName() {
-        return "ipqualityscore";
-    }
+    public @NotNull String getName() { return "ipqualityscore"; }
 
     @Override
-    public boolean isKeyRequired() {
-        return true;
-    }
+    public boolean isKeyRequired() { return true; }
 
     public IPQualityScore() {
         super(IPQualityScoreModel.class);

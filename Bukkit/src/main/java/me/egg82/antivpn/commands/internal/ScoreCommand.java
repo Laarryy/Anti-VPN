@@ -12,9 +12,7 @@ public class ScoreCommand extends AbstractCommand {
     }
 
     @Override
-    public void execute(@NonNull CommandContext<BukkitLocalizedCommandSender> commandContext) {
-
-    }
+    public void execute(@NonNull CommandContext<BukkitLocalizedCommandSender> commandContext) { }
 
     /*private final String sourceName;
 

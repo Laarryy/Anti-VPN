@@ -11,8 +11,7 @@ import org.slf4j.LoggerFactory;
 public class VelocityTailorUtil {
     private static final Logger logger = LoggerFactory.getLogger(VelocityTailorUtil.class);
 
-    private VelocityTailorUtil() {
-    }
+    private VelocityTailorUtil() { }
 
     public static @NotNull List<String> tailorCommands(@NotNull List<String> commands, @NotNull String name, @NotNull UUID uuid, @NotNull String ip) {
         List<String> retVal = new ArrayList<>();

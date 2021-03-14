@@ -8,12 +8,9 @@ import org.jetbrains.annotations.Nullable;
 public class PlayerNameModel implements Serializable {
     private String name = null;
 
-    public PlayerNameModel() {
-    }
+    public PlayerNameModel() { }
 
-    public @Nullable String getName() {
-        return name;
-    }
+    public @Nullable String getName() { return name; }
 
     public void setName(@Nullable String name) {
         this.name = name;
@@ -30,9 +27,7 @@ public class PlayerNameModel implements Serializable {
         return Objects.equals(name, that.name);
     }
 
-    public int hashCode() {
-        return Objects.hash(name);
-    }
+    public int hashCode() { return Objects.hash(name); }
 
     public String toString() {
         return "PlayerNameModel{" +

@@ -16,8 +16,7 @@ import java.util.Map;
 public class EventUtil {
     private static final Logger logger = new GELFLogger(LoggerFactory.getLogger(EventUtil.class));
 
-    private EventUtil() {
-    }
+    private EventUtil() { }
 
     public static void post(@NotNull VPNEvent event, @NotNull EventBus<VPNEvent> eventBus) {
         PostResult result = eventBus.post(event);

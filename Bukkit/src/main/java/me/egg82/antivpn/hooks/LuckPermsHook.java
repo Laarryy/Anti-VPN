@@ -32,26 +32,21 @@ public class LuckPermsHook implements PluginHook {
 
     private static LuckPermsHook hook = null;
 
-    public static @Nullable LuckPermsHook get() {
-        return hook;
-    }
+    public static @Nullable LuckPermsHook get() { return hook; }
 
     private LuckPermsHook() {
         PluginHooks.getHooks().add(this);
     }
 
     @Override
-    public void cancel() {
-    }
+    public void cancel() { }
 
     public boolean isExpensive(@NotNull UUID uuid) {
         UserManager userManager = LuckPermsProvider.get().getUserManager();
         return userManager.isLoaded(uuid) && userManager.getUser(uuid) != null;
     }
 
-    public @NotNull CompletableFuture<@NotNull UUID> getUuid(@NotNull String name) {
-        return LuckPermsProvider.get().getUserManager().lookupUniqueId(name);
-    }
+    public @NotNull CompletableFuture<@NotNull UUID> getUuid(@NotNull String name) { return LuckPermsProvider.get().getUserManager().lookupUniqueId(name); }
 
     public @NotNull CompletableFuture<@NotNull Boolean> hasPermission(@NotNull UUID uuid, @NotNull String permission) {
         UserManager userManager = LuckPermsProvider.get().getUserManager();

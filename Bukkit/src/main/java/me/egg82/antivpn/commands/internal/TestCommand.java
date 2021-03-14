@@ -12,9 +12,7 @@ public class TestCommand extends AbstractCommand {
     }
 
     @Override
-    public void execute(@NonNull CommandContext<BukkitLocalizedCommandSender> commandContext) {
-
-    }
+    public void execute(@NonNull CommandContext<BukkitLocalizedCommandSender> commandContext) { }
 
     /*private final String ip;
 

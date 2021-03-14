@@ -82,9 +82,7 @@ public class MultiPacket extends AbstractPacket {
         buffer.writeByte((byte) 0x00); // End of multi-packet
     }
 
-    public @NotNull Set<@NotNull Packet> getPackets() {
-        return packets;
-    }
+    public @NotNull Set<@NotNull Packet> getPackets() { return packets; }
 
     public void setPackets(@NotNull Set<@NotNull Packet> packets) {
         this.packets = packets;
@@ -101,9 +99,7 @@ public class MultiPacket extends AbstractPacket {
         return packets.equals(that.packets);
     }
 
-    public int hashCode() {
-        return Objects.hash(packets);
-    }
+    public int hashCode() { return Objects.hash(packets); }
 
     public String toString() {
         return "MultiPacket{" +

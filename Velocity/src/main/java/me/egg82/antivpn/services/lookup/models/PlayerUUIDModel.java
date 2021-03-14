@@ -12,17 +12,13 @@ public class PlayerUUIDModel implements Serializable {
         this.id = null;
     }
 
-    public String getName() {
-        return name;
-    }
+    public String getName() { return name; }
 
     public void setName(String name) {
         this.name = name;
     }
 
-    public String getId() {
-        return id;
-    }
+    public String getId() { return id; }
 
     public void setId(String id) {
         this.id = id;
@@ -40,9 +36,7 @@ public class PlayerUUIDModel implements Serializable {
                 Objects.equals(id, that.id);
     }
 
-    public int hashCode() {
-        return Objects.hash(name, id);
-    }
+    public int hashCode() { return Objects.hash(name, id); }
 
     public String toString() {
         return "PlayerModel{" +

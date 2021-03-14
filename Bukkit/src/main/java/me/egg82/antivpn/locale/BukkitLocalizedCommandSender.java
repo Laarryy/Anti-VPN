@@ -21,25 +21,15 @@ public class BukkitLocalizedCommandSender extends AbstractLocalizedCommandSender
             @NotNull CommandSender base,
             @NotNull Audience audience,
             @NotNull I18NManager localizationManager
-    ) {
-        return new BukkitLocalizedCommandSender(base, audience, localizationManager);
-    }
+    ) { return new BukkitLocalizedCommandSender(base, audience, localizationManager); }
 
-    public static @NotNull CommandSender getBaseCommandSender(@NotNull BukkitLocalizedCommandSender mapped) {
-        return mapped.base;
-    }
+    public static @NotNull CommandSender getBaseCommandSender(@NotNull BukkitLocalizedCommandSender mapped) { return mapped.base; }
 
-    public static @NotNull Audience getMappedAudience(@NotNull BukkitLocalizedCommandSender sender) {
-        return sender.getAudience();
-    }
+    public static @NotNull Audience getMappedAudience(@NotNull BukkitLocalizedCommandSender sender) { return sender.getAudience(); }
 
     @Override
-    public boolean isConsole() {
-        return isConsole;
-    }
+    public boolean isConsole() { return isConsole; }
 
     @Override
-    public boolean isUser() {
-        return isUser;
-    }
+    public boolean isUser() { return isUser; }
 }

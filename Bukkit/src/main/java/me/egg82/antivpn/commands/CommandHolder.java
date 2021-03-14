@@ -21,12 +21,9 @@ public abstract class CommandHolder {
 
     protected final List<Command<BukkitLocalizedCommandSender>> commands = new ArrayList<>();
 
-    protected CommandHolder() {
-    }
+    protected CommandHolder() { }
 
-    public final int numCommands() {
-        return commands.size();
-    }
+    public final int numCommands() { return commands.size(); }
 
     public final void cancel() {
         PaperCommandManager<BukkitLocalizedCommandSender> commandManager = BukkitLocaleCommandUtil.getCommandManager();

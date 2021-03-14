@@ -10,9 +10,7 @@ public class PlayerNameModel implements Serializable {
         this.name = null;
     }
 
-    public String getName() {
-        return name;
-    }
+    public String getName() { return name; }
 
     public void setName(String name) {
         this.name = name;
@@ -29,9 +27,7 @@ public class PlayerNameModel implements Serializable {
         return Objects.equals(name, that.name);
     }
 
-    public int hashCode() {
-        return Objects.hash(name);
-    }
+    public int hashCode() { return Objects.hash(name); }
 
     public String toString() {
         return "PlayerNameModel{" +

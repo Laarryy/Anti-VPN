@@ -13,52 +13,39 @@ public class IPInfoModel implements SourceModel {
     private boolean tor = false;
     private boolean hosting = false;
 
-    public IPInfoModel() {
-    }
+    public IPInfoModel() { }
 
-    public int getStatus() {
-        return status;
-    }
+    public int getStatus() { return status; }
 
     public void setStatus(int status) {
         this.status = status;
     }
 
-    public @Nullable Error getError() {
-        return error;
-    }
+    public @Nullable Error getError() { return error; }
 
     public void setError(@Nullable Error error) {
         this.error = error;
     }
 
-    public boolean isVpn() {
-        return vpn;
-    }
+    public boolean isVpn() { return vpn; }
 
     public void setVpn(boolean vpn) {
         this.vpn = vpn;
     }
 
-    public boolean isProxy() {
-        return proxy;
-    }
+    public boolean isProxy() { return proxy; }
 
     public void setProxy(boolean proxy) {
         this.proxy = proxy;
     }
 
-    public boolean isTor() {
-        return tor;
-    }
+    public boolean isTor() { return tor; }
 
     public void setTor(boolean tor) {
         this.tor = tor;
     }
 
-    public boolean isHosting() {
-        return hosting;
-    }
+    public boolean isHosting() { return hosting; }
 
     public void setHosting(boolean hosting) {
         this.hosting = hosting;
@@ -75,9 +62,7 @@ public class IPInfoModel implements SourceModel {
         return status == that.status && vpn == that.vpn && proxy == that.proxy && tor == that.tor && hosting == that.hosting && Objects.equals(error, that.error);
     }
 
-    public int hashCode() {
-        return Objects.hash(status, error, vpn, proxy, tor, hosting);
-    }
+    public int hashCode() { return Objects.hash(status, error, vpn, proxy, tor, hosting); }
 
     public String toString() {
         return "IPInfoModel{" +
@@ -94,20 +79,15 @@ public class IPInfoModel implements SourceModel {
         private String title = null;
         private String message = null;
 
-        public Error() {
-        }
+        public Error() { }
 
-        public @Nullable String getTitle() {
-            return title;
-        }
+        public @Nullable String getTitle() { return title; }
 
         public void setTitle(@Nullable String title) {
             this.title = title;
         }
 
-        public @Nullable String getMessage() {
-            return message;
-        }
+        public @Nullable String getMessage() { return message; }
 
         public void setMessage(@Nullable String message) {
             this.message = message;
@@ -124,9 +104,7 @@ public class IPInfoModel implements SourceModel {
             return Objects.equals(title, error.title) && Objects.equals(message, error.message);
         }
 
-        public int hashCode() {
-            return Objects.hash(title, message);
-        }
+        public int hashCode() { return Objects.hash(title, message); }
 
         public String toString() {
             return "Error{" +

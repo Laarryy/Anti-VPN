@@ -21,13 +21,9 @@ public abstract class AbstractPacket implements Packet {
     }
 
     @Override
-    public @NotNull UUID getSender() {
-        return sender;
-    }
+    public @NotNull UUID getSender() { return sender; }
 
-    protected final int readVarInt(@NotNull ByteBuf input) {
-        return readVarInt(input, 5);
-    }
+    protected final int readVarInt(@NotNull ByteBuf input) { return readVarInt(input, 5); }
 
     protected final int readVarInt(@NotNull ByteBuf input, int maxBytes) {
         int out = 0;
@@ -77,9 +73,7 @@ public abstract class AbstractPacket implements Packet {
         }
     }
 
-    protected final @NotNull UUID readUUID(@NotNull ByteBuf input) {
-        return new UUID(input.readLong(), input.readLong());
-    }
+    protected final @NotNull UUID readUUID(@NotNull ByteBuf input) { return new UUID(input.readLong(), input.readLong()); }
 
     protected final void writeUUID(@NotNull UUID value, @NotNull ByteBuf output) {
         output.writeLong(value.getMostSignificantBits());

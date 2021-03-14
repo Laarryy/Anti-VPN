@@ -53,13 +53,14 @@ public class RabbitMQMessagingService extends AbstractMessagingService {
     }
 
     @Override
-    public boolean isClosed() {
-        return closed || !connection.isOpen();
-    }
+    public boolean isClosed() { return closed || !connection.isOpen(); }
 
-    public static @NotNull Builder builder(@NotNull String name, @NotNull UUID serverId, @NotNull MessagingHandler handler, @NotNull File packetDirectory) {
-        return new Builder(name, serverId, handler, packetDirectory);
-    }
+    public static @NotNull Builder builder(
+            @NotNull String name,
+            @NotNull UUID serverId,
+            @NotNull MessagingHandler handler,
+            @NotNull File packetDirectory
+    ) { return new Builder(name, serverId, handler, packetDirectory); }
 
     public static class Builder {
         private final RabbitMQMessagingService service;
@@ -251,13 +252,9 @@ public class RabbitMQMessagingService extends AbstractMessagingService {
         return sender;
     }
 
-    private @NotNull RecoverableConnection getConnection() throws IOException, TimeoutException {
-        return (RecoverableConnection) factory.newConnection();
-    }
+    private @NotNull RecoverableConnection getConnection() throws IOException, TimeoutException { return (RecoverableConnection) factory.newConnection(); }
 
-    private @NotNull RecoverableChannel getChannel() throws IOException {
-        return (RecoverableChannel) connection.createChannel();
-    }
+    private @NotNull RecoverableChannel getChannel() throws IOException { return (RecoverableChannel) connection.createChannel(); }
 
     private enum DeliveryMode {
         /**
@@ -275,9 +272,7 @@ public class RabbitMQMessagingService extends AbstractMessagingService {
             this.mode = mode;
         }
 
-        public int getMode() {
-            return mode;
-        }
+        public int getMode() { return mode; }
     }
 
     private enum ExchangeType {
@@ -292,8 +287,6 @@ public class RabbitMQMessagingService extends AbstractMessagingService {
             this.type = type;
         }
 
-        public @NotNull String getType() {
-            return type;
-        }
+        public @NotNull String getType() { return type; }
     }
 }

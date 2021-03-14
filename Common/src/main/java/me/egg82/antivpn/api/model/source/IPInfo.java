@@ -13,14 +13,10 @@ import java.util.concurrent.CompletableFuture;
 
 public class IPInfo extends AbstractSource<IPInfoModel> {
     @Override
-    public @NotNull String getName() {
-        return "ipinfo";
-    }
+    public @NotNull String getName() { return "ipinfo"; }
 
     @Override
-    public boolean isKeyRequired() {
-        return true;
-    }
+    public boolean isKeyRequired() { return true; }
 
     public IPInfo() {
         super(IPInfoModel.class);

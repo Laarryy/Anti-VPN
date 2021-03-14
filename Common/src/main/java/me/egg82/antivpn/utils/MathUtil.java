@@ -4,8 +4,7 @@ import it.unimi.dsi.fastutil.ints.IntArrays;
 import org.jetbrains.annotations.NotNull;
 
 public class MathUtil {
-    private MathUtil() {
-    }
+    private MathUtil() { }
 
     public static int percentile(int @NotNull [] list, double percentile) {
         IntArrays.quickSort(list);

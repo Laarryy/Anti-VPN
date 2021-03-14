@@ -54,9 +54,7 @@ public abstract class AbstractIPManager implements IPManager {
         sourceInvalidationCache = Caffeine.newBuilder().expireAfterWrite(1L, TimeUnit.MINUTES).build(k -> Boolean.FALSE);
     }
 
-    public LoadingCache<Pair<String, AlgorithmMethod>, IPModel> getIpCache() {
-        return ipCache;
-    }
+    public LoadingCache<Pair<String, AlgorithmMethod>, IPModel> getIpCache() { return ipCache; }
 
     @Override
     public @NotNull CompletableFuture<@Nullable IP> getIP(@NotNull String ip) {
@@ -140,9 +138,7 @@ public abstract class AbstractIPManager implements IPManager {
     }
 
     @Override
-    public @NotNull AlgorithmMethod getCurrentAlgorithmMethod() {
-        return ConfigUtil.getCachedConfig().getVPNAlgorithmMethod();
-    }
+    public @NotNull AlgorithmMethod getCurrentAlgorithmMethod() { return ConfigUtil.getCachedConfig().getVPNAlgorithmMethod(); }
 
     @Override
     public @NotNull CompletableFuture<@NotNull Boolean> cascade(@NotNull String ip, boolean useCache) {
@@ -197,9 +193,7 @@ public abstract class AbstractIPManager implements IPManager {
     }
 
     @Override
-    public double getMinConsensusValue() {
-        return ConfigUtil.getCachedConfig().getVPNAlgorithmConsensus();
-    }
+    public double getMinConsensusValue() { return ConfigUtil.getCachedConfig().getVPNAlgorithmConsensus(); }
 
     private @NotNull IPModel calculateIpResult(@NotNull String ip, @NotNull AlgorithmMethod method, boolean useCache) throws APIException {
         CachedConfig cachedConfig = ConfigUtil.getCachedConfig();

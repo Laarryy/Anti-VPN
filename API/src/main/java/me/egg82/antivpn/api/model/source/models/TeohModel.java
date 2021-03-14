@@ -17,61 +17,46 @@ public class TeohModel implements SourceModel {
     @JSON(name = "vpn_or_proxy")
     private String vpnOrProxy = null;
 
-    public TeohModel() {
-    }
+    public TeohModel() { }
 
-    public @Nullable String getMessage() {
-        return message;
-    }
+    public @Nullable String getMessage() { return message; }
 
     public void setMessage(@Nullable String message) {
         this.message = message;
     }
 
-    public @Nullable String getIp() {
-        return ip;
-    }
+    public @Nullable String getIp() { return ip; }
 
     public void setIp(@Nullable String ip) {
         this.ip = ip;
     }
 
-    public @Nullable String getOrganization() {
-        return organization;
-    }
+    public @Nullable String getOrganization() { return organization; }
 
     public void setOrganization(@Nullable String organization) {
         this.organization = organization;
     }
 
-    public @Nullable String getAsn() {
-        return asn;
-    }
+    public @Nullable String getAsn() { return asn; }
 
     public void setAsn(@Nullable String asn) {
         this.asn = asn;
     }
 
-    public @Nullable String getType() {
-        return type;
-    }
+    public @Nullable String getType() { return type; }
 
     public void setType(@Nullable String type) {
         this.type = type;
     }
 
-    public @Nullable String getRisk() {
-        return risk;
-    }
+    public @Nullable String getRisk() { return risk; }
 
     public void setRisk(@Nullable String risk) {
         this.risk = risk;
     }
 
     @JSON(name = "is_hosting")
-    public int getHosting() {
-        return hosting;
-    }
+    public int getHosting() { return hosting; }
 
     @JSON(name = "is_hosting")
     public void setHosting(int hosting) {
@@ -79,9 +64,7 @@ public class TeohModel implements SourceModel {
     }
 
     @JSON(name = "vpn_or_proxy")
-    public @Nullable String getVpnOrProxy() {
-        return vpnOrProxy;
-    }
+    public @Nullable String getVpnOrProxy() { return vpnOrProxy; }
 
     @JSON(name = "vpn_or_proxy")
     public void setVpnOrProxy(@Nullable String vpnOrProxy) {
@@ -105,9 +88,7 @@ public class TeohModel implements SourceModel {
         );
     }
 
-    public int hashCode() {
-        return Objects.hash(message, ip, organization, asn, type, risk, hosting, vpnOrProxy);
-    }
+    public int hashCode() { return Objects.hash(message, ip, organization, asn, type, risk, hosting, vpnOrProxy); }
 
     public String toString() {
         return "TeohModel{" +

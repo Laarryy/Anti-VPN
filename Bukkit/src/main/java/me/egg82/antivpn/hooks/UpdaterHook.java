@@ -28,9 +28,7 @@ public class UpdaterHook implements PluginHook {
 
     private static UpdaterHook hook = null;
 
-    public static @Nullable UpdaterHook get() {
-        return hook;
-    }
+    public static @Nullable UpdaterHook get() { return hook; }
 
     private final ScheduledExecutorService workPool = Executors.newSingleThreadScheduledExecutor(new ThreadFactoryBuilder().setNameFormat("Anti-VPN_Updater_%d").build());
     private final BukkitUpdater updater;

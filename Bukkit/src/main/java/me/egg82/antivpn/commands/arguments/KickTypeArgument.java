@@ -31,21 +31,16 @@ public class KickTypeArgument<C> extends CommandArgument<C, KickType> {
         super(required, name, new KickTypeParser<>(), defaultValue, KickType.class, suggestionsProvider, defaultDescription);
     }
 
-    public static <C> @NotNull Builder<C> newBuilder(@NotNull String name) {
-        return new Builder<>(name);
-    }
+    public static <C> @NotNull Builder<C> newBuilder(@NotNull String name) { return new Builder<>(name); }
 
-    public static <C> @NotNull CommandArgument<C, KickType> of(@NotNull String name) {
-        return KickTypeArgument.<C>newBuilder(name).asRequired().build();
-    }
+    public static <C> @NotNull CommandArgument<C, KickType> of(@NotNull String name) { return KickTypeArgument.<C>newBuilder(name).asRequired().build(); }
 
-    public static <C> @NotNull CommandArgument<C, KickType> optional(@NotNull String name) {
-        return KickTypeArgument.<C>newBuilder(name).asOptional().build();
-    }
+    public static <C> @NotNull CommandArgument<C, KickType> optional(@NotNull String name) { return KickTypeArgument.<C>newBuilder(name).asOptional().build(); }
 
-    public static <C> @NotNull CommandArgument<C, KickType> optional(String name, KickType defaultKickType) {
-        return KickTypeArgument.<C>newBuilder(name).asOptionalWithDefault(defaultKickType.name()).build();
-    }
+    public static <C> @NotNull CommandArgument<C, KickType> optional(
+            String name,
+            KickType defaultKickType
+    ) { return KickTypeArgument.<C>newBuilder(name).asOptionalWithDefault(defaultKickType.name()).build(); }
 
     public static class Builder<C> extends CommandArgument.Builder<C, KickType> {
         private Builder(@NotNull String name) {
@@ -54,7 +49,13 @@ public class KickTypeArgument<C> extends CommandArgument<C, KickType> {
 
         @Override
         public @NotNull KickTypeArgument<C> build() {
-            return new KickTypeArgument<>(this.isRequired(), this.getName(), this.getDefaultValue(), this.getSuggestionsProvider(), this.getDefaultDescription());
+            return new KickTypeArgument<>(
+                    this.isRequired(),
+                    this.getName(),
+                    this.getDefaultValue(),
+                    this.getSuggestionsProvider(),
+                    this.getDefaultDescription()
+            );
         }
     }
 
@@ -90,9 +91,7 @@ public class KickTypeArgument<C> extends CommandArgument<C, KickType> {
         }
 
         @Override
-        public boolean isContextFree() {
-            return true;
-        }
+        public boolean isContextFree() { return true; }
     }
 
     public static class KickParseException extends ParserException {
@@ -103,8 +102,6 @@ public class KickTypeArgument<C> extends CommandArgument<C, KickType> {
             this.input = input;
         }
 
-        public @NotNull String getInput() {
-            return input;
-        }
+        public @NotNull String getInput() { return input; }
     }
 }

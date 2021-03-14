@@ -247,36 +247,85 @@ public class BungeeBootstrap extends Plugin {
         });
     }
 
-    private @NotNull String getInetIpaddrPackage() {
-        return new String(new byte[] { 'i', 'n', 'e', 't', '.', 'i', 'p', 'a', 'd', 'd', 'r' });
-    }
+    private @NotNull String getInetIpaddrPackage() { return new String(new byte[] { 'i', 'n', 'e', 't', '.', 'i', 'p', 'a', 'd', 'd', 'r' }); }
 
-    private @NotNull String getRabbitMqPackage() {
-        return new String(new byte[] { 'c', 'o', 'm', '.', 'r', 'a', 'b', 'b', 'i', 't', 'm', 'q' });
-    }
+    private @NotNull String getRabbitMqPackage() { return new String(new byte[] { 'c', 'o', 'm', '.', 'r', 'a', 'b', 'b', 'i', 't', 'm', 'q' }); }
 
-    private @NotNull String getEbeanPackage() {
-        return new String(new byte[] { 'i', 'o', '.', 'e', 'b', 'e', 'a', 'n' });
-    }
+    private @NotNull String getEbeanPackage() { return new String(new byte[] { 'i', 'o', '.', 'e', 'b', 'e', 'a', 'n' }); }
 
     private @NotNull String getEbeanInternalPackage() {
-        return new String(new byte[] { 'i', 'o', '.', 'e', 'b', 'e', 'a', 'n', 'i', 'n', 't', 'e', 'r', 'n', 'a', 'l' });
+        return new String(new byte[] {
+                'i',
+                'o',
+                '.',
+                'e',
+                'b',
+                'e',
+                'a',
+                'n',
+                'i',
+                'n',
+                't',
+                'e',
+                'r',
+                'n',
+                'a',
+                'l'
+        });
     }
 
-    private @NotNull String getEbeanServicePackage() {
-        return new String(new byte[] { 'i', 'o', '.', 'e', 'b', 'e', 'a', 'n', 's', 'e', 'r', 'v', 'i', 'c', 'e' });
-    }
+    private @NotNull String getEbeanServicePackage() { return new String(new byte[] { 'i', 'o', '.', 'e', 'b', 'e', 'a', 'n', 's', 'e', 'r', 'v', 'i', 'c', 'e' }); }
 
     private @NotNull String getFastUtilPackage() {
-        return new String(new byte[] { 'i', 't', '.', 'u', 'n', 'i', 'm', 'i', '.', 'd', 's', 'i', '.', 'f', 'a', 's', 't', 'u', 't', 'i', 'l' });
+        return new String(new byte[] {
+                'i',
+                't',
+                '.',
+                'u',
+                'n',
+                'i',
+                'm',
+                'i',
+                '.',
+                'd',
+                's',
+                'i',
+                '.',
+                'f',
+                'a',
+                's',
+                't',
+                'u',
+                't',
+                'i',
+                'l'
+        });
     }
 
-    private @NotNull String getJavassistPackage() {
-        return new String(new byte[] { 'j', 'a', 'v', 'a', 's', 's', 'i', 's', 't' });
-    }
+    private @NotNull String getJavassistPackage() { return new String(new byte[] { 'j', 'a', 'v', 'a', 's', 's', 'i', 's', 't' }); }
 
     private @NotNull String getJedisPackage() {
-        return new String(new byte[] { 'r', 'e', 'd', 'i', 's', '.', 'c', 'l', 'i', 'e', 'n', 't', 's', '.', 'j', 'e', 'd', 'i', 's' });
+        return new String(new byte[] {
+                'r',
+                'e',
+                'd',
+                'i',
+                's',
+                '.',
+                'c',
+                'l',
+                'i',
+                'e',
+                'n',
+                't',
+                's',
+                '.',
+                'j',
+                'e',
+                'd',
+                'i',
+                's'
+        });
     }
 
     private void printLatest(@NotNull String friendlyName) {

@@ -13,9 +13,7 @@ public enum AlgorithmMethod {
         this.name = name.toLowerCase();
     }
 
-    public String getName() {
-        return name;
-    }
+    public String getName() { return name; }
 
     public static @Nullable AlgorithmMethod getByName(@NotNull String name) {
         for (AlgorithmMethod value : values()) {

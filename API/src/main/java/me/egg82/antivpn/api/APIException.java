@@ -31,7 +31,5 @@ public class APIException extends RuntimeException {
      *
      * @return true if the exception is "hard", false if not
      */
-    public boolean isHard() {
-        return hard;
-    }
+    public boolean isHard() { return hard; }
 }

@@ -13,12 +13,8 @@ public abstract class AbstractEvent implements VPNEvent {
     }
 
     @Override
-    public @NotNull VPNAPI getApi() {
-        return api;
-    }
+    public @NotNull VPNAPI getApi() { return api; }
 
     @Override
-    public @NotNull Class<? extends VPNEvent> getEventType() {
-        return clazz;
-    }
+    public @NotNull Class<? extends VPNEvent> getEventType() { return clazz; }
 }

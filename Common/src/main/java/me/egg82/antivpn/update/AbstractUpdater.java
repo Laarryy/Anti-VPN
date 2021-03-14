@@ -28,14 +28,10 @@ public abstract class AbstractUpdater implements Updater {
     }
 
     @Override
-    public @NotNull String getCurrentVersion() {
-        return currentVersion;
-    }
+    public @NotNull String getCurrentVersion() { return currentVersion; }
 
     @Override
-    public @NotNull CompletableFuture<@NotNull Boolean> isUpdateAvailable() {
-        return getLatestVersion().thenApply(v -> updateAvailable);
-    }
+    public @NotNull CompletableFuture<@NotNull Boolean> isUpdateAvailable() { return getLatestVersion().thenApply(v -> updateAvailable); }
 
     @Override
     public @NotNull CompletableFuture<@NotNull String> getLatestVersion() {

@@ -15,14 +15,10 @@ import java.util.concurrent.CompletableFuture;
 
 public class ProxyCheck extends AbstractSource<ProxyCheckModel> {
     @Override
-    public @NotNull String getName() {
-        return "proxycheck";
-    }
+    public @NotNull String getName() { return "proxycheck"; }
 
     @Override
-    public boolean isKeyRequired() {
-        return false;
-    }
+    public boolean isKeyRequired() { return false; }
 
     public ProxyCheck() {
         super(ProxyCheckModel.class);

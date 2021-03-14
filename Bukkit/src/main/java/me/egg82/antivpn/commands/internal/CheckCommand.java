@@ -12,9 +12,7 @@ public class CheckCommand extends AbstractCommand {
     }
 
     @Override
-    public void execute(@NonNull CommandContext<BukkitLocalizedCommandSender> commandContext) {
-
-    }
+    public void execute(@NonNull CommandContext<BukkitLocalizedCommandSender> commandContext) { }
     /*private final String type;
 
     public CheckCommand(@NotNull CommandIssuer issuer, @NotNull TaskChainFactory taskFactory, @NotNull String type) {

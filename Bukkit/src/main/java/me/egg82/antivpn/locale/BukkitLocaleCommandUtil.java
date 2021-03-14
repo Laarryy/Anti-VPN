@@ -32,8 +32,7 @@ public class BukkitLocaleCommandUtil {
 
     private static BukkitLocalizedCommandSender consoleCommandSender = null;
 
-    private BukkitLocaleCommandUtil() {
-    }
+    private BukkitLocaleCommandUtil() { }
 
     public static void create(@NotNull Plugin plugin) {
         adventure = BukkitAudiences.create(plugin);

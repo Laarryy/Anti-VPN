@@ -397,11 +397,7 @@ public class PlayerEvents extends EventHolder {
         return host.getHostAddress();
     }
 
-    private @NotNull CompletableFuture<UUID> fetchUuid(@NotNull String name) {
-        return PlayerLookup.get(name, proxy).thenApply(PlayerInfo::getUUID);
-    }
+    private @NotNull CompletableFuture<UUID> fetchUuid(@NotNull String name) { return PlayerLookup.get(name, proxy).thenApply(PlayerInfo::getUUID); }
 
-    private boolean rangeContains(@NotNull String range, @NotNull String ip) {
-        return new IPAddressString(range).contains(new IPAddressString(ip));
-    }
+    private boolean rangeContains(@NotNull String range, @NotNull String ip) { return new IPAddressString(range).contains(new IPAddressString(ip)); }
 }

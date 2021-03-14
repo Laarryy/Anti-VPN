@@ -56,8 +56,7 @@ public class PlayerAnalyticsHook implements PluginHook {
     }
 
     @Override
-    public void cancel() {
-    }
+    public void cancel() { }
 
     private boolean isCapabilityAvailable(String capability) {
         try {
@@ -274,8 +273,6 @@ public class PlayerAnalyticsHook implements PluginHook {
         }
 
         @Override
-        public @NotNull CallEvents[] callExtensionMethodsOn() {
-            return events;
-        }
+        public @NotNull CallEvents[] callExtensionMethodsOn() { return events; }
     }
 }

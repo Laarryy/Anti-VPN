@@ -5,8 +5,7 @@ import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 
 public class VelocityLogUtil {
-    private VelocityLogUtil() {
-    }
+    private VelocityLogUtil() { }
 
     public static final TextComponent HEADING = Component.text("[", NamedTextColor.YELLOW)
             .append(Component.text("Anti-VPN", NamedTextColor.AQUA))

@@ -30,17 +30,13 @@ public class PlayerModel extends BaseModel {
         this.mcleaks = false;
     }
 
-    public @NotNull UUID getUuid() {
-        return uuid;
-    }
+    public @NotNull UUID getUuid() { return uuid; }
 
     public void setUuid(@NotNull UUID uuid) {
         this.uuid = uuid;
     }
 
-    public boolean isMcleaks() {
-        return mcleaks;
-    }
+    public boolean isMcleaks() { return mcleaks; }
 
     public void setMcleaks(boolean mcleaks) {
         this.mcleaks = mcleaks;

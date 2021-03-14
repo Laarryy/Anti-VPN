@@ -24,14 +24,10 @@ public class GenericIP implements IP {
     }
 
     @Override
-    public @NotNull InetAddress getIP() {
-        return ip;
-    }
+    public @NotNull InetAddress getIP() { return ip; }
 
     @Override
-    public @Nullable Boolean getCascade() {
-        return cascade;
-    }
+    public @Nullable Boolean getCascade() { return cascade; }
 
     @Override
     public void setCascade(@Nullable Boolean status) {
@@ -39,9 +35,7 @@ public class GenericIP implements IP {
     }
 
     @Override
-    public @Nullable Double getConsensus() {
-        return consensus;
-    }
+    public @Nullable Double getConsensus() { return consensus; }
 
     @Override
     public void setConsensus(@Nullable Double status) {
@@ -49,9 +43,7 @@ public class GenericIP implements IP {
     }
 
     @Override
-    public @NotNull AlgorithmMethod getType() {
-        return type;
-    }
+    public @NotNull AlgorithmMethod getType() { return type; }
 
     @Override
     public void setType(@NotNull AlgorithmMethod type) {
@@ -69,9 +61,7 @@ public class GenericIP implements IP {
         return ip.equals(genericIP.ip);
     }
 
-    public int hashCode() {
-        return hc;
-    }
+    public int hashCode() { return hc; }
 
     public String toString() {
         return "GenericIP{" +

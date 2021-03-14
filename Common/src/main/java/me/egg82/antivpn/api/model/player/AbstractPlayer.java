@@ -39,19 +39,13 @@ public abstract class AbstractPlayer implements Player {
     }
 
     @Override
-    public @NotNull UUID getUuid() {
-        return uuid;
-    }
+    public @NotNull UUID getUuid() { return uuid; }
 
     @Override
-    public @Nullable String getName() {
-        return name;
-    }
+    public @Nullable String getName() { return name; }
 
     @Override
-    public boolean isMcLeaks() {
-        return mcleaks;
-    }
+    public boolean isMcLeaks() { return mcleaks; }
 
     @Override
     public void setMcLeaks(boolean status) {
@@ -71,9 +65,7 @@ public abstract class AbstractPlayer implements Player {
         return uuid.equals(that.uuid);
     }
 
-    public int hashCode() {
-        return hc;
-    }
+    public int hashCode() { return hc; }
 
     public String toString() {
         return "AbstractPlayer{" +

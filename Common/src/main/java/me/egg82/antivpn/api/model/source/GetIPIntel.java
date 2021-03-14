@@ -32,14 +32,10 @@ public class GetIPIntel extends AbstractSource<GetIPIntelModel> {
     }
 
     @Override
-    public @NotNull String getName() {
-        return "getipintel";
-    }
+    public @NotNull String getName() { return "getipintel"; }
 
     @Override
-    public boolean isKeyRequired() {
-        return false;
-    }
+    public boolean isKeyRequired() { return false; }
 
     @Override
     public @NotNull CompletableFuture<@NotNull Boolean> getResult(@NotNull String ip) {

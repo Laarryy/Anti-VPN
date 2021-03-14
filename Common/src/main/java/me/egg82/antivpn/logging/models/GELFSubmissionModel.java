@@ -30,29 +30,22 @@ public class GELFSubmissionModel implements Serializable {
     @JSON(name = "_os")
     private String os = System.getProperty("os.name");
 
-    public GELFSubmissionModel() {
-    }
+    public GELFSubmissionModel() { }
 
-    public @NotNull String getVersion() {
-        return version;
-    }
+    public @NotNull String getVersion() { return version; }
 
     public void setVersion(@NotNull String version) {
         this.version = version;
     }
 
-    public @NotNull String getHost() {
-        return host;
-    }
+    public @NotNull String getHost() { return host; }
 
     public void setHost(@NotNull String host) {
         this.host = host;
     }
 
     @JSON(name = "short_message")
-    public @NotNull String getShortMessage() {
-        return shortMessage;
-    }
+    public @NotNull String getShortMessage() { return shortMessage; }
 
     @JSON(name = "short_message")
     public void setShortMessage(@NotNull String shortMessage) {
@@ -60,35 +53,27 @@ public class GELFSubmissionModel implements Serializable {
     }
 
     @JSON(name = "full_message")
-    public @Nullable String getFullMessage() {
-        return fullMessage;
-    }
+    public @Nullable String getFullMessage() { return fullMessage; }
 
     @JSON(name = "full_message")
     public void setFullMessage(@Nullable String fullMessage) {
         this.fullMessage = fullMessage;
     }
 
-    public long getTimestamp() {
-        return timestamp;
-    }
+    public long getTimestamp() { return timestamp; }
 
     public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
     }
 
-    public int getLevel() {
-        return level;
-    }
+    public int getLevel() { return level; }
 
     public void setLevel(int level) {
         this.level = level;
     }
 
     @JSON(name = "_session")
-    public @NotNull String getSession() {
-        return session;
-    }
+    public @NotNull String getSession() { return session; }
 
     @JSON(name = "_session")
     public void setSession(@NotNull String session) {
@@ -96,9 +81,7 @@ public class GELFSubmissionModel implements Serializable {
     }
 
     @JSON(name = "_plugin_version")
-    public @NotNull String getPluginVersion() {
-        return pluginVersion;
-    }
+    public @NotNull String getPluginVersion() { return pluginVersion; }
 
     @JSON(name = "_plugin_version")
     public void setPluginVersion(@NotNull String pluginVersion) {
@@ -106,9 +89,7 @@ public class GELFSubmissionModel implements Serializable {
     }
 
     @JSON(name = "_platform")
-    public @NotNull String getPlatform() {
-        return platform;
-    }
+    public @NotNull String getPlatform() { return platform; }
 
     @JSON(name = "_platform")
     public void setPlatform(@NotNull String platform) {
@@ -116,9 +97,7 @@ public class GELFSubmissionModel implements Serializable {
     }
 
     @JSON(name = "_platform_version")
-    public @NotNull String getPlatformVersion() {
-        return platformVersion;
-    }
+    public @NotNull String getPlatformVersion() { return platformVersion; }
 
     @JSON(name = "_platform_version")
     public void setPlatformVersion(@NotNull String platformVersion) {
@@ -126,9 +105,7 @@ public class GELFSubmissionModel implements Serializable {
     }
 
     @JSON(name = "_os")
-    public @NotNull String getOs() {
-        return os;
-    }
+    public @NotNull String getOs() { return os; }
 
     @JSON(name = "_os")
     public void setOs(@NotNull String os) {
@@ -151,9 +128,7 @@ public class GELFSubmissionModel implements Serializable {
                 .equals(that.os);
     }
 
-    public int hashCode() {
-        return Objects.hash(version, host, shortMessage, fullMessage, timestamp, level, session, pluginVersion, platform, platformVersion, os);
-    }
+    public int hashCode() { return Objects.hash(version, host, shortMessage, fullMessage, timestamp, level, session, pluginVersion, platform, platformVersion, os); }
 
     public String toString() {
         return "GELFSubmissionModel{" +

@@ -12,8 +12,7 @@ import java.util.UUID;
 public class BungeeTailorUtil {
     private static final Logger logger = LoggerFactory.getLogger(BungeeTailorUtil.class);
 
-    private BungeeTailorUtil() {
-    }
+    private BungeeTailorUtil() { }
 
     public static @NotNull List<String> tailorCommands(@NotNull List<String> commands, @NotNull String name, @NotNull UUID uuid, @NotNull String ip) {
         List<String> retVal = new ArrayList<>();

@@ -36,9 +36,7 @@ public class DeletePlayerPacket extends AbstractPacket {
         writeUUID(this.uuid, buffer);
     }
 
-    public @NotNull UUID getUuid() {
-        return uuid;
-    }
+    public @NotNull UUID getUuid() { return uuid; }
 
     public void setUuid(@NotNull UUID uuid) {
         this.uuid = uuid;
@@ -55,9 +53,7 @@ public class DeletePlayerPacket extends AbstractPacket {
         return uuid.equals(that.uuid);
     }
 
-    public int hashCode() {
-        return Objects.hash(uuid);
-    }
+    public int hashCode() { return Objects.hash(uuid); }
 
     public String toString() {
         return "DeletePlayerPacket{" +

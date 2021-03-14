@@ -6,8 +6,7 @@ import org.jetbrains.annotations.NotNull;
  * Provides static access to the {@link VPNAPI} service.
  */
 public final class VPNAPIProvider {
-    private VPNAPIProvider() {
-    }
+    private VPNAPIProvider() { }
 
     private static VPNAPI instance = null;
 

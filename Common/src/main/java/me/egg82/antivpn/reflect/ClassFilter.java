@@ -13,8 +13,7 @@ import org.slf4j.LoggerFactory;
 public class ClassFilter {
     private static final Logger logger = new GELFLogger(LoggerFactory.getLogger(ClassFilter.class));
 
-    private ClassFilter() {
-    }
+    private ClassFilter() { }
 
     public static @NotNull Object @NotNull [] getStaticFields(@NotNull Class<?> clazz) {
         Field[] fields = clazz.getDeclaredFields();

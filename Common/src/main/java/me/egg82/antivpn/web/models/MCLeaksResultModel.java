@@ -11,22 +11,17 @@ public class MCLeaksResultModel implements Serializable {
     private boolean isMcLeaks = false;
     private String error = null;
 
-    public MCLeaksResultModel() {
-    }
+    public MCLeaksResultModel() { }
 
     @JSON(name = "isMcLeaks")
-    public boolean isMcLeaks() {
-        return isMcLeaks;
-    }
+    public boolean isMcLeaks() { return isMcLeaks; }
 
     @JSON(name = "isMcLeaks")
     public void setMcLeaks(boolean mcLeaks) {
         isMcLeaks = mcLeaks;
     }
 
-    public @Nullable String getError() {
-        return error;
-    }
+    public @Nullable String getError() { return error; }
 
     public void setError(@Nullable String error) {
         this.error = error;
@@ -43,9 +38,7 @@ public class MCLeaksResultModel implements Serializable {
         return isMcLeaks == that.isMcLeaks && Objects.equals(error, that.error);
     }
 
-    public int hashCode() {
-        return Objects.hash(isMcLeaks, error);
-    }
+    public int hashCode() { return Objects.hash(isMcLeaks, error); }
 
     public String toString() {
         return "MCLeaksResultModel{" +

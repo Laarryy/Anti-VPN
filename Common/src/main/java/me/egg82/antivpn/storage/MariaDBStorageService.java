@@ -14,9 +14,7 @@ public class MariaDBStorageService extends AbstractJDBCStorageService {
         super(name);
     }
 
-    public static @NotNull Builder builder(@NotNull String name) {
-        return new MariaDBStorageService.Builder(name);
-    }
+    public static @NotNull Builder builder(@NotNull String name) { return new MariaDBStorageService.Builder(name); }
 
     public static class Builder {
         private final MariaDBStorageService service;

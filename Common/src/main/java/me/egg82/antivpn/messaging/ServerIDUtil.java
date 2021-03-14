@@ -15,8 +15,7 @@ import org.slf4j.LoggerFactory;
 public class ServerIDUtil {
     private static final Logger logger = new GELFLogger(LoggerFactory.getLogger(ServerIDUtil.class));
 
-    private ServerIDUtil() {
-    }
+    private ServerIDUtil() { }
 
     public static @NotNull UUID getId(@NotNull File idFile) {
         UUID retVal;

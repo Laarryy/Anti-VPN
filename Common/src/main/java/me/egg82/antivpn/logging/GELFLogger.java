@@ -13,14 +13,10 @@ public class GELFLogger implements Logger {
     }
 
     @Override
-    public String getName() {
-        return impl.getName();
-    }
+    public String getName() { return impl.getName(); }
 
     @Override
-    public boolean isTraceEnabled() {
-        return impl.isTraceEnabled();
-    }
+    public boolean isTraceEnabled() { return impl.isTraceEnabled(); }
 
     @Override
     public void trace(String msg) {
@@ -55,9 +51,7 @@ public class GELFLogger implements Logger {
     }
 
     @Override
-    public boolean isTraceEnabled(Marker marker) {
-        return impl.isTraceEnabled(marker);
-    }
+    public boolean isTraceEnabled(Marker marker) { return impl.isTraceEnabled(marker); }
 
     @Override
     public void trace(Marker marker, String msg) {
@@ -92,9 +86,7 @@ public class GELFLogger implements Logger {
     }
 
     @Override
-    public boolean isDebugEnabled() {
-        return impl.isDebugEnabled();
-    }
+    public boolean isDebugEnabled() { return impl.isDebugEnabled(); }
 
     @Override
     public void debug(String msg) {
@@ -129,9 +121,7 @@ public class GELFLogger implements Logger {
     }
 
     @Override
-    public boolean isDebugEnabled(Marker marker) {
-        return impl.isDebugEnabled(marker);
-    }
+    public boolean isDebugEnabled(Marker marker) { return impl.isDebugEnabled(marker); }
 
     @Override
     public void debug(Marker marker, String msg) {
@@ -166,9 +156,7 @@ public class GELFLogger implements Logger {
     }
 
     @Override
-    public boolean isInfoEnabled() {
-        return impl.isInfoEnabled();
-    }
+    public boolean isInfoEnabled() { return impl.isInfoEnabled(); }
 
     @Override
     public void info(String msg) {
@@ -203,9 +191,7 @@ public class GELFLogger implements Logger {
     }
 
     @Override
-    public boolean isInfoEnabled(Marker marker) {
-        return impl.isInfoEnabled(marker);
-    }
+    public boolean isInfoEnabled(Marker marker) { return impl.isInfoEnabled(marker); }
 
     @Override
     public void info(Marker marker, String msg) {
@@ -240,9 +226,7 @@ public class GELFLogger implements Logger {
     }
 
     @Override
-    public boolean isWarnEnabled() {
-        return impl.isWarnEnabled();
-    }
+    public boolean isWarnEnabled() { return impl.isWarnEnabled(); }
 
     @Override
     public void warn(String msg) {
@@ -289,9 +273,7 @@ public class GELFLogger implements Logger {
     }
 
     @Override
-    public boolean isWarnEnabled(Marker marker) {
-        return impl.isWarnEnabled(marker);
-    }
+    public boolean isWarnEnabled(Marker marker) { return impl.isWarnEnabled(marker); }
 
     @Override
     public void warn(Marker marker, String msg) {
@@ -338,9 +320,7 @@ public class GELFLogger implements Logger {
     }
 
     @Override
-    public boolean isErrorEnabled() {
-        return impl.isErrorEnabled();
-    }
+    public boolean isErrorEnabled() { return impl.isErrorEnabled(); }
 
     @Override
     public void error(String msg) {
@@ -387,9 +367,7 @@ public class GELFLogger implements Logger {
     }
 
     @Override
-    public boolean isErrorEnabled(Marker marker) {
-        return impl.isErrorEnabled(marker);
-    }
+    public boolean isErrorEnabled(Marker marker) { return impl.isErrorEnabled(marker); }
 
     @Override
     public void error(Marker marker, String msg) {

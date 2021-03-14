@@ -23,8 +23,7 @@ import org.slf4j.LoggerFactory;
 public class PackageFilter {
     private static final Logger logger = new GELFLogger(LoggerFactory.getLogger(PackageFilter.class));
 
-    private PackageFilter() {
-    }
+    private PackageFilter() { }
 
     public static <T> @NotNull List<@NotNull Class<T>> getClasses(
             @NotNull Class<T> clazz,

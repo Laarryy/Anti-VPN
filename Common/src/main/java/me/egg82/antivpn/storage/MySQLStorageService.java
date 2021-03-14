@@ -14,9 +14,7 @@ public class MySQLStorageService extends AbstractJDBCStorageService {
         super(name);
     }
 
-    public static @NotNull Builder builder(@NotNull String name) {
-        return new MySQLStorageService.Builder(name);
-    }
+    public static @NotNull Builder builder(@NotNull String name) { return new MySQLStorageService.Builder(name); }
 
     public static class Builder {
         private final MySQLStorageService service;

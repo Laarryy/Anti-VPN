@@ -18,29 +18,22 @@ public class VPNBlockerModel implements SourceModel {
     private boolean host = false;
     private String org = null;
 
-    public VPNBlockerModel() {
-    }
+    public VPNBlockerModel() { }
 
-    public @Nullable String getStatus() {
-        return status;
-    }
+    public @Nullable String getStatus() { return status; }
 
     public void setStatus(@Nullable String status) {
         this.status = status;
     }
 
-    public @Nullable String getMsg() {
-        return msg;
-    }
+    public @Nullable String getMsg() { return msg; }
 
     public void setMsg(@Nullable String msg) {
         this.msg = msg;
     }
 
     @JSON(name = "package")
-    public @Nullable String getPackageName() {
-        return packageName;
-    }
+    public @Nullable String getPackageName() { return packageName; }
 
     @JSON(name = "package")
     public void setPackageName(@Nullable String packageName) {
@@ -48,9 +41,7 @@ public class VPNBlockerModel implements SourceModel {
     }
 
     @JSON(name = "remaining_requests")
-    public int getRequestsRemaining() {
-        return requestsRemaining;
-    }
+    public int getRequestsRemaining() { return requestsRemaining; }
 
     @JSON(name = "remaining_requests")
     public void setRequestsRemaining(int requestsRemaining) {
@@ -58,9 +49,7 @@ public class VPNBlockerModel implements SourceModel {
     }
 
     @JSON(name = "ipaddress")
-    public @Nullable String getIp() {
-        return ip;
-    }
+    public @Nullable String getIp() { return ip; }
 
     @JSON(name = "ipaddress")
     public void setIp(@Nullable String ip) {
@@ -68,18 +57,14 @@ public class VPNBlockerModel implements SourceModel {
     }
 
     @JSON(name = "host-ip")
-    public boolean isHost() {
-        return host;
-    }
+    public boolean isHost() { return host; }
 
     @JSON(name = "host-ip")
     public void setHost(boolean host) {
         this.host = host;
     }
 
-    public @Nullable String getOrg() {
-        return org;
-    }
+    public @Nullable String getOrg() { return org; }
 
     public void setOrg(@Nullable String org) {
         this.org = org;
@@ -99,9 +84,7 @@ public class VPNBlockerModel implements SourceModel {
         ) && Objects.equals(ip, that.ip) && Objects.equals(org, that.org);
     }
 
-    public int hashCode() {
-        return Objects.hash(status, msg, packageName, requestsRemaining, ip, host, org);
-    }
+    public int hashCode() { return Objects.hash(status, msg, packageName, requestsRemaining, ip, host, org); }
 
     public String toString() {
         return "VPNBlockerModel{" +

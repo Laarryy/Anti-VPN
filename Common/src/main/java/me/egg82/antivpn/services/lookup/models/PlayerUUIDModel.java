@@ -9,20 +9,15 @@ public class PlayerUUIDModel implements Serializable {
     private String name = null;
     private String id = null;
 
-    public PlayerUUIDModel() {
-    }
+    public PlayerUUIDModel() { }
 
-    public @Nullable String getName() {
-        return name;
-    }
+    public @Nullable String getName() { return name; }
 
     public void setName(@Nullable String name) {
         this.name = name;
     }
 
-    public @Nullable String getId() {
-        return id;
-    }
+    public @Nullable String getId() { return id; }
 
     public void setId(@Nullable String id) {
         this.id = id;
@@ -40,9 +35,7 @@ public class PlayerUUIDModel implements Serializable {
                 Objects.equals(id, that.id);
     }
 
-    public int hashCode() {
-        return Objects.hash(name, id);
-    }
+    public int hashCode() { return Objects.hash(name, id); }
 
     public String toString() {
         return "PlayerModel{" +

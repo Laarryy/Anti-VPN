@@ -8,8 +8,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
 public class PlayerLookup {
-    private PlayerLookup() {
-    }
+    private PlayerLookup() { }
 
     public static @NotNull CompletableFuture<PlayerInfo> get(@NotNull UUID uuid) {
         return CompletableFuture.supplyAsync(() -> {

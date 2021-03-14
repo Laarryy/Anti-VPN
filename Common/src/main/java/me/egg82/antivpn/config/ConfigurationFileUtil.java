@@ -42,8 +42,7 @@ import redis.clients.jedis.exceptions.JedisException;
 public class ConfigurationFileUtil {
     private static final Logger logger = new GELFLogger(LoggerFactory.getLogger(ConfigurationFileUtil.class));
 
-    private ConfigurationFileUtil() {
-    }
+    private ConfigurationFileUtil() { }
 
     public static boolean getAllowErrorStats(@NotNull File dataDirectory) {
         ConfigurationNode config;
@@ -827,13 +826,9 @@ public class ConfigurationFileUtil {
             this.port = p;
         }
 
-        public @NotNull String getAddress() {
-            return address;
-        }
+        public @NotNull String getAddress() { return address; }
 
-        public int getPort() {
-            return port;
-        }
+        public int getPort() { return port; }
     }
 
     private static class PoolSettings {
@@ -859,20 +854,12 @@ public class ConfigurationFileUtil {
             timeout = t.getMillis();
         }
 
-        public int getMinPoolSize() {
-            return minPoolSize;
-        }
+        public int getMinPoolSize() { return minPoolSize; }
 
-        public int getMaxPoolSize() {
-            return maxPoolSize;
-        }
+        public int getMaxPoolSize() { return maxPoolSize; }
 
-        public long getMaxLifetime() {
-            return maxLifetime;
-        }
+        public long getMaxLifetime() { return maxLifetime; }
 
-        public long getTimeout() {
-            return timeout;
-        }
+        public long getTimeout() { return timeout; }
     }
 }

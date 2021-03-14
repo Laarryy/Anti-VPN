@@ -16,8 +16,7 @@ public class ValidationUtil {
      */
     private static final Pattern uuidValidator = Pattern.compile("^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$", Pattern.CASE_INSENSITIVE);
 
-    private ValidationUtil() {
-    }
+    private ValidationUtil() { }
 
     public static boolean isValidIpRange(@Nullable String range) {
         if (range == null || range.isEmpty()) {

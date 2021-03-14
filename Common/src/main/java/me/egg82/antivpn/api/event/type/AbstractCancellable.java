@@ -14,7 +14,5 @@ public abstract class AbstractCancellable extends AbstractEvent implements Cance
     }
 
     @Override
-    public @NotNull AtomicBoolean cancellationState() {
-        return cancelState;
-    }
+    public @NotNull AtomicBoolean cancellationState() { return cancelState; }
 }

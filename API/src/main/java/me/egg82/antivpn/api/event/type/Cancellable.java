@@ -20,18 +20,14 @@ public interface Cancellable {
      *
      * @return if the event is cancelled
      */
-    default boolean isCancelled() {
-        return cancellationState().get();
-    }
+    default boolean isCancelled() { return cancellationState().get(); }
 
     /**
      * Returns true if the event is not currently cancelled.
      *
      * @return if the event is not cancelled
      */
-    default boolean isNotCancelled() {
-        return !cancellationState().get();
-    }
+    default boolean isNotCancelled() { return !cancellationState().get(); }
 
     /**
      * Sets the cancellation state of the event.
@@ -40,7 +36,5 @@ public interface Cancellable {
      *
      * @return the previous state
      */
-    default boolean setCancelled(boolean cancelled) {
-        return cancellationState().getAndSet(cancelled);
-    }
+    default boolean setCancelled(boolean cancelled) { return cancellationState().getAndSet(cancelled); }
 }

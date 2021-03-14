@@ -40,17 +40,13 @@ public class InitializationPacket extends AbstractPacket {
         buffer.writeByte(this.packetVersion);
     }
 
-    public @NotNull UUID getServer() {
-        return server;
-    }
+    public @NotNull UUID getServer() { return server; }
 
     public void setServer(@NotNull UUID server) {
         this.server = server;
     }
 
-    public byte getPacketVersion() {
-        return packetVersion;
-    }
+    public byte getPacketVersion() { return packetVersion; }
 
     public void setPacketVersion(byte packetVersion) {
         this.packetVersion = packetVersion;
@@ -67,9 +63,7 @@ public class InitializationPacket extends AbstractPacket {
         return packetVersion == that.packetVersion && server.equals(that.server);
     }
 
-    public int hashCode() {
-        return Objects.hash(server, packetVersion);
-    }
+    public int hashCode() { return Objects.hash(server, packetVersion); }
 
     public String toString() {
         return "InitializationPacket{" +

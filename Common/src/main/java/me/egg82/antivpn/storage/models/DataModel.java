@@ -25,17 +25,13 @@ public class DataModel extends BaseModel {
         this.value = null;
     }
 
-    public @NotNull String getKey() {
-        return key;
-    }
+    public @NotNull String getKey() { return key; }
 
     public void setKey(@NotNull String key) {
         this.key = key;
     }
 
-    public @Nullable String getValue() {
-        return value;
-    }
+    public @Nullable String getValue() { return value; }
 
     public void setValue(@Nullable String value) {
         this.value = value;

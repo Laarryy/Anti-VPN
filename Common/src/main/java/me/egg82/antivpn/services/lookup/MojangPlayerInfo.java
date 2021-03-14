@@ -98,19 +98,13 @@ public class MojangPlayerInfo implements PlayerInfo {
     }
 
     @Override
-    public @NotNull UUID getUUID() {
-        return uuid;
-    }
+    public @NotNull UUID getUUID() { return uuid; }
 
     @Override
-    public @NotNull String getName() {
-        return name;
-    }
+    public @NotNull String getName() { return name; }
 
     @Override
-    public @NotNull List<ProfileModel.@NotNull ProfilePropertyModel> getProperties() {
-        return ImmutableList.copyOf(properties);
-    }
+    public @NotNull List<ProfileModel.@NotNull ProfilePropertyModel> getProperties() { return ImmutableList.copyOf(properties); }
 
     protected @Nullable String nameExpensive(@NotNull UUID uuid) throws IOException {
         // Network lookup

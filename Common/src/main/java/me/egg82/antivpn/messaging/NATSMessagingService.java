@@ -51,13 +51,14 @@ public class NATSMessagingService extends AbstractMessagingService {
     }
 
     @Override
-    public boolean isClosed() {
-        return closed || connection.getConnectedUrl() == null;
-    }
+    public boolean isClosed() { return closed || connection.getConnectedUrl() == null; }
 
-    public static @NotNull Builder builder(@NotNull String name, @NotNull UUID serverId, @NotNull MessagingHandler handler, @NotNull File packetDirectory) {
-        return new Builder(name, serverId, handler, packetDirectory);
-    }
+    public static @NotNull Builder builder(
+            @NotNull String name,
+            @NotNull UUID serverId,
+            @NotNull MessagingHandler handler,
+            @NotNull File packetDirectory
+    ) { return new Builder(name, serverId, handler, packetDirectory); }
 
     public static class Builder {
         private final NATSMessagingService service;

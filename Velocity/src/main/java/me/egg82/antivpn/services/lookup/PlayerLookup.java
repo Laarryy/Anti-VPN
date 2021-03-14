@@ -10,8 +10,7 @@ import java.util.concurrent.CompletionException;
 import org.jetbrains.annotations.NotNull;
 
 public class PlayerLookup {
-    private PlayerLookup() {
-    }
+    private PlayerLookup() { }
 
     public static @NotNull CompletableFuture<PlayerInfo> get(@NotNull UUID uuid, @NotNull ProxyServer proxy) {
         return CompletableFuture.supplyAsync(() -> {

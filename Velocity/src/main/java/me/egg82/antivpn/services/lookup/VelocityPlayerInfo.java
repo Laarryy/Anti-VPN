@@ -99,19 +99,13 @@ public class VelocityPlayerInfo implements PlayerInfo {
     }
 
     @Override
-    public @NotNull UUID getUUID() {
-        return uuid;
-    }
+    public @NotNull UUID getUUID() { return uuid; }
 
     @Override
-    public @NotNull String getName() {
-        return name;
-    }
+    public @NotNull String getName() { return name; }
 
     @Override
-    public @NotNull ImmutableList<ProfileModel.ProfilePropertyModel> getProperties() {
-        return ImmutableList.copyOf(properties);
-    }
+    public @NotNull ImmutableList<ProfileModel.ProfilePropertyModel> getProperties() { return ImmutableList.copyOf(properties); }
 
     private static @Nullable String nameExpensive(@NotNull UUID uuid, @NotNull ProxyServer proxy) throws IOException {
         // Currently-online lookup

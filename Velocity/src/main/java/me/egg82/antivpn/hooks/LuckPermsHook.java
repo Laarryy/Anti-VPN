@@ -21,8 +21,7 @@ public class LuckPermsHook implements PluginHook {
     }
 
     @Override
-    public void cancel() {
-    }
+    public void cancel() { }
 
     public boolean isExpensive(@NotNull UUID uuid) {
         UserManager userManager = LuckPermsProvider.get().getUserManager();

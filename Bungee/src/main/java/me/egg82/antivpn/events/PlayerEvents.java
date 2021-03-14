@@ -411,7 +411,5 @@ public class PlayerEvents extends EventHolder {
         return PlayerLookup.get(name).thenApply(PlayerInfo::getUUID);
     }
 
-    private boolean rangeContains(@NotNull String range, @NotNull String ip) {
-        return new IPAddressString(range).contains(new IPAddressString(ip));
-    }
+    private boolean rangeContains(@NotNull String range, @NotNull String ip) { return new IPAddressString(range).contains(new IPAddressString(ip)); }
 }

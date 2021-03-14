@@ -90,7 +90,5 @@ public class SourceManagerImpl implements SourceManager {
     }
 
     @Override
-    public @NotNull List<@NotNull Source<? extends SourceModel>> getSources() {
-        return ImmutableList.copyOf(sources);
-    }
+    public @NotNull List<@NotNull Source<? extends SourceModel>> getSources() { return ImmutableList.copyOf(sources); }
 }

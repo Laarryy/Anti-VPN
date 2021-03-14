@@ -36,9 +36,7 @@ public class ShutdownPacket extends AbstractPacket {
         writeUUID(this.server, buffer);
     }
 
-    public @NotNull UUID getServer() {
-        return server;
-    }
+    public @NotNull UUID getServer() { return server; }
 
     public void setServer(@NotNull UUID server) {
         this.server = server;
@@ -55,9 +53,7 @@ public class ShutdownPacket extends AbstractPacket {
         return server.equals(that.server);
     }
 
-    public int hashCode() {
-        return Objects.hash(server);
-    }
+    public int hashCode() { return Objects.hash(server); }
 
     public String toString() {
         return "ShutdownPacket{" +

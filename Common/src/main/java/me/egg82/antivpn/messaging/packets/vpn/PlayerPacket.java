@@ -40,17 +40,13 @@ public class PlayerPacket extends AbstractPacket {
         buffer.writeBoolean(this.value);
     }
 
-    public @NotNull UUID getUuid() {
-        return uuid;
-    }
+    public @NotNull UUID getUuid() { return uuid; }
 
     public void setUuid(@NotNull UUID uuid) {
         this.uuid = uuid;
     }
 
-    public boolean getValue() {
-        return value;
-    }
+    public boolean getValue() { return value; }
 
     public void setValue(boolean value) {
         this.value = value;
@@ -67,9 +63,7 @@ public class PlayerPacket extends AbstractPacket {
         return value == that.value && uuid.equals(that.uuid);
     }
 
-    public int hashCode() {
-        return Objects.hash(uuid, value);
-    }
+    public int hashCode() { return Objects.hash(uuid, value); }
 
     public String toString() {
         return "PlayerPacket{" +

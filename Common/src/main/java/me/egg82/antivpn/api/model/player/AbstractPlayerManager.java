@@ -44,9 +44,7 @@ public abstract class AbstractPlayerManager implements PlayerManager {
         this.mcleaksKey = mcleaksKey;
     }
 
-    public LoadingCache<UUID, PlayerModel> getPlayerCache() {
-        return playerCache;
-    }
+    public LoadingCache<UUID, PlayerModel> getPlayerCache() { return playerCache; }
 
     @Override
     public @NotNull CompletableFuture<Void> savePlayer(@NotNull Player player) {

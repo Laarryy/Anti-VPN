@@ -39,9 +39,7 @@ public class BStatsHook implements PluginHook {
 
     private static BStatsHook hook = null;
 
-    public static @Nullable BStatsHook getHook() {
-        return hook;
-    }
+    public static @Nullable BStatsHook getHook() { return hook; }
 
     private BStatsHook(@NotNull JavaPlugin plugin, int id) {
         if (!ConfigUtil.getConfig().node("stats", "usage").getBoolean(true)) {
@@ -131,6 +129,5 @@ public class BStatsHook implements PluginHook {
     }
 
     @Override
-    public void cancel() {
-    }
+    public void cancel() { }
 }

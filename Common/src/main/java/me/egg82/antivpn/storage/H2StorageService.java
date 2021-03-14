@@ -15,9 +15,7 @@ public class H2StorageService extends AbstractJDBCStorageService {
         super(name);
     }
 
-    public static @NotNull H2StorageService.Builder builder(@NotNull String name) {
-        return new H2StorageService.Builder(name);
-    }
+    public static @NotNull H2StorageService.Builder builder(@NotNull String name) { return new H2StorageService.Builder(name); }
 
     public static class Builder {
         private final H2StorageService service;

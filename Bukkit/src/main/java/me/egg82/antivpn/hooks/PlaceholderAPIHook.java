@@ -24,27 +24,18 @@ public class PlaceholderAPIHook implements PluginHook {
 
     private static PlaceholderAPIHook hook = null;
 
-    public static @Nullable PlaceholderAPIHook get() {
-        return hook;
-    }
+    public static @Nullable PlaceholderAPIHook get() { return hook; }
 
     private PlaceholderAPIHook() {
         PluginHooks.getHooks().add(this);
     }
 
     @Override
-    public void cancel() {
-    }
+    public void cancel() { }
 
-    public @NotNull String withPlaceholders(@NotNull String input) {
-        return PlaceholderAPI.setPlaceholders(null, input);
-    }
+    public @NotNull String withPlaceholders(@NotNull String input) { return PlaceholderAPI.setPlaceholders(null, input); }
 
-    public @NotNull String withPlaceholders(@NotNull Player player, @NotNull String input) {
-        return PlaceholderAPI.setPlaceholders(player, input);
-    }
+    public @NotNull String withPlaceholders(@NotNull Player player, @NotNull String input) { return PlaceholderAPI.setPlaceholders(player, input); }
 
-    public @NotNull String withPlaceholders(@NotNull OfflinePlayer player, @NotNull String input) {
-        return PlaceholderAPI.setPlaceholders(player, input);
-    }
+    public @NotNull String withPlaceholders(@NotNull OfflinePlayer player, @NotNull String input) { return PlaceholderAPI.setPlaceholders(player, input); }
 }
