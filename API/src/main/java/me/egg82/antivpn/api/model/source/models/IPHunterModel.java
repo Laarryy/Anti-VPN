@@ -31,6 +31,7 @@ public class IPHunterModel implements SourceModel {
         this.data = data;
     }
 
+    @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
@@ -42,8 +43,10 @@ public class IPHunterModel implements SourceModel {
         return Objects.equals(status, that.status) && Objects.equals(code, that.code) && Objects.equals(data, that.data);
     }
 
+    @Override
     public int hashCode() { return Objects.hash(status, code, data); }
 
+    @Override
     public String toString() {
         return "IPHunterModel{" +
                 "status='" + status + '\'' +
@@ -114,6 +117,7 @@ public class IPHunterModel implements SourceModel {
             this.block = block;
         }
 
+        @Override
         public boolean equals(Object o) {
             if (this == o) {
                 return true;
@@ -128,8 +132,10 @@ public class IPHunterModel implements SourceModel {
             ) && Objects.equals(city, data.city) && Objects.equals(isp, data.isp);
         }
 
+        @Override
         public int hashCode() { return Objects.hash(ip, ipNumber, countryCode, country, city, isp, block); }
 
+        @Override
         public String toString() {
             return "Data{" +
                     "ip='" + ip + '\'' +

@@ -111,6 +111,7 @@ public class GELFSubmissionModel implements Serializable {
         this.os = os;
     }
 
+    @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
@@ -127,8 +128,10 @@ public class GELFSubmissionModel implements Serializable {
                 .equals(that.os);
     }
 
+    @Override
     public int hashCode() { return Objects.hash(version, host, shortMessage, fullMessage, timestamp, level, session, pluginVersion, platform, platformVersion, os); }
 
+    @Override
     public String toString() {
         return "GELFSubmissionModel{" +
                 "version='" + version + '\'' +

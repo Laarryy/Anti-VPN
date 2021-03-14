@@ -37,6 +37,7 @@ public class DataModel extends BaseModel {
         this.value = value;
     }
 
+    @Override
     public String toString() {
         return "DataModel{" +
                 "id=" + id +

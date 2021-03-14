@@ -19,6 +19,7 @@ public class SourceDeregisterEventImpl extends AbstractCancellable implements So
     @Override
     public @NotNull Source<? extends SourceModel> getSource() { return source; }
 
+    @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
@@ -30,8 +31,10 @@ public class SourceDeregisterEventImpl extends AbstractCancellable implements So
         return source.equals(that.source);
     }
 
+    @Override
     public int hashCode() { return Objects.hash(source); }
 
+    @Override
     public String toString() {
         return "SourceDeregisterEventImpl{" +
                 "api=" + api +

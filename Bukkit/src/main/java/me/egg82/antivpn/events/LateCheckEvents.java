@@ -57,6 +57,7 @@ public class LateCheckEvents extends EventHolder {
         tryActOnPlayer(ip, event, event.getPlayer().hasPermission(ConfigUtil.getCachedConfig().getBypassPermissionNode()));
     }
 
+    @SuppressWarnings("deprecation")
     private void tryActOnPlayer(@NotNull String ip, @NotNull PlayerLoginEvent event, boolean hasBypassPermission) {
         if (hasBypassPermission) {
             if (ConfigUtil.getDebugOrFalse()) {

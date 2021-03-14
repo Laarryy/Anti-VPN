@@ -60,6 +60,7 @@ public class IPModel extends BaseModel {
         this.consensus = consensus;
     }
 
+    @Override
     public String toString() {
         return "IPModel{" +
                 "id=" + id +

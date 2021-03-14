@@ -143,6 +143,7 @@ public class BukkitLocaleCommandUtil {
         );
     }
 
+    @SuppressWarnings("deprecation")
     private static @NotNull I18NManager getLanguage(@NotNull Plugin plugin, @NotNull CommandSender sender) {
         if (sender instanceof Player) {
             return I18NManager.getUserCache().computeIfAbsent(((Player) sender).getUniqueId(), k -> I18NManager.getManager(

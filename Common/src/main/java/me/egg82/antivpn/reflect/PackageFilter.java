@@ -25,6 +25,7 @@ public class PackageFilter {
 
     private PackageFilter() { }
 
+    @SuppressWarnings("unchecked")
     public static <T> @NotNull List<@NotNull Class<T>> getClasses(
             @NotNull Class<T> clazz,
             @NotNull String pkg,
@@ -113,6 +114,7 @@ public class PackageFilter {
         return list;
     }
 
+    @SuppressWarnings("unchecked")
     public static <T> @NotNull List<@NotNull Class<? extends T>> getClassesParameterized(
             @NotNull Class<T> clazz,
             @NotNull String pkg,

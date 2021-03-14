@@ -458,7 +458,7 @@ public class VelocityBootstrap {
             String friendlyName,
             int depth,
             List<Relocation> rules
-    ) throws IOException, IllegalAccessException, InvocationTargetException, URISyntaxException, XPathExpressionException, SAXException {
+    ) throws IOException, URISyntaxException, XPathExpressionException, SAXException {
         File output = new File(jarsDir, artifact.getGroupId()
                 + "-" + artifact.getArtifactId()
                 + "-" + artifact.getRealVersion() + ".jar"
@@ -502,7 +502,7 @@ public class VelocityBootstrap {
             @NotNull File jarsDir,
             @NotNull PluginManager pluginManager,
             List<Relocation> rules
-    ) throws IOException, IllegalAccessException, InvocationTargetException {
+    ) throws IOException {
         File[] files = jarsDir.listFiles();
         if (files == null) {
             throw new IOException();

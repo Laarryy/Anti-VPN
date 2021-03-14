@@ -41,6 +41,7 @@ public class ShutdownPacket extends AbstractPacket {
         this.server = server;
     }
 
+    @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
@@ -52,8 +53,10 @@ public class ShutdownPacket extends AbstractPacket {
         return server.equals(that.server);
     }
 
+    @Override
     public int hashCode() { return Objects.hash(server); }
 
+    @Override
     public String toString() {
         return "ShutdownPacket{" +
                 "server=" + server +

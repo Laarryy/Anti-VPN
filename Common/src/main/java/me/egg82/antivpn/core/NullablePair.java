@@ -1,6 +1,6 @@
 package me.egg82.antivpn.core;
 
-import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 
@@ -10,42 +10,41 @@ import java.util.Objects;
  * Also, hashCode is calculated on Pair creation, so any changes made to objects
  * in this Pair won't be reflected in the hashCode.
  */
-public class Pair<T1, T2> {
+public class NullablePair<T1, T2> {
     private final T1 t1;
     private final T2 t2;
 
     private final int hc;
 
-    public Pair(@NotNull T1 t1, @NotNull T2 t2) {
+    public NullablePair(@Nullable T1 t1, @Nullable T2 t2) {
         this.t1 = t1;
         this.t2 = t2;
 
         this.hc = Objects.hash(t1, t2);
     }
 
-    public @NotNull T1 getT1() { return t1; }
+    public @Nullable T1 getT1() { return t1; }
 
-    public @NotNull T2 getT2() { return t2; }
+    public @Nullable T2 getT2() { return t2; }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof Pair)) {
+        if (!(o instanceof NullablePair)) {
             return false;
         }
-        Pair<?, ?> pair = (Pair<?, ?>) o;
-        return Objects.equals(t1, pair.t1) &&
-                Objects.equals(t2, pair.t2);
+        NullablePair<?, ?> that = (NullablePair<?, ?>) o;
+        return Objects.equals(t1, that.t1) && Objects.equals(t2, that.t2);
     }
 
     @Override
-    public int hashCode() { return hc; }
+    public int hashCode() { return Objects.hash(t1, t2, hc); }
 
     @Override
     public String toString() {
-        return "Pair{" +
+        return "NullablePair{" +
                 "t1=" + t1 +
                 ", t2=" + t2 +
                 '}';

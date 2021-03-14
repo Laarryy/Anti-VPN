@@ -9,6 +9,7 @@ public class APILoadedEventImpl extends AbstractEvent implements APILoadedEvent 
         super(api);
     }
 
+    @Override
     public String toString() {
         return "APILoadedEventImpl{" +
                 "api=" + api +

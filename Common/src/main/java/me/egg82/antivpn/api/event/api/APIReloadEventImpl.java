@@ -28,6 +28,7 @@ public class APIReloadEventImpl extends AbstractEvent implements APIReloadEvent 
     @Override
     public @NotNull SourceManager getNewSourceManager() { return newSourceManager; }
 
+    @Override
     public String toString() {
         return "APIReloadEventImpl{" +
                 "api=" + api +

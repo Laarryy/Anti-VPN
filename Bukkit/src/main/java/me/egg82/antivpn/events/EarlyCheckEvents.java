@@ -82,6 +82,7 @@ public class EarlyCheckEvents extends EventHolder {
         }
     }
 
+    @SuppressWarnings("deprecation")
     private void tryActOnPlayer(@NotNull String ip, @NotNull AsyncPlayerPreLoginEvent event, boolean hasBypassPermission) {
         if (hasBypassPermission) {
             if (ConfigUtil.getDebugOrFalse()) {

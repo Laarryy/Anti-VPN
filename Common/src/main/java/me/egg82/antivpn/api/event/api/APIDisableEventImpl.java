@@ -9,6 +9,7 @@ public class APIDisableEventImpl extends AbstractEvent implements APIDisableEven
         super(api);
     }
 
+    @Override
     public String toString() {
         return "APIDisableEventImpl{" +
                 "api=" + api +

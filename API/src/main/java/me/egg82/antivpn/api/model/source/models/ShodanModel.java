@@ -187,6 +187,7 @@ public class ShodanModel implements SourceModel {
         this.domains = domains;
     }
 
+    @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
@@ -210,6 +211,7 @@ public class ShodanModel implements SourceModel {
         ) && Objects.equals(ports, that.ports) && Objects.equals(tags, that.tags) && Objects.equals(hostnames, that.hostnames) && Objects.equals(domains, that.domains);
     }
 
+    @Override
     public int hashCode() {
         return Objects.hash(
                 error,
@@ -236,6 +238,7 @@ public class ShodanModel implements SourceModel {
         );
     }
 
+    @Override
     public String toString() {
         return "ShodanModel{" +
                 "error='" + error + '\'' +

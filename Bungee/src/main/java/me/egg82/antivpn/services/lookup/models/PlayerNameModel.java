@@ -16,6 +16,7 @@ public class PlayerNameModel implements Serializable {
         this.name = name;
     }
 
+    @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
@@ -27,8 +28,10 @@ public class PlayerNameModel implements Serializable {
         return Objects.equals(name, that.name);
     }
 
+    @Override
     public int hashCode() { return Objects.hash(name); }
 
+    @Override
     public String toString() {
         return "PlayerNameModel{" +
                 "name='" + name + '\'' +

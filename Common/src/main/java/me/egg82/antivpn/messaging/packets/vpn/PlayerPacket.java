@@ -51,6 +51,7 @@ public class PlayerPacket extends AbstractPacket {
         this.value = value;
     }
 
+    @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
@@ -62,8 +63,10 @@ public class PlayerPacket extends AbstractPacket {
         return value == that.value && uuid.equals(that.uuid);
     }
 
+    @Override
     public int hashCode() { return Objects.hash(uuid, value); }
 
+    @Override
     public String toString() {
         return "PlayerPacket{" +
                 "sender=" + sender +

@@ -74,6 +74,7 @@ public class TimeUtil {
 
         public long getMillis() { return unit.toMillis(time); }
 
+        @Override
         public boolean equals(Object o) {
             if (this == o) {
                 return true;
@@ -86,6 +87,7 @@ public class TimeUtil {
                     unit == time1.unit;
         }
 
+        @Override
         public int hashCode() { return hc; }
     }
 }

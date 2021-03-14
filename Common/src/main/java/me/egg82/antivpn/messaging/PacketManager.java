@@ -38,6 +38,7 @@ public class PacketManager {
 
     public static int getId(Class<? extends Packet> clazz) { return packets.getOrDefault(clazz, -1); }
 
+    @SuppressWarnings("unchecked")
     public static <T extends Packet> @Nullable T read(int id, @NotNull UUID sender, @NotNull ByteBuf buffer) {
         PacketSupplier<? extends Packet> retVal = suppliersById.get(id);
         return retVal != null ? (T) retVal.create(sender, buffer) : null;

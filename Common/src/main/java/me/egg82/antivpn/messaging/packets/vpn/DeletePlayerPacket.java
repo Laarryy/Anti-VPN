@@ -41,6 +41,7 @@ public class DeletePlayerPacket extends AbstractPacket {
         this.uuid = uuid;
     }
 
+    @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
@@ -52,8 +53,10 @@ public class DeletePlayerPacket extends AbstractPacket {
         return uuid.equals(that.uuid);
     }
 
+    @Override
     public int hashCode() { return Objects.hash(uuid); }
 
+    @Override
     public String toString() {
         return "DeletePlayerPacket{" +
                 "sender=" + sender +

@@ -93,6 +93,7 @@ public class IPPacket extends AbstractPacket {
         this.type = type;
     }
 
+    @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
@@ -104,8 +105,10 @@ public class IPPacket extends AbstractPacket {
         return ip.equals(ipPacket.ip) && type == ipPacket.type && Objects.equals(cascade, ipPacket.cascade) && Objects.equals(consensus, ipPacket.consensus);
     }
 
+    @Override
     public int hashCode() { return Objects.hash(ip, type, cascade, consensus); }
 
+    @Override
     public String toString() {
         return "IPPacket{" +
                 "sender=" + sender +

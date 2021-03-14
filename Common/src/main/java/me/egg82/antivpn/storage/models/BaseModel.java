@@ -62,6 +62,7 @@ public abstract class BaseModel extends Model implements Serializable {
         this.modified = modified;
     }
 
+    @Override
     public String toString() {
         return "BaseModel{" +
                 "id=" + id +

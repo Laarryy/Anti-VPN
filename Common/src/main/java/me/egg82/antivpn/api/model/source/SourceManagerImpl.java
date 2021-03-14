@@ -31,6 +31,7 @@ public class SourceManagerImpl implements SourceManager {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public @Nullable <T extends SourceModel> Source<T> getSource(@NotNull String name, @NotNull Class<T> modelClass) {
         for (Source<? extends SourceModel> source : sources) {
             if (source.getName().equals(name) && source.getModelClass().isAssignableFrom(modelClass)) {

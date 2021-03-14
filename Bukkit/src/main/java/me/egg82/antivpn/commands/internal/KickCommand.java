@@ -34,6 +34,7 @@ public class KickCommand extends AbstractCommand {
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     public void execute(@NonNull CommandContext<BukkitLocalizedCommandSender> commandContext) {
         commandManager.taskRecipe().begin(commandContext)
                 .synchronous(c -> {

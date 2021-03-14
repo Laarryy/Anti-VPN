@@ -51,6 +51,7 @@ public class IPInfoModel implements SourceModel {
         this.hosting = hosting;
     }
 
+    @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
@@ -62,8 +63,10 @@ public class IPInfoModel implements SourceModel {
         return status == that.status && vpn == that.vpn && proxy == that.proxy && tor == that.tor && hosting == that.hosting && Objects.equals(error, that.error);
     }
 
+    @Override
     public int hashCode() { return Objects.hash(status, error, vpn, proxy, tor, hosting); }
 
+    @Override
     public String toString() {
         return "IPInfoModel{" +
                 "status=" + status +
@@ -93,6 +96,7 @@ public class IPInfoModel implements SourceModel {
             this.message = message;
         }
 
+        @Override
         public boolean equals(Object o) {
             if (this == o) {
                 return true;
@@ -104,8 +108,10 @@ public class IPInfoModel implements SourceModel {
             return Objects.equals(title, error.title) && Objects.equals(message, error.message);
         }
 
+        @Override
         public int hashCode() { return Objects.hash(title, message); }
 
+        @Override
         public String toString() {
             return "Error{" +
                     "title='" + title + '\'' +

@@ -54,6 +54,7 @@ public abstract class AbstractPlayer implements Player {
 
     protected abstract @NotNull CompletableFuture<@NotNull String> fetchName(@NotNull UUID uuid);
 
+    @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
@@ -65,8 +66,10 @@ public abstract class AbstractPlayer implements Player {
         return uuid.equals(that.uuid);
     }
 
+    @Override
     public int hashCode() { return hc; }
 
+    @Override
     public String toString() {
         return "AbstractPlayer{" +
                 "uuid=" + uuid +

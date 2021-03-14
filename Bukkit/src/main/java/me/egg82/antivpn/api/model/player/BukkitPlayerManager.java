@@ -61,6 +61,7 @@ public class BukkitPlayerManager extends AbstractPlayerManager {
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     public boolean kickForMcLeaks(@NotNull String playerName, @NotNull UUID playerUuid, @NotNull String ip) {
         CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
 

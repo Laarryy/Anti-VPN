@@ -83,24 +83,6 @@ public class GELFLoggerUtil {
         }
     }
 
-    /*public static @NotNull Pair<String, Throwable> getBuriedException(@NotNull Throwable ex) {
-        Throwable oldEx = null;
-        if (ex instanceof CompletionException || ex instanceof ExecutionException) {
-            oldEx = ex;
-            ex = ex.getCause();
-        }
-        while (ex instanceof CompletionException || ex instanceof ExecutionException) {
-            ex = ex.getCause();
-        }
-
-        if (ex instanceof APIException) {
-            String apiError = LocaleUtil.getDefaultI18N().getText(MessageKey.ERROR__API_EXCEPTION, "{hard}", String.valueOf(((APIException) ex).isHard()), "{message}", ex.getClass().getName() + ": " + ex.getMessage());
-            if (ConfigUtil.getDebugOrFalse()) { return new Pair<>(apiError, oldEx != null ? oldEx : ex); } else { return new Pair<>(apiError, null); }
-        } else {
-            if (ConfigUtil.getDebugOrFalse()) { return new Pair<>(null, oldEx != null ? oldEx : ex); } else { return new Pair<>(null, null); }
-        }
-    }*/
-
     public static void send(int level, @Nullable String message) {
         sendModel(getModel(level, message));
     }

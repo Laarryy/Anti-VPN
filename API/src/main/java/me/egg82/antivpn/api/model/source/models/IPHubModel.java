@@ -61,6 +61,7 @@ public class IPHubModel implements SourceModel {
         this.block = block;
     }
 
+    @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
@@ -75,8 +76,10 @@ public class IPHubModel implements SourceModel {
         ) && Objects.equals(country, that.country) && Objects.equals(isp, that.isp);
     }
 
+    @Override
     public int hashCode() { return Objects.hash(error, ip, countryCode, country, asn, isp, block); }
 
+    @Override
     public String toString() {
         return "IPHubModel{" +
                 "error='" + error + '\'' +

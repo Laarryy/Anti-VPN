@@ -27,6 +27,7 @@ public class MCLeaksResultModel implements Serializable {
         this.error = error;
     }
 
+    @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
@@ -38,8 +39,10 @@ public class MCLeaksResultModel implements Serializable {
         return isMcLeaks == that.isMcLeaks && Objects.equals(error, that.error);
     }
 
+    @Override
     public int hashCode() { return Objects.hash(isMcLeaks, error); }
 
+    @Override
     public String toString() {
         return "MCLeaksResultModel{" +
                 "isMcLeaks=" + isMcLeaks +

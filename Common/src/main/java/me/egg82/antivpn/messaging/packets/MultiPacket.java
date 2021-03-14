@@ -87,6 +87,7 @@ public class MultiPacket extends AbstractPacket {
         this.packets = packets;
     }
 
+    @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
@@ -98,8 +99,10 @@ public class MultiPacket extends AbstractPacket {
         return packets.equals(that.packets);
     }
 
+    @Override
     public int hashCode() { return Objects.hash(packets); }
 
+    @Override
     public String toString() {
         return "MultiPacket{" +
                 "sender=" + sender +

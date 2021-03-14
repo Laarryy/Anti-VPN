@@ -30,6 +30,7 @@ public class ProxyCheckModel implements SourceModel {
         this.ip = ip;
     }
 
+    @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
@@ -41,8 +42,10 @@ public class ProxyCheckModel implements SourceModel {
         return Objects.equals(status, that.status) && Objects.equals(message, that.message) && Objects.equals(ip, that.ip);
     }
 
+    @Override
     public int hashCode() { return Objects.hash(status, message, ip); }
 
+    @Override
     public String toString() {
         return "ProxyCheckModel{" +
                 "status='" + status + '\'' +
@@ -69,6 +72,7 @@ public class ProxyCheckModel implements SourceModel {
             this.type = type;
         }
 
+        @Override
         public boolean equals(Object o) {
             if (this == o) {
                 return true;
@@ -80,8 +84,10 @@ public class ProxyCheckModel implements SourceModel {
             return Objects.equals(proxy, ip.proxy) && Objects.equals(type, ip.type);
         }
 
+        @Override
         public int hashCode() { return Objects.hash(proxy, type); }
 
+        @Override
         public String toString() {
             return "IP{" +
                     "proxy='" + proxy + '\'' +

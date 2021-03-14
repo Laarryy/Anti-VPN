@@ -54,6 +54,7 @@ public class IPTrooperModel implements SourceModel {
         this.type = type;
     }
 
+    @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
@@ -68,8 +69,10 @@ public class IPTrooperModel implements SourceModel {
         ) && Objects.equals(type, that.type);
     }
 
+    @Override
     public int hashCode() { return Objects.hash(code, bad, asn, countryCode, name, type); }
 
+    @Override
     public String toString() {
         return "IPTrooperModel{" +
                 "code=" + code +

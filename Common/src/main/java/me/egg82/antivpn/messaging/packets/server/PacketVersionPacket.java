@@ -61,6 +61,7 @@ public class PacketVersionPacket extends AbstractPacket {
         this.packetVersion = packetVersion;
     }
 
+    @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
@@ -72,8 +73,10 @@ public class PacketVersionPacket extends AbstractPacket {
         return packetVersion == that.packetVersion && intendedRecipient.equals(that.intendedRecipient) && server.equals(that.server);
     }
 
+    @Override
     public int hashCode() { return Objects.hash(intendedRecipient, server, packetVersion); }
 
+    @Override
     public String toString() {
         return "PacketVersionPacket{" +
                 "sender=" + sender +

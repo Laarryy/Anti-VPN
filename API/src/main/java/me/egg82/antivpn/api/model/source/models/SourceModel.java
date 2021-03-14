@@ -9,15 +9,18 @@ public interface SourceModel extends Serializable {
     /**
      * {@inheritDoc}
      */
+    @Override
     boolean equals(Object o);
 
     /**
      * {@inheritDoc}
      */
+    @Override
     int hashCode();
 
     /**
      * {@inheritDoc}
      */
+    @Override
     String toString();
 }

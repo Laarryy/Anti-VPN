@@ -11,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -35,8 +36,8 @@ public class MessagingHandlerImpl extends AbstractMessagingHandler implements Me
             }
 
             try {
-                handlers.add(clazz.newInstance());
-            } catch (InstantiationException | IllegalAccessException ex) {
+                handlers.add(clazz.getConstructor().newInstance());
+            } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException ex) {
                 logger.error("Could not create new handler instance.", ex);
             }
         }

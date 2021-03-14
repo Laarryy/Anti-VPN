@@ -70,6 +70,7 @@ public class VPNBlockerModel implements SourceModel {
         this.org = org;
     }
 
+    @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
@@ -84,8 +85,10 @@ public class VPNBlockerModel implements SourceModel {
         ) && Objects.equals(ip, that.ip) && Objects.equals(org, that.org);
     }
 
+    @Override
     public int hashCode() { return Objects.hash(status, msg, packageName, requestsRemaining, ip, host, org); }
 
+    @Override
     public String toString() {
         return "VPNBlockerModel{" +
                 "status='" + status + '\'' +

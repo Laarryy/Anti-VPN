@@ -50,6 +50,7 @@ public class GenericIP implements IP {
         this.type = type;
     }
 
+    @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
@@ -61,8 +62,10 @@ public class GenericIP implements IP {
         return ip.equals(genericIP.ip);
     }
 
+    @Override
     public int hashCode() { return hc; }
 
+    @Override
     public String toString() {
         return "GenericIP{" +
                 "ip='" + ip + '\'' +

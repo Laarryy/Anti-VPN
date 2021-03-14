@@ -43,6 +43,7 @@ public class IP2ProxyModel implements SourceModel {
         this.proxy = proxy;
     }
 
+    @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
@@ -57,8 +58,10 @@ public class IP2ProxyModel implements SourceModel {
         );
     }
 
+    @Override
     public int hashCode() { return Objects.hash(response, countryCode, country, proxy); }
 
+    @Override
     public String toString() {
         return "IP2ProxyModel{" +
                 "response='" + response + '\'' +

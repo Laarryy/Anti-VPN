@@ -213,6 +213,7 @@ public class IPQualityScoreModel implements SourceModel {
         this.fraudScore = fraudScore;
     }
 
+    @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
@@ -234,6 +235,7 @@ public class IPQualityScoreModel implements SourceModel {
         ) && Objects.equals(connectionType, that.connectionType) && Objects.equals(timezone, that.timezone) && Objects.equals(abuseVelocity, that.abuseVelocity);
     }
 
+    @Override
     public int hashCode() {
         return Objects.hash(
                 success,
@@ -263,6 +265,7 @@ public class IPQualityScoreModel implements SourceModel {
         );
     }
 
+    @Override
     public String toString() {
         return "IPQualityScoreModel{" +
                 "success=" + success +

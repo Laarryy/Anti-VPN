@@ -28,6 +28,7 @@ public class BukkitIPManager extends AbstractIPManager {
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     public boolean kickForVpn(@NotNull String playerName, @NotNull UUID playerUuid, @NotNull String ip) {
         Player p = Bukkit.getPlayer(playerUuid);
         if (p == null) {

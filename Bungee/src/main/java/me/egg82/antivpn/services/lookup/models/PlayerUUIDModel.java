@@ -24,6 +24,7 @@ public class PlayerUUIDModel implements Serializable {
         this.id = id;
     }
 
+    @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
@@ -36,8 +37,10 @@ public class PlayerUUIDModel implements Serializable {
                 Objects.equals(id, that.id);
     }
 
+    @Override
     public int hashCode() { return Objects.hash(name, id); }
 
+    @Override
     public String toString() {
         return "PlayerModel{" +
                 "name='" + name + '\'' +

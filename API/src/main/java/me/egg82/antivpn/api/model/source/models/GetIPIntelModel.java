@@ -67,6 +67,7 @@ public class GetIPIntelModel implements SourceModel {
         this.contact = contact;
     }
 
+    @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
@@ -81,8 +82,10 @@ public class GetIPIntelModel implements SourceModel {
         ) && Objects.equals(flags, that.flags) && Objects.equals(format, that.format) && Objects.equals(contact, that.contact);
     }
 
+    @Override
     public int hashCode() { return Objects.hash(status, result, message, ip, flags, format, contact); }
 
+    @Override
     public String toString() {
         return "GetIPIntelModel{" +
                 "status='" + status + '\'' +

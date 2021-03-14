@@ -41,6 +41,7 @@ public class DeleteIPPacket extends AbstractPacket {
         this.ip = ip;
     }
 
+    @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
@@ -52,8 +53,10 @@ public class DeleteIPPacket extends AbstractPacket {
         return ip.equals(that.ip);
     }
 
+    @Override
     public int hashCode() { return Objects.hash(ip); }
 
+    @Override
     public String toString() {
         return "DeleteIPPacket{" +
                 "sender=" + sender +

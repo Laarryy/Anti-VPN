@@ -41,6 +41,7 @@ public class PlayerModel extends BaseModel {
         this.mcleaks = mcleaks;
     }
 
+    @Override
     public String toString() {
         return "PlayerModel{" +
                 "id=" + id +
