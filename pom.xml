@@ -31,10 +31,10 @@
         <jedis.version>3.5.1</jedis.version>
         <rabbitmq.version>5.11.0</rabbitmq.version>
         <nats.version>2.8.0</nats.version>
-        <zstd.version>1.4.0-1</zstd.version>
+        <zstd.version>1.4.9-1</zstd.version>
         <guava.version>30.1-jre</guava.version>
         <fastutil.version>8.2.2</fastutil.version> <!-- keep updated with Paper: https://github.com/PaperMC/Paper/blob/master/Spigot-API-Patches/0002-Add-FastUtil-to-Bukkit.patch -->
-        <caffeine.version>3.0.0</caffeine.version>
+        <caffeine.version>2.9.0</caffeine.version> <!-- v3 is J11 only -->
         <ipaddress.version>5.3.3</ipaddress.version>
         <slf4j.version>1.7.30</slf4j.version>
         <netty.version>4.1.50.Final</netty.version> <!-- keep this updated with Paper: https://github.com/PaperMC/Paper/blob/d3dc24999e0a1e8f3e8d9d59a36f32261a52a498/Spigot-Server-Patches/0001-POM-Changes.patch -->

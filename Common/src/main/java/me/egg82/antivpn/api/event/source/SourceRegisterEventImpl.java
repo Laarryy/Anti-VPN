@@ -1,11 +1,12 @@
 package me.egg82.antivpn.api.event.source;
 
-import java.util.Objects;
 import me.egg82.antivpn.api.VPNAPI;
 import me.egg82.antivpn.api.event.type.AbstractCancellable;
 import me.egg82.antivpn.api.model.source.Source;
 import me.egg82.antivpn.api.model.source.models.SourceModel;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Objects;
 
 public class SourceRegisterEventImpl extends AbstractCancellable implements SourceRegisterEvent {
     private final Source<? extends SourceModel> source;

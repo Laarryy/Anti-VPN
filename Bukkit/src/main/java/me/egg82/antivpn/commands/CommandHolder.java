@@ -2,10 +2,6 @@ package me.egg82.antivpn.commands;
 
 import cloud.commandframework.Command;
 import cloud.commandframework.paper.PaperCommandManager;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 import me.egg82.antivpn.locale.BukkitLocaleCommandUtil;
 import me.egg82.antivpn.locale.BukkitLocalizedCommandSender;
 import me.egg82.antivpn.logging.GELFLogger;
@@ -14,6 +10,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongepowered.configurate.ConfigurationNode;
 import org.spongepowered.configurate.serialize.SerializationException;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public abstract class CommandHolder {
     protected final Logger logger = new GELFLogger(LoggerFactory.getLogger(getClass()));

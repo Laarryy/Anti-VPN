@@ -1,10 +1,11 @@
 package me.egg82.antivpn.core;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-import org.jetbrains.annotations.NotNull;
 
 public class DoubleBuffer<T> {
     private volatile Queue<T> currentBuffer = new ConcurrentLinkedQueue<>();

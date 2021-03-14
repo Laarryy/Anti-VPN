@@ -1,9 +1,10 @@
 package me.egg82.antivpn.web.models;
 
 import flexjson.JSON;
+import org.jetbrains.annotations.Nullable;
+
 import java.io.Serializable;
 import java.util.Objects;
-import org.jetbrains.annotations.Nullable;
 
 public class MCLeaksResultModel implements Serializable {
     @JSON(name = "isMcLeaks")

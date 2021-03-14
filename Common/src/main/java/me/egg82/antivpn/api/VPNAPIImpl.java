@@ -1,7 +1,5 @@
 package me.egg82.antivpn.api;
 
-import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 import me.egg82.antivpn.api.event.VPNEvent;
 import me.egg82.antivpn.api.model.ip.AbstractIPManager;
 import me.egg82.antivpn.api.model.player.AbstractPlayerManager;
@@ -13,6 +11,9 @@ import me.egg82.avpn.api.platform.AbstractPluginMetadata;
 import net.kyori.event.EventBus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 public class VPNAPIImpl implements VPNAPI {
     private final Platform platform;

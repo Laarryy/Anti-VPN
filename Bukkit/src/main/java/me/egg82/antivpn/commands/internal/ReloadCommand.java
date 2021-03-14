@@ -2,7 +2,6 @@ package me.egg82.antivpn.commands.internal;
 
 import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.paper.PaperCommandManager;
-import java.io.File;
 import me.egg82.antivpn.api.APIRegistrationUtil;
 import me.egg82.antivpn.api.VPNAPIImpl;
 import me.egg82.antivpn.api.VPNAPIProvider;
@@ -14,7 +13,11 @@ import me.egg82.antivpn.api.model.source.SourceManagerImpl;
 import me.egg82.antivpn.config.CachedConfig;
 import me.egg82.antivpn.config.ConfigUtil;
 import me.egg82.antivpn.config.ConfigurationFileUtil;
-import me.egg82.antivpn.locale.*;
+import me.egg82.antivpn.locale.BukkitLocaleCommandUtil;
+import me.egg82.antivpn.locale.BukkitLocalizedCommandSender;
+import me.egg82.antivpn.locale.I18NManager;
+import me.egg82.antivpn.locale.LocaleUtil;
+import me.egg82.antivpn.locale.MessageKey;
 import me.egg82.antivpn.messaging.MessagingService;
 import me.egg82.antivpn.messaging.handler.MessagingHandler;
 import me.egg82.antivpn.messaging.handler.MessagingHandlerImpl;
@@ -22,6 +25,8 @@ import me.egg82.antivpn.storage.StorageService;
 import me.egg82.antivpn.utils.EventUtil;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
+
+import java.io.File;
 
 public class ReloadCommand extends AbstractCommand {
     private final File dataFolder;
@@ -33,8 +38,8 @@ public class ReloadCommand extends AbstractCommand {
         this.plugin = plugin;
     }
 
-    public void execute(@NotNull CommandContext<BukkitLocalizedCommandSender> context) {
-        commandManager.taskRecipe().begin(context)
+    public void execute(@NotNull CommandContext<BukkitLocalizedCommandSender> commandContext) {
+        commandManager.taskRecipe().begin(commandContext)
             .asynchronous(c -> {
                 c.getSender().sendMessage(MessageKey.COMMAND__RELOAD__BEGIN);
 

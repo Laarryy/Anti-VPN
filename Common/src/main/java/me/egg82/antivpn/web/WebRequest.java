@@ -1,6 +1,20 @@
 package me.egg82.antivpn.web;
 
-import java.io.*;
+import me.egg82.antivpn.config.ConfigUtil;
+import me.egg82.antivpn.logging.GELFLogger;
+import me.egg82.antivpn.utils.TimeUtil;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.Proxy;
 import java.net.URL;
@@ -11,13 +25,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import me.egg82.antivpn.config.ConfigUtil;
-import me.egg82.antivpn.logging.GELFLogger;
-import me.egg82.antivpn.utils.TimeUtil;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class WebRequest {
     private static final Logger logger = new GELFLogger(LoggerFactory.getLogger(WebRequest.class));

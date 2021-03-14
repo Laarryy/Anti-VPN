@@ -1,13 +1,14 @@
 package me.egg82.antivpn.api.model.source;
 
 import flexjson.JSONDeserializer;
-import java.net.HttpURLConnection;
-import java.util.concurrent.CompletableFuture;
 import me.egg82.antivpn.api.APIException;
 import me.egg82.antivpn.api.model.source.models.IPTrooperModel;
 import me.egg82.antivpn.utils.ValidationUtil;
 import me.egg82.antivpn.web.WebRequest;
 import org.jetbrains.annotations.NotNull;
+
+import java.net.HttpURLConnection;
+import java.util.concurrent.CompletableFuture;
 
 public class IPTrooper extends AbstractSource<IPTrooperModel> {
     public @NotNull String getName() { return "iptrooper"; }

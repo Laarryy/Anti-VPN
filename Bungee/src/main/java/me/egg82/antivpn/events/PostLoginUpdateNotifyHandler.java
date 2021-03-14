@@ -1,8 +1,6 @@
 package me.egg82.antivpn.events;
 
 import co.aikar.commands.CommandManager;
-import java.util.concurrent.ExecutionException;
-import java.util.function.Consumer;
 import me.egg82.antivpn.config.ConfigUtil;
 import me.egg82.antivpn.locale.MessageKey;
 import net.md_5.bungee.api.event.PostLoginEvent;
@@ -14,6 +12,9 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongepowered.configurate.ConfigurationNode;
+
+import java.util.concurrent.ExecutionException;
+import java.util.function.Consumer;
 
 public class PostLoginUpdateNotifyHandler implements Consumer<PostLoginEvent> {
     private final Logger logger = LoggerFactory.getLogger(getClass());

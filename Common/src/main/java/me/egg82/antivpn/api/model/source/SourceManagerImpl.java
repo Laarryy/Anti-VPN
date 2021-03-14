@@ -1,9 +1,6 @@
 package me.egg82.antivpn.api.model.source;
 
 import com.google.common.collect.ImmutableList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 import me.egg82.antivpn.api.VPNAPI;
 import me.egg82.antivpn.api.VPNAPIProvider;
 import me.egg82.antivpn.api.event.source.SourceDeregisterEvent;
@@ -14,6 +11,10 @@ import me.egg82.antivpn.api.model.source.models.SourceModel;
 import me.egg82.antivpn.utils.EventUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Iterator;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class SourceManagerImpl implements SourceManager {
     private final List<Source<? extends SourceModel>> sources = new CopyOnWriteArrayList<>();

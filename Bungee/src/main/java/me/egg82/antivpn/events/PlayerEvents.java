@@ -2,13 +2,6 @@ package me.egg82.antivpn.events;
 
 import co.aikar.commands.CommandIssuer;
 import inet.ipaddr.IPAddressString;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.UnknownHostException;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.concurrent.*;
 import me.egg82.antivpn.AntiVPN;
 import me.egg82.antivpn.api.VPNAPIProvider;
 import me.egg82.antivpn.api.model.ip.AlgorithmMethod;
@@ -32,6 +25,18 @@ import ninja.egg82.events.BungeeEvents;
 import ninja.egg82.service.ServiceLocator;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.UnknownHostException;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class PlayerEvents extends EventHolder {
     private static final ExecutorService POOL = Executors.newWorkStealingPool(Math.max(4, Runtime.getRuntime().availableProcessors() / 4));

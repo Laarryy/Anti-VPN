@@ -1,9 +1,6 @@
 package me.egg82.antivpn.api.model.player;
 
 import com.google.common.collect.ImmutableList;
-import java.util.List;
-import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 import me.egg82.antivpn.bukkit.BukkitCapabilities;
 import me.egg82.antivpn.bukkit.BukkitCommandUtil;
 import me.egg82.antivpn.bukkit.BukkitTailorUtil;
@@ -19,6 +16,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 public class BukkitPlayerManager extends AbstractPlayerManager {
     private final Plugin plugin;

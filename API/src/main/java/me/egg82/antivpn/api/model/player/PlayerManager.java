@@ -1,5 +1,11 @@
 package me.egg82.antivpn.api.model.player;
 
+import me.egg82.antivpn.api.APIException;
+import me.egg82.antivpn.api.model.ip.IP;
+import net.kyori.adventure.text.Component;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.net.InetAddress;
 import java.util.List;
 import java.util.Objects;
@@ -8,11 +14,6 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.function.Consumer;
-import me.egg82.antivpn.api.APIException;
-import me.egg82.antivpn.api.model.ip.IP;
-import net.kyori.adventure.text.Component;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * Represents the object responsible for managing {@link Player} instances.

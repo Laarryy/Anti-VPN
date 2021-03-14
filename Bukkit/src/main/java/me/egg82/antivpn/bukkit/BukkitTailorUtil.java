@@ -1,8 +1,5 @@
 package me.egg82.antivpn.bukkit;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 import me.egg82.antivpn.hooks.PlaceholderAPIHook;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -10,8 +7,12 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
 public class BukkitTailorUtil {
-    private static final MiniMessage miniMessage = MiniMessage.markdown();
+    private static final MiniMessage miniMessage = MiniMessage.get();
 
     private BukkitTailorUtil() { }
 

@@ -92,7 +92,7 @@ public class GELFLoggerUtil {
         }
 
         if (ex instanceof APIException) {
-            String apiError = LocaleUtil.getDefaultI18N().getText(MessageKey.ERROR__API_EXCEPTION, "{hard}", String.valueOf(((APIException) ex).isHard()), "{message}", ex.getClass().getName() + ": " + ex.getLocalizedMessage());
+            String apiError = LocaleUtil.getDefaultI18N().getText(MessageKey.ERROR__API_EXCEPTION, "{hard}", String.valueOf(((APIException) ex).isHard()), "{message}", ex.getClass().getName() + ": " + ex.getMessage());
             if (ConfigUtil.getDebugOrFalse()) {
                 return new Pair<>(apiError, oldEx != null ? oldEx : ex);
             } else {
@@ -146,7 +146,7 @@ public class GELFLoggerUtil {
             String str = builder.toString();
             retVal.setFullMessage(str.substring(0, str.length() - System.lineSeparator().length()));
         } catch (IOException ex2) {
-            logger.error(ex2.getClass().getName() + ": " + ex2.getLocalizedMessage(), ex2);
+            logger.error(ex2.getClass().getName() + ": " + ex2.getMessage(), ex2);
         }
         retVal.setLevel(level);
         retVal.setSession(SESSION_ID);
@@ -188,7 +188,7 @@ public class GELFLoggerUtil {
                 throw new IOException(LocaleUtil.getDefaultI18N().getText(MessageKey.ERROR__LOGGER__SEND, "{code}", String.valueOf(conn.getResponseCode()), "{message}", WebRequest.getString(conn)));
             }
         } catch (IOException ex) {
-            logger.error(ex.getClass().getName() + ": " + ex.getLocalizedMessage(), ex);
+            logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex);
         }
     }
 }

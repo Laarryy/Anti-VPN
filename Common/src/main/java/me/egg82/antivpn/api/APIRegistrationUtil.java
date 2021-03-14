@@ -1,11 +1,12 @@
 package me.egg82.antivpn.api;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import me.egg82.antivpn.logging.GELFLogger;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 // https://github.com/lucko/LuckPerms/blob/master/common/src/main/java/me/lucko/luckperms/common/api/ApiRegistrationUtil.java
 public class APIRegistrationUtil {

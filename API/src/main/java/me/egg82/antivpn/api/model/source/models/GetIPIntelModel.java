@@ -1,8 +1,9 @@
 package me.egg82.antivpn.api.model.source.models;
 
 import flexjson.JSON;
-import java.util.Objects;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Objects;
 
 public class GetIPIntelModel implements SourceModel {
     private String status = null;

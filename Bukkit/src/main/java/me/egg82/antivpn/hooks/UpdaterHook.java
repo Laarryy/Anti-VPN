@@ -1,9 +1,6 @@
 package me.egg82.antivpn.hooks;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 import me.egg82.antivpn.config.ConfigUtil;
 import me.egg82.antivpn.core.Pair;
 import me.egg82.antivpn.locale.BukkitLocaleCommandUtil;
@@ -17,6 +14,10 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongepowered.configurate.ConfigurationNode;
+
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class UpdaterHook implements PluginHook {
     private final Logger logger = new GELFLogger(LoggerFactory.getLogger(getClass()));

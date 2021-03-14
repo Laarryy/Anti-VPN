@@ -7,7 +7,7 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class AbstractLocalizedCommandSender<M extends AbstractLocalizedCommandSender<M, B>, B> implements LocalizedCommandSender<M, B> {
-    protected static final MiniMessage formatter = MiniMessage.markdown();
+    protected static final MiniMessage formatter = MiniMessage.get();
 
     protected final B base;
     protected final Audience audience;

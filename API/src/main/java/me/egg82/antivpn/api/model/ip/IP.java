@@ -1,9 +1,10 @@
 package me.egg82.antivpn.api.model.ip;
 
-import java.io.Serializable;
-import java.net.InetAddress;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.io.Serializable;
+import java.net.InetAddress;
 
 /**
  * An IP which contains information about various statuses it holds.

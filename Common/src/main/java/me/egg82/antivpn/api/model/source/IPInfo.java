@@ -1,14 +1,15 @@
 package me.egg82.antivpn.api.model.source;
 
 import flexjson.JSONDeserializer;
-import java.net.HttpURLConnection;
-import java.util.concurrent.CompletableFuture;
 import me.egg82.antivpn.api.APIException;
 import me.egg82.antivpn.api.model.source.models.IPInfoModel;
 import me.egg82.antivpn.utils.ValidationUtil;
 import me.egg82.antivpn.web.WebRequest;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.configurate.ConfigurationNode;
+
+import java.net.HttpURLConnection;
+import java.util.concurrent.CompletableFuture;
 
 public class IPInfo extends AbstractSource<IPInfoModel> {
     public @NotNull String getName() { return "ipinfo"; }

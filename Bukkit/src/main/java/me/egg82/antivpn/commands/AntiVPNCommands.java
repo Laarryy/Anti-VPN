@@ -1,8 +1,13 @@
 package me.egg82.antivpn.commands;
 
+import cloud.commandframework.ArgumentDescription;
+import cloud.commandframework.arguments.standard.EnumArgument;
 import cloud.commandframework.arguments.standard.StringArgument;
+import cloud.commandframework.bukkit.parsers.selector.SinglePlayerSelectorArgument;
 import cloud.commandframework.minecraft.extras.MinecraftHelp;
 import cloud.commandframework.paper.PaperCommandManager;
+import me.egg82.antivpn.commands.arguments.KickType;
+import me.egg82.antivpn.commands.internal.KickCommand;
 import me.egg82.antivpn.commands.internal.ReloadCommand;
 import me.egg82.antivpn.config.ConfigUtil;
 import me.egg82.antivpn.locale.BukkitLocaleCommandUtil;
@@ -18,6 +23,11 @@ public class AntiVPNCommands extends CommandHolder {
         super();
 
         PaperCommandManager<BukkitLocalizedCommandSender> commandManager = BukkitLocaleCommandUtil.getCommandManager();
+
+        /*commandManager.getParserRegistry().registerParserSupplier(
+            TypeToken.get(KickTypeParser.KickType.class),
+            options -> new KickTypeParser<>()
+        );*/
 
         ConfigurationNode config = ConfigUtil.getConfig();
 
@@ -42,19 +52,19 @@ public class AntiVPNCommands extends CommandHolder {
                 .argument(IntegerArgument.<BukkitLocalizedCommandSender>newBuilder("batchSize").withMin(1).asOptionalWithDefault("50").build(), ArgumentDescription.of("[batchSize]")) // TODO: Localization
                 .handler(new ReloadCommand(commandManager, plugin.getDataFolder(), plugin))
                 .build()
-        );
+        );*/
 
         commands.add(
             commandManager.commandBuilder("antivpn", baseAliases)
                 .literal("kick", LocalizedArgumentDescription.of(MessageKey.COMMAND_DESC__KICK), getAliases(config, "kick")) // TODO: Localization
                 .permission(ConfigUtil.getCachedConfig().getAdminPermissionNode())
                 .argument(SinglePlayerSelectorArgument.of("player"), ArgumentDescription.of("<player>")) // TODO: Localization
-                .argument(StringArgument.<BukkitLocalizedCommandSender>newBuilder("type").withSuggestionsProvider(kickTypeSuggestions).withParser(kickTypeParser).build(), ArgumentDescription.of("[type]]")) // TODO: Localization
-                .handler(new KickCommand(commandManager))
+                .argument(EnumArgument.newBuilder(KickType.class, "type"), ArgumentDescription.of("[type]")) // TODO: Localization
+                .handler(new KickCommand(commandManager, plugin))
                 .build()
         );
 
-        commands.add(
+        /*commands.add(
             commandManager.commandBuilder("antivpn", baseAliases)
                 .literal("test", LocalizedArgumentDescription.of(MessageKey.COMMAND_DESC__TEST), getAliases(config, "test")) // TODO: Localization
                 .permission(ConfigUtil.getCachedConfig().getAdminPermissionNode())

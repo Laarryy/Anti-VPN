@@ -1,9 +1,6 @@
 package me.egg82.antivpn.api.model.ip;
 
 import com.google.common.collect.ImmutableList;
-import java.util.List;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 import me.egg82.antivpn.api.model.source.SourceManager;
 import me.egg82.antivpn.config.CachedConfig;
 import me.egg82.antivpn.config.ConfigUtil;
@@ -13,6 +10,10 @@ import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 public class BungeeIPManager extends AbstractIPManager {
     public BungeeIPManager(@NotNull SourceManager sourceManager, long cacheTime, @NotNull TimeUnit cacheTimeUnit) {

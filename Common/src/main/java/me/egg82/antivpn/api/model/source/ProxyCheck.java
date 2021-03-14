@@ -2,15 +2,16 @@ package me.egg82.antivpn.api.model.source;
 
 import flexjson.JSONDeserializer;
 import flexjson.JSONSerializer;
-import java.net.HttpURLConnection;
-import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 import me.egg82.antivpn.api.APIException;
 import me.egg82.antivpn.api.model.source.models.ProxyCheckModel;
 import me.egg82.antivpn.utils.ValidationUtil;
 import me.egg82.antivpn.web.WebRequest;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.configurate.ConfigurationNode;
+
+import java.net.HttpURLConnection;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 public class ProxyCheck extends AbstractSource<ProxyCheckModel> {
     public @NotNull String getName() { return "proxycheck"; }

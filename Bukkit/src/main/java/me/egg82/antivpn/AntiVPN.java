@@ -2,10 +2,6 @@ package me.egg82.antivpn;
 
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.CompletionException;
 import me.egg82.antivpn.api.APIRegistrationUtil;
 import me.egg82.antivpn.api.VPNAPI;
 import me.egg82.antivpn.api.VPNAPIImpl;
@@ -30,8 +26,18 @@ import me.egg82.antivpn.events.EarlyCheckEvents;
 import me.egg82.antivpn.events.EventHolder;
 import me.egg82.antivpn.events.ExtraPlayerEvents;
 import me.egg82.antivpn.events.LateCheckEvents;
-import me.egg82.antivpn.hooks.*;
-import me.egg82.antivpn.locale.*;
+import me.egg82.antivpn.hooks.BStatsHook;
+import me.egg82.antivpn.hooks.LuckPermsHook;
+import me.egg82.antivpn.hooks.PlaceholderAPIHook;
+import me.egg82.antivpn.hooks.PlayerAnalyticsHook;
+import me.egg82.antivpn.hooks.PluginHooks;
+import me.egg82.antivpn.hooks.UpdaterHook;
+import me.egg82.antivpn.hooks.VaultHook;
+import me.egg82.antivpn.locale.BukkitLocaleCommandUtil;
+import me.egg82.antivpn.locale.BukkitLocalizedCommandSender;
+import me.egg82.antivpn.locale.I18NManager;
+import me.egg82.antivpn.locale.LocaleUtil;
+import me.egg82.antivpn.locale.MessageKey;
 import me.egg82.antivpn.logging.GELFLogger;
 import me.egg82.antivpn.messaging.MessagingService;
 import me.egg82.antivpn.messaging.PacketManager;
@@ -61,6 +67,11 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.CompletionException;
 
 public class AntiVPN {
     private static final Logger logger = new GELFLogger(LoggerFactory.getLogger(AntiVPN.class));
@@ -355,18 +366,19 @@ public class AntiVPN {
 
     public void unloadServices() {
         VPNAPI api = VPNAPIProvider.getInstance();
-        EventUtil.post(new APIDisableEventImpl(api), api.getEventBus());
-        api.getEventBus().unregisterAll();
-        APIRegistrationUtil.deregister();
 
         // Needs to be done before the final runUpdateTask()
         PacketUtil.queuePacket(new ShutdownPacket(ConfigUtil.getCachedConfig().getServerId()));
 
         try {
-            VPNAPIProvider.getInstance().runUpdateTask().join();
+            api.runUpdateTask().join();
         } catch (CancellationException | CompletionException ex) {
             logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex);
         }
+
+        EventUtil.post(new APIDisableEventImpl(api), api.getEventBus());
+        api.getEventBus().unregisterAll();
+        APIRegistrationUtil.deregister();
 
         CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
         for (MessagingService service : cachedConfig.getMessaging()) {

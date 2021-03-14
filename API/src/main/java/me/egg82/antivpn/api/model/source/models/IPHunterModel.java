@@ -1,9 +1,10 @@
 package me.egg82.antivpn.api.model.source.models;
 
 import flexjson.JSON;
+import org.jetbrains.annotations.Nullable;
+
 import java.io.Serializable;
 import java.util.Objects;
-import org.jetbrains.annotations.Nullable;
 
 public class IPHunterModel implements SourceModel {
     private String status = null;

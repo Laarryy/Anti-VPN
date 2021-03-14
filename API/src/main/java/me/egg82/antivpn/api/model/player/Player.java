@@ -1,9 +1,10 @@
 package me.egg82.antivpn.api.model.player;
 
-import java.io.Serializable;
-import java.util.UUID;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.io.Serializable;
+import java.util.UUID;
 
 /**
  * A player which contains information about various statuses they hold.

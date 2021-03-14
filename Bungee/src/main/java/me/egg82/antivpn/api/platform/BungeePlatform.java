@@ -1,12 +1,13 @@
 package me.egg82.antivpn.api.platform;
 
 import com.google.common.collect.ImmutableSet;
+import org.jetbrains.annotations.NotNull;
+
 import java.net.InetAddress;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
-import org.jetbrains.annotations.NotNull;
 
 public class BungeePlatform implements Platform {
     private static final Set<UUID> uniquePlayers = new HashSet<>();

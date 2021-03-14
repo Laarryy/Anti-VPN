@@ -1,9 +1,5 @@
 package me.egg82.antivpn.hooks;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicLong;
 import me.egg82.antivpn.api.VPNAPIProvider;
 import me.egg82.antivpn.api.model.source.Source;
 import me.egg82.antivpn.api.model.source.models.SourceModel;
@@ -18,6 +14,11 @@ import org.bstats.charts.SingleLineChart;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class BStatsHook implements PluginHook {
     private static final AtomicLong blockedVPNs = new AtomicLong(0L);

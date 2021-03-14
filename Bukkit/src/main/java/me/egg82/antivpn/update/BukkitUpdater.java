@@ -1,14 +1,15 @@
 package me.egg82.antivpn.update;
 
-import java.io.IOException;
-import java.net.URL;
-import java.util.concurrent.TimeUnit;
 import me.egg82.antivpn.locale.LocaleUtil;
 import me.egg82.antivpn.locale.MessageKey;
 import me.egg82.antivpn.utils.TimeUtil;
 import me.egg82.antivpn.web.WebRequest;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
+
+import java.io.IOException;
+import java.net.URL;
+import java.util.concurrent.TimeUnit;
 
 public class BukkitUpdater extends AbstractUpdater {
     private final int resourceId;

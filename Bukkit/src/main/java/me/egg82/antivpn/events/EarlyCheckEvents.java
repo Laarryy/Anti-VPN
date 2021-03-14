@@ -1,7 +1,5 @@
 package me.egg82.antivpn.events;
 
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.ExecutionException;
 import me.egg82.antivpn.api.VPNAPIProvider;
 import me.egg82.antivpn.api.model.ip.IPManager;
 import me.egg82.antivpn.api.model.player.PlayerManager;
@@ -21,6 +19,9 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
 
 public class EarlyCheckEvents extends EventHolder {
     private final Plugin plugin;

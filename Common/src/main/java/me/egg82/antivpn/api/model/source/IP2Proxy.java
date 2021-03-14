@@ -1,14 +1,15 @@
 package me.egg82.antivpn.api.model.source;
 
 import flexjson.JSONDeserializer;
-import java.net.HttpURLConnection;
-import java.util.concurrent.CompletableFuture;
 import me.egg82.antivpn.api.APIException;
 import me.egg82.antivpn.api.model.source.models.IP2ProxyModel;
 import me.egg82.antivpn.utils.ValidationUtil;
 import me.egg82.antivpn.web.WebRequest;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.configurate.ConfigurationNode;
+
+import java.net.HttpURLConnection;
+import java.util.concurrent.CompletableFuture;
 
 public class IP2Proxy extends AbstractSource<IP2ProxyModel> {
     public @NotNull String getName() { return "ip2proxy"; }

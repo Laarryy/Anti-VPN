@@ -1,10 +1,11 @@
 package me.egg82.antivpn.bukkit;
 
-import java.util.Collection;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Collection;
 
 public class BukkitCommandUtil {
     private BukkitCommandUtil() { }

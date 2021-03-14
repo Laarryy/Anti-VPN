@@ -4,11 +4,6 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.google.common.collect.ImmutableList;
 import flexjson.JSONDeserializer;
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.*;
-import java.util.concurrent.TimeUnit;
 import me.egg82.antivpn.services.lookup.models.PlayerNameModel;
 import me.egg82.antivpn.services.lookup.models.PlayerUUIDModel;
 import me.egg82.antivpn.services.lookup.models.ProfileModel;
@@ -18,6 +13,16 @@ import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 public class BungeePlayerInfo implements PlayerInfo {
     private final UUID uuid;

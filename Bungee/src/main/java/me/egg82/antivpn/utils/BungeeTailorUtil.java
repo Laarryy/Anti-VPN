@@ -1,12 +1,13 @@
 package me.egg82.antivpn.utils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 import net.md_5.bungee.api.ChatColor;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 public class BungeeTailorUtil {
     private static final Logger logger = LoggerFactory.getLogger(BungeeTailorUtil.class);

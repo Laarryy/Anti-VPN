@@ -5,8 +5,6 @@ import cloud.commandframework.bukkit.CloudBukkitCapabilities;
 import cloud.commandframework.execution.AsynchronousCommandExecutionCoordinator;
 import cloud.commandframework.minecraft.extras.MinecraftExceptionHandler;
 import cloud.commandframework.paper.PaperCommandManager;
-import java.util.Locale;
-import java.util.UUID;
 import me.egg82.antivpn.bukkit.BukkitCapabilities;
 import me.egg82.antivpn.config.CachedConfig;
 import me.egg82.antivpn.config.ConfigUtil;
@@ -20,6 +18,9 @@ import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Locale;
+import java.util.UUID;
 
 public class BukkitLocaleCommandUtil {
     private static final Logger logger = new GELFLogger(LoggerFactory.getLogger(BukkitLocaleCommandUtil.class));
@@ -58,16 +59,16 @@ public class BukkitLocaleCommandUtil {
             .withInvalidSyntaxHandler()
             .withHandler(MinecraftExceptionHandler.ExceptionType.INVALID_SYNTAX, (sender, ex) -> {
                 logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex);
-                return sender.getComponent(MessageKey.ERROR__COMMAND__INVALID_SYNTAX, "{ex}", ex.getClass().getName() + ": " + ex.getLocalizedMessage());
+                return sender.getComponent(MessageKey.ERROR__COMMAND__INVALID_SYNTAX, "{ex}", ex.getMessage().substring(ex.getMessage().indexOf('.') + 1));
             })
             .withInvalidSenderHandler()
-            .withHandler(MinecraftExceptionHandler.ExceptionType.INVALID_SENDER, (sender, ex) -> sender.getComponent(MessageKey.ERROR__COMMAND__INVALID_SENDER, "{ex}", ex.getClass().getName() + ": " + ex.getLocalizedMessage()))
+            .withHandler(MinecraftExceptionHandler.ExceptionType.INVALID_SENDER, (sender, ex) -> sender.getComponent(MessageKey.ERROR__COMMAND__INVALID_SENDER, "{ex}", ex.getMessage()))
             .withNoPermissionHandler()
-            .withHandler(MinecraftExceptionHandler.ExceptionType.NO_PERMISSION, (sender, ex) -> sender.getComponent(MessageKey.ERROR__COMMAND__NO_PERMISSION, "{ex}", ex.getClass().getName() + ": " + ex.getLocalizedMessage()))
+            .withHandler(MinecraftExceptionHandler.ExceptionType.NO_PERMISSION, (sender, ex) -> sender.getComponent(MessageKey.ERROR__COMMAND__NO_PERMISSION, "{ex}", ex.getMessage()))
             .withArgumentParsingHandler()
             .withHandler(MinecraftExceptionHandler.ExceptionType.ARGUMENT_PARSING, (sender, ex) -> {
                 logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex);
-                return sender.getComponent(MessageKey.ERROR__COMMAND__INVALID_ARGS, "{ex}", ex.getClass().getName() + ": " + ex.getLocalizedMessage());
+                return sender.getComponent(MessageKey.ERROR__COMMAND__INVALID_ARGS, "{ex}", ex.getMessage());
             })
             .withCommandExecutionHandler()
             .withHandler(MinecraftExceptionHandler.ExceptionType.COMMAND_EXECUTION, (sender, ex) -> {

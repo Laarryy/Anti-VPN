@@ -1,10 +1,11 @@
 package me.egg82.antivpn.api.model.player;
 
-import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 import me.egg82.antivpn.services.lookup.PlayerInfo;
 import me.egg82.antivpn.services.lookup.PlayerLookup;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 public class BungeePlayer extends AbstractPlayer {
     public BungeePlayer(@NotNull UUID uuid, boolean mcleaks) { this(uuid, null, mcleaks); }

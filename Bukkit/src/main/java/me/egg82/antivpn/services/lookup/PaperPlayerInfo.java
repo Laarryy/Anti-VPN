@@ -2,15 +2,16 @@ package me.egg82.antivpn.services.lookup;
 
 import com.destroystokyo.paper.profile.PlayerProfile;
 import com.destroystokyo.paper.profile.ProfileProperty;
+import me.egg82.antivpn.services.lookup.models.ProfileModel;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import me.egg82.antivpn.services.lookup.models.ProfileModel;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
 
 public class PaperPlayerInfo extends MojangPlayerInfo {
     PaperPlayerInfo(@NotNull UUID uuid) throws IOException { super(uuid); }

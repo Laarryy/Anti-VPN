@@ -1,11 +1,12 @@
 package me.egg82.antivpn.services.lookup;
 
-import java.io.IOException;
-import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.io.IOException;
+import java.util.UUID;
 
 public class BukkitPlayerInfo extends MojangPlayerInfo {
     BukkitPlayerInfo(@NotNull UUID uuid) throws IOException { super(uuid); }

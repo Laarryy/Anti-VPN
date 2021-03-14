@@ -5,5 +5,5 @@ import java.util.UUID;
 public class UUIDUtil {
     private UUIDUtil() { }
 
-    public static final UUID EMPTY_UUID = UUIDUtil.EMPTY_UUID;
+    public static final UUID EMPTY_UUID = new UUID(0L, 0L);
 }

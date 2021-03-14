@@ -2,18 +2,19 @@ package me.egg82.antivpn.api.model.source;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import flexjson.JSONDeserializer;
-import java.net.HttpURLConnection;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 import me.egg82.antivpn.api.APIException;
 import me.egg82.antivpn.api.model.source.models.GetIPIntelModel;
 import me.egg82.antivpn.utils.ValidationUtil;
 import me.egg82.antivpn.web.WebRequest;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.configurate.ConfigurationNode;
+
+import java.net.HttpURLConnection;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class GetIPIntel extends AbstractSource<GetIPIntelModel> {
     private static final AtomicInteger hourlyRequests = new AtomicInteger(0);

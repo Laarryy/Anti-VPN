@@ -1,15 +1,16 @@
 package me.egg82.antivpn.api.model.player;
 
-import java.util.Objects;
-import java.util.UUID;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import me.egg82.antivpn.logging.GELFLogger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Objects;
+import java.util.UUID;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 public abstract class AbstractPlayer implements Player {
     protected final transient Logger logger = new GELFLogger(LoggerFactory.getLogger(getClass()));

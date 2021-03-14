@@ -1,8 +1,9 @@
 package me.egg82.antivpn.api.model.source.models;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.io.Serializable;
 import java.util.Objects;
-import org.jetbrains.annotations.Nullable;
 
 public class ProxyCheckModel implements SourceModel {
     private String status = null;

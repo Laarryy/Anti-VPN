@@ -1,7 +1,5 @@
 package me.egg82.antivpn.hooks;
 
-import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 import me.egg82.antivpn.config.ConfigUtil;
 import me.egg82.antivpn.locale.BukkitLocaleCommandUtil;
 import me.egg82.antivpn.locale.MessageKey;
@@ -16,6 +14,9 @@ import org.bukkit.event.server.PluginEnableEvent;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 public class LuckPermsHook implements PluginHook {
     public static void create(@NotNull Plugin plugin, @NotNull Plugin luckperms) {

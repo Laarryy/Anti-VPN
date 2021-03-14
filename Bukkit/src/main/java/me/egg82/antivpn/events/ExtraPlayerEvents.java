@@ -1,7 +1,5 @@
 package me.egg82.antivpn.events;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import me.egg82.antivpn.api.platform.BukkitPlatform;
 import me.egg82.antivpn.config.ConfigUtil;
 import me.egg82.antivpn.hooks.UpdaterHook;
@@ -15,6 +13,9 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
+
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 public class ExtraPlayerEvents extends EventHolder {
     public ExtraPlayerEvents(@NotNull Plugin plugin) {

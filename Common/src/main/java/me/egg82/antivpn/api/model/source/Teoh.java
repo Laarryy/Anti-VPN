@@ -2,17 +2,18 @@ package me.egg82.antivpn.api.model.source;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import flexjson.JSONDeserializer;
+import me.egg82.antivpn.api.APIException;
+import me.egg82.antivpn.api.model.source.models.TeohModel;
+import me.egg82.antivpn.utils.ValidationUtil;
+import me.egg82.antivpn.web.WebRequest;
+import org.jetbrains.annotations.NotNull;
+
 import java.net.HttpURLConnection;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-import me.egg82.antivpn.api.APIException;
-import me.egg82.antivpn.api.model.source.models.TeohModel;
-import me.egg82.antivpn.utils.ValidationUtil;
-import me.egg82.antivpn.web.WebRequest;
-import org.jetbrains.annotations.NotNull;
 
 public class Teoh extends AbstractSource<TeohModel> {
     public @NotNull String getName() { return "teoh"; }

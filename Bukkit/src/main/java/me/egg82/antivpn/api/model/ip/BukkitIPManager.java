@@ -1,8 +1,6 @@
 package me.egg82.antivpn.api.model.ip;
 
 import com.google.common.collect.ImmutableList;
-import java.util.List;
-import java.util.UUID;
 import me.egg82.antivpn.api.model.source.SourceManager;
 import me.egg82.antivpn.bukkit.BukkitCapabilities;
 import me.egg82.antivpn.bukkit.BukkitCommandUtil;
@@ -17,6 +15,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
+import java.util.UUID;
 
 public class BukkitIPManager extends AbstractIPManager {
     private final Plugin plugin;

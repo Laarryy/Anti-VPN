@@ -1,11 +1,12 @@
 package me.egg82.antivpn.api.model.source;
 
-import java.net.InetAddress;
-import java.util.concurrent.CompletableFuture;
 import me.egg82.antivpn.api.APIException;
 import me.egg82.antivpn.api.model.ip.IP;
 import me.egg82.antivpn.api.model.source.models.SourceModel;
 import org.jetbrains.annotations.NotNull;
+
+import java.net.InetAddress;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * An API source which contains information about various statuses it holds and methods for interfacing with the API.

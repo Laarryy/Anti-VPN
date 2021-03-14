@@ -30,6 +30,9 @@ public class GELFLogger implements Logger {
         } else {
             impl.trace(msg);
         }
+        if (impl.isTraceEnabled()) {
+            GELFLoggerUtil.queue(0, msg, t);
+        }
     }
 
     public boolean isTraceEnabled(Marker marker) { return impl.isTraceEnabled(marker); }
@@ -48,37 +51,20 @@ public class GELFLogger implements Logger {
         } else {
             impl.trace(marker, msg);
         }
+        if (impl.isTraceEnabled(marker)) {
+            GELFLoggerUtil.queue(0, msg, t);
+        }
     }
 
     public boolean isDebugEnabled() { return impl.isDebugEnabled(); }
 
-    public void debug(String msg) {
-        impl.debug(msg);
-        if (impl.isDebugEnabled()) {
-            GELFLoggerUtil.queue(0, msg);
-        }
-    }
+    public void debug(String msg) { impl.debug(msg); }
 
-    public void debug(String format, Object arg) {
-        impl.debug(format, arg);
-        if (impl.isDebugEnabled()) {
-            GELFLoggerUtil.queue(0, String.format(format, arg));
-        }
-    }
+    public void debug(String format, Object arg) { impl.debug(format, arg); }
 
-    public void debug(String format, Object arg1, Object arg2) {
-        impl.debug(format, arg1, arg2);
-        if (impl.isDebugEnabled()) {
-            GELFLoggerUtil.queue(0, String.format(format, arg1, arg2));
-        }
-    }
+    public void debug(String format, Object arg1, Object arg2) { impl.debug(format, arg1, arg2); }
 
-    public void debug(String format, Object... arguments) {
-        impl.debug(format, arguments);
-        if (impl.isDebugEnabled()) {
-            GELFLoggerUtil.queue(0, String.format(format, arguments));
-        }
-    }
+    public void debug(String format, Object... arguments) { impl.debug(format, arguments); }
 
     public void debug(String msg, Throwable t) {
         if (ConfigUtil.getDebugOrFalse()) {
@@ -93,33 +79,13 @@ public class GELFLogger implements Logger {
 
     public boolean isDebugEnabled(Marker marker) { return impl.isDebugEnabled(marker); }
 
-    public void debug(Marker marker, String msg) {
-        impl.debug(marker, msg);
-        if (impl.isDebugEnabled(marker)) {
-            GELFLoggerUtil.queue(0, msg);
-        }
-    }
+    public void debug(Marker marker, String msg) { impl.debug(marker, msg); }
 
-    public void debug(Marker marker, String format, Object arg) {
-        impl.debug(marker, format, arg);
-        if (impl.isDebugEnabled(marker)) {
-            GELFLoggerUtil.queue(0, String.format(format, arg));
-        }
-    }
+    public void debug(Marker marker, String format, Object arg) { impl.debug(marker, format, arg); }
 
-    public void debug(Marker marker, String format, Object arg1, Object arg2) {
-        impl.debug(marker, format, arg1, arg2);
-        if (impl.isDebugEnabled(marker)) {
-            GELFLoggerUtil.queue(0, String.format(format, arg1, arg2));
-        }
-    }
+    public void debug(Marker marker, String format, Object arg1, Object arg2) { impl.debug(marker, format, arg1, arg2); }
 
-    public void debug(Marker marker, String format, Object... arguments) {
-        impl.debug(marker, format, arguments);
-        if (impl.isDebugEnabled(marker)) {
-            GELFLoggerUtil.queue(0, String.format(format, arguments));
-        }
-    }
+    public void debug(Marker marker, String format, Object... arguments) { impl.debug(marker, format, arguments); }
 
     public void debug(Marker marker, String msg, Throwable t) {
         if (ConfigUtil.getDebugOrFalse()) {
@@ -134,33 +100,13 @@ public class GELFLogger implements Logger {
 
     public boolean isInfoEnabled() { return impl.isInfoEnabled(); }
 
-    public void info(String msg) {
-        impl.info(msg);
-        if (impl.isInfoEnabled()) {
-            GELFLoggerUtil.queue(1, msg);
-        }
-    }
+    public void info(String msg) { impl.info(msg); }
 
-    public void info(String format, Object arg) {
-        impl.info(format, arg);
-        if (impl.isInfoEnabled()) {
-            GELFLoggerUtil.queue(1, String.format(format, arg));
-        }
-    }
+    public void info(String format, Object arg) { impl.info(format, arg); }
 
-    public void info(String format, Object arg1, Object arg2) {
-        impl.info(format, arg1, arg2);
-        if (impl.isInfoEnabled()) {
-            GELFLoggerUtil.queue(1, String.format(format, arg1, arg2));
-        }
-    }
+    public void info(String format, Object arg1, Object arg2) { impl.info(format, arg1, arg2); }
 
-    public void info(String format, Object... arguments) {
-        impl.info(format, arguments);
-        if (impl.isInfoEnabled()) {
-            GELFLoggerUtil.queue(1, String.format(format, arguments));
-        }
-    }
+    public void info(String format, Object... arguments) { impl.info(format, arguments); }
 
     public void info(String msg, Throwable t) {
         if (ConfigUtil.getDebugOrFalse()) {
@@ -175,33 +121,13 @@ public class GELFLogger implements Logger {
 
     public boolean isInfoEnabled(Marker marker) { return impl.isInfoEnabled(marker); }
 
-    public void info(Marker marker, String msg) {
-        impl.info(marker, msg);
-        if (impl.isInfoEnabled(marker)) {
-            GELFLoggerUtil.queue(1, msg);
-        }
-    }
+    public void info(Marker marker, String msg) { impl.info(marker, msg); }
 
-    public void info(Marker marker, String format, Object arg) {
-        impl.info(marker, format, arg);
-        if (impl.isInfoEnabled(marker)) {
-            GELFLoggerUtil.queue(1, String.format(format, arg));
-        }
-    }
+    public void info(Marker marker, String format, Object arg) { impl.info(marker, format, arg); }
 
-    public void info(Marker marker, String format, Object arg1, Object arg2) {
-        impl.info(marker, format, arg1, arg2);
-        if (impl.isInfoEnabled(marker)) {
-            GELFLoggerUtil.queue(1, String.format(format, arg1, arg2));
-        }
-    }
+    public void info(Marker marker, String format, Object arg1, Object arg2) { impl.info(marker, format, arg1, arg2); }
 
-    public void info(Marker marker, String format, Object... arguments) {
-        impl.info(marker, format, arguments);
-        if (impl.isInfoEnabled(marker)) {
-            GELFLoggerUtil.queue(1, String.format(format, arguments));
-        }
-    }
+    public void info(Marker marker, String format, Object... arguments) { impl.info(marker, format, arguments); }
 
     public void info(Marker marker, String msg, Throwable t) {
         if (ConfigUtil.getDebugOrFalse()) {

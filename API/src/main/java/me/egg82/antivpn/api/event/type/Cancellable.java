@@ -1,7 +1,8 @@
 package me.egg82.antivpn.api.event.type;
 
-import java.util.concurrent.atomic.AtomicBoolean;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Represents an event that can be cancelled

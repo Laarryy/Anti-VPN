@@ -1,9 +1,10 @@
 package me.egg82.antivpn.api.model.ip;
 
-import java.net.InetAddress;
-import java.util.Objects;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.net.InetAddress;
+import java.util.Objects;
 
 public class GenericIP implements IP {
     private final InetAddress ip;

@@ -1,10 +1,11 @@
 package me.egg82.antivpn.api.platform;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.net.InetAddress;
 import java.time.Instant;
 import java.util.Set;
 import java.util.UUID;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * Provides information about the platform Anti-VPN is running on.

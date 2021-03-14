@@ -1,9 +1,5 @@
 package me.egg82.antivpn.api.model.source;
 
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.concurrent.TimeUnit;
 import me.egg82.antivpn.api.APIException;
 import me.egg82.antivpn.api.model.source.models.SourceModel;
 import me.egg82.antivpn.config.ConfigUtil;
@@ -11,6 +7,11 @@ import me.egg82.antivpn.utils.TimeUtil;
 import me.egg82.antivpn.web.WebRequest;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.configurate.ConfigurationNode;
+
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.concurrent.TimeUnit;
 
 public abstract class AbstractSource<T extends SourceModel> implements Source<T> {
     private final Class<T> modelClass;

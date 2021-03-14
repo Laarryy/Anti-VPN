@@ -1,7 +1,8 @@
 package me.egg82.antivpn.core;
 
-import java.util.Objects;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Objects;
 
 /**
  * This class should be used sparingly, only when needed.

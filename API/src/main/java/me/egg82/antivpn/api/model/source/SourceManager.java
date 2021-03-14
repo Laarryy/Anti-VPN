@@ -1,12 +1,13 @@
 package me.egg82.antivpn.api.model.source;
 
+import me.egg82.antivpn.api.model.source.models.SourceModel;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.function.Consumer;
-import me.egg82.antivpn.api.model.source.models.SourceModel;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * Represents the object responsible for managing {@link Source} instances.
