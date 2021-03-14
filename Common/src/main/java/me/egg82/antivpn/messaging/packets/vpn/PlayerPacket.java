@@ -1,8 +1,10 @@
 package me.egg82.antivpn.messaging.packets.vpn;
 
 import io.netty.buffer.ByteBuf;
+
 import java.util.Objects;
 import java.util.UUID;
+
 import me.egg82.antivpn.messaging.packets.AbstractPacket;
 import me.egg82.antivpn.utils.UUIDUtil;
 import org.jetbrains.annotations.NotNull;
@@ -36,28 +38,42 @@ public class PlayerPacket extends AbstractPacket {
         buffer.writeBoolean(this.value);
     }
 
-    public @NotNull UUID getUuid() { return uuid; }
+    public @NotNull UUID getUuid() {
+        return uuid;
+    }
 
-    public void setUuid(@NotNull UUID uuid) { this.uuid = uuid; }
+    public void setUuid(@NotNull UUID uuid) {
+        this.uuid = uuid;
+    }
 
-    public boolean getValue() { return value; }
+    public boolean getValue() {
+        return value;
+    }
 
-    public void setValue(boolean value) { this.value = value; }
+    public void setValue(boolean value) {
+        this.value = value;
+    }
 
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof PlayerPacket)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof PlayerPacket)) {
+            return false;
+        }
         PlayerPacket that = (PlayerPacket) o;
         return value == that.value && uuid.equals(that.uuid);
     }
 
-    public int hashCode() { return Objects.hash(uuid, value); }
+    public int hashCode() {
+        return Objects.hash(uuid, value);
+    }
 
     public String toString() {
         return "PlayerPacket{" +
-            "sender=" + sender +
-            ", uuid=" + uuid +
-            ", value=" + value +
-            '}';
+                "sender=" + sender +
+                ", uuid=" + uuid +
+                ", value=" + value +
+                '}';
     }
 }

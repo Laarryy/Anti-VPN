@@ -3,6 +3,7 @@ package me.egg82.antivpn.update;
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicLong;
+
 import me.egg82.antivpn.logging.GELFLogger;
 import me.egg82.antivpn.utils.TimeUtil;
 import me.egg82.antivpn.utils.VersionUtil;
@@ -26,9 +27,13 @@ public abstract class AbstractUpdater implements Updater {
         this.checkDelay = checkDelay.getMillis();
     }
 
-    public @NotNull String getCurrentVersion() { return currentVersion; }
+    public @NotNull String getCurrentVersion() {
+        return currentVersion;
+    }
 
-    public @NotNull CompletableFuture<@NotNull Boolean> isUpdateAvailable() { return getLatestVersion().thenApply(v -> updateAvailable); }
+    public @NotNull CompletableFuture<@NotNull Boolean> isUpdateAvailable() {
+        return getLatestVersion().thenApply(v -> updateAvailable);
+    }
 
     public @NotNull CompletableFuture<@NotNull String> getLatestVersion() {
         return CompletableFuture.supplyAsync(() -> {

@@ -10,18 +10,28 @@ public class PlayerNameModel implements Serializable {
         this.name = null;
     }
 
-    public String getName() { return name; }
+    public String getName() {
+        return name;
+    }
 
-    public void setName(String name) { this.name = name; }
+    public void setName(String name) {
+        this.name = name;
+    }
 
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof PlayerNameModel)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof PlayerNameModel)) {
+            return false;
+        }
         PlayerNameModel that = (PlayerNameModel) o;
         return Objects.equals(name, that.name);
     }
 
-    public int hashCode() { return Objects.hash(name); }
+    public int hashCode() {
+        return Objects.hash(name);
+    }
 
     public String toString() {
         return "PlayerNameModel{" +

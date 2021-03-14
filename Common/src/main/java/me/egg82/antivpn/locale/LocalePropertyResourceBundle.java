@@ -6,6 +6,7 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.util.Locale;
 import java.util.PropertyResourceBundle;
+
 import org.jetbrains.annotations.NotNull;
 
 public class LocalePropertyResourceBundle extends PropertyResourceBundle {
@@ -26,5 +27,7 @@ public class LocalePropertyResourceBundle extends PropertyResourceBundle {
         this.locale = locale;
     }
 
-    public @NotNull Locale getLocale() { return locale; }
+    public @NotNull Locale getLocale() {
+        return locale;
+    }
 }

@@ -38,24 +38,38 @@ public abstract class AbstractPlayer implements Player {
         this.hc = Objects.hash(uuid);
     }
 
-    public @NotNull UUID getUuid() { return uuid; }
+    public @NotNull UUID getUuid() {
+        return uuid;
+    }
 
-    public @Nullable String getName() { return name; }
+    public @Nullable String getName() {
+        return name;
+    }
 
-    public boolean isMcLeaks() { return mcleaks; }
+    public boolean isMcLeaks() {
+        return mcleaks;
+    }
 
-    public void setMcLeaks(boolean status) { this.mcleaks = status; }
+    public void setMcLeaks(boolean status) {
+        this.mcleaks = status;
+    }
 
     protected abstract @NotNull CompletableFuture<@NotNull String> fetchName(@NotNull UUID uuid);
 
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof AbstractPlayer)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof AbstractPlayer)) {
+            return false;
+        }
         AbstractPlayer that = (AbstractPlayer) o;
         return uuid.equals(that.uuid);
     }
 
-    public int hashCode() { return hc; }
+    public int hashCode() {
+        return hc;
+    }
 
     public String toString() {
         return "AbstractPlayer{" +

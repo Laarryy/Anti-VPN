@@ -12,9 +12,13 @@ import java.net.HttpURLConnection;
 import java.util.concurrent.CompletableFuture;
 
 public class VPNBlocker extends AbstractSource<VPNBlockerModel> {
-    public @NotNull String getName() { return "vpnblocker"; }
+    public @NotNull String getName() {
+        return "vpnblocker";
+    }
 
-    public boolean isKeyRequired() { return false; }
+    public boolean isKeyRequired() {
+        return false;
+    }
 
     public VPNBlocker() {
         super(VPNBlockerModel.class);
@@ -40,7 +44,9 @@ public class VPNBlocker extends AbstractSource<VPNBlockerModel> {
 
             String key = sourceConfigNode.node("key").getString();
 
-            WebRequest.Builder builder = getDefaultBuilder("http" + ((key != null && !key.isEmpty()) ? "s" : "") + "://api.vpnblocker.net/v2/json/" + ip + ((key != null && !key.isEmpty()) ? "/" + key : ""));
+            WebRequest.Builder builder = getDefaultBuilder("http" + ((key != null && !key.isEmpty())
+                                                                     ? "s"
+                                                                     : "") + "://api.vpnblocker.net/v2/json/" + ip + ((key != null && !key.isEmpty()) ? "/" + key : ""));
             HttpURLConnection conn = getConnection(builder.build());
             JSONDeserializer<VPNBlockerModel> modelDeserializer = new JSONDeserializer<>();
             return modelDeserializer.deserialize(getString(conn), VPNBlockerModel.class);

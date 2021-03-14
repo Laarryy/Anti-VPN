@@ -2,6 +2,7 @@ package me.egg82.antivpn.logging;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import flexjson.JSONSerializer;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -13,6 +14,7 @@ import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
 import me.egg82.antivpn.api.platform.Platform;
 import me.egg82.antivpn.compress.GZIPCompressionStream;
 import me.egg82.antivpn.core.DoubleBuffer;
@@ -30,13 +32,15 @@ import org.slf4j.LoggerFactory;
 public class GELFLoggerUtil {
     private static final Logger logger = LoggerFactory.getLogger(GELFLoggerUtil.class);
 
-    private static final ScheduledExecutorService workPool = Executors.newSingleThreadScheduledExecutor(new ThreadFactoryBuilder().setNameFormat("Anti-VPN_GELFLoggerUtil_%d").build());
+    private static final ScheduledExecutorService workPool = Executors.newSingleThreadScheduledExecutor(new ThreadFactoryBuilder().setNameFormat(
+            "Anti-VPN_GELFLoggerUtil_%d").build());
 
     static {
         workPool.scheduleWithFixedDelay(GELFLoggerUtil::sendModels, 1L, 2L, TimeUnit.SECONDS);
     }
 
-    private GELFLoggerUtil() { }
+    private GELFLoggerUtil() {
+    }
 
     private static final GZIPCompressionStream GZIP_COMPRESSION = new GZIPCompressionStream();
 
@@ -117,7 +121,9 @@ public class GELFLoggerUtil {
         }
     }
 
-    public static void send(int level, @Nullable String message, @NotNull Throwable ex) { sendModel(getModel(level, message, ex)); }
+    public static void send(int level, @Nullable String message, @NotNull Throwable ex) {
+        sendModel(getModel(level, message, ex));
+    }
 
     public static void queue(int level, @Nullable String message, @NotNull Throwable ex) {
         if (!initialized || sendErrors) {
@@ -176,16 +182,22 @@ public class GELFLoggerUtil {
 
         try {
             WebRequest request = WebRequest.builder(new URL(GELF_ADDRESS))
-                .method(WebRequest.RequestMethod.POST)
-                .timeout(new TimeUtil.Time(5000L, TimeUnit.MILLISECONDS))
-                .userAgent("egg82/GELFLogger")
-                .header("Content-Type", "application/json")
-                .header("Content-Encoding", "gzip")
-                .outputData(GZIP_COMPRESSION.compress(modelSerializer.exclude("*.class").deepSerialize(model).getBytes(StandardCharsets.UTF_8)))
-                .build();
+                    .method(WebRequest.RequestMethod.POST)
+                    .timeout(new TimeUtil.Time(5000L, TimeUnit.MILLISECONDS))
+                    .userAgent("egg82/GELFLogger")
+                    .header("Content-Type", "application/json")
+                    .header("Content-Encoding", "gzip")
+                    .outputData(GZIP_COMPRESSION.compress(modelSerializer.exclude("*.class").deepSerialize(model).getBytes(StandardCharsets.UTF_8)))
+                    .build();
             HttpURLConnection conn = request.getConnection();
             if (conn.getResponseCode() != 202) {
-                throw new IOException(LocaleUtil.getDefaultI18N().getText(MessageKey.ERROR__LOGGER__SEND, "{code}", String.valueOf(conn.getResponseCode()), "{message}", WebRequest.getString(conn)));
+                throw new IOException(LocaleUtil.getDefaultI18N()
+                                              .getText(MessageKey.ERROR__LOGGER__SEND,
+                                                       "{code}",
+                                                       String.valueOf(conn.getResponseCode()),
+                                                       "{message}",
+                                                       WebRequest.getString(conn)
+                                              ));
             }
         } catch (IOException ex) {
             logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex);

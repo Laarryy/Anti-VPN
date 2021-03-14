@@ -14,9 +14,13 @@ import java.util.Set;
 import java.util.UUID;
 
 public class PaperPlayerInfo extends MojangPlayerInfo {
-    PaperPlayerInfo(@NotNull UUID uuid) throws IOException { super(uuid); }
+    PaperPlayerInfo(@NotNull UUID uuid) throws IOException {
+        super(uuid);
+    }
 
-    PaperPlayerInfo(@NotNull String name) throws IOException { super(name); }
+    PaperPlayerInfo(@NotNull String name) throws IOException {
+        super(name);
+    }
 
     protected @NotNull String nameExpensive(@NotNull UUID uuid) throws IOException {
         // Currently-online lookup

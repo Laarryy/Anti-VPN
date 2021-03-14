@@ -27,7 +27,10 @@ public class UpdaterHook implements PluginHook {
     }
 
     private static UpdaterHook hook = null;
-    public static @Nullable UpdaterHook get() { return hook; }
+
+    public static @Nullable UpdaterHook get() {
+        return hook;
+    }
 
     private final ScheduledExecutorService workPool = Executors.newSingleThreadScheduledExecutor(new ThreadFactoryBuilder().setNameFormat("Anti-VPN_Updater_%d").build());
     private final BukkitUpdater updater;
@@ -59,22 +62,24 @@ public class UpdaterHook implements PluginHook {
         }
 
         updater.isUpdateAvailable()
-            .thenCombineAsync(updater.getLatestVersion(), Pair::new)
-            .whenCompleteAsync((val, ex) -> {
-                if (ex != null) {
-                    logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex);
-                    return;
-                }
+                .thenCombineAsync(updater.getLatestVersion(), Pair::new)
+                .whenCompleteAsync((val, ex) -> {
+                    if (ex != null) {
+                        logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex);
+                        return;
+                    }
 
-                if (!Boolean.TRUE.equals(val.getT1())) {
-                    return;
-                }
+                    if (!Boolean.TRUE.equals(val.getT1())) {
+                        return;
+                    }
 
-                if (commandSender.isConsole() || config.node("update", "notify").getBoolean(true)) {
-                    commandSender.sendMessage(MessageKey.GENERAL__UPDATE_FOUND, "{version}", val.getT2());
-                }
-            });
+                    if (commandSender.isConsole() || config.node("update", "notify").getBoolean(true)) {
+                        commandSender.sendMessage(MessageKey.GENERAL__UPDATE_FOUND, "{version}", val.getT2());
+                    }
+                });
     }
 
-    private void checkUpdate() { checkUpdate(BukkitLocaleCommandUtil.getConsole()); }
+    private void checkUpdate() {
+        checkUpdate(BukkitLocaleCommandUtil.getConsole());
+    }
 }

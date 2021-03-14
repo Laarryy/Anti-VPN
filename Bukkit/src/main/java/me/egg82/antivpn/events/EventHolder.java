@@ -31,7 +31,9 @@ public abstract class EventHolder {
 
     protected final List<BukkitEventSubscriber<?>> events = new ArrayList<>();
 
-    public final int numEvents() { return events.size(); }
+    public final int numEvents() {
+        return events.size();
+    }
 
     public final void cancel() {
         for (BukkitEventSubscriber<?> event : events) {
@@ -58,7 +60,9 @@ public abstract class EventHolder {
         return false;
     }
 
-    protected final boolean rangeContains(@NotNull String range, @NotNull String ip) { return new IPAddressString(range).contains(new IPAddressString(ip)); }
+    protected final boolean rangeContains(@NotNull String range, @NotNull String ip) {
+        return new IPAddressString(range).contains(new IPAddressString(ip));
+    }
 
     protected final boolean isIgnoredIp(@NotNull String ip, @NotNull String playerName, @NotNull UUID playerId) {
         CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
@@ -68,21 +72,21 @@ public abstract class EventHolder {
             if (ValidationUtil.isValidIp(testAddress) && ip.equalsIgnoreCase(testAddress)) {
                 if (ConfigUtil.getDebugOrFalse()) {
                     BukkitLocaleCommandUtil.getConsole().sendMessage(
-                        MessageKey.DEBUG__IGNORED_IP,
-                        "{name}", playerName,
-                        "{uuid}", playerId.toString(),
-                        "{ip}", ip
+                            MessageKey.DEBUG__IGNORED_IP,
+                            "{name}", playerName,
+                            "{uuid}", playerId.toString(),
+                            "{ip}", ip
                     );
                 }
                 return true;
             } else if (ValidationUtil.isValidIpRange(testAddress) && rangeContains(testAddress, ip)) {
                 if (ConfigUtil.getDebugOrFalse()) {
                     BukkitLocaleCommandUtil.getConsole().sendMessage(
-                        MessageKey.DEBUG__IGNORED_RANGE,
-                        "{name}", playerName,
-                        "{uuid}", playerId.toString(),
-                        "{ip}", ip,
-                        "{range}", testAddress
+                            MessageKey.DEBUG__IGNORED_RANGE,
+                            "{name}", playerName,
+                            "{uuid}", playerId.toString(),
+                            "{ip}", ip,
+                            "{range}", testAddress
                     );
                 }
                 return true;
@@ -144,17 +148,17 @@ public abstract class EventHolder {
             if (cachedConfig.getDebug()) {
                 if (isVPN) {
                     BukkitLocaleCommandUtil.getConsole().sendMessage(
-                        MessageKey.DEBUG__VPN_DETECTED,
-                        "{name}", playerName,
-                        "{uuid}", playerId.toString(),
-                        "{ip}", ip
+                            MessageKey.DEBUG__VPN_DETECTED,
+                            "{name}", playerName,
+                            "{uuid}", playerId.toString(),
+                            "{ip}", ip
                     );
                 } else {
                     BukkitLocaleCommandUtil.getConsole().sendMessage(
-                        MessageKey.DEBUG__VPN_PASSED,
-                        "{name}", playerName,
-                        "{uuid}", playerId.toString(),
-                        "{ip}", ip
+                            MessageKey.DEBUG__VPN_PASSED,
+                            "{name}", playerName,
+                            "{uuid}", playerId.toString(),
+                            "{ip}", ip
                     );
                 }
             }
@@ -162,10 +166,10 @@ public abstract class EventHolder {
         } else {
             if (cachedConfig.getDebug()) {
                 BukkitLocaleCommandUtil.getConsole().sendMessage(
-                    MessageKey.DEBUG__VPN_API_ONLY,
-                    "{name}", playerName,
-                    "{uuid}", playerId.toString(),
-                    "{ip}", ip
+                        MessageKey.DEBUG__VPN_API_ONLY,
+                        "{name}", playerName,
+                        "{uuid}", playerId.toString(),
+                        "{ip}", ip
                 );
             }
         }
@@ -181,15 +185,15 @@ public abstract class EventHolder {
             if (cachedConfig.getDebug()) {
                 if (isMCLeaks) {
                     BukkitLocaleCommandUtil.getConsole().sendMessage(
-                        MessageKey.DEBUG__MCLEAKS_DETECTED,
-                        "{name}", playerName,
-                        "{uuid}", playerId.toString()
+                            MessageKey.DEBUG__MCLEAKS_DETECTED,
+                            "{name}", playerName,
+                            "{uuid}", playerId.toString()
                     );
                 } else {
                     BukkitLocaleCommandUtil.getConsole().sendMessage(
-                        MessageKey.DEBUG__MCLEAKS_PASSED,
-                        "{name}", playerName,
-                        "{uuid}", playerId.toString()
+                            MessageKey.DEBUG__MCLEAKS_PASSED,
+                            "{name}", playerName,
+                            "{uuid}", playerId.toString()
                     );
                 }
             }
@@ -197,9 +201,9 @@ public abstract class EventHolder {
         } else {
             if (cachedConfig.getDebug()) {
                 BukkitLocaleCommandUtil.getConsole().sendMessage(
-                    MessageKey.DEBUG__MCLEAKS_API_ONLY,
-                    "{name}", playerName,
-                    "{uuid}", playerId.toString()
+                        MessageKey.DEBUG__MCLEAKS_API_ONLY,
+                        "{name}", playerName,
+                        "{uuid}", playerId.toString()
                 );
             }
         }

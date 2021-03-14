@@ -16,7 +16,8 @@ import java.util.Map;
 public class EventUtil {
     private static final Logger logger = new GELFLogger(LoggerFactory.getLogger(EventUtil.class));
 
-    private EventUtil() { }
+    private EventUtil() {
+    }
 
     public static void post(@NotNull VPNEvent event, @NotNull EventBus<VPNEvent> eventBus) {
         PostResult result = eventBus.post(event);
@@ -24,7 +25,10 @@ public class EventUtil {
             String decorator = LocaleUtil.getDefaultI18N().getText(MessageKey.API__DECORATOR);
 
             for (Map.Entry<EventSubscriber<?>, Throwable> kvp : result.exceptions().entrySet()) {
-                logger.error(LocaleUtil.getDefaultI18N().getText(MessageKey.API__EVENT_ERROR, "{decorator}", decorator, "{message}", kvp.getValue().getMessage()), kvp.getValue());
+                logger.error(
+                        LocaleUtil.getDefaultI18N().getText(MessageKey.API__EVENT_ERROR, "{decorator}", decorator, "{message}", kvp.getValue().getMessage()),
+                        kvp.getValue()
+                );
             }
             logger.warn(LocaleUtil.getDefaultI18N().getText(MessageKey.API__NO_REPORT, "{decorator}", decorator));
         }

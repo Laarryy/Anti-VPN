@@ -1,6 +1,7 @@
 package me.egg82.antivpn.locale;
 
 import java.util.Map;
+
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -19,17 +20,31 @@ public abstract class AbstractLocalizedCommandSender<M extends AbstractLocalized
         this.localizationManager = localizationManager;
     }
 
-    public @NotNull B getBase() { return base; }
+    public @NotNull B getBase() {
+        return base;
+    }
 
-    public @NotNull Audience getAudience() { return audience; }
+    public @NotNull Audience getAudience() {
+        return audience;
+    }
 
-    public void sendMessage(@NotNull String message) { getAudience().sendMessage(formatter.parse(localizationManager.getText(MessageKey.GENERAL__DECORATOR)).append(formatter.parse(message))); }
+    public void sendMessage(@NotNull String message) {
+        getAudience().sendMessage(formatter.parse(localizationManager.getText(MessageKey.GENERAL__DECORATOR)).append(formatter.parse(message)));
+    }
 
-    public void sendMessage(@NotNull String message, String... placeholders) { getAudience().sendMessage(formatter.parse(localizationManager.getText(MessageKey.GENERAL__DECORATOR)).append(formatter.parse(message, placeholders))); }
+    public void sendMessage(@NotNull String message, String... placeholders) {
+        getAudience().sendMessage(formatter.parse(localizationManager.getText(MessageKey.GENERAL__DECORATOR)).append(formatter.parse(message, placeholders)));
+    }
 
-    public void sendMessage(@NotNull String message, @NotNull Map<String, String> placeholders) { getAudience().sendMessage(formatter.parse(localizationManager.getText(MessageKey.GENERAL__DECORATOR)).append(formatter.parse(message, placeholders))); }
+    public void sendMessage(@NotNull String message, @NotNull Map<String, String> placeholders) {
+        getAudience().sendMessage(formatter.parse(localizationManager.getText(MessageKey.GENERAL__DECORATOR)).append(formatter.parse(message, placeholders)));
+    }
 
-    public @NotNull Component getComponent(@NotNull String message) { return formatter.parse(localizationManager.getText(MessageKey.GENERAL__DECORATOR)).append(formatter.parse(message)); }
+    public @NotNull Component getComponent(@NotNull String message) {
+        return formatter.parse(localizationManager.getText(MessageKey.GENERAL__DECORATOR)).append(formatter.parse(message));
+    }
 
-    public @NotNull I18NManager getLocalizationManager() { return localizationManager; }
+    public @NotNull I18NManager getLocalizationManager() {
+        return localizationManager;
+    }
 }

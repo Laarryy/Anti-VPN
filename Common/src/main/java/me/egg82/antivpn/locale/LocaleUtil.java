@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Locale;
 import java.util.ResourceBundle;
+
 import me.egg82.antivpn.logging.GELFLogger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -16,15 +17,20 @@ public class LocaleUtil {
     private static I18NManager consoleI18N = null;
     private static final I18NManager usI18N = new I18NManager(getInternalBundle("/lang/lang_en_US.properties", Locale.US));
 
-    private LocaleUtil() { }
+    private LocaleUtil() {
+    }
 
     public static void setLocale(@Nullable I18NManager consoleI18N) {
         LocaleUtil.consoleI18N = consoleI18N;
     }
 
-    public static @Nullable I18NManager getConsoleI18N() { return consoleI18N; }
+    public static @Nullable I18NManager getConsoleI18N() {
+        return consoleI18N;
+    }
 
-    public static @NotNull I18NManager getUSI18N() { return usI18N; }
+    public static @NotNull I18NManager getUSI18N() {
+        return usI18N;
+    }
 
     public static @NotNull I18NManager getDefaultI18N() {
         I18NManager m = consoleI18N; // Thread-safe reference

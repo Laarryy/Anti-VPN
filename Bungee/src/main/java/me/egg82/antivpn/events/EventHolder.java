@@ -12,7 +12,9 @@ public abstract class EventHolder {
 
     protected final List<BungeeEventSubscriber<?>> events = new ArrayList<>();
 
-    public final int numEvents() { return events.size(); }
+    public final int numEvents() {
+        return events.size();
+    }
 
     public final void cancel() {
         for (BungeeEventSubscriber<?> event : events) {

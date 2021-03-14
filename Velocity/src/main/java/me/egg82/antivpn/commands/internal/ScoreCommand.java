@@ -2,10 +2,12 @@ package me.egg82.antivpn.commands.internal;
 
 import co.aikar.commands.CommandIssuer;
 import com.velocitypowered.api.proxy.ProxyServer;
+
 import java.text.DecimalFormat;
 import java.util.Set;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
+
 import me.egg82.antivpn.api.APIException;
 import me.egg82.antivpn.api.VPNAPIProvider;
 import me.egg82.antivpn.api.model.source.Source;

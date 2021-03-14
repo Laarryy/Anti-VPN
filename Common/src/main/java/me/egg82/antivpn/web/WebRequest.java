@@ -61,7 +61,9 @@ public class WebRequest {
         }
     }
 
-    public @NotNull String getString() throws IOException { return getString(getConnection()); }
+    public @NotNull String getString() throws IOException {
+        return getString(getConnection());
+    }
 
     public static @NotNull String getString(@NotNull HttpURLConnection connection) throws IOException {
         String sep = System.lineSeparator();
@@ -80,7 +82,9 @@ public class WebRequest {
         }
     }
 
-    public byte @NotNull [] getBytes() throws IOException { return getBytes(getConnection()); }
+    public byte @NotNull [] getBytes() throws IOException {
+        return getBytes(getConnection());
+    }
 
     public static byte @NotNull [] getBytes(@NotNull HttpURLConnection connection) throws IOException {
         try (InputStream in = getInputStream(connection); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
@@ -94,9 +98,13 @@ public class WebRequest {
         }
     }
 
-    public @NotNull InputStream getInputStream() throws IOException { return getInputStream(getConnection()); }
+    public @NotNull InputStream getInputStream() throws IOException {
+        return getInputStream(getConnection());
+    }
 
-    public static @NotNull InputStream getInputStream(@NotNull HttpURLConnection connection) throws IOException { return connection.getInputStream(); }
+    public static @NotNull InputStream getInputStream(@NotNull HttpURLConnection connection) throws IOException {
+        return connection.getInputStream();
+    }
 
     public @NotNull HttpURLConnection getConnection() throws IOException {
         if (ConfigUtil.getDebugOrFalse()) {
@@ -212,7 +220,9 @@ public class WebRequest {
         }
     }
 
-    public static @NotNull WebRequest.Builder builder(@NotNull URL url) { return new WebRequest.Builder(url); }
+    public static @NotNull WebRequest.Builder builder(@NotNull URL url) {
+        return new WebRequest.Builder(url);
+    }
 
     public static class Builder {
         private final WebRequest request;

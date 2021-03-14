@@ -1,8 +1,10 @@
 package me.egg82.antivpn.messaging.packets.server;
 
 import io.netty.buffer.ByteBuf;
+
 import java.util.Objects;
 import java.util.UUID;
+
 import me.egg82.antivpn.messaging.packets.AbstractPacket;
 import me.egg82.antivpn.utils.UUIDUtil;
 import org.jetbrains.annotations.NotNull;
@@ -32,23 +34,33 @@ public class ShutdownPacket extends AbstractPacket {
         writeUUID(this.server, buffer);
     }
 
-    public @NotNull UUID getServer() { return server; }
+    public @NotNull UUID getServer() {
+        return server;
+    }
 
-    public void setServer(@NotNull UUID server) { this.server = server; }
+    public void setServer(@NotNull UUID server) {
+        this.server = server;
+    }
 
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof ShutdownPacket)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof ShutdownPacket)) {
+            return false;
+        }
         ShutdownPacket that = (ShutdownPacket) o;
         return server.equals(that.server);
     }
 
-    public int hashCode() { return Objects.hash(server); }
+    public int hashCode() {
+        return Objects.hash(server);
+    }
 
     public String toString() {
         return "ShutdownPacket{" +
-            "server=" + server +
-            ", sender=" + sender +
-            '}';
+                "server=" + server +
+                ", sender=" + sender +
+                '}';
     }
 }

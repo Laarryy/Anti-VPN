@@ -2,7 +2,9 @@ package me.egg82.antivpn.commands.internal;
 
 import co.aikar.commands.CommandIssuer;
 import com.velocitypowered.api.proxy.ProxyServer;
+
 import java.io.File;
+
 import me.egg82.antivpn.api.APIRegistrationUtil;
 import me.egg82.antivpn.api.VPNAPI;
 import me.egg82.antivpn.api.VPNAPIImpl;
@@ -53,7 +55,13 @@ public class ReloadCommand extends AbstractCommand {
         ConfigurationFileUtil.reloadConfig(dataFolder, console, messagingHandler, sourceManager);
 
         VelocityIPManager ipManager = new VelocityIPManager(proxy, sourceManager, cachedConfig.getCacheTime().getTime(), cachedConfig.getCacheTime().getUnit());
-        VelocityPlayerManager playerManager = new VelocityPlayerManager(proxy, cachedConfig.getThreads(), cachedConfig.getMcLeaksKey(), cachedConfig.getCacheTime().getTime(), cachedConfig.getCacheTime().getUnit());
+        VelocityPlayerManager playerManager = new VelocityPlayerManager(
+                proxy,
+                cachedConfig.getThreads(),
+                cachedConfig.getMcLeaksKey(),
+                cachedConfig.getCacheTime().getTime(),
+                cachedConfig.getCacheTime().getUnit()
+        );
         VPNAPI api = VPNAPIProvider.getInstance();
         api.getEventBus().post(new APIReloadEventImpl(api, ipManager, playerManager, sourceManager)).now();
         api = new VPNAPIImpl(api.getPlatform(), api.getPluginMetadata(), ipManager, playerManager, sourceManager, cachedConfig, api.getEventBus());

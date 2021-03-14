@@ -3,6 +3,7 @@ package me.egg82.antivpn.messaging.handler;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
 import me.egg82.antivpn.config.ConfigUtil;
 import me.egg82.antivpn.logging.GELFLogger;
 import me.egg82.antivpn.messaging.packets.MultiPacket;
@@ -20,7 +21,13 @@ public class MessagingHandlerImpl extends AbstractMessagingHandler implements Me
     private static final List<AbstractMessagingHandler> handlers = new ArrayList<>();
 
     static {
-        List<Class<AbstractMessagingHandler>> classes = PackageFilter.getClasses(AbstractMessagingHandler.class, "me.egg82.antivpn.messaging.handler", false, false, false);
+        List<Class<AbstractMessagingHandler>> classes = PackageFilter.getClasses(
+                AbstractMessagingHandler.class,
+                "me.egg82.antivpn.messaging.handler",
+                false,
+                false,
+                false
+        );
 
         for (Class<AbstractMessagingHandler> clazz : classes) {
             if (clazz.equals(MessagingHandlerImpl.class)) {

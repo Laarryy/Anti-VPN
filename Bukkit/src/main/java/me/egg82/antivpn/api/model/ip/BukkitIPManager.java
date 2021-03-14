@@ -34,12 +34,17 @@ public class BukkitIPManager extends AbstractIPManager {
         }
 
         CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
-        BukkitCommandUtil.dispatchCommands(BukkitTailorUtil.tailorCommands(cachedConfig.getVPNActionCommands(), playerName, playerUuid, ip), Bukkit.getConsoleSender(), plugin);
+        BukkitCommandUtil.dispatchCommands(
+                BukkitTailorUtil.tailorCommands(cachedConfig.getVPNActionCommands(), playerName, playerUuid, ip),
+                Bukkit.getConsoleSender(),
+                plugin
+        );
         if (!cachedConfig.getVPNKickMessage().isEmpty()) {
             if (BukkitCapabilities.HAS_ADVENTURE) {
                 p.kick(BukkitTailorUtil.tailorKickMessage(cachedConfig.getVPNKickMessage(), playerName, playerUuid, ip));
             } else {
-                p.kickPlayer(BukkitComponentSerializer.legacy().serialize(BukkitTailorUtil.tailorKickMessage(cachedConfig.getVPNKickMessage(), playerName, playerUuid, ip)));
+                p.kickPlayer(BukkitComponentSerializer.legacy()
+                                     .serialize(BukkitTailorUtil.tailorKickMessage(cachedConfig.getVPNKickMessage(), playerName, playerUuid, ip)));
             }
         }
         return true;

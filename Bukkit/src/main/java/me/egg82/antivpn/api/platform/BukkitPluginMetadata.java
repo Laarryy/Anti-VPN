@@ -10,5 +10,7 @@ public class BukkitPluginMetadata extends AbstractPluginMetadata {
         this.pluginVersion = pluginVersion;
     }
 
-    public @NotNull String getVersion() { return pluginVersion; }
+    public @NotNull String getVersion() {
+        return pluginVersion;
+    }
 }

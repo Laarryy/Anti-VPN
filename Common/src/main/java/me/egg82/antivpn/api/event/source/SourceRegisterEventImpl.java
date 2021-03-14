@@ -16,22 +16,30 @@ public class SourceRegisterEventImpl extends AbstractCancellable implements Sour
         this.source = source;
     }
 
-    public @NotNull Source<? extends SourceModel> getSource() { return source; }
+    public @NotNull Source<? extends SourceModel> getSource() {
+        return source;
+    }
 
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof SourceRegisterEventImpl)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof SourceRegisterEventImpl)) {
+            return false;
+        }
         SourceRegisterEventImpl that = (SourceRegisterEventImpl) o;
         return source.equals(that.source);
     }
 
-    public int hashCode() { return Objects.hash(source); }
+    public int hashCode() {
+        return Objects.hash(source);
+    }
 
     public String toString() {
         return "SourceRegisterEventImpl{" +
-            "api=" + api +
-            ", source=" + source +
-            ", cancelState=" + cancelState +
-            '}';
+                "api=" + api +
+                ", source=" + source +
+                ", cancelState=" + cancelState +
+                '}';
     }
 }

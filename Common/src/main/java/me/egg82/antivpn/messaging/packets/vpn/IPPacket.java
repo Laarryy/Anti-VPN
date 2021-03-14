@@ -1,8 +1,10 @@
 package me.egg82.antivpn.messaging.packets.vpn;
 
 import io.netty.buffer.ByteBuf;
+
 import java.util.Objects;
 import java.util.UUID;
+
 import me.egg82.antivpn.api.model.ip.AlgorithmMethod;
 import me.egg82.antivpn.messaging.packets.AbstractPacket;
 import me.egg82.antivpn.utils.UUIDUtil;
@@ -66,38 +68,60 @@ public class IPPacket extends AbstractPacket {
         }
     }
 
-    public @NotNull String getIp() { return ip; }
+    public @NotNull String getIp() {
+        return ip;
+    }
 
-    public void setIp(@NotNull String ip) { this.ip = ip; }
+    public void setIp(@NotNull String ip) {
+        this.ip = ip;
+    }
 
-    public @Nullable Boolean getCascade() { return cascade; }
+    public @Nullable Boolean getCascade() {
+        return cascade;
+    }
 
-    public void setCascade(@Nullable Boolean cascade) { this.cascade = cascade; }
+    public void setCascade(@Nullable Boolean cascade) {
+        this.cascade = cascade;
+    }
 
-    public @Nullable Double getConsensus() { return consensus; }
+    public @Nullable Double getConsensus() {
+        return consensus;
+    }
 
-    public void setConsensus(@Nullable Double consensus) { this.consensus = consensus; }
+    public void setConsensus(@Nullable Double consensus) {
+        this.consensus = consensus;
+    }
 
-    public @NotNull AlgorithmMethod getType() { return type; }
+    public @NotNull AlgorithmMethod getType() {
+        return type;
+    }
 
-    public void setType(@NotNull AlgorithmMethod type) { this.type = type; }
+    public void setType(@NotNull AlgorithmMethod type) {
+        this.type = type;
+    }
 
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof IPPacket)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof IPPacket)) {
+            return false;
+        }
         IPPacket ipPacket = (IPPacket) o;
         return ip.equals(ipPacket.ip) && type == ipPacket.type && Objects.equals(cascade, ipPacket.cascade) && Objects.equals(consensus, ipPacket.consensus);
     }
 
-    public int hashCode() { return Objects.hash(ip, type, cascade, consensus); }
+    public int hashCode() {
+        return Objects.hash(ip, type, cascade, consensus);
+    }
 
     public String toString() {
         return "IPPacket{" +
-            "sender=" + sender +
-            ", ip='" + ip + '\'' +
-            ", type=" + type +
-            ", cascade=" + cascade +
-            ", consensus=" + consensus +
-            '}';
+                "sender=" + sender +
+                ", ip='" + ip + '\'' +
+                ", type=" + type +
+                ", cascade=" + cascade +
+                ", consensus=" + consensus +
+                '}';
     }
 }

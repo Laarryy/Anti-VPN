@@ -11,4 +11,5 @@ import net.kyori.event.EventBus;
  * Anti-VPN plugin reloads from the plugin's command will not trigger this,
  * as the event bus will not be destroyed.</p>
  */
-public interface APIDisableEvent extends VPNEvent { }
+public interface APIDisableEvent extends VPNEvent {
+}

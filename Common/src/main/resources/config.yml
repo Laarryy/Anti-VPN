@@ -131,17 +131,17 @@ sources:
 
   # The order to try results in
   order:
-  - 'proxycheck'
-  - 'iptrooper'
-  - 'getipintel'
-  - 'ipqualityscore'
-  - 'iphub'
-  - 'iphunter'
-  - 'vpnblocker'
-  - 'ip2proxy'
-  - 'shodan'
-  - 'ipinfo'
-  - 'teoh'
+    - 'proxycheck'
+    - 'iptrooper'
+    - 'getipintel'
+    - 'ipqualityscore'
+    - 'iphub'
+    - 'iphunter'
+    - 'vpnblocker'
+    - 'ip2proxy'
+    - 'shodan'
+    - 'ipinfo'
+    - 'teoh'
 
   # https://proxycheck.io
   # Results updated Jan 19, 2020
@@ -336,12 +336,12 @@ action:
 
   # IP addresses and ranges to ignore when checking for VPNs and/or MCLeaks accounts
   ignore:
-  - '127.0.0.0/8'
-  - '10.0.0.0/8'
-  - '172.16.0.0/12'
-  - '192.168.0.0/16'
-  - '::1/128'
-  - 'fd00::/8'
+    - '127.0.0.0/8'
+    - '10.0.0.0/8'
+    - '172.16.0.0/12'
+    - '192.168.0.0/16'
+    - '::1/128'
+    - 'fd00::/8'
 
 # Plugin permissions
 permissions:

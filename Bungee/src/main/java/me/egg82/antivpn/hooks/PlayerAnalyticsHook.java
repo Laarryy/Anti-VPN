@@ -58,7 +58,8 @@ public class PlayerAnalyticsHook implements PluginHook {
         }
     }
 
-    public void cancel() { }
+    public void cancel() {
+    }
 
     private boolean isCapabilityAvailable(String capability) {
         try {
@@ -77,7 +78,8 @@ public class PlayerAnalyticsHook implements PluginHook {
     class Data implements DataExtension {
         private final CallEvents[] events = new CallEvents[] { CallEvents.SERVER_PERIODICAL, CallEvents.SERVER_EXTENSION_REGISTER, CallEvents.PLAYER_JOIN };
 
-        private Data() { }
+        private Data() {
+        }
 
         @NumberProvider(
                 text = "VPN Users",
@@ -271,6 +273,8 @@ public class PlayerAnalyticsHook implements PluginHook {
             return host.getHostAddress();
         }
 
-        public @NotNull CallEvents[] callExtensionMethodsOn() { return events; }
+        public @NotNull CallEvents[] callExtensionMethodsOn() {
+            return events;
+        }
     }
 }

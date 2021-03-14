@@ -120,7 +120,7 @@ public class PlayerEvents extends EventHolder {
         }
     }
 
-    private void checkPermsPlayer(@NotNull PreLoginEvent event, @NotNull UUID uuid,  boolean hasBypass) {
+    private void checkPermsPlayer(@NotNull PreLoginEvent event, @NotNull UUID uuid, boolean hasBypass) {
         if (hasBypass) {
             if (ConfigUtil.getDebugOrFalse()) {
                 console.sendMessage("<c1>" + event.getConnection().getName() + "</c1> <c2>bypasses pre-check. Ignoring.</c2>");
@@ -144,7 +144,8 @@ public class PlayerEvents extends EventHolder {
                 return;
             } else if (ValidationUtil.isValidIpRange(testAddress) && rangeContains(testAddress, ip)) {
                 if (ConfigUtil.getDebugOrFalse()) {
-                    console.sendMessage("<c1>" + event.getConnection().getName() + "</c1> <c2>is under an ignored range</c2> <c1>" + testAddress + " (" + ip + ")" + "</c1><c2>. Ignoring.</c2>");
+                    console.sendMessage("<c1>" + event.getConnection()
+                            .getName() + "</c1> <c2>is under an ignored range</c2> <c1>" + testAddress + " (" + ip + ")" + "</c1><c2>. Ignoring.</c2>");
                 }
                 return;
             }
@@ -197,7 +198,7 @@ public class PlayerEvents extends EventHolder {
         for (String testAddress : cachedConfig.getIgnoredIps()) {
             if (
                     ValidationUtil.isValidIp(testAddress) && ip.equalsIgnoreCase(testAddress)
-                    || ValidationUtil.isValidIpRange(testAddress) && rangeContains(testAddress, ip)
+                            || ValidationUtil.isValidIpRange(testAddress) && rangeContains(testAddress, ip)
             ) {
                 return;
             }
@@ -277,7 +278,8 @@ public class PlayerEvents extends EventHolder {
                 return;
             } else if (ValidationUtil.isValidIpRange(testAddress) && rangeContains(testAddress, ip)) {
                 if (ConfigUtil.getDebugOrFalse()) {
-                    console.sendMessage("<c1>" + event.getPlayer().getName() + "</c1> <c2>is under an ignored range</c2> <c1>" + testAddress + " (" + ip + ")" + "</c1><c2>. Ignoring.</c2>");
+                    console.sendMessage("<c1>" + event.getPlayer()
+                            .getName() + "</c1> <c2>is under an ignored range</c2> <c1>" + testAddress + " (" + ip + ")" + "</c1><c2>. Ignoring.</c2>");
                 }
                 return;
             }
@@ -409,5 +411,7 @@ public class PlayerEvents extends EventHolder {
         return PlayerLookup.get(name).thenApply(PlayerInfo::getUUID);
     }
 
-    private boolean rangeContains(@NotNull String range, @NotNull String ip) { return new IPAddressString(range).contains(new IPAddressString(ip)); }
+    private boolean rangeContains(@NotNull String range, @NotNull String ip) {
+        return new IPAddressString(range).contains(new IPAddressString(ip));
+    }
 }

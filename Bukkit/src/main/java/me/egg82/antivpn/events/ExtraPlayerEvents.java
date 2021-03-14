@@ -20,27 +20,27 @@ import java.net.UnknownHostException;
 public class ExtraPlayerEvents extends EventHolder {
     public ExtraPlayerEvents(@NotNull Plugin plugin) {
         events.add(
-            BukkitEvents.subscribe(plugin, PlayerJoinEvent.class, EventPriority.HIGH)
-                .handler(this::checkUpdate)
-                .exceptionHandler(ex -> logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex))
+                BukkitEvents.subscribe(plugin, PlayerJoinEvent.class, EventPriority.HIGH)
+                        .handler(this::checkUpdate)
+                        .exceptionHandler(ex -> logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex))
         );
 
         events.add(
-            BukkitEvents.subscribe(plugin, PlayerLoginEvent.class, EventPriority.MONITOR)
-                .filter(e -> e.getResult() == PlayerLoginEvent.Result.ALLOWED)
-                .filter(e -> !Bukkit.hasWhitelist() || e.getPlayer().isWhitelisted())
-                .handler(e -> {
-                    BukkitPlatform.addUniquePlayer(e.getPlayer().getUniqueId());
-                    String ip = getIp(e.getAddress());
-                    if (ip != null) {
-                        try {
-                            BukkitPlatform.addUniqueIp(InetAddress.getByName(ip));
-                        } catch (UnknownHostException ex) {
-                            logger.warn(LocaleUtil.getDefaultI18N().getText(MessageKey.ERROR__NO_INET, "{ip}", ip), ex);
-                        }
-                    }
-                })
-                .exceptionHandler(ex -> logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex))
+                BukkitEvents.subscribe(plugin, PlayerLoginEvent.class, EventPriority.MONITOR)
+                        .filter(e -> e.getResult() == PlayerLoginEvent.Result.ALLOWED)
+                        .filter(e -> !Bukkit.hasWhitelist() || e.getPlayer().isWhitelisted())
+                        .handler(e -> {
+                            BukkitPlatform.addUniquePlayer(e.getPlayer().getUniqueId());
+                            String ip = getIp(e.getAddress());
+                            if (ip != null) {
+                                try {
+                                    BukkitPlatform.addUniqueIp(InetAddress.getByName(ip));
+                                } catch (UnknownHostException ex) {
+                                    logger.warn(LocaleUtil.getDefaultI18N().getText(MessageKey.ERROR__NO_INET, "{ip}", ip), ex);
+                                }
+                            }
+                        })
+                        .exceptionHandler(ex -> logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex))
         );
     }
 

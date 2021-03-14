@@ -9,7 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class VersionUtil {
-    private VersionUtil() { }
+    private VersionUtil() {
+    }
 
     public static boolean isAtLeast(@NotNull String atLeastVersion, char separator1, @NotNull String versionToTest, char separator2) {
         int[] v1 = parseVersion(atLeastVersion, separator1);

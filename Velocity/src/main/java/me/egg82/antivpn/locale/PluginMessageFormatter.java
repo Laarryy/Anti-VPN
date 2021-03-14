@@ -8,7 +8,9 @@ import org.jetbrains.annotations.NotNull;
 public class PluginMessageFormatter extends VelocityMessageFormatter {
     private final String header;
 
-    public PluginMessageFormatter(@NotNull CommandManager manager, @NotNull MessageKeyProvider header) { this(manager.getLocales().getMessage(null, header)); }
+    public PluginMessageFormatter(@NotNull CommandManager manager, @NotNull MessageKeyProvider header) {
+        this(manager.getLocales().getMessage(null, header));
+    }
 
     public PluginMessageFormatter(@NotNull String header) {
         super();

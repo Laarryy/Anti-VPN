@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+
 import me.egg82.antivpn.logging.GELFLogger;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -18,7 +19,10 @@ public class I18NManager {
     private final String localeName;
 
     private static final ConcurrentMap<UUID, I18NManager> userCache = new ConcurrentHashMap<>();
-    public static ConcurrentMap<UUID, I18NManager> getUserCache() { return userCache; }
+
+    public static ConcurrentMap<UUID, I18NManager> getUserCache() {
+        return userCache;
+    }
 
     private static final ConcurrentMap<Locale, ResourceBundle> localeCache = new ConcurrentHashMap<>();
     private static final ConcurrentMap<Locale, I18NManager> managerCache = new ConcurrentHashMap<>();
@@ -92,9 +96,15 @@ public class I18NManager {
         return message;
     }
 
-    public @NotNull Locale getLocale() { return locale; }
+    public @NotNull Locale getLocale() {
+        return locale;
+    }
 
-    public @NotNull String getLocaleName() { return localeName; }
+    public @NotNull String getLocaleName() {
+        return localeName;
+    }
 
-    private static @NotNull String getLocaleName(@NotNull Locale locale) { return locale.getCountry() == null || locale.getCountry().isEmpty() ? locale.getLanguage() : locale.getLanguage() + "_" + locale.getCountry(); }
+    private static @NotNull String getLocaleName(@NotNull Locale locale) {
+        return locale.getCountry() == null || locale.getCountry().isEmpty() ? locale.getLanguage() : locale.getLanguage() + "_" + locale.getCountry();
+    }
 }

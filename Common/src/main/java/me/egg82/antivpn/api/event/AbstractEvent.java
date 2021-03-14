@@ -12,7 +12,11 @@ public abstract class AbstractEvent implements VPNEvent {
         this.clazz = getClass();
     }
 
-    public @NotNull VPNAPI getApi() { return api; }
+    public @NotNull VPNAPI getApi() {
+        return api;
+    }
 
-    public @NotNull Class<? extends VPNEvent> getEventType() { return clazz; }
+    public @NotNull Class<? extends VPNEvent> getEventType() {
+        return clazz;
+    }
 }

@@ -106,7 +106,13 @@ public class BungeeBootstrap extends Plugin {
 
         Artifact.Builder caffeine = Artifact.builder("com.github.ben-manes.caffeine", "caffeine", "${caffeine.version}", cacheDir)
                 .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
-        buildRelocateInject(caffeine, jarsDir, Collections.singletonList(new Relocation(getCaffeinePackage(), "me.egg82.antivpn.external." + getCaffeinePackage())), parentLoader, "Caffeine");
+        buildRelocateInject(
+                caffeine,
+                jarsDir,
+                Collections.singletonList(new Relocation(getCaffeinePackage(), "me.egg82.antivpn.external." + getCaffeinePackage())),
+                parentLoader,
+                "Caffeine"
+        );
 
         try {
             Class.forName("com.github.luben.zstd.Zstd");
@@ -118,13 +124,19 @@ public class BungeeBootstrap extends Plugin {
 
         Artifact.Builder ipaddr = Artifact.builder("com.github.seancfoley", "ipaddress", "${ipaddress.version}", cacheDir)
                 .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
-        buildRelocateInject(ipaddr, jarsDir, Collections.singletonList(new Relocation(getInetIpaddrPackage(), "me.egg82.antivpn.external." + getInetIpaddrPackage())), parentLoader, "IP Address");
+        buildRelocateInject(
+                ipaddr,
+                jarsDir,
+                Collections.singletonList(new Relocation(getInetIpaddrPackage(), "me.egg82.antivpn.external." + getInetIpaddrPackage())),
+                parentLoader,
+                "IP Address"
+        );
 
         try {
             Class.forName("org.h2.Driver");
         } catch (ClassNotFoundException ignored) {
             Artifact.Builder h2 = Artifact.builder("com.h2database", "h2", "${h2.version}", cacheDir)
-                .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
+                    .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
             buildRelocateInject(h2, jarsDir, Collections.emptyList(), parentLoader, "H2");
         }
 
@@ -138,7 +150,13 @@ public class BungeeBootstrap extends Plugin {
 
         Artifact.Builder rabbitmq = Artifact.builder(getRabbitMqPackage(), "amqp-client", "${rabbitmq.version}", cacheDir)
                 .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
-        buildRelocateInject(rabbitmq, jarsDir, Collections.singletonList(new Relocation(getRabbitMqPackage(), "me.egg82.antivpn.external." + getRabbitMqPackage())), parentLoader, "RabbitMQ");
+        buildRelocateInject(
+                rabbitmq,
+                jarsDir,
+                Collections.singletonList(new Relocation(getRabbitMqPackage(), "me.egg82.antivpn.external." + getRabbitMqPackage())),
+                parentLoader,
+                "RabbitMQ"
+        );
 
         Artifact.Builder ebeanCore = Artifact.builder(getEbeanPackage(), "ebean-core", "${ebean.version}", cacheDir)
                 .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
@@ -150,17 +168,29 @@ public class BungeeBootstrap extends Plugin {
 
         Artifact.Builder fastutil = Artifact.builder("it.unimi.dsi", "fastutil", "${fastutil.version}", cacheDir)
                 .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
-        buildRelocateInject(fastutil, jarsDir, Collections.singletonList(new Relocation(getFastUtilPackage(), "me.egg82.antivpn.external." + getFastUtilPackage())), parentLoader, "FastUtil");
+        buildRelocateInject(
+                fastutil,
+                jarsDir,
+                Collections.singletonList(new Relocation(getFastUtilPackage(), "me.egg82.antivpn.external." + getFastUtilPackage())),
+                parentLoader,
+                "FastUtil"
+        );
 
         Artifact.Builder javassist = Artifact.builder("org.javassist", getJavassistPackage(), "${javassist.version}", cacheDir)
-            .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
-        buildRelocateInject(javassist, jarsDir, Collections.singletonList(new Relocation(getJavassistPackage(), "me.egg82.antivpn.external." + getJavassistPackage())), parentLoader, "Javassist");
+                .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
+        buildRelocateInject(
+                javassist,
+                jarsDir,
+                Collections.singletonList(new Relocation(getJavassistPackage(), "me.egg82.antivpn.external." + getJavassistPackage())),
+                parentLoader,
+                "Javassist"
+        );
 
         try {
             Class.forName("org.postgresql.Driver");
         } catch (ClassNotFoundException ignored) {
             Artifact.Builder postgresql = Artifact.builder("org.postgresql", "postgresql", "${postgresql.version}", cacheDir)
-                .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
+                    .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
             buildRelocateInject(postgresql, jarsDir, Collections.emptyList(), parentLoader, "PostgreSQL");
         }
 
@@ -174,27 +204,80 @@ public class BungeeBootstrap extends Plugin {
 
         Artifact.Builder redis = Artifact.builder("redis.clients", "jedis", "${jedis.version}", cacheDir)
                 .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
-        buildRelocateInject(redis, jarsDir, Collections.singletonList(new Relocation(getJedisPackage(), "me.egg82.antivpn.external." + getJedisPackage())), parentLoader, "Jedis");
+        buildRelocateInject(
+                redis,
+                jarsDir,
+                Collections.singletonList(new Relocation(getJedisPackage(), "me.egg82.antivpn.external." + getJedisPackage())),
+                parentLoader,
+                "Jedis"
+        );
     }
 
     // Prevent Maven from relocating these
-    private @NotNull String getCaffeinePackage() { return new String(new byte[] {'c', 'o', 'm', '.', 'g', 'i', 't', 'h', 'u', 'b', '.', 'b', 'e', 'n', 'm', 'a', 'n', 'e', 's', '.', 'c', 'a', 'f', 'f', 'e', 'i', 'n', 'e'}); }
+    private @NotNull String getCaffeinePackage() {
+        return new String(new byte[] {
+                'c',
+                'o',
+                'm',
+                '.',
+                'g',
+                'i',
+                't',
+                'h',
+                'u',
+                'b',
+                '.',
+                'b',
+                'e',
+                'n',
+                'm',
+                'a',
+                'n',
+                'e',
+                's',
+                '.',
+                'c',
+                'a',
+                'f',
+                'f',
+                'e',
+                'i',
+                'n',
+                'e'
+        });
+    }
 
-    private @NotNull String getInetIpaddrPackage() { return new String(new byte[] {'i', 'n', 'e', 't', '.', 'i', 'p', 'a', 'd', 'd', 'r'}); }
+    private @NotNull String getInetIpaddrPackage() {
+        return new String(new byte[] { 'i', 'n', 'e', 't', '.', 'i', 'p', 'a', 'd', 'd', 'r' });
+    }
 
-    private @NotNull String getRabbitMqPackage() { return new String(new byte[] {'c', 'o', 'm', '.', 'r', 'a', 'b', 'b', 'i', 't', 'm', 'q'}); }
+    private @NotNull String getRabbitMqPackage() {
+        return new String(new byte[] { 'c', 'o', 'm', '.', 'r', 'a', 'b', 'b', 'i', 't', 'm', 'q' });
+    }
 
-    private @NotNull String getEbeanPackage() { return new String(new byte[] {'i', 'o', '.', 'e', 'b', 'e', 'a', 'n'}); }
+    private @NotNull String getEbeanPackage() {
+        return new String(new byte[] { 'i', 'o', '.', 'e', 'b', 'e', 'a', 'n' });
+    }
 
-    private @NotNull String getEbeanInternalPackage() { return new String(new byte[] {'i', 'o', '.', 'e', 'b', 'e', 'a', 'n', 'i', 'n', 't', 'e', 'r', 'n', 'a', 'l'}); }
+    private @NotNull String getEbeanInternalPackage() {
+        return new String(new byte[] { 'i', 'o', '.', 'e', 'b', 'e', 'a', 'n', 'i', 'n', 't', 'e', 'r', 'n', 'a', 'l' });
+    }
 
-    private @NotNull String getEbeanServicePackage() { return new String(new byte[] {'i', 'o', '.', 'e', 'b', 'e', 'a', 'n', 's', 'e', 'r', 'v', 'i', 'c', 'e'}); }
+    private @NotNull String getEbeanServicePackage() {
+        return new String(new byte[] { 'i', 'o', '.', 'e', 'b', 'e', 'a', 'n', 's', 'e', 'r', 'v', 'i', 'c', 'e' });
+    }
 
-    private @NotNull String getFastUtilPackage() { return new String(new byte[] {'i', 't', '.', 'u', 'n', 'i', 'm', 'i', '.', 'd', 's', 'i', '.', 'f', 'a', 's', 't', 'u', 't', 'i', 'l'}); }
+    private @NotNull String getFastUtilPackage() {
+        return new String(new byte[] { 'i', 't', '.', 'u', 'n', 'i', 'm', 'i', '.', 'd', 's', 'i', '.', 'f', 'a', 's', 't', 'u', 't', 'i', 'l' });
+    }
 
-    private @NotNull String getJavassistPackage() { return new String(new byte[] {'j', 'a', 'v', 'a', 's', 's', 'i', 's', 't'}); }
+    private @NotNull String getJavassistPackage() {
+        return new String(new byte[] { 'j', 'a', 'v', 'a', 's', 's', 'i', 's', 't' });
+    }
 
-    private @NotNull String getJedisPackage() { return new String(new byte[] {'r', 'e', 'd', 'i', 's', '.', 'c', 'l', 'i', 'e', 'n', 't', 's', '.', 'j', 'e', 'd', 'i', 's'}); }
+    private @NotNull String getJedisPackage() {
+        return new String(new byte[] { 'r', 'e', 'd', 'i', 's', '.', 'c', 'l', 'i', 'e', 'n', 't', 's', '.', 'j', 'e', 'd', 'i', 's' });
+    }
 
     private void printLatest(@NotNull String friendlyName) {
         logger.info(BungeeLogUtil.HEADING + ChatColor.YELLOW + "Checking version of " + ChatColor.WHITE + friendlyName);
@@ -225,24 +308,50 @@ public class BungeeBootstrap extends Plugin {
             return;
         }
 
-        logger.warn("Failed to download/relocate " + builder.getGroupId() + ":" + builder.getArtifactId() + "-" + builder.getVersion() + ". Searching disk instead.", lastEx);
+        logger.warn(
+                "Failed to download/relocate " + builder.getGroupId() + ":" + builder.getArtifactId() + "-" + builder.getVersion() + ". Searching disk instead.",
+                lastEx
+        );
 
         try {
             injectArtifact(builder, jarsDir, classLoader, null);
         } catch (IOException | IllegalAccessException | InvocationTargetException ex) {
-            throw new RuntimeException("Could not download/relocate " + builder.getGroupId() + ":" + builder.getArtifactId() + "-" + builder.getVersion() + ", and no on-disk option is available.", lastEx);
+            throw new RuntimeException(
+                    "Could not download/relocate " + builder.getGroupId() + ":" + builder.getArtifactId() + "-" + builder.getVersion() + ", and no on-disk option is available.",
+                    lastEx
+            );
         }
     }
 
-    private void buildRelocateInject(Artifact.Builder builder, @NotNull File jarsDir, @NotNull List<Relocation> rules, @NotNull URLClassLoader classLoader, @NotNull String friendlyName) {
+    private void buildRelocateInject(
+            Artifact.Builder builder,
+            @NotNull File jarsDir,
+            @NotNull List<Relocation> rules,
+            @NotNull URLClassLoader classLoader,
+            @NotNull String friendlyName
+    ) {
         buildRelocateInject(builder, jarsDir, rules, classLoader, friendlyName, 0);
     }
 
-    private void buildRelocateInject(Artifact.Builder builder, @NotNull File jarsDir, @NotNull List<Relocation> rules, @NotNull URLClassLoader classLoader, @NotNull String friendlyName, int depth) {
+    private void buildRelocateInject(
+            Artifact.Builder builder,
+            @NotNull File jarsDir,
+            @NotNull List<Relocation> rules,
+            @NotNull URLClassLoader classLoader,
+            @NotNull String friendlyName,
+            int depth
+    ) {
         downloadPool.submit(() -> buildRelocateInjectWait(builder, jarsDir, rules, classLoader, friendlyName, depth));
     }
 
-    private void buildRelocateInjectWait(Artifact.Builder builder, @NotNull File jarsDir, @NotNull List<Relocation> rules, @NotNull URLClassLoader classLoader, @NotNull String friendlyName, int depth) {
+    private void buildRelocateInjectWait(
+            Artifact.Builder builder,
+            @NotNull File jarsDir,
+            @NotNull List<Relocation> rules,
+            @NotNull URLClassLoader classLoader,
+            @NotNull String friendlyName,
+            int depth
+    ) {
         Exception lastEx;
         try {
             injectArtifact(builder.build(), jarsDir, classLoader, friendlyName, depth, rules);
@@ -259,16 +368,29 @@ public class BungeeBootstrap extends Plugin {
             return;
         }
 
-        logger.warn("Failed to download/relocate " + builder.getGroupId() + ":" + builder.getArtifactId() + "-" + builder.getVersion() + ". Searching disk instead.", lastEx);
+        logger.warn(
+                "Failed to download/relocate " + builder.getGroupId() + ":" + builder.getArtifactId() + "-" + builder.getVersion() + ". Searching disk instead.",
+                lastEx
+        );
 
         try {
             injectArtifact(builder, jarsDir, classLoader, rules);
         } catch (IOException | IllegalAccessException | InvocationTargetException ex) {
-            throw new RuntimeException("Could not download/relocate " + builder.getGroupId() + ":" + builder.getArtifactId() + "-" + builder.getVersion() + ", and no on-disk option is available.", lastEx);
+            throw new RuntimeException(
+                    "Could not download/relocate " + builder.getGroupId() + ":" + builder.getArtifactId() + "-" + builder.getVersion() + ", and no on-disk option is available.",
+                    lastEx
+            );
         }
     }
 
-    private void injectArtifact(@NotNull Artifact artifact, @NotNull File jarsDir, @NotNull URLClassLoader classLoader, String friendlyName, int depth, List<Relocation> rules) throws IOException, IllegalAccessException, InvocationTargetException, URISyntaxException, XPathExpressionException, SAXException {
+    private void injectArtifact(
+            @NotNull Artifact artifact,
+            @NotNull File jarsDir,
+            @NotNull URLClassLoader classLoader,
+            String friendlyName,
+            int depth,
+            List<Relocation> rules
+    ) throws IOException, IllegalAccessException, InvocationTargetException, URISyntaxException, XPathExpressionException, SAXException {
         File output = new File(jarsDir, artifact.getGroupId()
                 + "-" + artifact.getArtifactId()
                 + "-" + artifact.getRealVersion() + ".jar"
@@ -304,7 +426,12 @@ public class BungeeBootstrap extends Plugin {
         }
     }
 
-    private void injectArtifact(Artifact.Builder builder, @NotNull File jarsDir, @NotNull URLClassLoader classLoader, List<Relocation> rules) throws IOException, IllegalAccessException, InvocationTargetException {
+    private void injectArtifact(
+            Artifact.Builder builder,
+            @NotNull File jarsDir,
+            @NotNull URLClassLoader classLoader,
+            List<Relocation> rules
+    ) throws IOException, IllegalAccessException, InvocationTargetException {
         File[] files = jarsDir.listFiles();
         if (files == null) {
             throw new IOException();

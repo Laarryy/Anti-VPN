@@ -23,19 +23,29 @@ public class Pair<T1, T2> {
         this.hc = Objects.hash(t1, t2);
     }
 
-    public @Nullable T1 getT1() { return t1; }
+    public @Nullable T1 getT1() {
+        return t1;
+    }
 
-    public @Nullable T2 getT2() { return t2; }
+    public @Nullable T2 getT2() {
+        return t2;
+    }
 
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Pair)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Pair)) {
+            return false;
+        }
         Pair<?, ?> pair = (Pair<?, ?>) o;
         return Objects.equals(t1, pair.t1) &&
                 Objects.equals(t2, pair.t2);
     }
 
-    public int hashCode() { return hc; }
+    public int hashCode() {
+        return hc;
+    }
 
     public String toString() {
         return "Pair{" +

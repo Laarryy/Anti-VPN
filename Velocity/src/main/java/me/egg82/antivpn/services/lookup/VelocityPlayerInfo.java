@@ -6,6 +6,7 @@ import com.google.common.collect.ImmutableList;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import flexjson.JSONDeserializer;
+
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -13,6 +14,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+
 import me.egg82.antivpn.services.lookup.models.PlayerNameModel;
 import me.egg82.antivpn.services.lookup.models.PlayerUUIDModel;
 import me.egg82.antivpn.services.lookup.models.ProfileModel;
@@ -96,11 +98,17 @@ public class VelocityPlayerInfo implements PlayerInfo {
         }
     }
 
-    public @NotNull UUID getUUID() { return uuid; }
+    public @NotNull UUID getUUID() {
+        return uuid;
+    }
 
-    public @NotNull String getName() { return name; }
+    public @NotNull String getName() {
+        return name;
+    }
 
-    public @NotNull ImmutableList<ProfileModel.ProfilePropertyModel> getProperties() { return ImmutableList.copyOf(properties); }
+    public @NotNull ImmutableList<ProfileModel.ProfilePropertyModel> getProperties() {
+        return ImmutableList.copyOf(properties);
+    }
 
     private static @Nullable String nameExpensive(@NotNull UUID uuid, @NotNull ProxyServer proxy) throws IOException {
         // Currently-online lookup
@@ -113,7 +121,12 @@ public class VelocityPlayerInfo implements PlayerInfo {
         }
 
         // Network lookup
-        HttpURLConnection conn = WebRequest.builder(new URL("https://api.mojang.com/user/profiles/" + uuid.toString().replace("-", "") + "/names")).timeout(new TimeUtil.Time(2500L, TimeUnit.MILLISECONDS)).userAgent("egg82/PlayerInfo").header("Accept", "application/json").build().getConnection();
+        HttpURLConnection conn = WebRequest.builder(new URL("https://api.mojang.com/user/profiles/" + uuid.toString().replace("-", "") + "/names"))
+                .timeout(new TimeUtil.Time(2500L, TimeUnit.MILLISECONDS))
+                .userAgent("egg82/PlayerInfo")
+                .header("Accept", "application/json")
+                .build()
+                .getConnection();
         int status = conn.getResponseCode();
 
         if (status == 204) {
@@ -145,7 +158,12 @@ public class VelocityPlayerInfo implements PlayerInfo {
         }
 
         // Network lookup
-        HttpURLConnection conn = WebRequest.builder(new URL("https://api.mojang.com/users/profiles/minecraft/" + WebRequest.urlEncode(name))).timeout(new TimeUtil.Time(2500L, TimeUnit.MILLISECONDS)).userAgent("egg82/PlayerInfo").header("Accept", "application/json").build().getConnection();
+        HttpURLConnection conn = WebRequest.builder(new URL("https://api.mojang.com/users/profiles/minecraft/" + WebRequest.urlEncode(name)))
+                .timeout(new TimeUtil.Time(2500L, TimeUnit.MILLISECONDS))
+                .userAgent("egg82/PlayerInfo")
+                .header("Accept", "application/json")
+                .build()
+                .getConnection();
         int status = conn.getResponseCode();
 
         if (status == 204) {
@@ -167,7 +185,13 @@ public class VelocityPlayerInfo implements PlayerInfo {
 
     private static @Nullable List<ProfileModel.ProfilePropertyModel> propertiesExpensive(@NotNull UUID uuid) throws IOException {
         // Network lookup
-        HttpURLConnection conn = WebRequest.builder(new URL("https://sessionserver.mojang.com/session/minecraft/profile/" + uuid.toString().replace("-", "") + "?unsigned=false")).timeout(new TimeUtil.Time(2500L, TimeUnit.MILLISECONDS)).userAgent("egg82/PlayerInfo").header("Accept", "application/json").build().getConnection();
+        HttpURLConnection conn = WebRequest.builder(new URL("https://sessionserver.mojang.com/session/minecraft/profile/" + uuid.toString()
+                .replace("-", "") + "?unsigned=false"))
+                .timeout(new TimeUtil.Time(2500L, TimeUnit.MILLISECONDS))
+                .userAgent("egg82/PlayerInfo")
+                .header("Accept", "application/json")
+                .build()
+                .getConnection();
         int status = conn.getResponseCode();
 
         if (status == 204) {

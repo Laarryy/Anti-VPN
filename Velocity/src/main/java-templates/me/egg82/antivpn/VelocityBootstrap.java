@@ -9,6 +9,7 @@ import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.PluginDescription;
 import com.velocitypowered.api.plugin.PluginManager;
 import com.velocitypowered.api.proxy.ProxyServer;
+
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -22,6 +23,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 import javax.xml.xpath.XPathExpressionException;
+
 import me.egg82.antivpn.utils.VelocityLogUtil;
 import me.lucko.jarrelocator.JarRelocator;
 import me.lucko.jarrelocator.Relocation;
@@ -44,9 +46,9 @@ import org.xml.sax.SAXException;
         authors = "egg82",
         description = "Get the best; save money on overpriced plugins and block VPN users!",
         dependencies = {
-            @Dependency(id = "plan", optional = true),
-            @Dependency(id = "placeholderapi", optional = true),
-            @Dependency(id = "luckperms", optional = true)
+                @Dependency(id = "plan", optional = true),
+                @Dependency(id = "placeholderapi", optional = true),
+                @Dependency(id = "luckperms", optional = true)
         }
 )
 public class VelocityBootstrap {
@@ -120,26 +122,38 @@ public class VelocityBootstrap {
         File cacheDir = new File(jarsDir, "cache");
 
         Artifact.Builder caffeine = Artifact.builder("com.github.ben-manes.caffeine", "caffeine", "${caffeine.version}", cacheDir)
-            .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
-        buildRelocateInject(caffeine, jarsDir, Collections.singletonList(new Relocation(getCaffeinePackage(), "me.egg82.antivpn.external." + getCaffeinePackage())), pluginManager, "Caffeine");
+                .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
+        buildRelocateInject(
+                caffeine,
+                jarsDir,
+                Collections.singletonList(new Relocation(getCaffeinePackage(), "me.egg82.antivpn.external." + getCaffeinePackage())),
+                pluginManager,
+                "Caffeine"
+        );
 
         try {
             Class.forName("com.github.luben.zstd.Zstd");
         } catch (ClassNotFoundException ignored) {
             Artifact.Builder zstd = Artifact.builder("com.github.luben", "zstd-jni", "${zstd.version}", cacheDir)
-                .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
+                    .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
             buildRelocateInject(zstd, jarsDir, Collections.emptyList(), pluginManager, "Zstd");
         }
 
         Artifact.Builder ipaddr = Artifact.builder("com.github.seancfoley", "ipaddress", "${ipaddress.version}", cacheDir)
-            .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
-        buildRelocateInject(ipaddr, jarsDir, Collections.singletonList(new Relocation(getInetIpaddrPackage(), "me.egg82.antivpn.external." + getInetIpaddrPackage())), pluginManager, "IP Address");
+                .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
+        buildRelocateInject(
+                ipaddr,
+                jarsDir,
+                Collections.singletonList(new Relocation(getInetIpaddrPackage(), "me.egg82.antivpn.external." + getInetIpaddrPackage())),
+                pluginManager,
+                "IP Address"
+        );
 
         try {
             Class.forName("org.h2.Driver");
         } catch (ClassNotFoundException ignored) {
             Artifact.Builder h2 = Artifact.builder("com.h2database", "h2", "${h2.version}", cacheDir)
-                .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
+                    .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
             buildRelocateInject(h2, jarsDir, Collections.emptyList(), pluginManager, "H2");
         }
 
@@ -147,35 +161,53 @@ public class VelocityBootstrap {
             Class.forName("com.mysql.cj.jdbc.Driver");
         } catch (ClassNotFoundException ignored) {
             Artifact.Builder mysql = Artifact.builder("mysql", "mysql-connector-java", "${mysql.version}", cacheDir)
-                .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
+                    .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
             buildRelocateInject(mysql, jarsDir, Collections.emptyList(), pluginManager, "MySQL");
         }
 
         Artifact.Builder rabbitmq = Artifact.builder(getRabbitMqPackage(), "amqp-client", "${rabbitmq.version}", cacheDir)
-            .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
-        buildRelocateInject(rabbitmq, jarsDir, Collections.singletonList(new Relocation(getRabbitMqPackage(), "me.egg82.antivpn.external." + getRabbitMqPackage())), pluginManager, "RabbitMQ");
+                .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
+        buildRelocateInject(
+                rabbitmq,
+                jarsDir,
+                Collections.singletonList(new Relocation(getRabbitMqPackage(), "me.egg82.antivpn.external." + getRabbitMqPackage())),
+                pluginManager,
+                "RabbitMQ"
+        );
 
         Artifact.Builder ebeanCore = Artifact.builder(getEbeanPackage(), "ebean-core", "${ebean.version}", cacheDir)
-            .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
+                .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
         buildRelocateInject(ebeanCore, jarsDir, Arrays.asList(
-            new Relocation(getEbeanPackage(), "me.egg82.antivpn.external." + getEbeanPackage()),
-            new Relocation(getEbeanInternalPackage(), "me.egg82.antivpn.external." + getEbeanInternalPackage()),
-            new Relocation(getEbeanServicePackage(), "me.egg82.antivpn.external." + getEbeanServicePackage())
+                new Relocation(getEbeanPackage(), "me.egg82.antivpn.external." + getEbeanPackage()),
+                new Relocation(getEbeanInternalPackage(), "me.egg82.antivpn.external." + getEbeanInternalPackage()),
+                new Relocation(getEbeanServicePackage(), "me.egg82.antivpn.external." + getEbeanServicePackage())
         ), pluginManager, "Ebean Core");
 
         Artifact.Builder fastutil = Artifact.builder("it.unimi.dsi", "fastutil", "${fastutil.version}", cacheDir)
-            .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
-        buildRelocateInject(fastutil, jarsDir, Collections.singletonList(new Relocation(getFastUtilPackage(), "me.egg82.antivpn.external." + getFastUtilPackage())), pluginManager, "FastUtil");
+                .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
+        buildRelocateInject(
+                fastutil,
+                jarsDir,
+                Collections.singletonList(new Relocation(getFastUtilPackage(), "me.egg82.antivpn.external." + getFastUtilPackage())),
+                pluginManager,
+                "FastUtil"
+        );
 
         Artifact.Builder javassist = Artifact.builder("org.javassist", getJavassistPackage(), "${javassist.version}", cacheDir)
-            .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
-        buildRelocateInject(javassist, jarsDir, Collections.singletonList(new Relocation(getJavassistPackage(), "me.egg82.antivpn.external." + getJavassistPackage())), pluginManager, "Javassist");
+                .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
+        buildRelocateInject(
+                javassist,
+                jarsDir,
+                Collections.singletonList(new Relocation(getJavassistPackage(), "me.egg82.antivpn.external." + getJavassistPackage())),
+                pluginManager,
+                "Javassist"
+        );
 
         try {
             Class.forName("org.postgresql.Driver");
         } catch (ClassNotFoundException ignored) {
             Artifact.Builder postgresql = Artifact.builder("org.postgresql", "postgresql", "${postgresql.version}", cacheDir)
-                .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
+                    .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
             buildRelocateInject(postgresql, jarsDir, Collections.emptyList(), pluginManager, "PostgreSQL");
         }
 
@@ -183,38 +215,91 @@ public class VelocityBootstrap {
             Class.forName("org.sqlite.JDBC");
         } catch (ClassNotFoundException ignored) {
             Artifact.Builder sqlite = Artifact.builder("org.xerial", "sqlite-jdbc", "${sqlite.version}", cacheDir)
-                .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
+                    .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
             buildRelocateInject(sqlite, jarsDir, Collections.emptyList(), pluginManager, "SQLite");
         }
 
         Artifact.Builder redis = Artifact.builder("redis.clients", "jedis", "${jedis.version}", cacheDir)
-            .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
-        buildRelocateInject(redis, jarsDir, Collections.singletonList(new Relocation(getJedisPackage(), "me.egg82.antivpn.external." + getJedisPackage())), pluginManager, "Jedis");
+                .addRepository(Repository.builder("https://repo1.maven.org/maven2/").addProxy("https://nexus.egg82.me/repository/maven-central/").build());
+        buildRelocateInject(
+                redis,
+                jarsDir,
+                Collections.singletonList(new Relocation(getJedisPackage(), "me.egg82.antivpn.external." + getJedisPackage())),
+                pluginManager,
+                "Jedis"
+        );
     }
 
     // Prevent Maven from relocating these
-    private @NotNull String getCaffeinePackage() { return new String(new byte[] {'c', 'o', 'm', '.', 'g', 'i', 't', 'h', 'u', 'b', '.', 'b', 'e', 'n', 'm', 'a', 'n', 'e', 's', '.', 'c', 'a', 'f', 'f', 'e', 'i', 'n', 'e'}); }
+    private @NotNull String getCaffeinePackage() {
+        return new String(new byte[] {
+                'c',
+                'o',
+                'm',
+                '.',
+                'g',
+                'i',
+                't',
+                'h',
+                'u',
+                'b',
+                '.',
+                'b',
+                'e',
+                'n',
+                'm',
+                'a',
+                'n',
+                'e',
+                's',
+                '.',
+                'c',
+                'a',
+                'f',
+                'f',
+                'e',
+                'i',
+                'n',
+                'e'
+        });
+    }
 
-    private @NotNull String getInetIpaddrPackage() { return new String(new byte[] {'i', 'n', 'e', 't', '.', 'i', 'p', 'a', 'd', 'd', 'r'}); }
+    private @NotNull String getInetIpaddrPackage() {
+        return new String(new byte[] { 'i', 'n', 'e', 't', '.', 'i', 'p', 'a', 'd', 'd', 'r' });
+    }
 
-    private @NotNull String getRabbitMqPackage() { return new String(new byte[] {'c', 'o', 'm', '.', 'r', 'a', 'b', 'b', 'i', 't', 'm', 'q'}); }
+    private @NotNull String getRabbitMqPackage() {
+        return new String(new byte[] { 'c', 'o', 'm', '.', 'r', 'a', 'b', 'b', 'i', 't', 'm', 'q' });
+    }
 
-    private @NotNull String getEbeanPackage() { return new String(new byte[] {'i', 'o', '.', 'e', 'b', 'e', 'a', 'n'}); }
+    private @NotNull String getEbeanPackage() {
+        return new String(new byte[] { 'i', 'o', '.', 'e', 'b', 'e', 'a', 'n' });
+    }
 
-    private @NotNull String getEbeanInternalPackage() { return new String(new byte[] {'i', 'o', '.', 'e', 'b', 'e', 'a', 'n', 'i', 'n', 't', 'e', 'r', 'n', 'a', 'l'}); }
+    private @NotNull String getEbeanInternalPackage() {
+        return new String(new byte[] { 'i', 'o', '.', 'e', 'b', 'e', 'a', 'n', 'i', 'n', 't', 'e', 'r', 'n', 'a', 'l' });
+    }
 
-    private @NotNull String getEbeanServicePackage() { return new String(new byte[] {'i', 'o', '.', 'e', 'b', 'e', 'a', 'n', 's', 'e', 'r', 'v', 'i', 'c', 'e'}); }
+    private @NotNull String getEbeanServicePackage() {
+        return new String(new byte[] { 'i', 'o', '.', 'e', 'b', 'e', 'a', 'n', 's', 'e', 'r', 'v', 'i', 'c', 'e' });
+    }
 
-    private @NotNull String getFastUtilPackage() { return new String(new byte[] {'i', 't', '.', 'u', 'n', 'i', 'm', 'i', '.', 'd', 's', 'i', '.', 'f', 'a', 's', 't', 'u', 't', 'i', 'l'}); }
+    private @NotNull String getFastUtilPackage() {
+        return new String(new byte[] { 'i', 't', '.', 'u', 'n', 'i', 'm', 'i', '.', 'd', 's', 'i', '.', 'f', 'a', 's', 't', 'u', 't', 'i', 'l' });
+    }
 
-    private @NotNull String getJavassistPackage() { return new String(new byte[] {'j', 'a', 'v', 'a', 's', 's', 'i', 's', 't'}); }
+    private @NotNull String getJavassistPackage() {
+        return new String(new byte[] { 'j', 'a', 'v', 'a', 's', 's', 'i', 's', 't' });
+    }
 
-    private @NotNull String getJedisPackage() { return new String(new byte[] {'r', 'e', 'd', 'i', 's', '.', 'c', 'l', 'i', 'e', 'n', 't', 's', '.', 'j', 'e', 'd', 'i', 's'}); }
+    private @NotNull String getJedisPackage() {
+        return new String(new byte[] { 'r', 'e', 'd', 'i', 's', '.', 'c', 'l', 'i', 'e', 'n', 't', 's', '.', 'j', 'e', 'd', 'i', 's' });
+    }
 
     private void printLatest(@NotNull String friendlyName) {
         proxy.getConsoleCommandSource().sendMessage(VelocityLogUtil.HEADING
-            .append(Component.text("Checking version of ", NamedTextColor.YELLOW))
-            .append(Component.text(friendlyName, NamedTextColor.WHITE))
+                                                            .append(Component.text("Checking version of ", NamedTextColor.YELLOW))
+                                                            .append(Component.text(friendlyName, NamedTextColor.WHITE))
         );
     }
 
@@ -243,24 +328,50 @@ public class VelocityBootstrap {
             return;
         }
 
-        logger.warn("Failed to download/relocate " + builder.getGroupId() + ":" + builder.getArtifactId() + "-" + builder.getVersion() + ". Searching disk instead.", lastEx);
+        logger.warn(
+                "Failed to download/relocate " + builder.getGroupId() + ":" + builder.getArtifactId() + "-" + builder.getVersion() + ". Searching disk instead.",
+                lastEx
+        );
 
         try {
             injectArtifact(builder, jarsDir, pluginManager, null);
         } catch (IOException | IllegalAccessException | InvocationTargetException ex) {
-            throw new RuntimeException("Could not download/relocate " + builder.getGroupId() + ":" + builder.getArtifactId() + "-" + builder.getVersion() + ", and no on-disk option is available.", lastEx);
+            throw new RuntimeException(
+                    "Could not download/relocate " + builder.getGroupId() + ":" + builder.getArtifactId() + "-" + builder.getVersion() + ", and no on-disk option is available.",
+                    lastEx
+            );
         }
     }
 
-    private void buildRelocateInject(Artifact.Builder builder, @NotNull File jarsDir, @NotNull List<Relocation> rules, @NotNull PluginManager pluginManager, @NotNull String friendlyName) {
+    private void buildRelocateInject(
+            Artifact.Builder builder,
+            @NotNull File jarsDir,
+            @NotNull List<Relocation> rules,
+            @NotNull PluginManager pluginManager,
+            @NotNull String friendlyName
+    ) {
         buildRelocateInject(builder, jarsDir, rules, pluginManager, friendlyName, 0);
     }
 
-    private void buildRelocateInject(Artifact.Builder builder, @NotNull File jarsDir, @NotNull List<Relocation> rules, @NotNull PluginManager pluginManager, @NotNull String friendlyName, int depth) {
+    private void buildRelocateInject(
+            Artifact.Builder builder,
+            @NotNull File jarsDir,
+            @NotNull List<Relocation> rules,
+            @NotNull PluginManager pluginManager,
+            @NotNull String friendlyName,
+            int depth
+    ) {
         downloadPool.submit(() -> buildRelocateInjectWait(builder, jarsDir, rules, pluginManager, friendlyName, depth));
     }
 
-    private void buildRelocateInjectWait(Artifact.Builder builder, @NotNull File jarsDir, @NotNull List<Relocation> rules, @NotNull PluginManager pluginManager, @NotNull String friendlyName, int depth) {
+    private void buildRelocateInjectWait(
+            Artifact.Builder builder,
+            @NotNull File jarsDir,
+            @NotNull List<Relocation> rules,
+            @NotNull PluginManager pluginManager,
+            @NotNull String friendlyName,
+            int depth
+    ) {
         Exception lastEx;
         try {
             injectArtifact(builder.build(), jarsDir, pluginManager, friendlyName, depth, rules);
@@ -277,25 +388,38 @@ public class VelocityBootstrap {
             return;
         }
 
-        logger.warn("Failed to download/relocate " + builder.getGroupId() + ":" + builder.getArtifactId() + "-" + builder.getVersion() + ". Searching disk instead.", lastEx);
+        logger.warn(
+                "Failed to download/relocate " + builder.getGroupId() + ":" + builder.getArtifactId() + "-" + builder.getVersion() + ". Searching disk instead.",
+                lastEx
+        );
 
         try {
             injectArtifact(builder, jarsDir, pluginManager, rules);
         } catch (IOException | IllegalAccessException | InvocationTargetException ex) {
-            throw new RuntimeException("Could not download/relocate " + builder.getGroupId() + ":" + builder.getArtifactId() + "-" + builder.getVersion() + ", and no on-disk option is available.", lastEx);
+            throw new RuntimeException(
+                    "Could not download/relocate " + builder.getGroupId() + ":" + builder.getArtifactId() + "-" + builder.getVersion() + ", and no on-disk option is available.",
+                    lastEx
+            );
         }
     }
 
-    private void injectArtifact(@NotNull Artifact artifact, @NotNull File jarsDir, @NotNull PluginManager pluginManager, String friendlyName, int depth, List<Relocation> rules) throws IOException, IllegalAccessException, InvocationTargetException, URISyntaxException, XPathExpressionException, SAXException {
+    private void injectArtifact(
+            @NotNull Artifact artifact,
+            @NotNull File jarsDir,
+            @NotNull PluginManager pluginManager,
+            String friendlyName,
+            int depth,
+            List<Relocation> rules
+    ) throws IOException, IllegalAccessException, InvocationTargetException, URISyntaxException, XPathExpressionException, SAXException {
         File output = new File(jarsDir, artifact.getGroupId()
-            + "-" + artifact.getArtifactId()
-            + "-" + artifact.getRealVersion() + ".jar"
+                + "-" + artifact.getArtifactId()
+                + "-" + artifact.getRealVersion() + ".jar"
         );
 
         if (friendlyName != null && !artifact.fileExists(output)) {
             proxy.getConsoleCommandSource().sendMessage(VelocityLogUtil.HEADING
-                .append(Component.text("Downloading ", NamedTextColor.YELLOW))
-                .append(Component.text(friendlyName, NamedTextColor.WHITE))
+                                                                .append(Component.text("Downloading ", NamedTextColor.YELLOW))
+                                                                .append(Component.text(friendlyName, NamedTextColor.WHITE))
             );
         }
 
@@ -306,8 +430,8 @@ public class VelocityBootstrap {
                 artifact.downloadJar(output);
             }
             File relocatedOutput = new File(jarsDir, artifact.getGroupId()
-                + "-" + artifact.getArtifactId()
-                + "-" + artifact.getRealVersion() + "-relocated.jar"
+                    + "-" + artifact.getArtifactId()
+                    + "-" + artifact.getRealVersion() + "-relocated.jar"
             );
             if (!DownloadUtil.hasFile(relocatedOutput)) {
                 JarRelocator relocator = new JarRelocator(output, relocatedOutput, rules);
@@ -325,7 +449,12 @@ public class VelocityBootstrap {
         }
     }
 
-    private void injectArtifact(Artifact.Builder builder, @NotNull File jarsDir, @NotNull PluginManager pluginManager, List<Relocation> rules) throws IOException, IllegalAccessException, InvocationTargetException {
+    private void injectArtifact(
+            Artifact.Builder builder,
+            @NotNull File jarsDir,
+            @NotNull PluginManager pluginManager,
+            List<Relocation> rules
+    ) throws IOException, IllegalAccessException, InvocationTargetException {
         File[] files = jarsDir.listFiles();
         if (files == null) {
             throw new IOException();

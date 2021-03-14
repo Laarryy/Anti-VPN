@@ -2,6 +2,7 @@ package me.egg82.antivpn.messaging;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.netty.buffer.ByteBuf;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -11,6 +12,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+
 import me.egg82.antivpn.config.ConfigUtil;
 import me.egg82.antivpn.locale.LocaleUtil;
 import me.egg82.antivpn.locale.MessageKey;
@@ -58,9 +60,13 @@ public class RedisMessagingService extends AbstractMessagingService {
         }
     }
 
-    public boolean isClosed() { return closed || pool.isClosed(); }
+    public boolean isClosed() {
+        return closed || pool.isClosed();
+    }
 
-    public static @NotNull Builder builder(@NotNull String name, @NotNull UUID serverId, @NotNull MessagingHandler handler, @NotNull File packetDirectory) { return new Builder(name, serverId, handler, packetDirectory); }
+    public static @NotNull Builder builder(@NotNull String name, @NotNull UUID serverId, @NotNull MessagingHandler handler, @NotNull File packetDirectory) {
+        return new Builder(name, serverId, handler, packetDirectory);
+    }
 
     public static class Builder {
         private final RedisMessagingService service;
@@ -130,8 +136,9 @@ public class RedisMessagingService extends AbstractMessagingService {
             service.workPool.execute(() -> {
                 while (!service.isClosed()) {
                     try (Jedis redis = service.pool.getResource()) {
-                        redis.subscribe(service.pubSub,
-                            CHANNEL_NAME_BYTES
+                        redis.subscribe(
+                                service.pubSub,
+                                CHANNEL_NAME_BYTES
                         );
                     } catch (JedisException ex) {
                         if (!service.isClosed()) {
@@ -163,7 +170,9 @@ public class RedisMessagingService extends AbstractMessagingService {
     private static class PubSub extends BinaryJedisPubSub {
         private final RedisMessagingService service;
 
-        private PubSub(@NotNull RedisMessagingService service) { this.service = service; }
+        private PubSub(@NotNull RedisMessagingService service) {
+            this.service = service;
+        }
 
         public void onMessage(byte @NotNull [] c, byte @NotNull [] m) {
             String channel = new String(c, StandardCharsets.UTF_8);
@@ -203,7 +212,10 @@ public class RedisMessagingService extends AbstractMessagingService {
 
                 byte packetVersion = CollectionProvider.getServerVersions().getOrDefault(sender, (byte) -1);
                 if (packetVersion > -1 && packetVersion != Packet.VERSION) {
-                    service.logger.warn("Server " + sender + " packet version " + String.format("0x%02X ", packetVersion) + " does not match current packet version " + String.format("0x%02X ", Packet.VERSION) + ". Skipping packet.");
+                    service.logger.warn("Server " + sender + " packet version " + String.format(
+                            "0x%02X ",
+                            packetVersion
+                    ) + " does not match current packet version " + String.format("0x%02X ", Packet.VERSION) + ". Skipping packet.");
                     return;
                 }
 
@@ -219,7 +231,10 @@ public class RedisMessagingService extends AbstractMessagingService {
                     }
                 } catch (Exception ex) {
                     Class<? extends Packet> clazz = PacketManager.getPacket(packetId);
-                    service.logger.error(LocaleUtil.getDefaultI18N().getText(MessageKey.ERROR__MESSAGING__BAD_PACKET, "{name}", clazz != null ? clazz.getName() : "null"), ex);
+                    service.logger.error(
+                            LocaleUtil.getDefaultI18N().getText(MessageKey.ERROR__MESSAGING__BAD_PACKET, "{name}", clazz != null ? clazz.getName() : "null"),
+                            ex
+                    );
                     return;
                 }
 

@@ -21,17 +21,31 @@ import java.util.function.BiFunction;
 
 // https://github.com/Incendo/cloud/blob/master/cloud-core/src/main/java/cloud/commandframework/arguments/standard/UUIDArgument.java
 public class KickTypeArgument<C> extends CommandArgument<C, KickType> {
-    private KickTypeArgument(boolean required, @NonNull String name, @NotNull String defaultValue, @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider, ArgumentDescription defaultDescription) {
+    private KickTypeArgument(
+            boolean required,
+            @NonNull String name,
+            @NotNull String defaultValue,
+            @Nullable BiFunction<CommandContext<C>, String, List<String>> suggestionsProvider,
+            ArgumentDescription defaultDescription
+    ) {
         super(required, name, new KickTypeParser<>(), defaultValue, KickType.class, suggestionsProvider, defaultDescription);
     }
 
-    public static <C> @NotNull Builder<C> newBuilder(@NotNull String name) { return new Builder<>(name); }
+    public static <C> @NotNull Builder<C> newBuilder(@NotNull String name) {
+        return new Builder<>(name);
+    }
 
-    public static <C> @NotNull CommandArgument<C, KickType> of(@NotNull String name) { return KickTypeArgument.<C>newBuilder(name).asRequired().build(); }
+    public static <C> @NotNull CommandArgument<C, KickType> of(@NotNull String name) {
+        return KickTypeArgument.<C>newBuilder(name).asRequired().build();
+    }
 
-    public static <C> @NotNull CommandArgument<C, KickType> optional(@NotNull String name) { return KickTypeArgument.<C>newBuilder(name).asOptional().build(); }
+    public static <C> @NotNull CommandArgument<C, KickType> optional(@NotNull String name) {
+        return KickTypeArgument.<C>newBuilder(name).asOptional().build();
+    }
 
-    public static <C> @NotNull CommandArgument<C, KickType> optional(String name, KickType defaultKickType) { return KickTypeArgument.<C>newBuilder(name).asOptionalWithDefault(defaultKickType.name()).build(); }
+    public static <C> @NotNull CommandArgument<C, KickType> optional(String name, KickType defaultKickType) {
+        return KickTypeArgument.<C>newBuilder(name).asOptionalWithDefault(defaultKickType.name()).build();
+    }
 
     public static class Builder<C> extends CommandArgument.Builder<C, KickType> {
         private Builder(@NotNull String name) {
@@ -72,7 +86,9 @@ public class KickTypeArgument<C> extends CommandArgument<C, KickType> {
             return ImmutableList.of();
         }
 
-        public boolean isContextFree() { return true; }
+        public boolean isContextFree() {
+            return true;
+        }
     }
 
     public static class KickParseException extends ParserException {
@@ -83,6 +99,8 @@ public class KickTypeArgument<C> extends CommandArgument<C, KickType> {
             this.input = input;
         }
 
-        public @NotNull String getInput() { return input; }
+        public @NotNull String getInput() {
+            return input;
+        }
     }
 }

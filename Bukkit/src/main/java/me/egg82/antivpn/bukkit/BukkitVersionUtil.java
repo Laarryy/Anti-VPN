@@ -9,7 +9,8 @@ public class BukkitVersionUtil {
     private static final Object versionLock = new Object();
     private static String gameVersion = null;
 
-    private BukkitVersionUtil() { }
+    private BukkitVersionUtil() {
+    }
 
     public static @NotNull String getGameVersion() {
         String localVersion = gameVersion;

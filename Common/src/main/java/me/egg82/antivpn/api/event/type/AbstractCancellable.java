@@ -13,5 +13,7 @@ public abstract class AbstractCancellable extends AbstractEvent implements Cance
         super(api);
     }
 
-    public @NotNull AtomicBoolean cancellationState() { return cancelState; }
+    public @NotNull AtomicBoolean cancellationState() {
+        return cancelState;
+    }
 }

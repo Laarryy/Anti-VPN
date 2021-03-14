@@ -12,9 +12,13 @@ import java.net.HttpURLConnection;
 import java.util.concurrent.CompletableFuture;
 
 public class Shodan extends AbstractSource<ShodanModel> {
-    public @NotNull String getName() { return "shodan"; }
+    public @NotNull String getName() {
+        return "shodan";
+    }
 
-    public boolean isKeyRequired() { return true; }
+    public boolean isKeyRequired() {
+        return true;
+    }
 
     public Shodan() {
         super(ShodanModel.class);

@@ -17,13 +17,27 @@ public class BukkitLocalizedCommandSender extends AbstractLocalizedCommandSender
         this.isUser = base instanceof Player;
     }
 
-    public static @NotNull BukkitLocalizedCommandSender getMappedCommandSender(@NotNull CommandSender base, @NotNull Audience audience, @NotNull I18NManager localizationManager) { return new BukkitLocalizedCommandSender(base, audience, localizationManager); }
+    public static @NotNull BukkitLocalizedCommandSender getMappedCommandSender(
+            @NotNull CommandSender base,
+            @NotNull Audience audience,
+            @NotNull I18NManager localizationManager
+    ) {
+        return new BukkitLocalizedCommandSender(base, audience, localizationManager);
+    }
 
-    public static @NotNull CommandSender getBaseCommandSender(@NotNull BukkitLocalizedCommandSender mapped) { return mapped.base; }
+    public static @NotNull CommandSender getBaseCommandSender(@NotNull BukkitLocalizedCommandSender mapped) {
+        return mapped.base;
+    }
 
-    public static @NotNull Audience getMappedAudience(@NotNull BukkitLocalizedCommandSender sender) { return sender.getAudience(); }
+    public static @NotNull Audience getMappedAudience(@NotNull BukkitLocalizedCommandSender sender) {
+        return sender.getAudience();
+    }
 
-    public boolean isConsole() { return isConsole; }
+    public boolean isConsole() {
+        return isConsole;
+    }
 
-    public boolean isUser() { return isUser; }
+    public boolean isUser() {
+        return isUser;
+    }
 }

@@ -3,10 +3,12 @@ package me.egg82.antivpn.messaging.packets;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.PooledByteBufAllocator;
+
 import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+
 import me.egg82.antivpn.locale.LocaleUtil;
 import me.egg82.antivpn.locale.MessageKey;
 import me.egg82.antivpn.messaging.PacketManager;
@@ -78,23 +80,33 @@ public class MultiPacket extends AbstractPacket {
         buffer.writeByte((byte) 0x00); // End of multi-packet
     }
 
-    public @NotNull Set<@NotNull Packet> getPackets() { return packets; }
+    public @NotNull Set<@NotNull Packet> getPackets() {
+        return packets;
+    }
 
-    public void setPackets(@NotNull Set<@NotNull Packet> packets) { this.packets = packets; }
+    public void setPackets(@NotNull Set<@NotNull Packet> packets) {
+        this.packets = packets;
+    }
 
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof MultiPacket)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof MultiPacket)) {
+            return false;
+        }
         MultiPacket that = (MultiPacket) o;
         return packets.equals(that.packets);
     }
 
-    public int hashCode() { return Objects.hash(packets); }
+    public int hashCode() {
+        return Objects.hash(packets);
+    }
 
     public String toString() {
         return "MultiPacket{" +
-            "sender=" + sender +
-            ", packets=" + packets +
-            '}';
+                "sender=" + sender +
+                ", packets=" + packets +
+                '}';
     }
 }

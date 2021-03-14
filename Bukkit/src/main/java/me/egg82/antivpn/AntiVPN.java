@@ -88,7 +88,8 @@ public class AntiVPN {
         loadPackets();
     }
 
-    public void onLoad() { }
+    public void onLoad() {
+    }
 
     public void onEnable() {
         BukkitLocaleCommandUtil.create(plugin);
@@ -123,11 +124,11 @@ public class AntiVPN {
         console.sendMessage(MessageKey.GENERAL__ENABLE_MESSAGE);
 
         console.sendMessage(MessageKey.GENERAL__LOAD_MESSAGE,
-                "{version}", plugin.getDescription().getVersion(),
-                "{apiversion}", VPNAPIProvider.getInstance().getPluginMetadata().getApiVersion(),
-                "{commands}", String.valueOf(numCommands),
-                "{events}", String.valueOf(numEvents),
-                "{tasks}", String.valueOf(tasks.size())
+                            "{version}", plugin.getDescription().getVersion(),
+                            "{apiversion}", VPNAPIProvider.getInstance().getPluginMetadata().getApiVersion(),
+                            "{commands}", String.valueOf(numCommands),
+                            "{events}", String.valueOf(numEvents),
+                            "{tasks}", String.valueOf(tasks.size())
         );
     }
 
@@ -391,7 +392,9 @@ public class AntiVPN {
 
     private boolean isVanished(@NotNull Player player) {
         for (MetadataValue meta : player.getMetadata("vanished")) {
-            if (meta.asBoolean()) return true;
+            if (meta.asBoolean()) {
+                return true;
+            }
         }
         return false;
     }

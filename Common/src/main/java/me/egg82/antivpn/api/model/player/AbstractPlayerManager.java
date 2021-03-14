@@ -37,11 +37,16 @@ public abstract class AbstractPlayerManager implements PlayerManager {
     private final String mcleaksKey;
 
     protected AbstractPlayerManager(@NotNull TimeUtil.Time cacheTime, @Nullable String mcleaksKey) {
-        playerCache = Caffeine.newBuilder().expireAfterAccess(cacheTime.getTime(), cacheTime.getUnit()).expireAfterWrite(cacheTime.getTime(), cacheTime.getUnit()).build(k -> calculatePlayerResult(k, true));
+        playerCache = Caffeine.newBuilder()
+                .expireAfterAccess(cacheTime.getTime(), cacheTime.getUnit())
+                .expireAfterWrite(cacheTime.getTime(), cacheTime.getUnit())
+                .build(k -> calculatePlayerResult(k, true));
         this.mcleaksKey = mcleaksKey;
     }
 
-    public LoadingCache<UUID, PlayerModel> getPlayerCache() { return playerCache; }
+    public LoadingCache<UUID, PlayerModel> getPlayerCache() {
+        return playerCache;
+    }
 
     public @NotNull CompletableFuture<Void> savePlayer(@NotNull Player player) {
         return CompletableFuture.runAsync(() -> {
@@ -143,11 +148,11 @@ public abstract class AbstractPlayerManager implements PlayerManager {
 
         try {
             HttpURLConnection conn = WebRequest.builder(new URL("https://mcleaks.themrgong.xyz/api/v3/isuuidmcleaks/" + uuid))
-                .timeout(new TimeUtil.Time(2500L, TimeUnit.MILLISECONDS))
-                .userAgent("egg82/Anti-VPN")
-                .header("API-Key", mcleaksKey)
-                .build()
-                .getConnection();
+                    .timeout(new TimeUtil.Time(2500L, TimeUnit.MILLISECONDS))
+                    .userAgent("egg82/Anti-VPN")
+                    .header("API-Key", mcleaksKey)
+                    .build()
+                    .getConnection();
 
             JSONDeserializer<MCLeaksResultModel> modelDeserializer = new JSONDeserializer<>();
             MCLeaksResultModel model = modelDeserializer.deserialize(WebRequest.getString(conn));

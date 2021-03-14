@@ -4,6 +4,7 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.google.common.collect.ImmutableList;
 import flexjson.JSONDeserializer;
+
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -12,6 +13,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+
 import me.egg82.antivpn.services.lookup.models.PlayerNameModel;
 import me.egg82.antivpn.services.lookup.models.PlayerUUIDModel;
 import me.egg82.antivpn.services.lookup.models.ProfileModel;
@@ -95,19 +97,25 @@ public class MojangPlayerInfo implements PlayerInfo {
         }
     }
 
-    public @NotNull UUID getUUID() { return uuid; }
+    public @NotNull UUID getUUID() {
+        return uuid;
+    }
 
-    public @NotNull String getName() { return name; }
+    public @NotNull String getName() {
+        return name;
+    }
 
-    public @NotNull List<ProfileModel.@NotNull ProfilePropertyModel> getProperties() { return ImmutableList.copyOf(properties); }
+    public @NotNull List<ProfileModel.@NotNull ProfilePropertyModel> getProperties() {
+        return ImmutableList.copyOf(properties);
+    }
 
     protected @Nullable String nameExpensive(@NotNull UUID uuid) throws IOException {
         // Network lookup
         HttpURLConnection conn = WebRequest.builder(new URL("https://api.mojang.com/user/profiles/" + uuid.toString().replace("-", "") + "/names"))
-            .timeout(new TimeUtil.Time(2500L, TimeUnit.MILLISECONDS)).userAgent("egg82/PlayerInfo")
-            .header("Accept", "application/json")
-            .build()
-            .getConnection();
+                .timeout(new TimeUtil.Time(2500L, TimeUnit.MILLISECONDS)).userAgent("egg82/PlayerInfo")
+                .header("Accept", "application/json")
+                .build()
+                .getConnection();
         int status = conn.getResponseCode();
 
         if (status == 204) {
@@ -131,11 +139,11 @@ public class MojangPlayerInfo implements PlayerInfo {
     protected @Nullable UUID uuidExpensive(@NotNull String name) throws IOException {
         // Network lookup
         HttpURLConnection conn = WebRequest.builder(new URL("https://api.mojang.com/users/profiles/minecraft/" + WebRequest.urlEncode(name)))
-            .timeout(new TimeUtil.Time(2500L, TimeUnit.MILLISECONDS))
-            .userAgent("egg82/PlayerInfo")
-            .header("Accept", "application/json")
-            .build()
-            .getConnection();
+                .timeout(new TimeUtil.Time(2500L, TimeUnit.MILLISECONDS))
+                .userAgent("egg82/PlayerInfo")
+                .header("Accept", "application/json")
+                .build()
+                .getConnection();
         int status = conn.getResponseCode();
 
         if (status == 204) {
@@ -161,12 +169,13 @@ public class MojangPlayerInfo implements PlayerInfo {
 
     protected @Nullable List<ProfileModel.ProfilePropertyModel> propertiesExpensive(@NotNull UUID uuid) throws IOException {
         // Network lookup
-        HttpURLConnection conn = WebRequest.builder(new URL("https://sessionserver.mojang.com/session/minecraft/profile/" + uuid.toString().replace("-", "") + "?unsigned=false"))
-            .timeout(new TimeUtil.Time(2500L, TimeUnit.MILLISECONDS))
-            .userAgent("egg82/PlayerInfo")
-            .header("Accept", "application/json")
-            .build()
-            .getConnection();
+        HttpURLConnection conn = WebRequest.builder(new URL("https://sessionserver.mojang.com/session/minecraft/profile/" + uuid.toString()
+                .replace("-", "") + "?unsigned=false"))
+                .timeout(new TimeUtil.Time(2500L, TimeUnit.MILLISECONDS))
+                .userAgent("egg82/PlayerInfo")
+                .header("Accept", "application/json")
+                .build()
+                .getConnection();
         int status = conn.getResponseCode();
 
         if (status == 204) {

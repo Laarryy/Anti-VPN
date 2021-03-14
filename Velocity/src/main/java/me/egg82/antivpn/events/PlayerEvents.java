@@ -6,6 +6,7 @@ import com.velocitypowered.api.event.connection.PostLoginEvent;
 import com.velocitypowered.api.event.connection.PreLoginEvent;
 import com.velocitypowered.api.proxy.ProxyServer;
 import inet.ipaddr.IPAddressString;
+
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
@@ -16,6 +17,7 @@ import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutionException;
+
 import me.egg82.antivpn.AntiVPN;
 import me.egg82.antivpn.api.VPNAPIProvider;
 import me.egg82.antivpn.api.model.ip.AlgorithmMethod;
@@ -110,7 +112,7 @@ public class PlayerEvents extends EventHolder {
         }
     }
 
-    private void checkPermsPlayer(@NotNull PreLoginEvent event, @NotNull UUID uuid,  boolean hasBypass) {
+    private void checkPermsPlayer(@NotNull PreLoginEvent event, @NotNull UUID uuid, boolean hasBypass) {
         if (hasBypass) {
             if (ConfigUtil.getDebugOrFalse()) {
                 console.sendMessage("<c1>" + event.getUsername() + "</c1> <c2>bypasses pre-check. Ignoring.</c2>");
@@ -188,8 +190,8 @@ public class PlayerEvents extends EventHolder {
         // Check ignored IP addresses/ranges
         for (String testAddress : cachedConfig.getIgnoredIps()) {
             if (
-                ValidationUtil.isValidIp(testAddress) && ip.equalsIgnoreCase(testAddress)
-                    || ValidationUtil.isValidIpRange(testAddress) && rangeContains(testAddress, ip)
+                    ValidationUtil.isValidIp(testAddress) && ip.equalsIgnoreCase(testAddress)
+                            || ValidationUtil.isValidIpRange(testAddress) && rangeContains(testAddress, ip)
             ) {
                 return;
             }
@@ -269,7 +271,8 @@ public class PlayerEvents extends EventHolder {
                 return;
             } else if (ValidationUtil.isValidIpRange(testAddress) && rangeContains(testAddress, ip)) {
                 if (ConfigUtil.getDebugOrFalse()) {
-                    console.sendMessage("<c1>" + event.getPlayer().getUsername() + "</c1> <c2>is under an ignored range</c2> <c1>" + testAddress + " (" + ip + ")" + "</c1><c2>. Ignoring.</c2>");
+                    console.sendMessage("<c1>" + event.getPlayer()
+                            .getUsername() + "</c1> <c2>is under an ignored range</c2> <c1>" + testAddress + " (" + ip + ")" + "</c1><c2>. Ignoring.</c2>");
                 }
                 return;
             }
@@ -394,7 +397,11 @@ public class PlayerEvents extends EventHolder {
         return host.getHostAddress();
     }
 
-    private @NotNull CompletableFuture<UUID> fetchUuid(@NotNull String name) { return PlayerLookup.get(name, proxy).thenApply(PlayerInfo::getUUID); }
+    private @NotNull CompletableFuture<UUID> fetchUuid(@NotNull String name) {
+        return PlayerLookup.get(name, proxy).thenApply(PlayerInfo::getUUID);
+    }
 
-    private boolean rangeContains(@NotNull String range, @NotNull String ip) { return new IPAddressString(range).contains(new IPAddressString(ip)); }
+    private boolean rangeContains(@NotNull String range, @NotNull String ip) {
+        return new IPAddressString(range).contains(new IPAddressString(ip));
+    }
 }

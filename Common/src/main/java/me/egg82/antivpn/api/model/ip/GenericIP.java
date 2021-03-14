@@ -23,28 +23,48 @@ public class GenericIP implements IP {
         this.hc = Objects.hash(ip);
     }
 
-    public @NotNull InetAddress getIP() { return ip; }
+    public @NotNull InetAddress getIP() {
+        return ip;
+    }
 
-    public @Nullable Boolean getCascade() { return cascade; }
+    public @Nullable Boolean getCascade() {
+        return cascade;
+    }
 
-    public void setCascade(@Nullable Boolean status) { this.cascade = status; }
+    public void setCascade(@Nullable Boolean status) {
+        this.cascade = status;
+    }
 
-    public @Nullable Double getConsensus() { return consensus; }
+    public @Nullable Double getConsensus() {
+        return consensus;
+    }
 
-    public void setConsensus(@Nullable Double status) { this.consensus = status; }
+    public void setConsensus(@Nullable Double status) {
+        this.consensus = status;
+    }
 
-    public @NotNull AlgorithmMethod getType() { return type; }
+    public @NotNull AlgorithmMethod getType() {
+        return type;
+    }
 
-    public void setType(@NotNull AlgorithmMethod type) { this.type = type; }
+    public void setType(@NotNull AlgorithmMethod type) {
+        this.type = type;
+    }
 
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof GenericIP)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof GenericIP)) {
+            return false;
+        }
         GenericIP genericIP = (GenericIP) o;
         return ip.equals(genericIP.ip);
     }
 
-    public int hashCode() { return hc; }
+    public int hashCode() {
+        return hc;
+    }
 
     public String toString() {
         return "GenericIP{" +

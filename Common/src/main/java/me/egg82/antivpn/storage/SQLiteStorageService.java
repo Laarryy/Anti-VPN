@@ -2,10 +2,12 @@ package me.egg82.antivpn.storage;
 
 import com.zaxxer.hikari.HikariConfig;
 import io.ebean.config.dbplatform.sqlite.SQLitePlatform;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.Properties;
+
 import org.jetbrains.annotations.NotNull;
 
 public class SQLiteStorageService extends AbstractJDBCStorageService {
@@ -13,7 +15,9 @@ public class SQLiteStorageService extends AbstractJDBCStorageService {
         super(name);
     }
 
-    public static @NotNull SQLiteStorageService.Builder builder(@NotNull String name) { return new SQLiteStorageService.Builder(name); }
+    public static @NotNull SQLiteStorageService.Builder builder(@NotNull String name) {
+        return new SQLiteStorageService.Builder(name);
+    }
 
     public static class Builder {
         private final SQLiteStorageService service;

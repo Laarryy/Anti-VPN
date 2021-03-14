@@ -12,9 +12,13 @@ import java.net.HttpURLConnection;
 import java.util.concurrent.CompletableFuture;
 
 public class IPQualityScore extends AbstractSource<IPQualityScoreModel> {
-    public @NotNull String getName() { return "ipqualityscore"; }
+    public @NotNull String getName() {
+        return "ipqualityscore";
+    }
 
-    public boolean isKeyRequired() { return true; }
+    public boolean isKeyRequired() {
+        return true;
+    }
 
     public IPQualityScore() {
         super(IPQualityScoreModel.class);
@@ -23,7 +27,10 @@ public class IPQualityScore extends AbstractSource<IPQualityScoreModel> {
     public @NotNull CompletableFuture<@NotNull Boolean> getResult(@NotNull String ip) {
         return getRawResponse(ip).thenApply(model -> {
             if (!model.isSuccess()) {
-                throw new APIException(model.getMessage() != null && model.getMessage().contains("key"), "Could not get result from " + getName() + " (" + model.getMessage() + ")");
+                throw new APIException(
+                        model.getMessage() != null && model.getMessage().contains("key"),
+                        "Could not get result from " + getName() + " (" + model.getMessage() + ")"
+                );
             }
 
             ConfigurationNode sourceConfigNode = getSourceConfigNode();
@@ -55,7 +62,10 @@ public class IPQualityScore extends AbstractSource<IPQualityScoreModel> {
                 throw new APIException(true, "Key is not defined for " + getName());
             }
 
-            WebRequest.Builder builder = getDefaultBuilder("http://www.ipqualityscore.com/api/json/ip/" + key + "/" + ip + "?strictness=" + sourceConfigNode.node("strictness").getInt(0) + "&mobile=" + (sourceConfigNode.node("mobile").getBoolean(true) ? "true" : "false") + "&fast=true&allow_public_access_points=true&lighter_penalties=true");
+            WebRequest.Builder builder = getDefaultBuilder("http://www.ipqualityscore.com/api/json/ip/" + key + "/" + ip + "?strictness=" + sourceConfigNode.node(
+                    "strictness").getInt(0) + "&mobile=" + (sourceConfigNode.node("mobile").getBoolean(true)
+                                                            ? "true"
+                                                            : "false") + "&fast=true&allow_public_access_points=true&lighter_penalties=true");
             HttpURLConnection conn = getConnection(builder.build());
             JSONDeserializer<IPQualityScoreModel> modelDeserializer = new JSONDeserializer<>();
             return modelDeserializer.deserialize(getString(conn), IPQualityScoreModel.class);

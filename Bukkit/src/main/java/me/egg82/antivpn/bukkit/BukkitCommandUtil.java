@@ -8,9 +8,12 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Collection;
 
 public class BukkitCommandUtil {
-    private BukkitCommandUtil() { }
+    private BukkitCommandUtil() {
+    }
 
-    public static void dispatchCommands(@NotNull Collection<String> commands, @NotNull CommandSender issuer, @NotNull Plugin plugin) { dispatchCommands(commands, issuer, plugin, Bukkit.isPrimaryThread()); }
+    public static void dispatchCommands(@NotNull Collection<String> commands, @NotNull CommandSender issuer, @NotNull Plugin plugin) {
+        dispatchCommands(commands, issuer, plugin, Bukkit.isPrimaryThread());
+    }
 
     public static void dispatchCommands(@NotNull Collection<String> commands, @NotNull CommandSender issuer, @NotNull Plugin plugin, boolean isAsync) {
         if (isAsync) {
@@ -26,7 +29,9 @@ public class BukkitCommandUtil {
         }
     }
 
-    public static void dispatchCommand(@NotNull String command, @NotNull CommandSender issuer, @NotNull Plugin plugin) { dispatchCommand(command, issuer, plugin, Bukkit.isPrimaryThread()); }
+    public static void dispatchCommand(@NotNull String command, @NotNull CommandSender issuer, @NotNull Plugin plugin) {
+        dispatchCommand(command, issuer, plugin, Bukkit.isPrimaryThread());
+    }
 
     public static void dispatchCommand(@NotNull String command, @NotNull CommandSender issuer, @NotNull Plugin plugin, boolean isAsync) {
         if (isAsync) {

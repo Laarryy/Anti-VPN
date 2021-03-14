@@ -5,12 +5,14 @@ import io.nats.client.Dispatcher;
 import io.nats.client.Nats;
 import io.nats.client.Options;
 import io.netty.buffer.ByteBuf;
+
 import java.io.File;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.UUID;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+
 import me.egg82.antivpn.config.ConfigUtil;
 import me.egg82.antivpn.locale.LocaleUtil;
 import me.egg82.antivpn.locale.MessageKey;
@@ -47,9 +49,13 @@ public class NATSMessagingService extends AbstractMessagingService {
         }
     }
 
-    public boolean isClosed() { return closed || connection.getConnectedUrl() == null; }
+    public boolean isClosed() {
+        return closed || connection.getConnectedUrl() == null;
+    }
 
-    public static @NotNull Builder builder(@NotNull String name, @NotNull UUID serverId, @NotNull MessagingHandler handler, @NotNull File packetDirectory) { return new Builder(name, serverId, handler, packetDirectory); }
+    public static @NotNull Builder builder(@NotNull String name, @NotNull UUID serverId, @NotNull MessagingHandler handler, @NotNull File packetDirectory) {
+        return new Builder(name, serverId, handler, packetDirectory);
+    }
 
     public static class Builder {
         private final NATSMessagingService service;
@@ -139,7 +145,10 @@ public class NATSMessagingService extends AbstractMessagingService {
 
                 byte packetVersion = CollectionProvider.getServerVersions().getOrDefault(sender, (byte) -1);
                 if (packetVersion > -1 && packetVersion != Packet.VERSION) {
-                    service.logger.warn("Server " + sender + " packet version " + String.format("0x%02X ", packetVersion) + " does not match current packet version " + String.format("0x%02X ", Packet.VERSION) + ". Skipping packet.");
+                    service.logger.warn("Server " + sender + " packet version " + String.format(
+                            "0x%02X ",
+                            packetVersion
+                    ) + " does not match current packet version " + String.format("0x%02X ", Packet.VERSION) + ". Skipping packet.");
                     return;
                 }
 
@@ -155,7 +164,10 @@ public class NATSMessagingService extends AbstractMessagingService {
                     }
                 } catch (Exception ex) {
                     Class<? extends Packet> clazz = PacketManager.getPacket(packetId);
-                    service.logger.error(LocaleUtil.getDefaultI18N().getText(MessageKey.ERROR__MESSAGING__BAD_PACKET, "{name}", clazz != null ? clazz.getName() : "null"), ex);
+                    service.logger.error(
+                            LocaleUtil.getDefaultI18N().getText(MessageKey.ERROR__MESSAGING__BAD_PACKET, "{name}", clazz != null ? clazz.getName() : "null"),
+                            ex
+                    );
                     return;
                 }
 

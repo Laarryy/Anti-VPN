@@ -32,23 +32,24 @@ public class BukkitLocaleCommandUtil {
 
     private static BukkitLocalizedCommandSender consoleCommandSender = null;
 
-    private BukkitLocaleCommandUtil() { }
+    private BukkitLocaleCommandUtil() {
+    }
 
     public static void create(@NotNull Plugin plugin) {
         adventure = BukkitAudiences.create(plugin);
 
         consoleCommandSender = BukkitLocalizedCommandSender.getMappedCommandSender(
-            plugin.getServer().getConsoleSender(),
-            adventure.sender(plugin.getServer().getConsoleSender()),
-            LocaleUtil.getDefaultI18N()
+                plugin.getServer().getConsoleSender(),
+                adventure.sender(plugin.getServer().getConsoleSender()),
+                LocaleUtil.getDefaultI18N()
         );
 
         try {
             commandManager = new PaperCommandManager<>(
-                plugin,
-                AsynchronousCommandExecutionCoordinator.<BukkitLocalizedCommandSender>newBuilder().build(),
-                s -> BukkitLocalizedCommandSender.getMappedCommandSender(s, adventure.sender(s), getLanguage(plugin, s)),
-                BukkitLocalizedCommandSender::getBaseCommandSender
+                    plugin,
+                    AsynchronousCommandExecutionCoordinator.<BukkitLocalizedCommandSender>newBuilder().build(),
+                    s -> BukkitLocalizedCommandSender.getMappedCommandSender(s, adventure.sender(s), getLanguage(plugin, s)),
+                    BukkitLocalizedCommandSender::getBaseCommandSender
             );
         } catch (Exception ex) {
             logger.error(LocaleUtil.getDefaultI18N().getText(MessageKey.ERROR__COMMAND_MANAGER), ex);
@@ -56,30 +57,36 @@ public class BukkitLocaleCommandUtil {
         }
 
         commandExceptionHandler
-            .withInvalidSyntaxHandler()
-            .withHandler(MinecraftExceptionHandler.ExceptionType.INVALID_SYNTAX, (sender, ex) -> {
-                logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex);
-                return sender.getComponent(MessageKey.ERROR__COMMAND__INVALID_SYNTAX, "{ex}", ex.getMessage().substring(ex.getMessage().indexOf('.') + 1));
-            })
-            .withInvalidSenderHandler()
-            .withHandler(MinecraftExceptionHandler.ExceptionType.INVALID_SENDER, (sender, ex) -> sender.getComponent(MessageKey.ERROR__COMMAND__INVALID_SENDER, "{ex}", ex.getMessage()))
-            .withNoPermissionHandler()
-            .withHandler(MinecraftExceptionHandler.ExceptionType.NO_PERMISSION, (sender, ex) -> sender.getComponent(MessageKey.ERROR__COMMAND__NO_PERMISSION, "{ex}", ex.getMessage()))
-            .withArgumentParsingHandler()
-            .withHandler(MinecraftExceptionHandler.ExceptionType.ARGUMENT_PARSING, (sender, ex) -> {
-                logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex);
-                return sender.getComponent(MessageKey.ERROR__COMMAND__INVALID_ARGS, "{ex}", ex.getMessage());
-            })
-            .withCommandExecutionHandler()
-            .withHandler(MinecraftExceptionHandler.ExceptionType.COMMAND_EXECUTION, (sender, ex) -> {
-                logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex);
-                return sender.getComponent(MessageKey.ERROR__INTERNAL);
-            })
-            .withDecorator(component -> Component.text()
-                .append(component)
-                .build()
-            )
-            .apply(commandManager, BukkitLocalizedCommandSender::getMappedAudience);
+                .withInvalidSyntaxHandler()
+                .withHandler(MinecraftExceptionHandler.ExceptionType.INVALID_SYNTAX, (sender, ex) -> {
+                    logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex);
+                    return sender.getComponent(MessageKey.ERROR__COMMAND__INVALID_SYNTAX, "{ex}", ex.getMessage().substring(ex.getMessage().indexOf('.') + 1));
+                })
+                .withInvalidSenderHandler()
+                .withHandler(
+                        MinecraftExceptionHandler.ExceptionType.INVALID_SENDER,
+                        (sender, ex) -> sender.getComponent(MessageKey.ERROR__COMMAND__INVALID_SENDER, "{ex}", ex.getMessage())
+                )
+                .withNoPermissionHandler()
+                .withHandler(
+                        MinecraftExceptionHandler.ExceptionType.NO_PERMISSION,
+                        (sender, ex) -> sender.getComponent(MessageKey.ERROR__COMMAND__NO_PERMISSION, "{ex}", ex.getMessage())
+                )
+                .withArgumentParsingHandler()
+                .withHandler(MinecraftExceptionHandler.ExceptionType.ARGUMENT_PARSING, (sender, ex) -> {
+                    logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex);
+                    return sender.getComponent(MessageKey.ERROR__COMMAND__INVALID_ARGS, "{ex}", ex.getMessage());
+                })
+                .withCommandExecutionHandler()
+                .withHandler(MinecraftExceptionHandler.ExceptionType.COMMAND_EXECUTION, (sender, ex) -> {
+                    logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex);
+                    return sender.getComponent(MessageKey.ERROR__INTERNAL);
+                })
+                .withDecorator(component -> Component.text()
+                        .append(component)
+                        .build()
+                )
+                .apply(commandManager, BukkitLocalizedCommandSender::getMappedAudience);
 
         if (commandManager.queryCapability(CloudBukkitCapabilities.BRIGADIER)) {
             try {
@@ -131,9 +138,9 @@ public class BukkitLocaleCommandUtil {
 
     public static void setConsoleLocale(@NotNull Plugin plugin, @NotNull I18NManager manager) {
         consoleCommandSender = BukkitLocalizedCommandSender.getMappedCommandSender(
-            plugin.getServer().getConsoleSender(),
-            adventure.sender(plugin.getServer().getConsoleSender()),
-            manager
+                plugin.getServer().getConsoleSender(),
+                adventure.sender(plugin.getServer().getConsoleSender()),
+                manager
         );
     }
 
@@ -141,8 +148,8 @@ public class BukkitLocaleCommandUtil {
         if (sender instanceof Player) {
             return I18NManager.getUserCache().computeIfAbsent(((Player) sender).getUniqueId(), k -> {
                 return I18NManager.getManager(
-                    plugin.getDataFolder(),
-                    BukkitCapabilities.HAS_ADVENTURE ? ((Player) sender).locale() : LocaleUtil.parseLocale(((Player) sender).getLocale())
+                        plugin.getDataFolder(),
+                        BukkitCapabilities.HAS_ADVENTURE ? ((Player) sender).locale() : LocaleUtil.parseLocale(((Player) sender).getLocale())
                 );
             });
         } else {
@@ -154,8 +161,8 @@ public class BukkitLocaleCommandUtil {
                     cachedConfig = null;
                 }
                 return I18NManager.getManager(
-                    plugin.getDataFolder(),
-                    cachedConfig != null ? cachedConfig.getLanguage() : Locale.US
+                        plugin.getDataFolder(),
+                        cachedConfig != null ? cachedConfig.getLanguage() : Locale.US
                 );
             });
         }

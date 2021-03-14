@@ -7,7 +7,11 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class PluginHooks {
     private static final List<PluginHook> hooks = new CopyOnWriteArrayList<>();
-    public static @NotNull List<PluginHook> getHooks() { return hooks; }
 
-    private PluginHooks() { }
+    public static @NotNull List<PluginHook> getHooks() {
+        return hooks;
+    }
+
+    private PluginHooks() {
+    }
 }

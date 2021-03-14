@@ -22,17 +22,26 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public class BStatsHook implements PluginHook {
     private static final AtomicLong blockedVPNs = new AtomicLong(0L);
-    public static void incrementBlockedVPNs() { blockedVPNs.getAndIncrement(); }
+
+    public static void incrementBlockedVPNs() {
+        blockedVPNs.getAndIncrement();
+    }
 
     private static final AtomicLong blockedMCLeaks = new AtomicLong(0L);
-    public static void incrementBlockedMCLeaks() { blockedMCLeaks.getAndIncrement(); }
+
+    public static void incrementBlockedMCLeaks() {
+        blockedMCLeaks.getAndIncrement();
+    }
 
     public static void create(@NotNull JavaPlugin plugin, int id) {
         hook = new BStatsHook(plugin, id);
     }
 
     private static BStatsHook hook = null;
-    public static @Nullable BStatsHook getHook() { return hook; }
+
+    public static @Nullable BStatsHook getHook() {
+        return hook;
+    }
 
     private BStatsHook(@NotNull JavaPlugin plugin, int id) {
         if (!ConfigUtil.getConfig().node("stats", "usage").getBoolean(true)) {
@@ -123,5 +132,6 @@ public class BStatsHook implements PluginHook {
         PluginHooks.getHooks().add(this);
     }
 
-    public void cancel() { }
+    public void cancel() {
+    }
 }

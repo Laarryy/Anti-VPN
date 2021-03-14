@@ -14,7 +14,8 @@ import java.util.UUID;
 public class BukkitTailorUtil {
     private static final MiniMessage miniMessage = MiniMessage.get();
 
-    private BukkitTailorUtil() { }
+    private BukkitTailorUtil() {
+    }
 
     public static @NotNull List<String> tailorCommands(@NotNull List<String> commands, @NotNull String name, @NotNull UUID uuid, @NotNull String ip) {
         List<String> retVal = new ArrayList<>();

@@ -29,7 +29,10 @@ public class VaultHook implements PluginHook {
     }
 
     private static VaultHook hook = null;
-    public static @Nullable VaultHook get() { return hook; }
+
+    public static @Nullable VaultHook get() {
+        return hook;
+    }
 
     private VaultHook() {
         BukkitLocalizedCommandSender console = BukkitLocaleCommandUtil.getConsole();
@@ -50,7 +53,8 @@ public class VaultHook implements PluginHook {
         PluginHooks.getHooks().add(this);
     }
 
-    public void cancel() { }
+    public void cancel() {
+    }
 
     public @Nullable Permission getPermission() {
         if (permission == null && ConfigUtil.getDebugOrFalse()) {

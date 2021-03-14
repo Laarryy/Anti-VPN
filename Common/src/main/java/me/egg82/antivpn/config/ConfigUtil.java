@@ -12,7 +12,8 @@ public class ConfigUtil {
     private static CachedConfig cachedConfig = null;
     private static HiddenConfig hiddenConfig = null;
 
-    private ConfigUtil() { }
+    private ConfigUtil() {
+    }
 
     public static void setConfiguration(@Nullable ConfigurationNode config, @Nullable CachedConfig cachedConfig, @Nullable HiddenConfig hiddenConfig) {
         ConfigUtil.config = config;

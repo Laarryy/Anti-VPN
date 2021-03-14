@@ -30,22 +30,22 @@ public class EarlyCheckEvents extends EventHolder {
         this.plugin = plugin;
 
         events.add(
-            BukkitEvents.subscribe(plugin, AsyncPlayerPreLoginEvent.class, EventPriority.LOWEST)
-                .filter(e -> {
-                    if (Bukkit.hasWhitelist() && !isWhitelisted(e.getUniqueId())) {
-                        if (ConfigUtil.getDebugOrFalse()) {
-                            BukkitLocaleCommandUtil.getConsole().sendMessage(
-                                MessageKey.DEBUG__NOT_WHITELISTED,
-                                "{name}", e.getName(),
-                                "{uuid}", e.getUniqueId().toString()
-                            );
-                        }
-                        return false;
-                    }
-                    return true;
-                })
-                .handler(this::checkPerms)
-                .exceptionHandler(ex -> logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex))
+                BukkitEvents.subscribe(plugin, AsyncPlayerPreLoginEvent.class, EventPriority.LOWEST)
+                        .filter(e -> {
+                            if (Bukkit.hasWhitelist() && !isWhitelisted(e.getUniqueId())) {
+                                if (ConfigUtil.getDebugOrFalse()) {
+                                    BukkitLocaleCommandUtil.getConsole().sendMessage(
+                                            MessageKey.DEBUG__NOT_WHITELISTED,
+                                            "{name}", e.getName(),
+                                            "{uuid}", e.getUniqueId().toString()
+                                    );
+                                }
+                                return false;
+                            }
+                            return true;
+                        })
+                        .handler(this::checkPerms)
+                        .exceptionHandler(ex -> logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex))
         );
     }
 
@@ -86,9 +86,9 @@ public class EarlyCheckEvents extends EventHolder {
         if (hasBypassPermission) {
             if (ConfigUtil.getDebugOrFalse()) {
                 BukkitLocaleCommandUtil.getConsole().sendMessage(
-                    MessageKey.DEBUG__BYPASS_CHECK,
-                    "{name}", event.getName(),
-                    "{uuid}", event.getUniqueId().toString()
+                        MessageKey.DEBUG__BYPASS_CHECK,
+                        "{name}", event.getName(),
+                        "{uuid}", event.getUniqueId().toString()
                 );
             }
             return;
@@ -101,7 +101,12 @@ public class EarlyCheckEvents extends EventHolder {
         if (isVpn(ip, event.getName(), event.getUniqueId())) {
             BStatsHook.incrementBlockedVPNs();
             IPManager ipManager = VPNAPIProvider.getInstance().getIPManager();
-            BukkitCommandUtil.dispatchCommands(ipManager.getVpnCommands(event.getName(), event.getUniqueId(), ip), Bukkit.getConsoleSender(), plugin, event.isAsynchronous());
+            BukkitCommandUtil.dispatchCommands(
+                    ipManager.getVpnCommands(event.getName(), event.getUniqueId(), ip),
+                    Bukkit.getConsoleSender(),
+                    plugin,
+                    event.isAsynchronous()
+            );
             Component kickMessage = ipManager.getVpnKickMessage(event.getName(), event.getUniqueId(), ip);
             if (kickMessage != null) {
                 event.setLoginResult(AsyncPlayerPreLoginEvent.Result.KICK_OTHER);
@@ -116,7 +121,12 @@ public class EarlyCheckEvents extends EventHolder {
         if (isMcLeaks(event.getName(), event.getUniqueId())) {
             BStatsHook.incrementBlockedMCLeaks();
             PlayerManager playerManager = VPNAPIProvider.getInstance().getPlayerManager();
-            BukkitCommandUtil.dispatchCommands(playerManager.getMcLeaksCommands(event.getName(), event.getUniqueId(), ip), Bukkit.getConsoleSender(), plugin, event.isAsynchronous());
+            BukkitCommandUtil.dispatchCommands(
+                    playerManager.getMcLeaksCommands(event.getName(), event.getUniqueId(), ip),
+                    Bukkit.getConsoleSender(),
+                    plugin,
+                    event.isAsynchronous()
+            );
             Component kickMessage = playerManager.getMcLeaksKickMessage(event.getName(), event.getUniqueId(), ip);
             if (kickMessage != null) {
                 event.setLoginResult(AsyncPlayerPreLoginEvent.Result.KICK_OTHER);

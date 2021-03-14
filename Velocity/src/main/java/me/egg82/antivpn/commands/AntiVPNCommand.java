@@ -6,7 +6,9 @@ import co.aikar.commands.annotation.*;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.plugin.PluginDescription;
 import com.velocitypowered.api.proxy.ProxyServer;
+
 import java.io.File;
+
 import me.egg82.antivpn.commands.internal.*;
 import me.egg82.antivpn.locale.LocalizedCommandSender;
 import org.jetbrains.annotations.NotNull;
@@ -35,7 +37,12 @@ public class AntiVPNCommand extends BaseCommand {
     @Description("{@@description.import}")
     @Syntax("<master> <slave> [batchSize]")
     @CommandCompletion("@storage @storage @nothing")
-    public void onImport(@NotNull LocalizedCommandSender issuer, @NotNull @Conditions("storage") String master, @NotNull @Conditions("storage") String slave, @Default("50") String batchSize) {
+    public void onImport(
+            @NotNull LocalizedCommandSender issuer,
+            @NotNull @Conditions("storage") String master,
+            @NotNull @Conditions("storage") String slave,
+            @Default("50") String batchSize
+    ) {
         new ImportCommand(proxy, issuer, master, slave, batchSize).run();
     }
 
@@ -75,7 +82,8 @@ public class AntiVPNCommand extends BaseCommand {
         new CheckCommand(proxy, issuer, type).run();
     }
 
-    @CatchUnknown @Default
+    @CatchUnknown
+    @Default
     @CommandCompletion("@subcommand")
     public void onDefault(@NotNull CommandSource source, String[] args) {
         proxy.getCommandManager().executeImmediatelyAsync(source, "antivpn help");
@@ -83,5 +91,7 @@ public class AntiVPNCommand extends BaseCommand {
 
     @HelpCommand
     @Syntax("[command]")
-    public void onHelp(@NotNull CommandSource source, @NotNull CommandHelp help) { help.showHelp(); }
+    public void onHelp(@NotNull CommandSource source, @NotNull CommandHelp help) {
+        help.showHelp();
+    }
 }

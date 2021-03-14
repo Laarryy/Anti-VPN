@@ -12,9 +12,13 @@ import java.net.HttpURLConnection;
 import java.util.concurrent.CompletableFuture;
 
 public class IPInfo extends AbstractSource<IPInfoModel> {
-    public @NotNull String getName() { return "ipinfo"; }
+    public @NotNull String getName() {
+        return "ipinfo";
+    }
 
-    public boolean isKeyRequired() { return true; }
+    public boolean isKeyRequired() {
+        return true;
+    }
 
     public IPInfo() {
         super(IPInfoModel.class);
@@ -23,7 +27,10 @@ public class IPInfo extends AbstractSource<IPInfoModel> {
     public @NotNull CompletableFuture<@NotNull Boolean> getResult(@NotNull String ip) {
         return getRawResponse(ip).thenApply(model -> {
             if (model.getError() != null) {
-                throw new APIException(model.getError().getMessage() != null && model.getError().getMessage().contains("token"), "Could not get result from " + getName() + " (" + model.getError().getMessage() + ")");
+                throw new APIException(
+                        model.getError().getMessage() != null && model.getError().getMessage().contains("token"),
+                        "Could not get result from " + getName() + " (" + model.getError().getMessage() + ")"
+                );
             }
 
             ConfigurationNode sourceConfigNode = getSourceConfigNode();

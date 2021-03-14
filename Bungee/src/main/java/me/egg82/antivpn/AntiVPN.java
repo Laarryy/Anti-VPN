@@ -100,7 +100,9 @@ public class AntiVPN {
 
     private CommandIssuer consoleCommandIssuer = null;
 
-    public AntiVPN(@NotNull Plugin plugin) { this.plugin = plugin; }
+    public AntiVPN(@NotNull Plugin plugin) {
+        this.plugin = plugin;
+    }
 
     public void onLoad() {
         if (BungeeEnvironmentUtil.getEnvironment() != BungeeEnvironmentUtil.Environment.WATERFALL) {
@@ -112,7 +114,11 @@ public class AntiVPN {
     }
 
     public void onEnable() {
-        GameAnalyticsErrorHandler.open(ServerIDUtil.getId(new File(plugin.getDataFolder(), "stats-id.txt")), plugin.getDescription().getVersion(), ProxyServer.getInstance().getVersion());
+        GameAnalyticsErrorHandler.open(
+                ServerIDUtil.getId(new File(plugin.getDataFolder(), "stats-id.txt")),
+                plugin.getDescription().getVersion(),
+                ProxyServer.getInstance().getVersion()
+        );
 
         commandManager = new BungeeCommandManager(plugin);
         commandManager.enableUnstableAPI("help");
@@ -136,11 +142,11 @@ public class AntiVPN {
 
         consoleCommandIssuer.sendInfo(MessageKey.GENERAL__ENABLED);
         consoleCommandIssuer.sendInfo(MessageKey.GENERAL__LOAD,
-                "{version}", plugin.getDescription().getVersion(),
-                "{apiversion}", VPNAPIProvider.getInstance().getPluginMetadata().getApiVersion(),
-                "{commands}", String.valueOf(commandManager.getRegisteredRootCommands().size()),
-                "{events}", String.valueOf(numEvents),
-                "{tasks}", String.valueOf(tasks.size())
+                                      "{version}", plugin.getDescription().getVersion(),
+                                      "{apiversion}", VPNAPIProvider.getInstance().getPluginMetadata().getApiVersion(),
+                                      "{commands}", String.valueOf(commandManager.getRegisteredRootCommands().size()),
+                                      "{events}", String.valueOf(numEvents),
+                                      "{tasks}", String.valueOf(tasks.size())
         );
 
         workPool.execute(this::checkUpdate);
@@ -214,7 +220,18 @@ public class AntiVPN {
 
     private void setChatColors() {
         commandManager.setFormat(MessageType.ERROR, ChatColor.DARK_RED, ChatColor.YELLOW, ChatColor.AQUA, ChatColor.WHITE);
-        commandManager.setFormat(MessageType.INFO, ChatColor.WHITE, ChatColor.YELLOW, ChatColor.AQUA, ChatColor.GREEN, ChatColor.RED, ChatColor.GOLD, ChatColor.BLUE, ChatColor.GRAY, ChatColor.DARK_RED);
+        commandManager.setFormat(
+                MessageType.INFO,
+                ChatColor.WHITE,
+                ChatColor.YELLOW,
+                ChatColor.AQUA,
+                ChatColor.GREEN,
+                ChatColor.RED,
+                ChatColor.GOLD,
+                ChatColor.BLUE,
+                ChatColor.GRAY,
+                ChatColor.DARK_RED
+        );
     }
 
     private void loadServices() {
@@ -228,7 +245,12 @@ public class AntiVPN {
         CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
 
         BungeeIPManager ipManager = new BungeeIPManager(sourceManager, cachedConfig.getCacheTime().getTime(), cachedConfig.getCacheTime().getUnit());
-        BungeePlayerManager playerManager = new BungeePlayerManager(cachedConfig.getThreads(), cachedConfig.getMcLeaksKey(), cachedConfig.getCacheTime().getTime(), cachedConfig.getCacheTime().getUnit());
+        BungeePlayerManager playerManager = new BungeePlayerManager(
+                cachedConfig.getThreads(),
+                cachedConfig.getMcLeaksKey(),
+                cachedConfig.getCacheTime().getTime(),
+                cachedConfig.getCacheTime().getUnit()
+        );
         Platform platform = new BungeePlatform(System.currentTimeMillis());
         PluginMetadata metadata = new BungeePluginMetadata(plugin.getDescription().getVersion());
         VPNAPI api = new VPNAPIImpl(platform, metadata, ipManager, playerManager, sourceManager, cachedConfig, new MBassador<>(new GenericPublicationErrorHandler()));
@@ -337,7 +359,8 @@ public class AntiVPN {
     }
 
     private void loadEvents() {
-        events.add(BungeeEvents.subscribe(plugin, PostLoginEvent.class, EventPriority.LOW).handler(e -> new PostLoginUpdateNotifyHandler(plugin, commandManager).accept(e)));
+        events.add(BungeeEvents.subscribe(plugin, PostLoginEvent.class, EventPriority.LOW)
+                           .handler(e -> new PostLoginUpdateNotifyHandler(plugin, commandManager).accept(e)));
         eventHolders.add(new PlayerEvents(plugin, consoleCommandIssuer));
     }
 
@@ -379,9 +402,13 @@ public class AntiVPN {
 
     private static final AtomicLong blockedMCLeaks = new AtomicLong(0L);
 
-    public static void incrementBlockedVPNs() { blockedVPNs.getAndIncrement(); }
+    public static void incrementBlockedVPNs() {
+        blockedVPNs.getAndIncrement();
+    }
 
-    public static void incrementBlockedMCLeaks() { blockedMCLeaks.getAndIncrement(); }
+    public static void incrementBlockedMCLeaks() {
+        blockedMCLeaks.getAndIncrement();
+    }
 
     private void loadMetrics() {
         Metrics metrics = new Metrics(plugin, 3249);
@@ -557,7 +584,8 @@ public class AntiVPN {
 
         try {
             workPool.execute(this::checkUpdate);
-        } catch (RejectedExecutionException ignored) { }
+        } catch (RejectedExecutionException ignored) {
+        }
     }
 
     private void unloadHooks() {

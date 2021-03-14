@@ -10,6 +10,7 @@ public interface SourceModel extends Serializable {
      * {@inheritDoc}
      */
     boolean equals(Object o);
+
     /**
      * {@inheritDoc}
      */

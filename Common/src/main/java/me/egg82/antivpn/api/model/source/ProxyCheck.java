@@ -14,9 +14,13 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 public class ProxyCheck extends AbstractSource<ProxyCheckModel> {
-    public @NotNull String getName() { return "proxycheck"; }
+    public @NotNull String getName() {
+        return "proxycheck";
+    }
 
-    public boolean isKeyRequired() { return false; }
+    public boolean isKeyRequired() {
+        return false;
+    }
 
     public ProxyCheck() {
         super(ProxyCheckModel.class);
@@ -25,7 +29,10 @@ public class ProxyCheck extends AbstractSource<ProxyCheckModel> {
     public @NotNull CompletableFuture<@NotNull Boolean> getResult(@NotNull String ip) {
         return getRawResponse(ip).thenApply(model -> {
             if (!"ok".equalsIgnoreCase(model.getStatus())) {
-                throw new APIException(model.getMessage() != null && model.getMessage().contains("Key"), "Could not get result from " + getName() + " (" + model.getMessage() + ")");
+                throw new APIException(
+                        model.getMessage() != null && model.getMessage().contains("Key"),
+                        "Could not get result from " + getName() + " (" + model.getMessage() + ")"
+                );
             }
 
             return model.getIp() != null && "yes".equalsIgnoreCase(model.getIp().getProxy());

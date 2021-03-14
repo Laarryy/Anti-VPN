@@ -6,5 +6,7 @@ import org.jetbrains.annotations.NotNull;
 public abstract class AbstractPluginMetadata implements PluginMetadata {
     private static final String API_VERSION = "${api.version}";
 
-    public @NotNull String getApiVersion() { return API_VERSION; }
+    public @NotNull String getApiVersion() {
+        return API_VERSION;
+    }
 }

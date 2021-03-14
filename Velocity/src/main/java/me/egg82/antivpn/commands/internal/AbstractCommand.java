@@ -2,8 +2,10 @@ package me.egg82.antivpn.commands.internal;
 
 import co.aikar.commands.CommandIssuer;
 import com.velocitypowered.api.proxy.ProxyServer;
+
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+
 import me.egg82.antivpn.services.lookup.PlayerInfo;
 import me.egg82.antivpn.services.lookup.PlayerLookup;
 import org.jetbrains.annotations.NotNull;
@@ -21,5 +23,7 @@ public abstract class AbstractCommand implements Runnable {
         this.issuer = issuer;
     }
 
-    protected @NotNull CompletableFuture<UUID> fetchUuid(@NotNull String name) { return PlayerLookup.get(name, proxy).thenApply(PlayerInfo::getUUID); }
+    protected @NotNull CompletableFuture<UUID> fetchUuid(@NotNull String name) {
+        return PlayerLookup.get(name, proxy).thenApply(PlayerInfo::getUUID);
+    }
 }

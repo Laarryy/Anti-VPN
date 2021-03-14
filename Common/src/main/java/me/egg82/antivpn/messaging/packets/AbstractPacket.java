@@ -1,8 +1,10 @@
 package me.egg82.antivpn.messaging.packets;
 
 import io.netty.buffer.ByteBuf;
+
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
+
 import me.egg82.antivpn.config.ConfigUtil;
 import me.egg82.antivpn.logging.GELFLogger;
 import org.jetbrains.annotations.NotNull;
@@ -18,9 +20,13 @@ public abstract class AbstractPacket implements Packet {
         this.sender = sender;
     }
 
-    public @NotNull UUID getSender() { return sender; }
+    public @NotNull UUID getSender() {
+        return sender;
+    }
 
-    protected final int readVarInt(@NotNull ByteBuf input) { return readVarInt(input, 5); }
+    protected final int readVarInt(@NotNull ByteBuf input) {
+        return readVarInt(input, 5);
+    }
 
     protected final int readVarInt(@NotNull ByteBuf input, int maxBytes) {
         int out = 0;
@@ -70,7 +76,9 @@ public abstract class AbstractPacket implements Packet {
         }
     }
 
-    protected final @NotNull UUID readUUID(@NotNull ByteBuf input) { return new UUID(input.readLong(), input.readLong()); }
+    protected final @NotNull UUID readUUID(@NotNull ByteBuf input) {
+        return new UUID(input.readLong(), input.readLong());
+    }
 
     protected final void writeUUID(@NotNull UUID value, @NotNull ByteBuf output) {
         output.writeLong(value.getMostSignificantBits());
@@ -80,7 +88,7 @@ public abstract class AbstractPacket implements Packet {
     protected final @NotNull String readString(@NotNull ByteBuf buf) {
         int len = readVarInt(buf);
         if (len > Short.MAX_VALUE) {
-            throw new RuntimeException(String.format( "Cannot receive string longer than Short.MAX_VALUE (got %s characters)", len));
+            throw new RuntimeException(String.format("Cannot receive string longer than Short.MAX_VALUE (got %s characters)", len));
         }
 
         byte[] b = new byte[len];
@@ -91,7 +99,7 @@ public abstract class AbstractPacket implements Packet {
 
     protected final void writeString(@NotNull String s, @NotNull ByteBuf buf) {
         if (s.length() > Short.MAX_VALUE) {
-            throw new RuntimeException(String.format( "Cannot send string longer than Short.MAX_VALUE (got %s characters)", s.length()));
+            throw new RuntimeException(String.format("Cannot send string longer than Short.MAX_VALUE (got %s characters)", s.length()));
         }
 
         byte[] b = s.getBytes(StandardCharsets.UTF_8);

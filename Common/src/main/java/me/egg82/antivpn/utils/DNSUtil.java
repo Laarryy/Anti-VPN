@@ -24,7 +24,8 @@ import java.util.Set;
 public class DNSUtil {
     private static final Logger logger = new GELFLogger(LoggerFactory.getLogger(DNSUtil.class));
 
-    private DNSUtil() { }
+    private DNSUtil() {
+    }
 
     public static @NotNull Set<@NotNull String> getNordVpnIps() {
         Set<String> dns = new HashSet<>();
@@ -101,7 +102,8 @@ public class DNSUtil {
                 String name = dns.replace("{}", String.valueOf(i));
                 InetAddress.getByName(name);
                 retVal.add(name);
-            } catch (UnknownHostException ignored) { }
+            } catch (UnknownHostException ignored) {
+            }
         }
         if (ConfigUtil.getDebugOrFalse()) {
             logger.info("Got " + retVal.size() + " value(s) for NordVPN set " + dns.replace("{}", ""));

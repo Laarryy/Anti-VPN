@@ -22,5 +22,7 @@ public abstract class AbstractCommand implements CommandExecutionHandler<BukkitL
         this.commandManager = commandManager;
     }
 
-    protected @NotNull CompletableFuture<@NotNull UUID> fetchUuid(@NotNull String name) { return PlayerLookup.get(name).thenApply(PlayerInfo::getUUID); }
+    protected @NotNull CompletableFuture<@NotNull UUID> fetchUuid(@NotNull String name) {
+        return PlayerLookup.get(name).thenApply(PlayerInfo::getUUID);
+    }
 }

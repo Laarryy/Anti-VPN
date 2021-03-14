@@ -37,7 +37,12 @@ public class AntiVPNCommand extends BaseCommand {
     @Description("{@@description.import}")
     @Syntax("<master> <slave> [batchSize]")
     @CommandCompletion("@storage @storage @nothing")
-    public void onImport(@NotNull LocalizedCommandSender issuer, @NotNull @Conditions("storage") String master, @NotNull @Conditions("storage") String slave, @Default("50") String batchSize) {
+    public void onImport(
+            @NotNull LocalizedCommandSender issuer,
+            @NotNull @Conditions("storage") String master,
+            @NotNull @Conditions("storage") String slave,
+            @Default("50") String batchSize
+    ) {
         new ImportCommand(issuer, master, slave, batchSize).run();
     }
 
@@ -77,7 +82,8 @@ public class AntiVPNCommand extends BaseCommand {
         new CheckCommand(issuer, type).run();
     }
 
-    @CatchUnknown @Default
+    @CatchUnknown
+    @Default
     @CommandCompletion("@subcommand")
     public void onDefault(@NotNull CommandSender sender, String[] args) {
         ProxyServer.getInstance().getPluginManager().dispatchCommand(sender, "antivpn help");
@@ -85,5 +91,7 @@ public class AntiVPNCommand extends BaseCommand {
 
     @HelpCommand
     @Syntax("[command]")
-    public void onHelp(@NotNull CommandSender sender, @NotNull CommandHelp help) { help.showHelp(); }
+    public void onHelp(@NotNull CommandSender sender, @NotNull CommandHelp help) {
+        help.showHelp();
+    }
 }

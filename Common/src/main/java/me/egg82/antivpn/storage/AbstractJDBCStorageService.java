@@ -7,10 +7,12 @@ import io.ebean.DatabaseFactory;
 import io.ebean.Transaction;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
+
 import java.io.File;
 import java.time.Instant;
 import java.util.*;
 import javax.persistence.PersistenceException;
+
 import me.egg82.antivpn.storage.models.BaseModel;
 import me.egg82.antivpn.storage.models.DataModel;
 import me.egg82.antivpn.storage.models.IPModel;
@@ -233,16 +235,16 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         queueLock.readLock().lock();
         try {
             DataModel model = new QDataModel(connection)
-                .key.equalTo(key)
-                .findOne();
+                    .key.equalTo(key)
+                    .findOne();
             if (model == null) {
                 model = new DataModel();
                 model.setKey(key);
                 model.setValue(value);
                 connection.save(model);
                 model = new QDataModel(connection)
-                    .key.equalTo(key)
-                    .findOne();
+                        .key.equalTo(key)
+                        .findOne();
                 if (model == null) {
                     throw new PersistenceException("findOne() returned null after saving.");
                 }
@@ -262,8 +264,8 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         queueLock.readLock().lock();
         try {
             return new QDataModel(connection)
-                .key.equalTo(key)
-                .findOne();
+                    .key.equalTo(key)
+                    .findOne();
         } finally {
             queueLock.readLock().unlock();
         }
@@ -273,8 +275,8 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         queueLock.readLock().lock();
         try {
             return new QDataModel(connection)
-                .id.equalTo(dataId)
-                .findOne();
+                    .id.equalTo(dataId)
+                    .findOne();
         } finally {
             queueLock.readLock().unlock();
         }
@@ -437,8 +439,8 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
             }
         } else if (model instanceof DataModel) {
             DataModel m = new QDataModel(connection)
-                .key.equalTo(((DataModel) model).getKey())
-                .findOne();
+                    .key.equalTo(((DataModel) model).getKey())
+                    .findOne();
             if (m == null) {
                 m = (DataModel) duplicateModel(model, keepModified);
                 if (m == null) {

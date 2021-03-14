@@ -34,11 +34,15 @@ public class AntiVPNCommands extends CommandHolder {
         String[] baseAliases = getAliases(config, "base");
 
         commands.add(
-            commandManager.commandBuilder("antivpn", baseAliases)
-                .literal("reload", LocalizedArgumentDescription.of(BukkitLocaleCommandUtil.getConsole().getLocalizationManager(), MessageKey.COMMAND_DESC__RELOAD), getAliases(config, "reload")) // TODO: Localization
-                .permission(ConfigUtil.getCachedConfig().getAdminPermissionNode())
-                .handler(new ReloadCommand(commandManager, plugin.getDataFolder(), plugin))
-                .build()
+                commandManager.commandBuilder("antivpn", baseAliases)
+                        .literal(
+                                "reload",
+                                LocalizedArgumentDescription.of(BukkitLocaleCommandUtil.getConsole().getLocalizationManager(), MessageKey.COMMAND_DESC__RELOAD),
+                                getAliases(config, "reload")
+                        ) // TODO: Localization
+                        .permission(ConfigUtil.getCachedConfig().getAdminPermissionNode())
+                        .handler(new ReloadCommand(commandManager, plugin.getDataFolder(), plugin))
+                        .build()
         );
 
         // TODO: Commands + argument suggestions
@@ -55,13 +59,13 @@ public class AntiVPNCommands extends CommandHolder {
         );*/
 
         commands.add(
-            commandManager.commandBuilder("antivpn", baseAliases)
-                .literal("kick", LocalizedArgumentDescription.of(MessageKey.COMMAND_DESC__KICK), getAliases(config, "kick")) // TODO: Localization
-                .permission(ConfigUtil.getCachedConfig().getAdminPermissionNode())
-                .argument(SinglePlayerSelectorArgument.of("player"), ArgumentDescription.of("<player>")) // TODO: Localization
-                .argument(EnumArgument.newBuilder(KickType.class, "type"), ArgumentDescription.of("[type]")) // TODO: Localization
-                .handler(new KickCommand(commandManager, plugin))
-                .build()
+                commandManager.commandBuilder("antivpn", baseAliases)
+                        .literal("kick", LocalizedArgumentDescription.of(MessageKey.COMMAND_DESC__KICK), getAliases(config, "kick")) // TODO: Localization
+                        .permission(ConfigUtil.getCachedConfig().getAdminPermissionNode())
+                        .argument(SinglePlayerSelectorArgument.of("player"), ArgumentDescription.of("<player>")) // TODO: Localization
+                        .argument(EnumArgument.newBuilder(KickType.class, "type"), ArgumentDescription.of("[type]")) // TODO: Localization
+                        .handler(new KickCommand(commandManager, plugin))
+                        .build()
         );
 
         /*commands.add(
@@ -92,16 +96,20 @@ public class AntiVPNCommands extends CommandHolder {
         );*/
 
         MinecraftHelp<BukkitLocalizedCommandSender> help = new MinecraftHelp<>(
-            "/antivpn help",
-            BukkitLocalizedCommandSender::getMappedAudience,
-            commandManager
+                "/antivpn help",
+                BukkitLocalizedCommandSender::getMappedAudience,
+                commandManager
         );
 
         commandManager.command(
-            commandManager.commandBuilder("antivpn", baseAliases)
-                .literal("help", LocalizedArgumentDescription.of(BukkitLocaleCommandUtil.getConsole().getLocalizationManager(), MessageKey.COMMAND_DESC__HELP), getAliases(config, "help")) // TODO: Localization
-                .argument(StringArgument.optional("query", StringArgument.StringMode.GREEDY))
-                .handler(context -> help.queryCommands(context.getOrDefault("query", ""), context.getSender()))
+                commandManager.commandBuilder("antivpn", baseAliases)
+                        .literal(
+                                "help",
+                                LocalizedArgumentDescription.of(BukkitLocaleCommandUtil.getConsole().getLocalizationManager(), MessageKey.COMMAND_DESC__HELP),
+                                getAliases(config, "help")
+                        ) // TODO: Localization
+                        .argument(StringArgument.optional("query", StringArgument.StringMode.GREEDY))
+                        .handler(context -> help.queryCommands(context.getOrDefault("query", ""), context.getSender()))
         );
 
         registerAll();

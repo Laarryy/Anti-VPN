@@ -25,9 +25,19 @@ public class VPNAPIImpl implements VPNAPI {
     private final EventBus<VPNEvent> eventBus;
 
     private static VPNAPIImpl instance = null;
-    public static @Nullable VPNAPIImpl get() { return instance; }
 
-    public VPNAPIImpl(@NotNull Platform platform, @NotNull AbstractPluginMetadata pluginMetadata, @NotNull AbstractIPManager ipManager, @NotNull AbstractPlayerManager playerManager, @NotNull SourceManagerImpl sourceManager, @NotNull EventBus<VPNEvent> eventBus) {
+    public static @Nullable VPNAPIImpl get() {
+        return instance;
+    }
+
+    public VPNAPIImpl(
+            @NotNull Platform platform,
+            @NotNull AbstractPluginMetadata pluginMetadata,
+            @NotNull AbstractIPManager ipManager,
+            @NotNull AbstractPlayerManager playerManager,
+            @NotNull SourceManagerImpl sourceManager,
+            @NotNull EventBus<VPNEvent> eventBus
+    ) {
         this.platform = platform;
         this.pluginMetadata = pluginMetadata;
 
@@ -39,19 +49,35 @@ public class VPNAPIImpl implements VPNAPI {
         instance = this;
     }
 
-    public @NotNull UUID getServerId() { return ConfigUtil.getCachedConfig().getServerId(); }
+    public @NotNull UUID getServerId() {
+        return ConfigUtil.getCachedConfig().getServerId();
+    }
 
-    public @NotNull AbstractIPManager getIPManager() { return ipManager; }
+    public @NotNull AbstractIPManager getIPManager() {
+        return ipManager;
+    }
 
-    public @NotNull AbstractPlayerManager getPlayerManager() { return playerManager; }
+    public @NotNull AbstractPlayerManager getPlayerManager() {
+        return playerManager;
+    }
 
-    public @NotNull SourceManagerImpl getSourceManager() { return sourceManager; }
+    public @NotNull SourceManagerImpl getSourceManager() {
+        return sourceManager;
+    }
 
-    public @NotNull Platform getPlatform() { return platform; }
+    public @NotNull Platform getPlatform() {
+        return platform;
+    }
 
-    public @NotNull AbstractPluginMetadata getPluginMetadata() { return pluginMetadata; }
+    public @NotNull AbstractPluginMetadata getPluginMetadata() {
+        return pluginMetadata;
+    }
 
-    public @NotNull CompletableFuture<Void> runUpdateTask() { return CompletableFuture.runAsync(PacketUtil::trySendQueue); }
+    public @NotNull CompletableFuture<Void> runUpdateTask() {
+        return CompletableFuture.runAsync(PacketUtil::trySendQueue);
+    }
 
-    public @NotNull EventBus<VPNEvent> getEventBus() { return eventBus; }
+    public @NotNull EventBus<VPNEvent> getEventBus() {
+        return eventBus;
+    }
 }

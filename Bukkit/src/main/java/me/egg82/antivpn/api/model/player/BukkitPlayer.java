@@ -9,9 +9,15 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 public class BukkitPlayer extends AbstractPlayer {
-    public BukkitPlayer(@NotNull UUID uuid, boolean mcleaks) { this(uuid, null, mcleaks); }
+    public BukkitPlayer(@NotNull UUID uuid, boolean mcleaks) {
+        this(uuid, null, mcleaks);
+    }
 
-    public BukkitPlayer(@NotNull UUID uuid, @Nullable String name, boolean mcleaks) { super(uuid, name, mcleaks); }
+    public BukkitPlayer(@NotNull UUID uuid, @Nullable String name, boolean mcleaks) {
+        super(uuid, name, mcleaks);
+    }
 
-    protected @NotNull CompletableFuture<@NotNull String> fetchName(@NotNull UUID uuid) { return PlayerLookup.get(uuid).thenApply(PlayerInfo::getName); }
+    protected @NotNull CompletableFuture<@NotNull String> fetchName(@NotNull UUID uuid) {
+        return PlayerLookup.get(uuid).thenApply(PlayerInfo::getName);
+    }
 }

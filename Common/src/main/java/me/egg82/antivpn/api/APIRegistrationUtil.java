@@ -27,7 +27,8 @@ public class APIRegistrationUtil {
         }
     }
 
-    private APIRegistrationUtil() { }
+    private APIRegistrationUtil() {
+    }
 
     public static void register(@NotNull VPNAPI api) {
         try {

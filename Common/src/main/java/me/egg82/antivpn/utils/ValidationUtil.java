@@ -2,7 +2,9 @@ package me.egg82.antivpn.utils;
 
 import inet.ipaddr.AddressStringException;
 import inet.ipaddr.IPAddressString;
+
 import java.util.regex.Pattern;
+
 import org.jetbrains.annotations.Nullable;
 
 public class ValidationUtil {
@@ -14,7 +16,8 @@ public class ValidationUtil {
      */
     private static final Pattern uuidValidator = Pattern.compile("^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$", Pattern.CASE_INSENSITIVE);
 
-    private ValidationUtil() { }
+    private ValidationUtil() {
+    }
 
     public static boolean isValidIpRange(@Nullable String range) {
         if (range == null || range.isEmpty()) {
@@ -22,7 +25,9 @@ public class ValidationUtil {
         }
         try {
             return new IPAddressString(range).toAddress().isMultiple();
-        } catch (AddressStringException ignored) { return false; }
+        } catch (AddressStringException ignored) {
+            return false;
+        }
     }
 
     public static boolean isValidIp(@Nullable String ip) {
@@ -31,7 +36,9 @@ public class ValidationUtil {
         }
         try {
             return !new IPAddressString(ip).toAddress().isMultiple();
-        } catch (AddressStringException ignored) { return false; }
+        } catch (AddressStringException ignored) {
+            return false;
+        }
     }
 
     public static boolean isValidUuid(@Nullable String uuid) {

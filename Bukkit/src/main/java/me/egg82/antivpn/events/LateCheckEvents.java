@@ -27,23 +27,24 @@ public class LateCheckEvents extends EventHolder {
         this.plugin = plugin;
 
         events.add(
-            BukkitEvents.subscribe(plugin, PlayerLoginEvent.class, EventPriority.LOWEST)
-                .filter(e -> LuckPermsHook.get() == null && (VaultHook.get() == null || VaultHook.get().getPermission() == null)) // Player has already been processed
-                .filter(e -> {
-                    if (Bukkit.hasWhitelist() && !e.getPlayer().isWhitelisted()) {
-                        if (ConfigUtil.getDebugOrFalse()) {
-                            BukkitLocaleCommandUtil.getConsole().sendMessage(
-                                MessageKey.DEBUG__NOT_WHITELISTED,
-                                "{name}", e.getPlayer().getName(),
-                                "{uuid}", e.getPlayer().getUniqueId().toString()
-                            );
-                        }
-                        return false;
-                    }
-                    return true;
-                })
-                .handler(this::checkPerms)
-                .exceptionHandler(ex -> logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex))
+                BukkitEvents.subscribe(plugin, PlayerLoginEvent.class, EventPriority.LOWEST)
+                        .filter(e -> LuckPermsHook.get() == null && (VaultHook.get() == null || VaultHook.get()
+                                .getPermission() == null)) // Player has already been processed
+                        .filter(e -> {
+                            if (Bukkit.hasWhitelist() && !e.getPlayer().isWhitelisted()) {
+                                if (ConfigUtil.getDebugOrFalse()) {
+                                    BukkitLocaleCommandUtil.getConsole().sendMessage(
+                                            MessageKey.DEBUG__NOT_WHITELISTED,
+                                            "{name}", e.getPlayer().getName(),
+                                            "{uuid}", e.getPlayer().getUniqueId().toString()
+                                    );
+                                }
+                                return false;
+                            }
+                            return true;
+                        })
+                        .handler(this::checkPerms)
+                        .exceptionHandler(ex -> logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex))
         );
     }
 
@@ -60,9 +61,9 @@ public class LateCheckEvents extends EventHolder {
         if (hasBypassPermission) {
             if (ConfigUtil.getDebugOrFalse()) {
                 BukkitLocaleCommandUtil.getConsole().sendMessage(
-                    MessageKey.DEBUG__BYPASS_CHECK,
-                    "{name}", event.getPlayer().getName(),
-                    "{uuid}", event.getPlayer().getUniqueId().toString()
+                        MessageKey.DEBUG__BYPASS_CHECK,
+                        "{name}", event.getPlayer().getName(),
+                        "{uuid}", event.getPlayer().getUniqueId().toString()
                 );
             }
             return;
@@ -75,7 +76,12 @@ public class LateCheckEvents extends EventHolder {
         if (isVpn(ip, event.getPlayer().getName(), event.getPlayer().getUniqueId())) {
             BStatsHook.incrementBlockedVPNs();
             IPManager ipManager = VPNAPIProvider.getInstance().getIPManager();
-            BukkitCommandUtil.dispatchCommands(ipManager.getVpnCommands(event.getPlayer().getName(), event.getPlayer().getUniqueId(), ip), Bukkit.getConsoleSender(), plugin, event.isAsynchronous());
+            BukkitCommandUtil.dispatchCommands(
+                    ipManager.getVpnCommands(event.getPlayer().getName(), event.getPlayer().getUniqueId(), ip),
+                    Bukkit.getConsoleSender(),
+                    plugin,
+                    event.isAsynchronous()
+            );
             Component kickMessage = ipManager.getVpnKickMessage(event.getPlayer().getName(), event.getPlayer().getUniqueId(), ip);
             if (kickMessage != null) {
                 event.setResult(PlayerLoginEvent.Result.KICK_OTHER);
@@ -90,7 +96,12 @@ public class LateCheckEvents extends EventHolder {
         if (isMcLeaks(event.getPlayer().getName(), event.getPlayer().getUniqueId())) {
             BStatsHook.incrementBlockedMCLeaks();
             PlayerManager playerManager = VPNAPIProvider.getInstance().getPlayerManager();
-            BukkitCommandUtil.dispatchCommands(playerManager.getMcLeaksCommands(event.getPlayer().getName(), event.getPlayer().getUniqueId(), ip), Bukkit.getConsoleSender(), plugin, event.isAsynchronous());
+            BukkitCommandUtil.dispatchCommands(
+                    playerManager.getMcLeaksCommands(event.getPlayer().getName(), event.getPlayer().getUniqueId(), ip),
+                    Bukkit.getConsoleSender(),
+                    plugin,
+                    event.isAsynchronous()
+            );
             Component kickMessage = playerManager.getMcLeaksKickMessage(event.getPlayer().getName(), event.getPlayer().getUniqueId(), ip);
             if (kickMessage != null) {
                 event.setResult(PlayerLoginEvent.Result.KICK_OTHER);

@@ -11,7 +11,7 @@ public class APIDisableEventImpl extends AbstractEvent implements APIDisableEven
 
     public String toString() {
         return "APIDisableEventImpl{" +
-            "api=" + api +
-            '}';
+                "api=" + api +
+                '}';
     }
 }

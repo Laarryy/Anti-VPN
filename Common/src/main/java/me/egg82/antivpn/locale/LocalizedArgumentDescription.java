@@ -1,7 +1,9 @@
 package me.egg82.antivpn.locale;
 
 import cloud.commandframework.ArgumentDescription;
+
 import java.util.Map;
+
 import org.jetbrains.annotations.NotNull;
 
 public class LocalizedArgumentDescription implements ArgumentDescription {
@@ -43,7 +45,11 @@ public class LocalizedArgumentDescription implements ArgumentDescription {
         this.description = localizationManager.getText(key, placeholders);
     }
 
-    public @NotNull String getDescription() { return description; }
+    public @NotNull String getDescription() {
+        return description;
+    }
 
-    public boolean isEmpty() { return false; }
+    public boolean isEmpty() {
+        return false;
+    }
 }

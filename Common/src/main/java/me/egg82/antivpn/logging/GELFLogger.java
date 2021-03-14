@@ -12,17 +12,29 @@ public class GELFLogger implements Logger {
         this.impl = impl;
     }
 
-    public String getName() { return impl.getName(); }
+    public String getName() {
+        return impl.getName();
+    }
 
-    public boolean isTraceEnabled() { return impl.isTraceEnabled(); }
+    public boolean isTraceEnabled() {
+        return impl.isTraceEnabled();
+    }
 
-    public void trace(String msg) { impl.trace(msg); }
+    public void trace(String msg) {
+        impl.trace(msg);
+    }
 
-    public void trace(String format, Object arg) { impl.trace(format, arg); }
+    public void trace(String format, Object arg) {
+        impl.trace(format, arg);
+    }
 
-    public void trace(String format, Object arg1, Object arg2) { impl.trace(format, arg1, arg2); }
+    public void trace(String format, Object arg1, Object arg2) {
+        impl.trace(format, arg1, arg2);
+    }
 
-    public void trace(String format, Object... arguments) { impl.trace(format, arguments); }
+    public void trace(String format, Object... arguments) {
+        impl.trace(format, arguments);
+    }
 
     public void trace(String msg, Throwable t) {
         if (ConfigUtil.getDebugOrFalse()) {
@@ -35,15 +47,25 @@ public class GELFLogger implements Logger {
         }
     }
 
-    public boolean isTraceEnabled(Marker marker) { return impl.isTraceEnabled(marker); }
+    public boolean isTraceEnabled(Marker marker) {
+        return impl.isTraceEnabled(marker);
+    }
 
-    public void trace(Marker marker, String msg) { impl.trace(marker, msg); }
+    public void trace(Marker marker, String msg) {
+        impl.trace(marker, msg);
+    }
 
-    public void trace(Marker marker, String format, Object arg) { impl.trace(marker, format, arg); }
+    public void trace(Marker marker, String format, Object arg) {
+        impl.trace(marker, format, arg);
+    }
 
-    public void trace(Marker marker, String format, Object arg1, Object arg2) { impl.trace(marker, format, arg1, arg2); }
+    public void trace(Marker marker, String format, Object arg1, Object arg2) {
+        impl.trace(marker, format, arg1, arg2);
+    }
 
-    public void trace(Marker marker, String format, Object... argArray) { impl.trace(marker, format, argArray); }
+    public void trace(Marker marker, String format, Object... argArray) {
+        impl.trace(marker, format, argArray);
+    }
 
     public void trace(Marker marker, String msg, Throwable t) {
         if (ConfigUtil.getDebugOrFalse()) {
@@ -56,15 +78,25 @@ public class GELFLogger implements Logger {
         }
     }
 
-    public boolean isDebugEnabled() { return impl.isDebugEnabled(); }
+    public boolean isDebugEnabled() {
+        return impl.isDebugEnabled();
+    }
 
-    public void debug(String msg) { impl.debug(msg); }
+    public void debug(String msg) {
+        impl.debug(msg);
+    }
 
-    public void debug(String format, Object arg) { impl.debug(format, arg); }
+    public void debug(String format, Object arg) {
+        impl.debug(format, arg);
+    }
 
-    public void debug(String format, Object arg1, Object arg2) { impl.debug(format, arg1, arg2); }
+    public void debug(String format, Object arg1, Object arg2) {
+        impl.debug(format, arg1, arg2);
+    }
 
-    public void debug(String format, Object... arguments) { impl.debug(format, arguments); }
+    public void debug(String format, Object... arguments) {
+        impl.debug(format, arguments);
+    }
 
     public void debug(String msg, Throwable t) {
         if (ConfigUtil.getDebugOrFalse()) {
@@ -77,15 +109,25 @@ public class GELFLogger implements Logger {
         }
     }
 
-    public boolean isDebugEnabled(Marker marker) { return impl.isDebugEnabled(marker); }
+    public boolean isDebugEnabled(Marker marker) {
+        return impl.isDebugEnabled(marker);
+    }
 
-    public void debug(Marker marker, String msg) { impl.debug(marker, msg); }
+    public void debug(Marker marker, String msg) {
+        impl.debug(marker, msg);
+    }
 
-    public void debug(Marker marker, String format, Object arg) { impl.debug(marker, format, arg); }
+    public void debug(Marker marker, String format, Object arg) {
+        impl.debug(marker, format, arg);
+    }
 
-    public void debug(Marker marker, String format, Object arg1, Object arg2) { impl.debug(marker, format, arg1, arg2); }
+    public void debug(Marker marker, String format, Object arg1, Object arg2) {
+        impl.debug(marker, format, arg1, arg2);
+    }
 
-    public void debug(Marker marker, String format, Object... arguments) { impl.debug(marker, format, arguments); }
+    public void debug(Marker marker, String format, Object... arguments) {
+        impl.debug(marker, format, arguments);
+    }
 
     public void debug(Marker marker, String msg, Throwable t) {
         if (ConfigUtil.getDebugOrFalse()) {
@@ -98,15 +140,25 @@ public class GELFLogger implements Logger {
         }
     }
 
-    public boolean isInfoEnabled() { return impl.isInfoEnabled(); }
+    public boolean isInfoEnabled() {
+        return impl.isInfoEnabled();
+    }
 
-    public void info(String msg) { impl.info(msg); }
+    public void info(String msg) {
+        impl.info(msg);
+    }
 
-    public void info(String format, Object arg) { impl.info(format, arg); }
+    public void info(String format, Object arg) {
+        impl.info(format, arg);
+    }
 
-    public void info(String format, Object arg1, Object arg2) { impl.info(format, arg1, arg2); }
+    public void info(String format, Object arg1, Object arg2) {
+        impl.info(format, arg1, arg2);
+    }
 
-    public void info(String format, Object... arguments) { impl.info(format, arguments); }
+    public void info(String format, Object... arguments) {
+        impl.info(format, arguments);
+    }
 
     public void info(String msg, Throwable t) {
         if (ConfigUtil.getDebugOrFalse()) {
@@ -119,15 +171,25 @@ public class GELFLogger implements Logger {
         }
     }
 
-    public boolean isInfoEnabled(Marker marker) { return impl.isInfoEnabled(marker); }
+    public boolean isInfoEnabled(Marker marker) {
+        return impl.isInfoEnabled(marker);
+    }
 
-    public void info(Marker marker, String msg) { impl.info(marker, msg); }
+    public void info(Marker marker, String msg) {
+        impl.info(marker, msg);
+    }
 
-    public void info(Marker marker, String format, Object arg) { impl.info(marker, format, arg); }
+    public void info(Marker marker, String format, Object arg) {
+        impl.info(marker, format, arg);
+    }
 
-    public void info(Marker marker, String format, Object arg1, Object arg2) { impl.info(marker, format, arg1, arg2); }
+    public void info(Marker marker, String format, Object arg1, Object arg2) {
+        impl.info(marker, format, arg1, arg2);
+    }
 
-    public void info(Marker marker, String format, Object... arguments) { impl.info(marker, format, arguments); }
+    public void info(Marker marker, String format, Object... arguments) {
+        impl.info(marker, format, arguments);
+    }
 
     public void info(Marker marker, String msg, Throwable t) {
         if (ConfigUtil.getDebugOrFalse()) {
@@ -140,7 +202,9 @@ public class GELFLogger implements Logger {
         }
     }
 
-    public boolean isWarnEnabled() { return impl.isWarnEnabled(); }
+    public boolean isWarnEnabled() {
+        return impl.isWarnEnabled();
+    }
 
     public void warn(String msg) {
         impl.warn(msg);
@@ -181,7 +245,9 @@ public class GELFLogger implements Logger {
         }
     }
 
-    public boolean isWarnEnabled(Marker marker) { return impl.isWarnEnabled(marker); }
+    public boolean isWarnEnabled(Marker marker) {
+        return impl.isWarnEnabled(marker);
+    }
 
     public void warn(Marker marker, String msg) {
         impl.warn(marker, msg);
@@ -222,7 +288,9 @@ public class GELFLogger implements Logger {
         }
     }
 
-    public boolean isErrorEnabled() { return impl.isErrorEnabled(); }
+    public boolean isErrorEnabled() {
+        return impl.isErrorEnabled();
+    }
 
     public void error(String msg) {
         impl.error(msg);
@@ -263,7 +331,9 @@ public class GELFLogger implements Logger {
         }
     }
 
-    public boolean isErrorEnabled(Marker marker) { return impl.isErrorEnabled(marker); }
+    public boolean isErrorEnabled(Marker marker) {
+        return impl.isErrorEnabled(marker);
+    }
 
     public void error(Marker marker, String msg) {
         impl.error(marker, msg);

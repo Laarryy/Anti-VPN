@@ -10,28 +10,47 @@ public class ProxyCheckModel implements SourceModel {
     private String message = null;
     private ProxyCheckModel.IP ip = null;
 
-    public ProxyCheckModel() { }
+    public ProxyCheckModel() {
+    }
 
-    public @Nullable String getStatus() { return status; }
+    public @Nullable String getStatus() {
+        return status;
+    }
 
-    public void setStatus(@Nullable String status) { this.status = status; }
+    public void setStatus(@Nullable String status) {
+        this.status = status;
+    }
 
-    public @Nullable String getMessage() { return message; }
+    public @Nullable String getMessage() {
+        return message;
+    }
 
-    public void setMessage(@Nullable String message) { this.message = message; }
+    public void setMessage(@Nullable String message) {
+        this.message = message;
+    }
 
-    public @Nullable IP getIp() { return ip; }
+    public @Nullable IP getIp() {
+        return ip;
+    }
 
-    public void setIp(@Nullable IP ip) { this.ip = ip; }
+    public void setIp(@Nullable IP ip) {
+        this.ip = ip;
+    }
 
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof ProxyCheckModel)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof ProxyCheckModel)) {
+            return false;
+        }
         ProxyCheckModel that = (ProxyCheckModel) o;
         return Objects.equals(status, that.status) && Objects.equals(message, that.message) && Objects.equals(ip, that.ip);
     }
 
-    public int hashCode() { return Objects.hash(status, message, ip); }
+    public int hashCode() {
+        return Objects.hash(status, message, ip);
+    }
 
     public String toString() {
         return "ProxyCheckModel{" +
@@ -45,24 +64,39 @@ public class ProxyCheckModel implements SourceModel {
         private String proxy = null;
         private String type = null;
 
-        public IP() { }
+        public IP() {
+        }
 
-        public @Nullable String getProxy() { return proxy; }
+        public @Nullable String getProxy() {
+            return proxy;
+        }
 
-        public void setProxy(@Nullable String proxy) { this.proxy = proxy; }
+        public void setProxy(@Nullable String proxy) {
+            this.proxy = proxy;
+        }
 
-        public @Nullable String getType() { return type; }
+        public @Nullable String getType() {
+            return type;
+        }
 
-        public void setType(@Nullable String type) { this.type = type; }
+        public void setType(@Nullable String type) {
+            this.type = type;
+        }
 
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (!(o instanceof IP)) return false;
+            if (this == o) {
+                return true;
+            }
+            if (!(o instanceof IP)) {
+                return false;
+            }
             IP ip = (IP) o;
             return Objects.equals(proxy, ip.proxy) && Objects.equals(type, ip.type);
         }
 
-        public int hashCode() { return Objects.hash(proxy, type); }
+        public int hashCode() {
+            return Objects.hash(proxy, type);
+        }
 
         public String toString() {
             return "IP{" +

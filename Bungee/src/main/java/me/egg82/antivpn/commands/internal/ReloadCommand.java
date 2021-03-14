@@ -55,7 +55,12 @@ public class ReloadCommand extends AbstractCommand {
         I18NManager.clearCaches();
 
         BungeeIPManager ipManager = new BungeeIPManager(sourceManager, cachedConfig.getCacheTime().getTime(), cachedConfig.getCacheTime().getUnit());
-        BungeePlayerManager playerManager = new BungeePlayerManager(cachedConfig.getThreads(), cachedConfig.getMcLeaksKey(), cachedConfig.getCacheTime().getTime(), cachedConfig.getCacheTime().getUnit());
+        BungeePlayerManager playerManager = new BungeePlayerManager(
+                cachedConfig.getThreads(),
+                cachedConfig.getMcLeaksKey(),
+                cachedConfig.getCacheTime().getTime(),
+                cachedConfig.getCacheTime().getUnit()
+        );
         VPNAPI api = VPNAPIProvider.getInstance();
         api.getEventBus().post(new APIReloadEventImpl(api, ipManager, playerManager, sourceManager)).now();
         api = new VPNAPIImpl(api.getPlatform(), api.getPluginMetadata(), ipManager, playerManager, sourceManager, cachedConfig, api.getEventBus());

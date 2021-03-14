@@ -2,9 +2,11 @@ package me.egg82.antivpn.storage;
 
 import com.zaxxer.hikari.HikariConfig;
 import io.ebean.config.dbplatform.mariadb.MariaDbPlatform;
+
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.Properties;
+
 import org.jetbrains.annotations.NotNull;
 
 public class MariaDBStorageService extends AbstractJDBCStorageService {
@@ -12,7 +14,9 @@ public class MariaDBStorageService extends AbstractJDBCStorageService {
         super(name);
     }
 
-    public static @NotNull Builder builder(@NotNull String name) { return new MariaDBStorageService.Builder(name); }
+    public static @NotNull Builder builder(@NotNull String name) {
+        return new MariaDBStorageService.Builder(name);
+    }
 
     public static class Builder {
         private final MariaDBStorageService service;

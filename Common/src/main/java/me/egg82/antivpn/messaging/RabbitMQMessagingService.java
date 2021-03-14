@@ -2,6 +2,7 @@ package me.egg82.antivpn.messaging;
 
 import com.rabbitmq.client.*;
 import io.netty.buffer.ByteBuf;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
@@ -10,6 +11,7 @@ import java.util.UUID;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+
 import me.egg82.antivpn.config.ConfigUtil;
 import me.egg82.antivpn.locale.LocaleUtil;
 import me.egg82.antivpn.locale.MessageKey;
@@ -42,15 +44,20 @@ public class RabbitMQMessagingService extends AbstractMessagingService {
             closed = true;
             try {
                 connection.close(8000);
-            } catch (IOException ignored) { }
+            } catch (IOException ignored) {
+            }
         } finally {
             queueLock.writeLock().unlock();
         }
     }
 
-    public boolean isClosed() { return closed || !connection.isOpen(); }
+    public boolean isClosed() {
+        return closed || !connection.isOpen();
+    }
 
-    public static @NotNull Builder builder(@NotNull String name, @NotNull UUID serverId, @NotNull MessagingHandler handler, @NotNull File packetDirectory) { return new Builder(name, serverId, handler, packetDirectory); }
+    public static @NotNull Builder builder(@NotNull String name, @NotNull UUID serverId, @NotNull MessagingHandler handler, @NotNull File packetDirectory) {
+        return new Builder(name, serverId, handler, packetDirectory);
+    }
 
     public static class Builder {
         private final RabbitMQMessagingService service;
@@ -108,7 +115,7 @@ public class RabbitMQMessagingService extends AbstractMessagingService {
 
     private void bind() throws IOException {
         RecoverableChannel channel = getChannel();
-        channel.exchangeDeclare(EXCHANGE_NAME,  ExchangeType.FANOUT.getType(), true);
+        channel.exchangeDeclare(EXCHANGE_NAME, ExchangeType.FANOUT.getType(), true);
         String queue = channel.queueDeclare().getQueue();
         channel.queueBind(queue, EXCHANGE_NAME, "");
         Consumer consumer = new DefaultConsumer(channel) {
@@ -124,7 +131,10 @@ public class RabbitMQMessagingService extends AbstractMessagingService {
 
                 byte packetVersion = CollectionProvider.getServerVersions().getOrDefault(sender, (byte) -1);
                 if (packetVersion > -1 && packetVersion != Packet.VERSION) {
-                    logger.warn("Server " + sender + " packet version " + String.format("0x%02X ", packetVersion) + " does not match current packet version " + String.format("0x%02X ", Packet.VERSION) + ". Skipping packet.");
+                    logger.warn("Server " + sender + " packet version " + String.format(
+                            "0x%02X ",
+                            packetVersion
+                    ) + " does not match current packet version " + String.format("0x%02X ", Packet.VERSION) + ". Skipping packet.");
                     return;
                 }
 
@@ -148,7 +158,10 @@ public class RabbitMQMessagingService extends AbstractMessagingService {
                         }
                     } catch (Exception ex) {
                         Class<? extends Packet> clazz = PacketManager.getPacket(packetId);
-                        logger.error(LocaleUtil.getDefaultI18N().getText(MessageKey.ERROR__MESSAGING__BAD_PACKET, "{name}", clazz != null ? clazz.getName() : "null"), ex);
+                        logger.error(
+                                LocaleUtil.getDefaultI18N().getText(MessageKey.ERROR__MESSAGING__BAD_PACKET, "{name}", clazz != null ? clazz.getName() : "null"),
+                                ex
+                        );
                         return;
                     }
 
@@ -234,9 +247,13 @@ public class RabbitMQMessagingService extends AbstractMessagingService {
         return sender;
     }
 
-    private @NotNull RecoverableConnection getConnection() throws IOException, TimeoutException { return (RecoverableConnection) factory.newConnection(); }
+    private @NotNull RecoverableConnection getConnection() throws IOException, TimeoutException {
+        return (RecoverableConnection) factory.newConnection();
+    }
 
-    private @NotNull RecoverableChannel getChannel() throws IOException { return (RecoverableChannel) connection.createChannel(); }
+    private @NotNull RecoverableChannel getChannel() throws IOException {
+        return (RecoverableChannel) connection.createChannel();
+    }
 
     private enum DeliveryMode {
         /**
@@ -249,8 +266,14 @@ public class RabbitMQMessagingService extends AbstractMessagingService {
         PERSISTENT(2);
 
         private final int mode;
-        DeliveryMode(int mode) { this.mode = mode; }
-        public int getMode() { return mode; }
+
+        DeliveryMode(int mode) {
+            this.mode = mode;
+        }
+
+        public int getMode() {
+            return mode;
+        }
     }
 
     private enum ExchangeType {
@@ -260,7 +283,13 @@ public class RabbitMQMessagingService extends AbstractMessagingService {
         HEADERS("match"); // AMQP compatibility
 
         private final String type;
-        ExchangeType(@NotNull String type) { this.type = type; }
-        public @NotNull String getType() { return type; }
+
+        ExchangeType(@NotNull String type) {
+            this.type = type;
+        }
+
+        public @NotNull String getType() {
+            return type;
+        }
     }
 }

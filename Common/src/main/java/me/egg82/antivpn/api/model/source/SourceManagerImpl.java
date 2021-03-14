@@ -53,7 +53,8 @@ public class SourceManagerImpl implements SourceManager {
                 if (event.isCancelled()) {
                     return false;
                 }
-            } catch (IllegalStateException ignored) { }
+            } catch (IllegalStateException ignored) {
+            }
 
             sources.add(index, source);
             return true;
@@ -62,7 +63,7 @@ public class SourceManagerImpl implements SourceManager {
 
     public boolean deregisterSource(@NotNull Source<? extends SourceModel> source) {
         synchronized (sourceLock) {
-            for (Iterator<Source<? extends SourceModel>> i = sources.iterator(); i.hasNext();) {
+            for (Iterator<Source<? extends SourceModel>> i = sources.iterator(); i.hasNext(); ) {
                 Source<? extends SourceModel> s = i.next();
                 if (s.getName().equals(source.getName())) {
                     try {
@@ -73,7 +74,8 @@ public class SourceManagerImpl implements SourceManager {
                         if (event.isCancelled()) {
                             return false;
                         }
-                    } catch (IllegalStateException ignored) { }
+                    } catch (IllegalStateException ignored) {
+                    }
 
                     i.remove();
                     return true;
@@ -83,5 +85,7 @@ public class SourceManagerImpl implements SourceManager {
         }
     }
 
-    public @NotNull List<@NotNull Source<? extends SourceModel>> getSources() { return ImmutableList.copyOf(sources); }
+    public @NotNull List<@NotNull Source<? extends SourceModel>> getSources() {
+        return ImmutableList.copyOf(sources);
+    }
 }

@@ -1,10 +1,12 @@
 package me.egg82.antivpn.config;
 
 import com.google.common.io.Files;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+
 import me.egg82.antivpn.utils.TimeUtil;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.configurate.CommentedConfigurationNode;
@@ -12,9 +14,14 @@ import org.spongepowered.configurate.loader.ConfigurationLoader;
 import org.spongepowered.configurate.serialize.SerializationException;
 
 public class ConfigurationVersionUtil {
-    private ConfigurationVersionUtil() { }
+    private ConfigurationVersionUtil() {
+    }
 
-    public static void conformVersion(@NotNull ConfigurationLoader<CommentedConfigurationNode> loader, @NotNull CommentedConfigurationNode config, @NotNull File fileOnDisk) throws IOException {
+    public static void conformVersion(
+            @NotNull ConfigurationLoader<CommentedConfigurationNode> loader,
+            @NotNull CommentedConfigurationNode config,
+            @NotNull File fileOnDisk
+    ) throws IOException {
         double oldVersion = config.node("version").getDouble(1.0d);
 
         if (config.node("version").getDouble(1.0d) == 1.0d) {
@@ -415,7 +422,8 @@ public class ConfigurationVersionUtil {
         config.node("storage", "engines", "mysql", "connection", "prefix").set(storagePrefix);
         config.node("storage", "engines", "mysql", "connection", "username").set(storageUser);
         config.node("storage", "engines", "mysql", "connection", "password").set(storagePass);
-        config.node("storage", "engines", "mysql", "connection", "options").set("useSSL=" + storageSSL + "&useUnicode=" + storageUnicode + "&characterEncoding=" + storageEncoding);
+        config.node("storage", "engines", "mysql", "connection", "options")
+                .set("useSSL=" + storageSSL + "&useUnicode=" + storageUnicode + "&characterEncoding=" + storageEncoding);
         config.node("storage", "engines", "redis", "enabled").set(Boolean.FALSE);
         config.node("storage", "engines", "redis", "connection", "address").set("127.0.0.1:6379");
         config.node("storage", "engines", "redis", "connection", "password").set("");
@@ -555,7 +563,7 @@ public class ConfigurationVersionUtil {
         added.add("192.168.0.0/16");
         added.add("fd00::/8");
 
-        for (Iterator<String> i = added.iterator(); i.hasNext();) {
+        for (Iterator<String> i = added.iterator(); i.hasNext(); ) {
             String ip = i.next();
             for (String ip2 : ignoredIPs) {
                 if (ip.equalsIgnoreCase(ip2)) { // IPs are case-insensitive when loaded
@@ -599,8 +607,10 @@ public class ConfigurationVersionUtil {
         config.node("storage", "order").setList(String.class, newStorageOrder);
 
         // Make storage->settings->max-lifetime/timeout more readable
-        config.node("storage", "settings", "max-lifetime").set(TimeUtil.getTimeString(new TimeUtil.Time((config.node("storage", "settings", "max-lifetime").getLong(1800000L) / 1000L) / 60L, TimeUnit.MINUTES)));
-        config.node("storage", "settings", "timeout").set(TimeUtil.getTimeString(new TimeUtil.Time(config.node("storage", "settings", "timeout").getLong(5000L) / 1000L, TimeUnit.SECONDS)));
+        config.node("storage", "settings", "max-lifetime")
+                .set(TimeUtil.getTimeString(new TimeUtil.Time((config.node("storage", "settings", "max-lifetime").getLong(1800000L) / 1000L) / 60L, TimeUnit.MINUTES)));
+        config.node("storage", "settings", "timeout")
+                .set(TimeUtil.getTimeString(new TimeUtil.Time(config.node("storage", "settings", "timeout").getLong(5000L) / 1000L, TimeUnit.SECONDS)));
 
         // Remove storage->engines->name->connection->prefix
         config.node("storage", "engines", "engine1", "connection").removeChild("prefix");
@@ -618,11 +628,14 @@ public class ConfigurationVersionUtil {
         config.node("messaging").removeChild("order");
 
         // Make messaging->settings->max-lifetime/timeout more readable
-        config.node("messaging", "settings", "max-lifetime").set(TimeUtil.getTimeString(new TimeUtil.Time((config.node("messaging", "settings", "max-lifetime").getLong(1800000L) / 1000L) / 60L, TimeUnit.MINUTES)));
-        config.node("messaging", "settings", "timeout").set(TimeUtil.getTimeString(new TimeUtil.Time(config.node("messaging", "settings", "timeout").getLong(5000L) / 1000L, TimeUnit.SECONDS)));
+        config.node("messaging", "settings", "max-lifetime")
+                .set(TimeUtil.getTimeString(new TimeUtil.Time((config.node("messaging", "settings", "max-lifetime").getLong(1800000L) / 1000L) / 60L, TimeUnit.MINUTES)));
+        config.node("messaging", "settings", "timeout")
+                .set(TimeUtil.getTimeString(new TimeUtil.Time(config.node("messaging", "settings", "timeout").getLong(5000L) / 1000L, TimeUnit.SECONDS)));
 
         // Make connection->timeout more readable
-        config.node("connection", "timeout").set(TimeUtil.getTimeString(new TimeUtil.Time(config.node("connection", "timeout").getLong(5000L) / 1000L, TimeUnit.SECONDS)));
+        config.node("connection", "timeout")
+                .set(TimeUtil.getTimeString(new TimeUtil.Time(config.node("connection", "timeout").getLong(5000L) / 1000L, TimeUnit.SECONDS)));
 
         // Add ipinfo
         config.node("sources", "ipinfo", "enabled").set(Boolean.FALSE);
@@ -676,10 +689,14 @@ public class ConfigurationVersionUtil {
         }
 
         // Update action->vpn/mcleaks->kick-message to use minimessage format
-        if (config.node("action", "vpn", "kick-message").getString("&cPlease disconnect from your proxy or VPN before re-joining!").equalsIgnoreCase("&cPlease disconnect from your proxy or VPN before re-joining!")) {
+        if (config.node("action", "vpn", "kick-message")
+                .getString("&cPlease disconnect from your proxy or VPN before re-joining!")
+                .equalsIgnoreCase("&cPlease disconnect from your proxy or VPN before re-joining!")) {
             config.node("action", "vpn", "kick-message").set("<red>Please disconnect from your proxy or VPN before re-joining!</red>");
         }
-        if (config.node("action", "mcleaks", "kick-message").getString("&cPlease discontinue your use of an MCLeaks account!").equalsIgnoreCase("&cPlease discontinue your use of an MCLeaks account!")) {
+        if (config.node("action", "mcleaks", "kick-message")
+                .getString("&cPlease discontinue your use of an MCLeaks account!")
+                .equalsIgnoreCase("&cPlease discontinue your use of an MCLeaks account!")) {
             config.node("action", "mcleaks", "kick-message").set("<red>Please discontinue your use of an MCLeaks account!</red>");
         }
 

@@ -11,7 +11,7 @@ public class APILoadedEventImpl extends AbstractEvent implements APILoadedEvent 
 
     public String toString() {
         return "APILoadedEventImpl{" +
-            "api=" + api +
-            '}';
+                "api=" + api +
+                '}';
     }
 }

@@ -1,7 +1,9 @@
 package me.egg82.antivpn.messaging;
 
 import io.netty.buffer.ByteBuf;
+
 import java.util.UUID;
+
 import me.egg82.antivpn.messaging.packets.Packet;
 import org.jetbrains.annotations.NotNull;
 

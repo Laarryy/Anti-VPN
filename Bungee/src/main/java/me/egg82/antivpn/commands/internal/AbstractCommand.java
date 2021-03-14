@@ -19,5 +19,7 @@ public abstract class AbstractCommand implements Runnable {
         this.issuer = issuer;
     }
 
-    protected @NotNull CompletableFuture<UUID> fetchUuid(@NotNull String name) { return PlayerLookup.get(name).thenApply(PlayerInfo::getUUID); }
+    protected @NotNull CompletableFuture<UUID> fetchUuid(@NotNull String name) {
+        return PlayerLookup.get(name).thenApply(PlayerInfo::getUUID);
+    }
 }

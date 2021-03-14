@@ -5,6 +5,7 @@ import com.github.luben.zstd.ZstdException;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.PooledByteBufAllocator;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -16,6 +17,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+
 import me.egg82.antivpn.config.ConfigUtil;
 import me.egg82.antivpn.locale.LocaleUtil;
 import me.egg82.antivpn.locale.MessageKey;
@@ -54,7 +56,9 @@ public abstract class AbstractMessagingService implements MessagingService {
         this.receivedPacketDirectory = new File(packetDirectory, "received");
     }
 
-    public @NotNull String getName() { return name; }
+    public @NotNull String getName() {
+        return name;
+    }
 
     private static final double TOLERANCE = 1.1; // Compression ratio tolerance. Determines when compression should happen
 

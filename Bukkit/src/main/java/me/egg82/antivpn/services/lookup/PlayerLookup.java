@@ -8,7 +8,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
 public class PlayerLookup {
-    private PlayerLookup() { }
+    private PlayerLookup() {
+    }
 
     private static final boolean HAS_PLAYERPROFILE_API;
 

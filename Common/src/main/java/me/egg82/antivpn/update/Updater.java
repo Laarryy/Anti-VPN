@@ -1,6 +1,7 @@
 package me.egg82.antivpn.update;
 
 import java.util.concurrent.CompletableFuture;
+
 import org.jetbrains.annotations.NotNull;
 
 public interface Updater {

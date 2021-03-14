@@ -66,12 +66,17 @@ public class BukkitPlayerManager extends AbstractPlayerManager {
             return false;
         }
 
-        BukkitCommandUtil.dispatchCommands(BukkitTailorUtil.tailorCommands(cachedConfig.getMCLeaksActionCommands(), playerName, playerUuid, ip), Bukkit.getConsoleSender(), plugin);
+        BukkitCommandUtil.dispatchCommands(
+                BukkitTailorUtil.tailorCommands(cachedConfig.getMCLeaksActionCommands(), playerName, playerUuid, ip),
+                Bukkit.getConsoleSender(),
+                plugin
+        );
         if (!cachedConfig.getMCLeaksKickMessage().isEmpty()) {
             if (BukkitCapabilities.HAS_ADVENTURE) {
                 p.kick(BukkitTailorUtil.tailorKickMessage(cachedConfig.getMCLeaksKickMessage(), playerName, playerUuid, ip));
             } else {
-                p.kickPlayer(BukkitComponentSerializer.legacy().serialize(BukkitTailorUtil.tailorKickMessage(cachedConfig.getMCLeaksKickMessage(), playerName, playerUuid, ip)));
+                p.kickPlayer(BukkitComponentSerializer.legacy()
+                                     .serialize(BukkitTailorUtil.tailorKickMessage(cachedConfig.getMCLeaksKickMessage(), playerName, playerUuid, ip)));
             }
         }
         return true;

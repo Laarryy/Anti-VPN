@@ -12,9 +12,13 @@ import java.net.HttpURLConnection;
 import java.util.concurrent.CompletableFuture;
 
 public class IPHub extends AbstractSource<IPHubModel> {
-    public @NotNull String getName() { return "iphub"; }
+    public @NotNull String getName() {
+        return "iphub";
+    }
 
-    public boolean isKeyRequired() { return true; }
+    public boolean isKeyRequired() {
+        return true;
+    }
 
     public IPHub() {
         super(IPHubModel.class);

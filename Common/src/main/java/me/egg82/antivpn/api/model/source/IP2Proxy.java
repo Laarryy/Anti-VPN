@@ -12,9 +12,13 @@ import java.net.HttpURLConnection;
 import java.util.concurrent.CompletableFuture;
 
 public class IP2Proxy extends AbstractSource<IP2ProxyModel> {
-    public @NotNull String getName() { return "ip2proxy"; }
+    public @NotNull String getName() {
+        return "ip2proxy";
+    }
 
-    public boolean isKeyRequired() { return true; }
+    public boolean isKeyRequired() {
+        return true;
+    }
 
     public IP2Proxy() {
         super(IP2ProxyModel.class);

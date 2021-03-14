@@ -11,9 +11,13 @@ import java.net.HttpURLConnection;
 import java.util.concurrent.CompletableFuture;
 
 public class IPTrooper extends AbstractSource<IPTrooperModel> {
-    public @NotNull String getName() { return "iptrooper"; }
+    public @NotNull String getName() {
+        return "iptrooper";
+    }
 
-    public boolean isKeyRequired() { return false; }
+    public boolean isKeyRequired() {
+        return false;
+    }
 
     public IPTrooper() {
         super(IPTrooperModel.class);

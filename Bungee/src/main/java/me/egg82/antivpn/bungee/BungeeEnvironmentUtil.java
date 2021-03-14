@@ -3,10 +3,14 @@ package me.egg82.antivpn.bungee;
 import org.jetbrains.annotations.NotNull;
 
 public class BungeeEnvironmentUtil {
-    private BungeeEnvironmentUtil() { }
+    private BungeeEnvironmentUtil() {
+    }
 
     private static Environment environemnt;
-    public static @NotNull Environment getEnvironment() { return environemnt; }
+
+    public static @NotNull Environment getEnvironment() {
+        return environemnt;
+    }
 
     static {
         try {

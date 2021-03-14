@@ -9,9 +9,13 @@ import java.io.IOException;
 import java.util.UUID;
 
 public class BukkitPlayerInfo extends MojangPlayerInfo {
-    BukkitPlayerInfo(@NotNull UUID uuid) throws IOException { super(uuid); }
+    BukkitPlayerInfo(@NotNull UUID uuid) throws IOException {
+        super(uuid);
+    }
 
-    BukkitPlayerInfo(@NotNull String name) throws IOException { super(name); }
+    BukkitPlayerInfo(@NotNull String name) throws IOException {
+        super(name);
+    }
 
     protected @Nullable String nameExpensive(@NotNull UUID uuid) throws IOException {
         // Currently-online lookup

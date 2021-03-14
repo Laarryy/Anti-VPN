@@ -3,10 +3,12 @@ package me.egg82.antivpn.api.model.ip;
 import com.google.common.collect.ImmutableList;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+
 import me.egg82.antivpn.api.model.source.SourceManager;
 import me.egg82.antivpn.config.CachedConfig;
 import me.egg82.antivpn.config.ConfigUtil;
@@ -36,7 +38,9 @@ public class VelocityIPManager extends AbstractIPManager {
             proxy.getCommandManager().executeImmediatelyAsync(proxy.getConsoleCommandSource(), command);
         }
         if (!cachedConfig.getVPNKickMessage().isEmpty()) {
-            p.get().disconnect(LegacyComponentSerializer.legacyAmpersand().deserialize(VelocityTailorUtil.tailorKickMessage(cachedConfig.getVPNKickMessage(), playerName, playerUuid, ip)));
+            p.get()
+                    .disconnect(LegacyComponentSerializer.legacyAmpersand()
+                                        .deserialize(VelocityTailorUtil.tailorKickMessage(cachedConfig.getVPNKickMessage(), playerName, playerUuid, ip)));
         }
         return true;
     }

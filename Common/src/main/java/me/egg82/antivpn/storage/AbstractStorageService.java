@@ -2,6 +2,7 @@ package me.egg82.antivpn.storage;
 
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+
 import me.egg82.antivpn.logging.GELFLogger;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -16,10 +17,14 @@ public abstract class AbstractStorageService implements StorageService {
 
     protected final String name;
 
-    public @NotNull String getName() { return name; }
+    public @NotNull String getName() {
+        return name;
+    }
 
     protected volatile boolean closed = false;
     protected final ReadWriteLock queueLock = new ReentrantReadWriteLock();
 
-    public boolean isClosed() { return closed; }
+    public boolean isClosed() {
+        return closed;
+    }
 }

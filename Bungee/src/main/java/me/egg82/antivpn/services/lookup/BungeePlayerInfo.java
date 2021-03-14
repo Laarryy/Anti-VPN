@@ -38,6 +38,7 @@ public class BungeePlayerInfo implements PlayerInfo {
     private static final Object propertiesCacheLock = new Object();
 
     private static final Map<String, String> headers = new HashMap<>();
+
     static {
         headers.put("Accept", "application/json");
         headers.put("Accept-Language", "en-US,en;q=0.8");
@@ -105,11 +106,17 @@ public class BungeePlayerInfo implements PlayerInfo {
         }
     }
 
-    public @NotNull UUID getUUID() { return uuid; }
+    public @NotNull UUID getUUID() {
+        return uuid;
+    }
 
-    public @NotNull String getName() { return name; }
+    public @NotNull String getName() {
+        return name;
+    }
 
-    public @NotNull ImmutableList<ProfileModel.ProfilePropertyModel> getProperties() { return ImmutableList.copyOf(properties); }
+    public @NotNull ImmutableList<ProfileModel.ProfilePropertyModel> getProperties() {
+        return ImmutableList.copyOf(properties);
+    }
 
     private static @Nullable String nameExpensive(@NotNull UUID uuid) throws IOException {
         // Currently-online lookup
@@ -122,7 +129,12 @@ public class BungeePlayerInfo implements PlayerInfo {
         }
 
         // Network lookup
-        HttpURLConnection conn = WebRequest.builder(new URL("https://api.mojang.com/user/profiles/" + uuid.toString().replace("-", "") + "/names")).timeout(new TimeUtil.Time(2500L, TimeUnit.MILLISECONDS)).userAgent("egg82/PlayerInfo").header("Accept", "application/json").build().getConnection();
+        HttpURLConnection conn = WebRequest.builder(new URL("https://api.mojang.com/user/profiles/" + uuid.toString().replace("-", "") + "/names"))
+                .timeout(new TimeUtil.Time(2500L, TimeUnit.MILLISECONDS))
+                .userAgent("egg82/PlayerInfo")
+                .header("Accept", "application/json")
+                .build()
+                .getConnection();
         int status = conn.getResponseCode();
 
         if (status == 204) {
@@ -154,7 +166,12 @@ public class BungeePlayerInfo implements PlayerInfo {
         }
 
         // Network lookup
-        HttpURLConnection conn = WebRequest.builder(new URL("https://api.mojang.com/users/profiles/minecraft/" + WebRequest.urlEncode(name))).timeout(new TimeUtil.Time(2500L, TimeUnit.MILLISECONDS)).userAgent("egg82/PlayerInfo").header("Accept", "application/json").build().getConnection();
+        HttpURLConnection conn = WebRequest.builder(new URL("https://api.mojang.com/users/profiles/minecraft/" + WebRequest.urlEncode(name)))
+                .timeout(new TimeUtil.Time(2500L, TimeUnit.MILLISECONDS))
+                .userAgent("egg82/PlayerInfo")
+                .header("Accept", "application/json")
+                .build()
+                .getConnection();
         int status = conn.getResponseCode();
 
         if (status == 204) {
@@ -176,7 +193,13 @@ public class BungeePlayerInfo implements PlayerInfo {
 
     private static @Nullable List<ProfileModel.ProfilePropertyModel> propertiesExpensive(@NotNull UUID uuid) throws IOException {
         // Network lookup
-        HttpURLConnection conn = WebRequest.builder(new URL("https://sessionserver.mojang.com/session/minecraft/profile/" + uuid.toString().replace("-", "") + "?unsigned=false")).timeout(new TimeUtil.Time(2500L, TimeUnit.MILLISECONDS)).userAgent("egg82/PlayerInfo").header("Accept", "application/json").build().getConnection();
+        HttpURLConnection conn = WebRequest.builder(new URL("https://sessionserver.mojang.com/session/minecraft/profile/" + uuid.toString()
+                .replace("-", "") + "?unsigned=false"))
+                .timeout(new TimeUtil.Time(2500L, TimeUnit.MILLISECONDS))
+                .userAgent("egg82/PlayerInfo")
+                .header("Accept", "application/json")
+                .build()
+                .getConnection();
         int status = conn.getResponseCode();
 
         if (status == 204) {

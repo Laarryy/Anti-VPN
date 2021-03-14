@@ -28,7 +28,8 @@ public class PacketUtil {
 
     private static ExecutorService workPool = Executors.newFixedThreadPool(4, new ThreadFactoryBuilder().setNameFormat("Anti-VPN_Messaging_%d").build());
 
-    private PacketUtil() { }
+    private PacketUtil() {
+    }
 
     public static void setPoolSize(int size) {
         workPool.shutdown();
@@ -63,7 +64,9 @@ public class PacketUtil {
         requiresSending.set(true);
     }
 
-    public static void repeatPacket(@NotNull UUID messageId, @NotNull Packet packet, @NotNull String fromService) { sendPacket(messageId, packet, fromService); }
+    public static void repeatPacket(@NotNull UUID messageId, @NotNull Packet packet, @NotNull String fromService) {
+        sendPacket(messageId, packet, fromService);
+    }
 
     public static void trySendQueue() {
         if (!requiresSending.compareAndSet(true, false)) {

@@ -47,11 +47,16 @@ public abstract class AbstractIPManager implements IPManager {
     protected AbstractIPManager(@NotNull SourceManager sourceManager, @NotNull TimeUtil.Time cacheTime) {
         this.sourceManager = sourceManager;
 
-        ipCache = Caffeine.newBuilder().expireAfterAccess(cacheTime.getTime(), cacheTime.getUnit()).expireAfterWrite(cacheTime.getTime(), cacheTime.getUnit()).build(k -> calculateIpResult(k.getT1(), k.getT2(), true));
+        ipCache = Caffeine.newBuilder()
+                .expireAfterAccess(cacheTime.getTime(), cacheTime.getUnit())
+                .expireAfterWrite(cacheTime.getTime(), cacheTime.getUnit())
+                .build(k -> calculateIpResult(k.getT1(), k.getT2(), true));
         sourceInvalidationCache = Caffeine.newBuilder().expireAfterWrite(1L, TimeUnit.MINUTES).build(k -> Boolean.FALSE);
     }
 
-    public LoadingCache<Pair<String, AlgorithmMethod>, IPModel> getIpCache() { return ipCache; }
+    public LoadingCache<Pair<String, AlgorithmMethod>, IPModel> getIpCache() {
+        return ipCache;
+    }
 
     public @NotNull CompletableFuture<@Nullable IP> getIP(@NotNull String ip) {
         return CompletableFuture.supplyAsync(() -> {
@@ -130,7 +135,9 @@ public abstract class AbstractIPManager implements IPManager {
         });
     }
 
-    public @NotNull AlgorithmMethod getCurrentAlgorithmMethod() { return ConfigUtil.getCachedConfig().getVPNAlgorithmMethod(); }
+    public @NotNull AlgorithmMethod getCurrentAlgorithmMethod() {
+        return ConfigUtil.getCachedConfig().getVPNAlgorithmMethod();
+    }
 
     public @NotNull CompletableFuture<@NotNull Boolean> cascade(@NotNull String ip, boolean useCache) {
         return CompletableFuture.supplyAsync(() -> {
@@ -182,7 +189,9 @@ public abstract class AbstractIPManager implements IPManager {
         });
     }
 
-    public double getMinConsensusValue() { return ConfigUtil.getCachedConfig().getVPNAlgorithmConsensus(); }
+    public double getMinConsensusValue() {
+        return ConfigUtil.getCachedConfig().getVPNAlgorithmConsensus();
+    }
 
     private @NotNull IPModel calculateIpResult(@NotNull String ip, @NotNull AlgorithmMethod method, boolean useCache) throws APIException {
         CachedConfig cachedConfig = ConfigUtil.getCachedConfig();

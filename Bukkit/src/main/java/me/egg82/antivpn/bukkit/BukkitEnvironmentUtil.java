@@ -3,10 +3,14 @@ package me.egg82.antivpn.bukkit;
 import org.jetbrains.annotations.NotNull;
 
 public class BukkitEnvironmentUtil {
-    private BukkitEnvironmentUtil() { }
+    private BukkitEnvironmentUtil() {
+    }
 
     private static Environment environment;
-    public static @NotNull Environment getEnvironment() { return environment; }
+
+    public static @NotNull Environment getEnvironment() {
+        return environment;
+    }
 
     static {
         try {

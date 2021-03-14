@@ -12,9 +12,13 @@ import java.net.HttpURLConnection;
 import java.util.concurrent.CompletableFuture;
 
 public class IPHunter extends AbstractSource<IPHunterModel> {
-    public @NotNull String getName() { return "iphunter"; }
+    public @NotNull String getName() {
+        return "iphunter";
+    }
 
-    public boolean isKeyRequired() { return true; }
+    public boolean isKeyRequired() {
+        return true;
+    }
 
     public IPHunter() {
         super(IPHunterModel.class);
@@ -23,7 +27,10 @@ public class IPHunter extends AbstractSource<IPHunterModel> {
     public @NotNull CompletableFuture<@NotNull Boolean> getResult(@NotNull String ip) {
         return getRawResponse(ip).thenApply(model -> {
             if (!"success".equalsIgnoreCase(model.getStatus())) {
-                throw new APIException(model.getCode() != null && model.getCode().contains("X-Key"), "Could not get result from " + getName() + " (" + model.getCode() + ")");
+                throw new APIException(
+                        model.getCode() != null && model.getCode().contains("X-Key"),
+                        "Could not get result from " + getName() + " (" + model.getCode() + ")"
+                );
             }
 
             return model.getData() != null && (model.getData().getBlock() == getSourceConfigNode().node("block").getInt(1));

@@ -3,6 +3,7 @@ package me.egg82.antivpn.messaging;
 import java.io.*;
 import java.nio.file.Files;
 import java.util.UUID;
+
 import me.egg82.antivpn.locale.LocaleUtil;
 import me.egg82.antivpn.locale.MessageKey;
 import me.egg82.antivpn.logging.GELFLogger;
@@ -14,7 +15,8 @@ import org.slf4j.LoggerFactory;
 public class ServerIDUtil {
     private static final Logger logger = new GELFLogger(LoggerFactory.getLogger(ServerIDUtil.class));
 
-    private ServerIDUtil() { }
+    private ServerIDUtil() {
+    }
 
     public static @NotNull UUID getId(@NotNull File idFile) {
         UUID retVal;
@@ -54,7 +56,8 @@ public class ServerIDUtil {
 
         try {
             return UUID.fromString(retVal);
-        } catch (IllegalArgumentException ignored) { }
+        } catch (IllegalArgumentException ignored) {
+        }
 
         return null;
     }

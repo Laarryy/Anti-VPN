@@ -104,5 +104,7 @@ public enum MessageKey {
 
     private final String key = name().toLowerCase().replace("__", ".");
 
-    public @NotNull String getKey() { return key; }
+    public @NotNull String getKey() {
+        return key;
+    }
 }

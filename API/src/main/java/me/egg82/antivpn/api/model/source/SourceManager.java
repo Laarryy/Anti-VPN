@@ -27,7 +27,9 @@ public interface SourceManager {
      * Gets a source.
      *
      * @param name the name of the source to get
+     *
      * @return a {@link Source} object, if one matching the name is available, or null if not
+     *
      * @throws NullPointerException if the name is null
      */
     @Nullable Source<? extends SourceModel> getSource(@NotNull String name);
@@ -37,7 +39,9 @@ public interface SourceManager {
      *
      * @param name the name of the source to get
      * @param modelClass the class of the model to return
+     *
      * @return a {@link Source} object, if one matching the name is available, or null if not
+     *
      * @throws NullPointerException if the name or model is null
      * @throws ClassCastException is the modelClass is incorrect for this source
      */
@@ -52,7 +56,9 @@ public interface SourceManager {
      * the same name was not registered.</p>
      *
      * @param newSource The new source to replace an existing source with
+     *
      * @return true if the replacement was successful, false if not
+     *
      * @throws NullPointerException if the new source is null
      */
     default boolean replaceSource(@NotNull Source<? extends SourceModel> newSource) {
@@ -81,10 +87,14 @@ public interface SourceManager {
      * the same name as an existing source is being added.</p>
      *
      * @param source The new, unique source to add
+     *
      * @return true if the addition was successful, false if not
+     *
      * @throws NullPointerException if the source is null
      */
-    default boolean registerSource(@NotNull Source<? extends SourceModel> source) { return registerSource(source, getSources().size()); }
+    default boolean registerSource(@NotNull Source<? extends SourceModel> source) {
+        return registerSource(source, getSources().size());
+    }
 
     /**
      * Registers and enables a new, unique {@link Source}, inserting
@@ -95,7 +105,9 @@ public interface SourceManager {
      * the same name as an existing source is being added.</p>
      *
      * @param source The new, unique source to add
+     *
      * @return true if the addition was successful, false if not
+     *
      * @throws NullPointerException if the source is null
      */
     boolean registerSource(@NotNull Source<? extends SourceModel> source, int index);
@@ -108,7 +120,9 @@ public interface SourceManager {
      * was not registered.</p>
      *
      * @param source The source to remove
+     *
      * @return true if the removal was successful, false if not
+     *
      * @throws NullPointerException if the source is null
      */
     boolean deregisterSource(@NotNull Source<? extends SourceModel> source);
@@ -121,7 +135,9 @@ public interface SourceManager {
      * was not registered.</p>
      *
      * @param sourceName The source to remove
+     *
      * @return true if the removal was successful, false if not
+     *
      * @throws NullPointerException if the source name is null
      */
     default boolean deregisterSource(@NotNull String sourceName) {

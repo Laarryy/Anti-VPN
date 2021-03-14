@@ -16,12 +16,17 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Teoh extends AbstractSource<TeohModel> {
-    public @NotNull String getName() { return "teoh"; }
+    public @NotNull String getName() {
+        return "teoh";
+    }
 
-    public boolean isKeyRequired() { return false; }
+    public boolean isKeyRequired() {
+        return false;
+    }
 
     private static final AtomicInteger requests = new AtomicInteger(0);
-    private static final ScheduledExecutorService threadPool = Executors.newSingleThreadScheduledExecutor(new ThreadFactoryBuilder().setNameFormat("Anti-VPN_TeohAPI_%d").build());
+    private static final ScheduledExecutorService threadPool = Executors.newSingleThreadScheduledExecutor(new ThreadFactoryBuilder().setNameFormat("Anti-VPN_TeohAPI_%d")
+                                                                                                                  .build());
 
     static {
         threadPool.scheduleAtFixedRate(() -> requests.set(0), 0L, 24L, TimeUnit.HOURS);

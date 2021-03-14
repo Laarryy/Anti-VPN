@@ -9,6 +9,7 @@ import com.velocitypowered.api.plugin.PluginManager;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.scheduler.ScheduledTask;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
@@ -16,6 +17,7 @@ import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
+
 import me.egg82.antivpn.api.APIRegistrationUtil;
 import me.egg82.antivpn.api.VPNAPI;
 import me.egg82.antivpn.api.VPNAPIImpl;
@@ -84,10 +86,14 @@ public class AntiVPN {
         this.description = description;
     }
 
-    public void onLoad() { }
+    public void onLoad() {
+    }
 
     public void onEnable() {
-        GameAnalyticsErrorHandler.open(ServerIDUtil.getId(new File(new File(description.getSource().get().getParent().toFile(), description.getName().get()), "stats-id.txt")), description.getVersion().get(), proxy.getVersion().getVersion());
+        GameAnalyticsErrorHandler.open(ServerIDUtil.getId(new File(
+                new File(description.getSource().get().getParent().toFile(), description.getName().get()),
+                "stats-id.txt"
+        )), description.getVersion().get(), proxy.getVersion().getVersion());
 
         commandManager = new VelocityCommandManager(proxy, plugin);
         commandManager.enableUnstableAPI("help");
@@ -110,11 +116,11 @@ public class AntiVPN {
 
         consoleCommandIssuer.sendInfo(MessageKey.GENERAL__ENABLED);
         consoleCommandIssuer.sendInfo(MessageKey.GENERAL__LOAD,
-            "{version}", description.getVersion().get(),
-            "{apiversion}", VPNAPIProvider.getInstance().getPluginMetadata().getApiVersion(),
-            "{commands}", String.valueOf(commandManager.getRegisteredRootCommands().size()),
-            "{events}", String.valueOf(numEvents),
-            "{tasks}", String.valueOf(tasks.size())
+                                      "{version}", description.getVersion().get(),
+                                      "{apiversion}", VPNAPIProvider.getInstance().getPluginMetadata().getApiVersion(),
+                                      "{commands}", String.valueOf(commandManager.getRegisteredRootCommands().size()),
+                                      "{events}", String.valueOf(numEvents),
+                                      "{tasks}", String.valueOf(tasks.size())
         );
     }
 
@@ -156,7 +162,10 @@ public class AntiVPN {
 
         try {
             for (Locale locale : Locale.getAvailableLocales()) {
-                Optional<File> localeFile = LanguageFileUtil.getLanguage(new File(description.getSource().get().getParent().toFile(), description.getName().get()), locale);
+                Optional<File> localeFile = LanguageFileUtil.getLanguage(
+                        new File(description.getSource().get().getParent().toFile(), description.getName().get()),
+                        locale
+                );
                 if (localeFile.isPresent()) {
                     commandManager.addSupportedLanguage(locale);
                     loadYamlLanguageFile(locales, localeFile.get(), locale);
@@ -177,7 +186,18 @@ public class AntiVPN {
 
     private void setChatColors() {
         commandManager.setFormat(MessageType.ERROR, TextColor.DARK_RED, TextColor.YELLOW, TextColor.AQUA, TextColor.WHITE);
-        commandManager.setFormat(MessageType.INFO, TextColor.WHITE, TextColor.YELLOW, TextColor.AQUA, TextColor.GREEN, TextColor.RED, TextColor.GOLD, TextColor.BLUE, TextColor.GRAY, TextColor.DARK_RED);
+        commandManager.setFormat(
+                MessageType.INFO,
+                TextColor.WHITE,
+                TextColor.YELLOW,
+                TextColor.AQUA,
+                TextColor.GREEN,
+                TextColor.RED,
+                TextColor.GOLD,
+                TextColor.BLUE,
+                TextColor.GRAY,
+                TextColor.DARK_RED
+        );
     }
 
     private void loadServices() {
@@ -186,12 +206,23 @@ public class AntiVPN {
         MessagingHandler messagingHandler = new MessagingHandlerImpl();
         ServiceLocator.register(messagingHandler);
 
-        ConfigurationFileUtil.reloadConfig(new File(description.getSource().get().getParent().toFile(), description.getName().get()), consoleCommandIssuer, messagingHandler, sourceManager);
+        ConfigurationFileUtil.reloadConfig(
+                new File(description.getSource().get().getParent().toFile(), description.getName().get()),
+                consoleCommandIssuer,
+                messagingHandler,
+                sourceManager
+        );
 
         CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
 
         VelocityIPManager ipManager = new VelocityIPManager(proxy, sourceManager, cachedConfig.getCacheTime().getTime(), cachedConfig.getCacheTime().getUnit());
-        VelocityPlayerManager playerManager = new VelocityPlayerManager(proxy, cachedConfig.getThreads(), cachedConfig.getMcLeaksKey(), cachedConfig.getCacheTime().getTime(), cachedConfig.getCacheTime().getUnit());
+        VelocityPlayerManager playerManager = new VelocityPlayerManager(
+                proxy,
+                cachedConfig.getThreads(),
+                cachedConfig.getMcLeaksKey(),
+                cachedConfig.getCacheTime().getTime(),
+                cachedConfig.getCacheTime().getUnit()
+        );
         Platform platform = new VelocityPlatform(System.currentTimeMillis());
         PluginMetadata metadata = new VelocityPluginMetadata(proxy.getVersion().getVersion());
         VPNAPI api = new VPNAPIImpl(platform, metadata, ipManager, playerManager, sourceManager, cachedConfig, new MBassador<>(new GenericPublicationErrorHandler()));
@@ -339,9 +370,13 @@ public class AntiVPN {
 
     private static final AtomicLong blockedMCLeaks = new AtomicLong(0L);
 
-    public static void incrementBlockedVPNs() { blockedVPNs.getAndIncrement(); }
+    public static void incrementBlockedVPNs() {
+        blockedVPNs.getAndIncrement();
+    }
 
-    public static void incrementBlockedMCLeaks() { blockedMCLeaks.getAndIncrement(); }
+    public static void incrementBlockedMCLeaks() {
+        blockedMCLeaks.getAndIncrement();
+    }
 
     private void unloadHooks() {
         Set<? extends PluginHook> hooks = ServiceLocator.remove(PluginHook.class);

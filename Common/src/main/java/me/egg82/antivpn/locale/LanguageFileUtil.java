@@ -4,11 +4,13 @@ import java.io.*;
 import java.nio.file.Files;
 import java.util.Locale;
 import java.util.ResourceBundle;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class LanguageFileUtil {
-    private LanguageFileUtil() { }
+    private LanguageFileUtil() {
+    }
 
     public static @Nullable ResourceBundle getLanguage(@NotNull File dataDirectory, @NotNull Locale locale) throws IOException {
         return getLanguage(dataDirectory, locale, false);
@@ -17,7 +19,9 @@ public class LanguageFileUtil {
     public static @Nullable ResourceBundle getLanguage(@NotNull File dataDirectory, @NotNull Locale locale, boolean ignoreCountry) throws IOException {
         // Build resource path & file path for language
         // Use country is specified (and lang provides country)
-        String resourcePath = ignoreCountry || locale.getCountry() == null || locale.getCountry().isEmpty() ? "lang_" + locale.getLanguage() + ".properties" : "lang_" + locale.getLanguage() + "_" + locale.getCountry() + ".properties";
+        String resourcePath = ignoreCountry || locale.getCountry() == null || locale.getCountry().isEmpty()
+                              ? "lang_" + locale.getLanguage() + ".properties"
+                              : "lang_" + locale.getLanguage() + "_" + locale.getCountry() + ".properties";
         File langDir = new File(dataDirectory, "lang");
         File fileOnDisk = new File(langDir, resourcePath);
 

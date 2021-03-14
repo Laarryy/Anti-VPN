@@ -14,7 +14,9 @@ import java.util.concurrent.TimeUnit;
 public class BukkitUpdater extends AbstractUpdater {
     private final int resourceId;
 
-    public BukkitUpdater(@NotNull Plugin plugin, int resourceId) { this(plugin, resourceId, new TimeUtil.Time(1L, TimeUnit.HOURS)); }
+    public BukkitUpdater(@NotNull Plugin plugin, int resourceId) {
+        this(plugin, resourceId, new TimeUtil.Time(1L, TimeUnit.HOURS));
+    }
 
     public BukkitUpdater(@NotNull Plugin plugin, int resourceId, @NotNull TimeUtil.Time checkDelay) {
         super(plugin.getDescription().getVersion(), checkDelay);
@@ -26,12 +28,14 @@ public class BukkitUpdater extends AbstractUpdater {
 
     protected @NotNull String getNewVersion() throws IOException {
         return WebRequest.builder(new URL("https://api.spigotmc.org/legacy/update.php?resource=" + resourceId))
-            .timeout(new TimeUtil.Time(5000L, TimeUnit.MILLISECONDS))
-            .userAgent("egg82/Updater")
-            .header("Accept", "text/plain")
-            .build()
-            .getString();
+                .timeout(new TimeUtil.Time(5000L, TimeUnit.MILLISECONDS))
+                .userAgent("egg82/Updater")
+                .header("Accept", "text/plain")
+                .build()
+                .getString();
     }
 
-    public @NotNull String getDownloadLink() { return "https://api.spiget.org/v2/resources/" + resourceId + "/versions/latest/download"; }
+    public @NotNull String getDownloadLink() {
+        return "https://api.spiget.org/v2/resources/" + resourceId + "/versions/latest/download";
+    }
 }

@@ -36,7 +36,9 @@ public interface PlayerManager {
      * Gets a player.
      *
      * @param uniqueId the {@link UUID} of the player to get
+     *
      * @return a {@link CompletableFuture} - a {@link Player} object, if one matching the uuid is available, or null if not
+     *
      * @throws NullPointerException if the uuid is null
      */
     @NotNull CompletableFuture<@Nullable Player> getPlayer(@NotNull UUID uniqueId);
@@ -45,7 +47,9 @@ public interface PlayerManager {
      * Gets a player.
      *
      * @param username the username of the player to get
+     *
      * @return a {@link CompletableFuture} - a {@link Player} object, if one matching the name is available, or null if not
+     *
      * @throws NullPointerException if the name is null
      */
     @NotNull CompletableFuture<@Nullable Player> getPlayer(@NotNull String username);
@@ -56,7 +60,9 @@ public interface PlayerManager {
      * <p>You should call this after you make any changes to a player.</p>
      *
      * @param player the player to save
+     *
      * @return a {@link CompletableFuture} to encapsulate the operation.
+     *
      * @throws NullPointerException if player is null
      */
     @NotNull CompletableFuture<Void> savePlayer(@NotNull Player player);
@@ -65,16 +71,22 @@ public interface PlayerManager {
      * Deletes any data about a given player from the system.
      *
      * @param player the {@link Player} object to delete
+     *
      * @return a {@link CompletableFuture} encapsulating the result of the operation
+     *
      * @throws NullPointerException if player is null
      */
-    default @NotNull CompletableFuture<Void> deletePlayer(@NotNull Player player) { return deletePlayer(player.getUuid()); }
+    default @NotNull CompletableFuture<Void> deletePlayer(@NotNull Player player) {
+        return deletePlayer(player.getUuid());
+    }
 
     /**
      * Deletes any data about a given player from the system.
      *
      * @param uniqueId the player's {@link UUID}
+     *
      * @return a {@link CompletableFuture} encapsulating the result of the operation
+     *
      * @throws NullPointerException if the uuid is null
      */
     @NotNull CompletableFuture<Void> deletePlayer(@NotNull UUID uniqueId);
@@ -96,11 +108,15 @@ public interface PlayerManager {
      *
      * @param player The player to test
      * @param useCache true if you would like to use Anti-VPN's internal cache, false if not
+     *
      * @return a {@link CompletableFuture} - true if the API thinks the provided player is an MCLeaks account, false if not
+     *
      * @throws NullPointerException if player is null
      * @throws APIException in the result if a result could not be obtained
      */
-    default @NotNull CompletableFuture<@NotNull Boolean> checkMcLeaks(@NotNull Player player, boolean useCache) { return checkMcLeaks(player.getUuid(), useCache); }
+    default @NotNull CompletableFuture<@NotNull Boolean> checkMcLeaks(@NotNull Player player, boolean useCache) {
+        return checkMcLeaks(player.getUuid(), useCache);
+    }
 
     /**
      * Gets the MCLeaks result from Anti-VPN using the configuration
@@ -112,7 +128,9 @@ public interface PlayerManager {
      *
      * @param uniqueId The player {@link UUID} to test
      * @param useCache true if you would like to use Anti-VPN's internal cache, false if not
+     *
      * @return a {@link CompletableFuture} - true if the API thinks the provided player is an MCLeaks account, false if not
+     *
      * @throws NullPointerException if the uuid is null
      * @throws APIException in the result if a result could not be obtained
      */
@@ -124,10 +142,14 @@ public interface PlayerManager {
      *
      * @param player The {@link Player} to kick
      * @param ip The {@link IP} of the player to kick
+     *
      * @return true if the player was online, false if not
+     *
      * @throws NullPointerException if player is null, player.getName() is null, or ip is null
      */
-    default boolean kickForMcLeaks(@NotNull Player player, @NotNull IP ip) { return kickForMcLeaks(Objects.requireNonNull(player.getName()), player.getUuid(), ip.getIP().getHostAddress()); }
+    default boolean kickForMcLeaks(@NotNull Player player, @NotNull IP ip) {
+        return kickForMcLeaks(Objects.requireNonNull(player.getName()), player.getUuid(), ip.getIP().getHostAddress());
+    }
 
     /**
      * Runs the player through the kick/command procedure
@@ -136,10 +158,14 @@ public interface PlayerManager {
      * @param playerName The player name to kick
      * @param playerUuid The player UUID to kick
      * @param ip The IP of the player to kick
+     *
      * @return true if the player was online, false if not
+     *
      * @throws NullPointerException if playerName, playerUuid, or ip is null
      */
-    default boolean kickForMcLeaks(@NotNull String playerName, @NotNull UUID playerUuid, @NotNull IP ip) { return kickForMcLeaks(playerName, playerUuid, ip.getIP().getHostAddress()); }
+    default boolean kickForMcLeaks(@NotNull String playerName, @NotNull UUID playerUuid, @NotNull IP ip) {
+        return kickForMcLeaks(playerName, playerUuid, ip.getIP().getHostAddress());
+    }
 
     /**
      * Runs the player through the kick/command procedure
@@ -147,10 +173,14 @@ public interface PlayerManager {
      *
      * @param player The {@link Player} to kick
      * @param ip The IP of the player to kick
+     *
      * @return true if the player was online, false if not
+     *
      * @throws NullPointerException if player is null, player.getName() is null, or ip is null
      */
-    default boolean kickForMcLeaks(@NotNull Player player, @NotNull InetAddress ip) { return kickForMcLeaks(Objects.requireNonNull(player.getName()), player.getUuid(), ip.getHostAddress()); }
+    default boolean kickForMcLeaks(@NotNull Player player, @NotNull InetAddress ip) {
+        return kickForMcLeaks(Objects.requireNonNull(player.getName()), player.getUuid(), ip.getHostAddress());
+    }
 
     /**
      * Runs the player through the kick/command procedure
@@ -158,10 +188,14 @@ public interface PlayerManager {
      *
      * @param player The {@link Player} to kick
      * @param ip The IP of the player to kick
+     *
      * @return true if the player was online, false if not
+     *
      * @throws NullPointerException if player is null, player.getName() is null, or ip is null
      */
-    default boolean kickForMcLeaks(@NotNull Player player, @NotNull String ip) { return kickForMcLeaks(Objects.requireNonNull(player.getName()), player.getUuid(), ip); }
+    default boolean kickForMcLeaks(@NotNull Player player, @NotNull String ip) {
+        return kickForMcLeaks(Objects.requireNonNull(player.getName()), player.getUuid(), ip);
+    }
 
     /**
      * Runs the player through the kick/command procedure
@@ -170,10 +204,16 @@ public interface PlayerManager {
      * @param playerName The player name to kick
      * @param playerUuid The player UUID to kick
      * @param ip The IP of the player to kick
+     *
      * @return true if the player was online, false if not
+     *
      * @throws NullPointerException if playerName, playerUuid, or ip is null
      */
-    default boolean kickForMcLeaks(@NotNull String playerName, @NotNull UUID playerUuid, @NotNull InetAddress ip) { return kickForMcLeaks(playerName, playerUuid, ip.getHostAddress()); };
+    default boolean kickForMcLeaks(@NotNull String playerName, @NotNull UUID playerUuid, @NotNull InetAddress ip) {
+        return kickForMcLeaks(playerName, playerUuid, ip.getHostAddress());
+    }
+
+    ;
 
     /**
      * Runs the player through the kick/command procedure
@@ -182,7 +222,9 @@ public interface PlayerManager {
      * @param playerName The player name to kick
      * @param playerUuid The player UUID to kick
      * @param ip The IP of the player to kick
+     *
      * @return true if the player was online, false if not
+     *
      * @throws NullPointerException if playerName, playerUuid, or ip is null
      */
     boolean kickForMcLeaks(@NotNull String playerName, @NotNull UUID playerUuid, @NotNull String ip);
@@ -193,10 +235,14 @@ public interface PlayerManager {
      *
      * @param player The {@link Player} to tailor the message to
      * @param ip The {@link IP} of the player to tailor the message to
+     *
      * @return the MCLeaks kick message, as defined in Anti-VPN's config
+     *
      * @throws NullPointerException if player is null, player.getName() is null, or ip is null
      */
-    default @Nullable Component getMcLeaksKickMessage(@NotNull Player player, @NotNull IP ip) { return getMcLeaksKickMessage(Objects.requireNonNull(player.getName()), player.getUuid(), ip.getIP().getHostAddress()); }
+    default @Nullable Component getMcLeaksKickMessage(@NotNull Player player, @NotNull IP ip) {
+        return getMcLeaksKickMessage(Objects.requireNonNull(player.getName()), player.getUuid(), ip.getIP().getHostAddress());
+    }
 
     /**
      * Returns the MCLeaks kick message as defined
@@ -205,10 +251,14 @@ public interface PlayerManager {
      * @param playerName The player name to tailor the message to
      * @param playerUuid The player UUID to tailor the message to
      * @param ip The IP of the player to tailor the message to
+     *
      * @return the MCLeaks kick message, as defined in Anti-VPN's config
+     *
      * @throws NullPointerException if playerName, playerUuid, or ip is null
      */
-    default @Nullable Component getMcLeaksKickMessage(@NotNull String playerName, @NotNull UUID playerUuid, @NotNull IP ip) { return getMcLeaksKickMessage(playerName, playerUuid, ip.getIP().getHostAddress()); }
+    default @Nullable Component getMcLeaksKickMessage(@NotNull String playerName, @NotNull UUID playerUuid, @NotNull IP ip) {
+        return getMcLeaksKickMessage(playerName, playerUuid, ip.getIP().getHostAddress());
+    }
 
     /**
      * Returns the MCLeaks kick message as defined
@@ -216,10 +266,14 @@ public interface PlayerManager {
      *
      * @param player The {@link Player} to tailor the message to
      * @param ip The IP of the player to tailor the message to
+     *
      * @return the MCLeaks kick message, as defined in Anti-VPN's config
+     *
      * @throws NullPointerException if player is null, player.getName() is null, or ip is null
      */
-    default @Nullable Component getMcLeaksKickMessage(@NotNull Player player, @NotNull InetAddress ip) { return getMcLeaksKickMessage(Objects.requireNonNull(player.getName()), player.getUuid(), ip.getHostAddress()); }
+    default @Nullable Component getMcLeaksKickMessage(@NotNull Player player, @NotNull InetAddress ip) {
+        return getMcLeaksKickMessage(Objects.requireNonNull(player.getName()), player.getUuid(), ip.getHostAddress());
+    }
 
     /**
      * Returns the MCLeaks kick message as defined
@@ -227,10 +281,14 @@ public interface PlayerManager {
      *
      * @param player The {@link Player} to tailor the message to
      * @param ip The IP of the player to tailor the message to
+     *
      * @return the MCLeaks kick message, as defined in Anti-VPN's config
+     *
      * @throws NullPointerException if player is null, player.getName() is null, or ip is null
      */
-    default @Nullable Component getMcLeaksKickMessage(@NotNull Player player, @NotNull String ip) { return getMcLeaksKickMessage(Objects.requireNonNull(player.getName()), player.getUuid(), ip); }
+    default @Nullable Component getMcLeaksKickMessage(@NotNull Player player, @NotNull String ip) {
+        return getMcLeaksKickMessage(Objects.requireNonNull(player.getName()), player.getUuid(), ip);
+    }
 
     /**
      * Returns the MCLeaks kick message as defined
@@ -239,10 +297,14 @@ public interface PlayerManager {
      * @param playerName The player name to tailor the message to
      * @param playerUuid The player UUID to tailor the message to
      * @param ip The IP of the player to tailor the message to
+     *
      * @return the MCLeaks kick message, as defined in Anti-VPN's config
+     *
      * @throws NullPointerException if playerName, playerUuid, or ip is null
      */
-    default @Nullable Component getMcLeaksKickMessage(@NotNull String playerName, @NotNull UUID playerUuid, @NotNull InetAddress ip) { return getMcLeaksKickMessage(playerName, playerUuid, ip.getHostAddress()); }
+    default @Nullable Component getMcLeaksKickMessage(@NotNull String playerName, @NotNull UUID playerUuid, @NotNull InetAddress ip) {
+        return getMcLeaksKickMessage(playerName, playerUuid, ip.getHostAddress());
+    }
 
     /**
      * Returns the MCLeaks kick message as defined
@@ -251,7 +313,9 @@ public interface PlayerManager {
      * @param playerName The player name to tailor the message to
      * @param playerUuid The player UUID to tailor the message to
      * @param ip The IP of the player to tailor the message to
+     *
      * @return the MCLeaks kick message, as defined in Anti-VPN's config
+     *
      * @throws NullPointerException if playerName, playerUuid, or ip is null
      */
     @Nullable Component getMcLeaksKickMessage(@NotNull String playerName, @NotNull UUID playerUuid, @NotNull String ip);
@@ -262,10 +326,14 @@ public interface PlayerManager {
      *
      * @param player The {@link Player} to tailor the commands to
      * @param ip The {@link IP} of the player to tailor the commands to
+     *
      * @return a {@link List} of MCLeaks commands to run, as defined in Anti-VPN's config
+     *
      * @throws NullPointerException if player is null, player.getName() is null, or ip is null
      */
-    default @NotNull List<@NotNull String> getMcLeaksCommands(@NotNull Player player, @NotNull IP ip) { return getMcLeaksCommands(Objects.requireNonNull(player.getName()), player.getUuid(), ip.getIP().getHostAddress()); }
+    default @NotNull List<@NotNull String> getMcLeaksCommands(@NotNull Player player, @NotNull IP ip) {
+        return getMcLeaksCommands(Objects.requireNonNull(player.getName()), player.getUuid(), ip.getIP().getHostAddress());
+    }
 
     /**
      * Returns the MCLeaks commands as defined
@@ -274,10 +342,14 @@ public interface PlayerManager {
      * @param playerName The player name to tailor the commands to
      * @param playerUuid The player UUID to tailor the commands to
      * @param ip The IP of the player to tailor the commands to
+     *
      * @return a {@link List} of MCLeaks commands to run, as defined in Anti-VPN's config
+     *
      * @throws NullPointerException if playerName, playerUuid, or ip is null
      */
-    default @NotNull List<@NotNull String> getMcLeaksCommands(@NotNull String playerName, @NotNull UUID playerUuid, @NotNull IP ip) { return getMcLeaksCommands(playerName, playerUuid, ip.getIP().getHostAddress()); }
+    default @NotNull List<@NotNull String> getMcLeaksCommands(@NotNull String playerName, @NotNull UUID playerUuid, @NotNull IP ip) {
+        return getMcLeaksCommands(playerName, playerUuid, ip.getIP().getHostAddress());
+    }
 
     /**
      * Returns the MCLeaks commands as defined
@@ -285,10 +357,14 @@ public interface PlayerManager {
      *
      * @param player The {@link Player} to tailor the commands to
      * @param ip The IP of the player to tailor the commands to
+     *
      * @return a {@link List} of MCLeaks commands to run, as defined in Anti-VPN's config
+     *
      * @throws NullPointerException if player is null, player.getName() is null, or ip is null
      */
-    default @NotNull List<@NotNull String> getMcLeaksCommands(@NotNull Player player, @NotNull InetAddress ip) { return getMcLeaksCommands(Objects.requireNonNull(player.getName()), player.getUuid(), ip.getHostAddress()); }
+    default @NotNull List<@NotNull String> getMcLeaksCommands(@NotNull Player player, @NotNull InetAddress ip) {
+        return getMcLeaksCommands(Objects.requireNonNull(player.getName()), player.getUuid(), ip.getHostAddress());
+    }
 
     /**
      * Returns the MCLeaks commands as defined
@@ -296,10 +372,14 @@ public interface PlayerManager {
      *
      * @param player The {@link Player} to tailor the commands to
      * @param ip The IP of the player to tailor the commands to
+     *
      * @return a {@link List} of MCLeaks commands to run, as defined in Anti-VPN's config
+     *
      * @throws NullPointerException if player is null, player.getName() is null, or ip is null
      */
-    default @NotNull List<@NotNull String> getMcLeaksCommands(@NotNull Player player, @NotNull String ip) { return getMcLeaksCommands(Objects.requireNonNull(player.getName()), player.getUuid(), ip); }
+    default @NotNull List<@NotNull String> getMcLeaksCommands(@NotNull Player player, @NotNull String ip) {
+        return getMcLeaksCommands(Objects.requireNonNull(player.getName()), player.getUuid(), ip);
+    }
 
     /**
      * Returns the MCLeaks commands as defined
@@ -308,10 +388,14 @@ public interface PlayerManager {
      * @param playerName The player name to tailor the commands to
      * @param playerUuid The player UUID to tailor the commands to
      * @param ip The IP of the player to tailor the commands to
+     *
      * @return a {@link List} of MCLeaks commands to run, as defined in Anti-VPN's config
+     *
      * @throws NullPointerException if playerName, playerUuid, or ip is null
      */
-    default @NotNull List<@NotNull String> getMcLeaksCommands(@NotNull String playerName, @NotNull UUID playerUuid, @NotNull InetAddress ip) { return getMcLeaksCommands(playerName, playerUuid, ip.getHostAddress()); }
+    default @NotNull List<@NotNull String> getMcLeaksCommands(@NotNull String playerName, @NotNull UUID playerUuid, @NotNull InetAddress ip) {
+        return getMcLeaksCommands(playerName, playerUuid, ip.getHostAddress());
+    }
 
     /**
      * Returns the MCLeaks commands as defined
@@ -320,7 +404,9 @@ public interface PlayerManager {
      * @param playerName The player name to tailor the commands to
      * @param playerUuid The player UUID to tailor the commands to
      * @param ip The IP of the player to tailor the commands to
+     *
      * @return a {@link List} of MCLeaks commands to run, as defined in Anti-VPN's config
+     *
      * @throws NullPointerException if playerName, playerUuid, or ip is null
      */
     @NotNull List<@NotNull String> getMcLeaksCommands(@NotNull String playerName, @NotNull UUID playerUuid, @NotNull String ip);

@@ -57,14 +57,14 @@ public class CheckCommand extends AbstractCommand {
         PlayerManager playerManager = VPNAPIProvider.getInstance().getPlayerManager();
 
         fetchUuid(playerName)
-            .thenComposeAsync(uuid -> playerManager.checkMcLeaks(uuid, true))
-            .whenCompleteAsync((val, ex) -> {
-                if (ex != null) {
-                    ExceptionUtil.handleException(ex, logger);
-                    issuer.sendError(MessageKey.ERROR__INTERNAL);
-                    return;
-                }
-                issuer.sendInfo(Boolean.TRUE.equals(val) ? MessageKey.CHECK__MCLEAKS_DETECTED : MessageKey.CHECK__NO_MCLEAKS_DETECTED);
-            });
+                .thenComposeAsync(uuid -> playerManager.checkMcLeaks(uuid, true))
+                .whenCompleteAsync((val, ex) -> {
+                    if (ex != null) {
+                        ExceptionUtil.handleException(ex, logger);
+                        issuer.sendError(MessageKey.ERROR__INTERNAL);
+                        return;
+                    }
+                    issuer.sendInfo(Boolean.TRUE.equals(val) ? MessageKey.CHECK__MCLEAKS_DETECTED : MessageKey.CHECK__NO_MCLEAKS_DETECTED);
+                });
     }
 }

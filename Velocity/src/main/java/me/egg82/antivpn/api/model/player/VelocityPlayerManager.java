@@ -2,11 +2,13 @@ package me.egg82.antivpn.api.model.player;
 
 import com.google.common.collect.ImmutableList;
 import com.velocitypowered.api.proxy.ProxyServer;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
+
 import me.egg82.antivpn.api.APIException;
 import me.egg82.antivpn.config.CachedConfig;
 import me.egg82.antivpn.config.ConfigUtil;
@@ -30,11 +32,11 @@ public class VelocityPlayerManager extends AbstractPlayerManager {
 
         this.proxy = proxy;
         api = MCLeaksAPI.builder()
-            .nocache()
-            .threadCount(webThreads)
-            .userAgent("egg82/Anti-VPN")
-            .apiKey(mcleaksKey)
-            .build();
+                .nocache()
+                .threadCount(webThreads)
+                .userAgent("egg82/Anti-VPN")
+                .apiKey(mcleaksKey)
+                .build();
     }
 
     public void cancel() {
@@ -82,7 +84,9 @@ public class VelocityPlayerManager extends AbstractPlayerManager {
             proxy.getCommandManager().executeImmediatelyAsync(proxy.getConsoleCommandSource(), command);
         }
         if (!cachedConfig.getMCLeaksKickMessage().isEmpty()) {
-            p.get().disconnect(LegacyComponentSerializer.legacyAmpersand().deserialize(VelocityTailorUtil.tailorKickMessage(cachedConfig.getMCLeaksKickMessage(), playerName, playerUuid, ip)));
+            p.get()
+                    .disconnect(LegacyComponentSerializer.legacyAmpersand()
+                                        .deserialize(VelocityTailorUtil.tailorKickMessage(cachedConfig.getMCLeaksKickMessage(), playerName, playerUuid, ip)));
         }
         return true;
     }

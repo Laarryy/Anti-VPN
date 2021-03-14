@@ -2,6 +2,7 @@ package me.egg82.antivpn.storage.models;
 
 import javax.persistence.Entity;
 import javax.persistence.Table;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -24,22 +25,30 @@ public class DataModel extends BaseModel {
         this.value = null;
     }
 
-    public @NotNull String getKey() { return key; }
+    public @NotNull String getKey() {
+        return key;
+    }
 
-    public void setKey(@NotNull String key) { this.key = key; }
+    public void setKey(@NotNull String key) {
+        this.key = key;
+    }
 
-    public @Nullable String getValue() { return value; }
+    public @Nullable String getValue() {
+        return value;
+    }
 
-    public void setValue(@Nullable String value) { this.value = value; }
+    public void setValue(@Nullable String value) {
+        this.value = value;
+    }
 
     public String toString() {
         return "DataModel{" +
-            "id=" + id +
-            ", version=" + version +
-            ", created=" + created +
-            ", modified=" + modified +
-            ", key='" + key + '\'' +
-            ", value='" + value + '\'' +
-            '}';
+                "id=" + id +
+                ", version=" + version +
+                ", created=" + created +
+                ", modified=" + modified +
+                ", key='" + key + '\'' +
+                ", value='" + value + '\'' +
+                '}';
     }
 }
