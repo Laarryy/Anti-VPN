@@ -23,6 +23,6 @@ public class BungeeEnvironmentUtil {
 
     public enum Environment {
         WATERFALL,
-        BUNGEECORD;
+        BUNGEECORD
     }
 }

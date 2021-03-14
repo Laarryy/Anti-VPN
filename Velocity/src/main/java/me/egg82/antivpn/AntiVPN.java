@@ -87,6 +87,7 @@ public class AntiVPN {
     }
 
     public void onLoad() {
+        // Empty
     }
 
     public void onEnable() {

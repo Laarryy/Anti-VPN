@@ -101,9 +101,7 @@ public class BStatsHook implements PluginHook {
 
             return retVal;
         }));
-        metrics.addCustomChart(new SimplePie("algorithm", () -> {
-            return ConfigUtil.getCachedConfig().getVPNAlgorithmMethod().getName();
-        }));
+        metrics.addCustomChart(new SimplePie("algorithm", () -> ConfigUtil.getCachedConfig().getVPNAlgorithmMethod().getName()));
         metrics.addCustomChart(new SimplePie("vpn_action", () -> {
             CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
 

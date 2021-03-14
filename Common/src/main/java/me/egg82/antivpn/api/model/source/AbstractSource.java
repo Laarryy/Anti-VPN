@@ -30,12 +30,11 @@ public abstract class AbstractSource<T extends SourceModel> implements Source<T>
 
     protected final @NotNull WebRequest.Builder getDefaultBuilder(@NotNull String url) throws APIException {
         try {
-            WebRequest.Builder retVal = WebRequest.builder(new URL(url));
-            retVal.timeout(new TimeUtil.Time(ConfigUtil.getCachedConfig().getTimeout(), TimeUnit.MILLISECONDS));
-            retVal.userAgent("egg82/Anti-VPN");
-            retVal.header("Accept", "application/json");
-            retVal.throwOnStandardErrors(false);
-            return retVal;
+            return WebRequest.builder(new URL(url))
+                    .timeout(new TimeUtil.Time(ConfigUtil.getCachedConfig().getTimeout(), TimeUnit.MILLISECONDS))
+                    .userAgent("egg82/Anti-VPN")
+                    .header("Accept", "application/json")
+                    .throwOnStandardErrors(false);
         } catch (IOException ex) {
             throw new APIException(false, "Could not get builder for " + getName(), ex);
         }

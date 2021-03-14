@@ -124,7 +124,7 @@ public abstract class AbstractPacket implements Packet {
         sb.append('\n');
         sb.append("-- Begin Packet --");
         sb.append('\n');
-        sb.append("Type: " + getClass().getName());
+        sb.append("Type: ").append(getClass().getName());
         sb.append('\n');
 
         sb.append("Bytes:");
@@ -137,12 +137,12 @@ public abstract class AbstractPacket implements Packet {
         sb.append('\n');
         buffer.readerIndex(0);
         while (buffer.readableBytes() > 0) {
-            sb.append(String.format("%8s ", Integer.toBinaryString(buffer.readByte() & 0xFF)).replace(' ', '0') + " ");
+            sb.append(String.format("%8s ", Integer.toBinaryString(buffer.readByte() & 0xFF)).replace(' ', '0')).append(' ');
         }
         sb.append('\n');
         buffer.readerIndex(0);
         while (buffer.readableBytes() > 0) {
-            sb.append(buffer.readByte() + " ");
+            sb.append(buffer.readByte()).append(' ');
         }
         buffer.readerIndex(index);
 

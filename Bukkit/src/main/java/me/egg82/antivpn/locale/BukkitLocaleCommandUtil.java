@@ -146,12 +146,10 @@ public class BukkitLocaleCommandUtil {
 
     private static @NotNull I18NManager getLanguage(@NotNull Plugin plugin, @NotNull CommandSender sender) {
         if (sender instanceof Player) {
-            return I18NManager.getUserCache().computeIfAbsent(((Player) sender).getUniqueId(), k -> {
-                return I18NManager.getManager(
-                        plugin.getDataFolder(),
-                        BukkitCapabilities.HAS_ADVENTURE ? ((Player) sender).locale() : LocaleUtil.parseLocale(((Player) sender).getLocale())
-                );
-            });
+            return I18NManager.getUserCache().computeIfAbsent(((Player) sender).getUniqueId(), k -> I18NManager.getManager(
+                    plugin.getDataFolder(),
+                    BukkitCapabilities.HAS_ADVENTURE ? ((Player) sender).locale() : LocaleUtil.parseLocale(((Player) sender).getLocale())
+            ));
         } else {
             return I18NManager.getUserCache().computeIfAbsent(consoleUuid, k -> {
                 CachedConfig cachedConfig;

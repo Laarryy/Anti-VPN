@@ -181,13 +181,10 @@ public class RedisMessagingService extends AbstractMessagingService {
             }
 
             try {
-                switch (channel) {
-                    case CHANNEL_NAME:
-                        handleMessage(m);
-                        break;
-                    default:
-                        service.logger.warn("Got data from channel that should not exist: " + channel);
-                        break;
+                if (CHANNEL_NAME.equals(channel)) {
+                    handleMessage(m);
+                } else {
+                    service.logger.warn("Got data from channel that should not exist: " + channel);
                 }
             } catch (IOException ex) {
                 service.logger.error(LocaleUtil.getDefaultI18N().getText(MessageKey.ERROR__MESSAGING__BAD_HANDLE), ex);

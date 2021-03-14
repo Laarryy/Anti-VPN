@@ -308,12 +308,12 @@ public abstract class AbstractMessagingService implements MessagingService {
         sb.append('\n');
         buffer.readerIndex(0);
         while (buffer.readableBytes() > 0) {
-            sb.append(String.format("%8s ", Integer.toBinaryString(buffer.readByte() & 0xFF)).replace(' ', '0') + " ");
+            sb.append(String.format("%8s ", Integer.toBinaryString(buffer.readByte() & 0xFF)).replace(' ', '0')).append(' ');
         }
         sb.append('\n');
         buffer.readerIndex(0);
         while (buffer.readableBytes() > 0) {
-            sb.append(buffer.readByte() + " ");
+            sb.append(buffer.readByte()).append(' ');
         }
         buffer.readerIndex(index);
 
@@ -332,16 +332,16 @@ public abstract class AbstractMessagingService implements MessagingService {
 
         sb.append("Bytes:");
         sb.append('\n');
-        for (int i = 0; i < bytes.length; i++) {
-            sb.append(String.format("0x%02X ", bytes[i]));
+        for (byte b : bytes) {
+            sb.append(String.format("0x%02X ", b));
         }
         sb.append('\n');
-        for (int i = 0; i < bytes.length; i++) {
-            sb.append(String.format("%8s ", Integer.toBinaryString(bytes[i] & 0xFF)).replace(' ', '0') + " ");
+        for (byte b : bytes) {
+            sb.append(String.format("%8s ", Integer.toBinaryString(b & 0xFF)).replace(' ', '0')).append(' ');
         }
         sb.append('\n');
-        for (int i = 0; i < bytes.length; i++) {
-            sb.append(bytes[i] + " ");
+        for (byte b : bytes) {
+            sb.append(b).append(' ');
         }
 
         sb.append('\n');

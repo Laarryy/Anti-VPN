@@ -29,6 +29,6 @@ public class BukkitEnvironmentUtil {
     public enum Environment {
         PAPER,
         SPIGOT,
-        BUKKIT;
+        BUKKIT
     }
 }

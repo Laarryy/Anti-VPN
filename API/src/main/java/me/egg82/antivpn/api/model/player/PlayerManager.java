@@ -213,8 +213,6 @@ public interface PlayerManager {
         return kickForMcLeaks(playerName, playerUuid, ip.getHostAddress());
     }
 
-    ;
-
     /**
      * Runs the player through the kick/command procedure
      * for MCLeaks usage, as outlined by Anti-VPN's config.

@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public abstract class AbstractCancellable extends AbstractEvent implements Cancellable {
-    protected AtomicBoolean cancelState = new AtomicBoolean(false);
+    protected final AtomicBoolean cancelState = new AtomicBoolean(false);
 
     protected AbstractCancellable(@NotNull VPNAPI api) {
         super(api);

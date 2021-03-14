@@ -112,13 +112,10 @@ public class NATSMessagingService extends AbstractMessagingService {
                 }
 
                 try {
-                    switch (subject) {
-                        case SUBJECT_NAME:
-                            handleMessage(message.getData());
-                            break;
-                        default:
-                            service.logger.warn("Got data from subject that should not exist: " + subject);
-                            break;
+                    if (SUBJECT_NAME.equals(subject)) {
+                        handleMessage(message.getData());
+                    } else {
+                        service.logger.warn("Got data from subject that should not exist: " + subject);
                     }
                 } catch (IOException ex) {
                     service.logger.error(LocaleUtil.getDefaultI18N().getText(MessageKey.ERROR__MESSAGING__BAD_HANDLE), ex);
