@@ -48,6 +48,7 @@ public abstract class AbstractPlayerManager implements PlayerManager {
         return playerCache;
     }
 
+    @Override
     public @NotNull CompletableFuture<Void> savePlayer(@NotNull Player player) {
         return CompletableFuture.runAsync(() -> {
             CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
@@ -64,6 +65,7 @@ public abstract class AbstractPlayerManager implements PlayerManager {
         });
     }
 
+    @Override
     public @NotNull CompletableFuture<Void> deletePlayer(@NotNull UUID uniqueId) {
         return CompletableFuture.runAsync(() -> {
             CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
@@ -81,6 +83,7 @@ public abstract class AbstractPlayerManager implements PlayerManager {
         });
     }
 
+    @Override
     public @NotNull CompletableFuture<@NotNull Set<@NotNull UUID>> getPlayers() {
         return CompletableFuture.supplyAsync(() -> {
             CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
@@ -99,6 +102,7 @@ public abstract class AbstractPlayerManager implements PlayerManager {
         });
     }
 
+    @Override
     public @NotNull CompletableFuture<@NotNull Boolean> checkMcLeaks(@NotNull UUID uniqueId, boolean useCache) throws APIException {
         return CompletableFuture.supplyAsync(() -> {
             PlayerModel model;

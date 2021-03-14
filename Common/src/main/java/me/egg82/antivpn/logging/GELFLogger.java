@@ -12,30 +12,37 @@ public class GELFLogger implements Logger {
         this.impl = impl;
     }
 
+    @Override
     public String getName() {
         return impl.getName();
     }
 
+    @Override
     public boolean isTraceEnabled() {
         return impl.isTraceEnabled();
     }
 
+    @Override
     public void trace(String msg) {
         impl.trace(msg);
     }
 
+    @Override
     public void trace(String format, Object arg) {
         impl.trace(format, arg);
     }
 
+    @Override
     public void trace(String format, Object arg1, Object arg2) {
         impl.trace(format, arg1, arg2);
     }
 
+    @Override
     public void trace(String format, Object... arguments) {
         impl.trace(format, arguments);
     }
 
+    @Override
     public void trace(String msg, Throwable t) {
         if (ConfigUtil.getDebugOrFalse()) {
             impl.trace(msg, t);
@@ -47,26 +54,32 @@ public class GELFLogger implements Logger {
         }
     }
 
+    @Override
     public boolean isTraceEnabled(Marker marker) {
         return impl.isTraceEnabled(marker);
     }
 
+    @Override
     public void trace(Marker marker, String msg) {
         impl.trace(marker, msg);
     }
 
+    @Override
     public void trace(Marker marker, String format, Object arg) {
         impl.trace(marker, format, arg);
     }
 
+    @Override
     public void trace(Marker marker, String format, Object arg1, Object arg2) {
         impl.trace(marker, format, arg1, arg2);
     }
 
+    @Override
     public void trace(Marker marker, String format, Object... argArray) {
         impl.trace(marker, format, argArray);
     }
 
+    @Override
     public void trace(Marker marker, String msg, Throwable t) {
         if (ConfigUtil.getDebugOrFalse()) {
             impl.trace(marker, msg, t);
@@ -78,26 +91,32 @@ public class GELFLogger implements Logger {
         }
     }
 
+    @Override
     public boolean isDebugEnabled() {
         return impl.isDebugEnabled();
     }
 
+    @Override
     public void debug(String msg) {
         impl.debug(msg);
     }
 
+    @Override
     public void debug(String format, Object arg) {
         impl.debug(format, arg);
     }
 
+    @Override
     public void debug(String format, Object arg1, Object arg2) {
         impl.debug(format, arg1, arg2);
     }
 
+    @Override
     public void debug(String format, Object... arguments) {
         impl.debug(format, arguments);
     }
 
+    @Override
     public void debug(String msg, Throwable t) {
         if (ConfigUtil.getDebugOrFalse()) {
             impl.debug(msg, t);
@@ -109,26 +128,32 @@ public class GELFLogger implements Logger {
         }
     }
 
+    @Override
     public boolean isDebugEnabled(Marker marker) {
         return impl.isDebugEnabled(marker);
     }
 
+    @Override
     public void debug(Marker marker, String msg) {
         impl.debug(marker, msg);
     }
 
+    @Override
     public void debug(Marker marker, String format, Object arg) {
         impl.debug(marker, format, arg);
     }
 
+    @Override
     public void debug(Marker marker, String format, Object arg1, Object arg2) {
         impl.debug(marker, format, arg1, arg2);
     }
 
+    @Override
     public void debug(Marker marker, String format, Object... arguments) {
         impl.debug(marker, format, arguments);
     }
 
+    @Override
     public void debug(Marker marker, String msg, Throwable t) {
         if (ConfigUtil.getDebugOrFalse()) {
             impl.debug(marker, msg, t);
@@ -140,26 +165,32 @@ public class GELFLogger implements Logger {
         }
     }
 
+    @Override
     public boolean isInfoEnabled() {
         return impl.isInfoEnabled();
     }
 
+    @Override
     public void info(String msg) {
         impl.info(msg);
     }
 
+    @Override
     public void info(String format, Object arg) {
         impl.info(format, arg);
     }
 
+    @Override
     public void info(String format, Object arg1, Object arg2) {
         impl.info(format, arg1, arg2);
     }
 
+    @Override
     public void info(String format, Object... arguments) {
         impl.info(format, arguments);
     }
 
+    @Override
     public void info(String msg, Throwable t) {
         if (ConfigUtil.getDebugOrFalse()) {
             impl.info(msg, t);
@@ -171,26 +202,32 @@ public class GELFLogger implements Logger {
         }
     }
 
+    @Override
     public boolean isInfoEnabled(Marker marker) {
         return impl.isInfoEnabled(marker);
     }
 
+    @Override
     public void info(Marker marker, String msg) {
         impl.info(marker, msg);
     }
 
+    @Override
     public void info(Marker marker, String format, Object arg) {
         impl.info(marker, format, arg);
     }
 
+    @Override
     public void info(Marker marker, String format, Object arg1, Object arg2) {
         impl.info(marker, format, arg1, arg2);
     }
 
+    @Override
     public void info(Marker marker, String format, Object... arguments) {
         impl.info(marker, format, arguments);
     }
 
+    @Override
     public void info(Marker marker, String msg, Throwable t) {
         if (ConfigUtil.getDebugOrFalse()) {
             impl.info(marker, msg, t);
@@ -202,10 +239,12 @@ public class GELFLogger implements Logger {
         }
     }
 
+    @Override
     public boolean isWarnEnabled() {
         return impl.isWarnEnabled();
     }
 
+    @Override
     public void warn(String msg) {
         impl.warn(msg);
         if (impl.isWarnEnabled()) {
@@ -213,6 +252,7 @@ public class GELFLogger implements Logger {
         }
     }
 
+    @Override
     public void warn(String format, Object arg) {
         impl.warn(format, arg);
         if (impl.isWarnEnabled()) {
@@ -220,6 +260,7 @@ public class GELFLogger implements Logger {
         }
     }
 
+    @Override
     public void warn(String format, Object... arguments) {
         impl.warn(format, arguments);
         if (impl.isWarnEnabled()) {
@@ -227,6 +268,7 @@ public class GELFLogger implements Logger {
         }
     }
 
+    @Override
     public void warn(String format, Object arg1, Object arg2) {
         impl.warn(format, arg1, arg2);
         if (impl.isWarnEnabled()) {
@@ -234,6 +276,7 @@ public class GELFLogger implements Logger {
         }
     }
 
+    @Override
     public void warn(String msg, Throwable t) {
         if (ConfigUtil.getDebugOrFalse()) {
             impl.warn(msg, t);
@@ -245,10 +288,12 @@ public class GELFLogger implements Logger {
         }
     }
 
+    @Override
     public boolean isWarnEnabled(Marker marker) {
         return impl.isWarnEnabled(marker);
     }
 
+    @Override
     public void warn(Marker marker, String msg) {
         impl.warn(marker, msg);
         if (impl.isWarnEnabled(marker)) {
@@ -256,6 +301,7 @@ public class GELFLogger implements Logger {
         }
     }
 
+    @Override
     public void warn(Marker marker, String format, Object arg) {
         impl.warn(marker, format, arg);
         if (impl.isWarnEnabled(marker)) {
@@ -263,6 +309,7 @@ public class GELFLogger implements Logger {
         }
     }
 
+    @Override
     public void warn(Marker marker, String format, Object arg1, Object arg2) {
         impl.warn(marker, format, arg1, arg2);
         if (impl.isWarnEnabled(marker)) {
@@ -270,6 +317,7 @@ public class GELFLogger implements Logger {
         }
     }
 
+    @Override
     public void warn(Marker marker, String format, Object... arguments) {
         impl.warn(marker, format, arguments);
         if (impl.isWarnEnabled(marker)) {
@@ -277,6 +325,7 @@ public class GELFLogger implements Logger {
         }
     }
 
+    @Override
     public void warn(Marker marker, String msg, Throwable t) {
         if (ConfigUtil.getDebugOrFalse()) {
             impl.warn(marker, msg, t);
@@ -288,10 +337,12 @@ public class GELFLogger implements Logger {
         }
     }
 
+    @Override
     public boolean isErrorEnabled() {
         return impl.isErrorEnabled();
     }
 
+    @Override
     public void error(String msg) {
         impl.error(msg);
         if (impl.isErrorEnabled()) {
@@ -299,6 +350,7 @@ public class GELFLogger implements Logger {
         }
     }
 
+    @Override
     public void error(String format, Object arg) {
         impl.error(format, arg);
         if (impl.isErrorEnabled()) {
@@ -306,6 +358,7 @@ public class GELFLogger implements Logger {
         }
     }
 
+    @Override
     public void error(String format, Object arg1, Object arg2) {
         impl.error(format, arg1, arg2);
         if (impl.isErrorEnabled()) {
@@ -313,6 +366,7 @@ public class GELFLogger implements Logger {
         }
     }
 
+    @Override
     public void error(String format, Object... arguments) {
         impl.error(format, arguments);
         if (impl.isErrorEnabled()) {
@@ -320,6 +374,7 @@ public class GELFLogger implements Logger {
         }
     }
 
+    @Override
     public void error(String msg, Throwable t) {
         if (ConfigUtil.getDebugOrFalse()) {
             impl.error(msg, t);
@@ -331,10 +386,12 @@ public class GELFLogger implements Logger {
         }
     }
 
+    @Override
     public boolean isErrorEnabled(Marker marker) {
         return impl.isErrorEnabled(marker);
     }
 
+    @Override
     public void error(Marker marker, String msg) {
         impl.error(marker, msg);
         if (impl.isErrorEnabled(marker)) {
@@ -342,6 +399,7 @@ public class GELFLogger implements Logger {
         }
     }
 
+    @Override
     public void error(Marker marker, String format, Object arg) {
         impl.error(marker, format, arg);
         if (impl.isErrorEnabled(marker)) {
@@ -349,6 +407,7 @@ public class GELFLogger implements Logger {
         }
     }
 
+    @Override
     public void error(Marker marker, String format, Object arg1, Object arg2) {
         impl.error(marker, format, arg1, arg2);
         if (impl.isErrorEnabled(marker)) {
@@ -356,6 +415,7 @@ public class GELFLogger implements Logger {
         }
     }
 
+    @Override
     public void error(Marker marker, String format, Object... arguments) {
         impl.error(marker, format, arguments);
         if (impl.isErrorEnabled(marker)) {
@@ -363,6 +423,7 @@ public class GELFLogger implements Logger {
         }
     }
 
+    @Override
     public void error(Marker marker, String msg, Throwable t) {
         if (ConfigUtil.getDebugOrFalse()) {
             impl.error(marker, msg, t);

@@ -26,10 +26,12 @@ public class DeleteIPPacket extends AbstractPacket {
         this.ip = ip;
     }
 
+    @Override
     public void read(@NotNull ByteBuf buffer) {
         this.ip = readString(buffer);
     }
 
+    @Override
     public void write(@NotNull ByteBuf buffer) {
         writeString(this.ip, buffer);
     }

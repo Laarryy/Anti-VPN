@@ -40,6 +40,7 @@ public class LuckPermsHook implements PluginHook {
         PluginHooks.getHooks().add(this);
     }
 
+    @Override
     public void cancel() {
     }
 

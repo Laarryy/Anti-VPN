@@ -27,6 +27,7 @@ public class BukkitIPManager extends AbstractIPManager {
         this.plugin = plugin;
     }
 
+    @Override
     public boolean kickForVpn(@NotNull String playerName, @NotNull UUID playerUuid, @NotNull String ip) {
         Player p = Bukkit.getPlayer(playerUuid);
         if (p == null) {
@@ -50,6 +51,7 @@ public class BukkitIPManager extends AbstractIPManager {
         return true;
     }
 
+    @Override
     public @Nullable Component getVpnKickMessage(@NotNull String playerName, @NotNull UUID playerUuid, @NotNull String ip) {
         CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
 
@@ -59,6 +61,7 @@ public class BukkitIPManager extends AbstractIPManager {
         return null;
     }
 
+    @Override
     public @NotNull List<@NotNull String> getVpnCommands(@NotNull String playerName, @NotNull UUID playerUuid, @NotNull String ip) {
         CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
 

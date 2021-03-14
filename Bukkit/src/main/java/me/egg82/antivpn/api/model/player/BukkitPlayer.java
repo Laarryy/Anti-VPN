@@ -17,6 +17,7 @@ public class BukkitPlayer extends AbstractPlayer {
         super(uuid, name, mcleaks);
     }
 
+    @Override
     protected @NotNull CompletableFuture<@NotNull String> fetchName(@NotNull UUID uuid) {
         return PlayerLookup.get(uuid).thenApply(PlayerInfo::getName);
     }

@@ -58,6 +58,7 @@ public class PlayerAnalyticsHook implements PluginHook {
         }
     }
 
+    @Override
     public void cancel() {
     }
 
@@ -273,6 +274,7 @@ public class PlayerAnalyticsHook implements PluginHook {
             return host.getHostAddress();
         }
 
+        @Override
         public @NotNull CallEvents[] callExtensionMethodsOn() {
             return events;
         }

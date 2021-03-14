@@ -12,10 +12,12 @@ import java.net.HttpURLConnection;
 import java.util.concurrent.CompletableFuture;
 
 public class IPHub extends AbstractSource<IPHubModel> {
+    @Override
     public @NotNull String getName() {
         return "iphub";
     }
 
+    @Override
     public boolean isKeyRequired() {
         return true;
     }
@@ -24,6 +26,7 @@ public class IPHub extends AbstractSource<IPHubModel> {
         super(IPHubModel.class);
     }
 
+    @Override
     public @NotNull CompletableFuture<@NotNull Boolean> getResult(@NotNull String ip) {
         return getRawResponse(ip).thenApply(model -> {
             if (model.getError() != null) {
@@ -34,6 +37,7 @@ public class IPHub extends AbstractSource<IPHubModel> {
         });
     }
 
+    @Override
     public @NotNull CompletableFuture<@NotNull IPHubModel> getRawResponse(@NotNull String ip) {
         return CompletableFuture.supplyAsync(() -> {
             if (!ValidationUtil.isValidIp(ip)) {

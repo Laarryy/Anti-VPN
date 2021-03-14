@@ -12,6 +12,7 @@ import me.egg82.antivpn.utils.PacketUtil;
 import org.jetbrains.annotations.NotNull;
 
 public class ServerMessagingHandler extends AbstractMessagingHandler {
+    @Override
     protected boolean handlePacket(@NotNull Packet packet) {
         if (packet instanceof InitializationPacket) {
             handleInitialization((InitializationPacket) packet);

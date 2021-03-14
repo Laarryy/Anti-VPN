@@ -26,10 +26,12 @@ public class DeletePlayerPacket extends AbstractPacket {
         this.uuid = uuid;
     }
 
+    @Override
     public void read(@NotNull ByteBuf buffer) {
         this.uuid = readUUID(buffer);
     }
 
+    @Override
     public void write(@NotNull ByteBuf buffer) {
         writeUUID(this.uuid, buffer);
     }

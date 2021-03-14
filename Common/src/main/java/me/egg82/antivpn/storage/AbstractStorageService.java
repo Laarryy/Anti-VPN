@@ -17,6 +17,7 @@ public abstract class AbstractStorageService implements StorageService {
 
     protected final String name;
 
+    @Override
     public @NotNull String getName() {
         return name;
     }
@@ -24,6 +25,7 @@ public abstract class AbstractStorageService implements StorageService {
     protected volatile boolean closed = false;
     protected final ReadWriteLock queueLock = new ReentrantReadWriteLock();
 
+    @Override
     public boolean isClosed() {
         return closed;
     }

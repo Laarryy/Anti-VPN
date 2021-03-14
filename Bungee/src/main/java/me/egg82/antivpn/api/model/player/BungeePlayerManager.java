@@ -40,6 +40,7 @@ public class BungeePlayerManager extends AbstractPlayerManager {
         api.shutdown();
     }
 
+    @Override
     public @NotNull CompletableFuture<Player> getPlayer(@NotNull UUID uniqueId) {
         return CompletableFuture.supplyAsync(() -> {
             CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
@@ -54,6 +55,7 @@ public class BungeePlayerManager extends AbstractPlayerManager {
         });
     }
 
+    @Override
     public @NotNull CompletableFuture<Player> getPlayer(@NotNull String username) {
         return PlayerLookup.get(username).thenApply(info -> {
             CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
@@ -68,6 +70,7 @@ public class BungeePlayerManager extends AbstractPlayerManager {
         });
     }
 
+    @Override
     public boolean kickForMcLeaks(@NotNull String playerName, @NotNull UUID playerUuid, @NotNull String ip) {
         CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
 
@@ -86,6 +89,7 @@ public class BungeePlayerManager extends AbstractPlayerManager {
         return true;
     }
 
+    @Override
     public @Nullable String getMcLeaksKickMessage(@NotNull String playerName, @NotNull UUID playerUuid, @NotNull String ip) {
         CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
 
@@ -95,6 +99,7 @@ public class BungeePlayerManager extends AbstractPlayerManager {
         return null;
     }
 
+    @Override
     public @NotNull List<String> getMcLeaksCommands(@NotNull String playerName, @NotNull UUID playerUuid, @NotNull String ip) {
         CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
 

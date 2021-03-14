@@ -27,6 +27,7 @@ public class PostLoginUpdateNotifyHandler implements Consumer<PostLoginEvent> {
         this.commandManager = commandManager;
     }
 
+    @Override
     public void accept(@NotNull PostLoginEvent event) {
         if (!event.getPlayer().hasPermission("avpn.admin")) {
             return;

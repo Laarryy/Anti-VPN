@@ -27,18 +27,22 @@ public class BungeePlatform implements Platform {
         this.startTime = Instant.ofEpochMilli(startTime);
     }
 
+    @Override
     public @NotNull Type getType() {
         return Type.BUNGEECORD;
     }
 
+    @Override
     public @NotNull Set<UUID> getUniquePlayers() {
         return ImmutableSet.copyOf(uniquePlayers);
     }
 
+    @Override
     public @NotNull Set<InetAddress> getUniqueIPs() {
         return ImmutableSet.copyOf(uniqueIps);
     }
 
+    @Override
     public @NotNull Instant getStartTime() {
         return startTime;
     }

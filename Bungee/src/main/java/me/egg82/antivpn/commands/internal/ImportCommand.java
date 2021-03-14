@@ -23,6 +23,7 @@ public class ImportCommand extends AbstractCommand {
         this.batchMax = batchMax;
     }
 
+    @Override
     public void run() {
         if (masterName.isEmpty()) {
             issuer.sendError(MessageKey.IMPORT__NO_MASTER);

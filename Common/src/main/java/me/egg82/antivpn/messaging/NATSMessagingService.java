@@ -34,6 +34,7 @@ public class NATSMessagingService extends AbstractMessagingService {
         super(name, packetDirectory);
     }
 
+    @Override
     public void close() {
         queueLock.writeLock().lock();
         try {
@@ -49,6 +50,7 @@ public class NATSMessagingService extends AbstractMessagingService {
         }
     }
 
+    @Override
     public boolean isClosed() {
         return closed || connection.getConnectedUrl() == null;
     }
@@ -185,6 +187,7 @@ public class NATSMessagingService extends AbstractMessagingService {
         }
     }
 
+    @Override
     public void sendPacket(@NotNull UUID messageId, @NotNull Packet packet) throws IOException {
         queueLock.readLock().lock();
         try {

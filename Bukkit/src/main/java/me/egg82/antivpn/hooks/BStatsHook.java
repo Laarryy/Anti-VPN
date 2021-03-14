@@ -130,6 +130,7 @@ public class BStatsHook implements PluginHook {
         PluginHooks.getHooks().add(this);
     }
 
+    @Override
     public void cancel() {
     }
 }

@@ -11,6 +11,7 @@ import java.util.zip.GZIPOutputStream;
 import org.jetbrains.annotations.NotNull;
 
 public class GZIPCompressionStream extends AbstractCompressionStream {
+    @Override
     public byte @NotNull [] compress(byte @NotNull [] buf) throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream(buf.length);
         try (GZIPOutputStream gzipOut = new GZIPOutputStream(out)) {
@@ -19,6 +20,7 @@ public class GZIPCompressionStream extends AbstractCompressionStream {
         return out.toByteArray();
     }
 
+    @Override
     public byte @NotNull [] decompress(byte @NotNull [] buf) throws IOException {
         ByteArrayInputStream in = new ByteArrayInputStream(buf);
         try (GZIPInputStream gzipIn = new GZIPInputStream(in)) {

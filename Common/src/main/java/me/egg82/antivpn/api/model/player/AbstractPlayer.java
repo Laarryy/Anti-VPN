@@ -38,18 +38,22 @@ public abstract class AbstractPlayer implements Player {
         this.hc = Objects.hash(uuid);
     }
 
+    @Override
     public @NotNull UUID getUuid() {
         return uuid;
     }
 
+    @Override
     public @Nullable String getName() {
         return name;
     }
 
+    @Override
     public boolean isMcLeaks() {
         return mcleaks;
     }
 
+    @Override
     public void setMcLeaks(boolean status) {
         this.mcleaks = status;
     }

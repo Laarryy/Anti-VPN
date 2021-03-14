@@ -26,6 +26,7 @@ public class BukkitUpdater extends AbstractUpdater {
         this.resourceId = resourceId;
     }
 
+    @Override
     protected @NotNull String getNewVersion() throws IOException {
         return WebRequest.builder(new URL("https://api.spigotmc.org/legacy/update.php?resource=" + resourceId))
                 .timeout(new TimeUtil.Time(5000L, TimeUnit.MILLISECONDS))
@@ -35,6 +36,7 @@ public class BukkitUpdater extends AbstractUpdater {
                 .getString();
     }
 
+    @Override
     public @NotNull String getDownloadLink() {
         return "https://api.spiget.org/v2/resources/" + resourceId + "/versions/latest/download";
     }

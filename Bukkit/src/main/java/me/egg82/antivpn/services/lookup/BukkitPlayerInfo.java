@@ -17,6 +17,7 @@ public class BukkitPlayerInfo extends MojangPlayerInfo {
         super(name);
     }
 
+    @Override
     protected @Nullable String nameExpensive(@NotNull UUID uuid) throws IOException {
         // Currently-online lookup
         Player player = Bukkit.getPlayer(uuid);
@@ -30,6 +31,7 @@ public class BukkitPlayerInfo extends MojangPlayerInfo {
         return super.nameExpensive(uuid);
     }
 
+    @Override
     protected @Nullable UUID uuidExpensive(@NotNull String name) throws IOException {
         // Currently-online lookup
         Player player = Bukkit.getPlayer(name);

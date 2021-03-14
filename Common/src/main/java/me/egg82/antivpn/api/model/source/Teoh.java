@@ -16,10 +16,12 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Teoh extends AbstractSource<TeohModel> {
+    @Override
     public @NotNull String getName() {
         return "teoh";
     }
 
+    @Override
     public boolean isKeyRequired() {
         return false;
     }
@@ -36,6 +38,7 @@ public class Teoh extends AbstractSource<TeohModel> {
         super(TeohModel.class);
     }
 
+    @Override
     public @NotNull CompletableFuture<@NotNull Boolean> getResult(@NotNull String ip) {
         return getRawResponse(ip).thenApply(model -> {
             if (model.getMessage() != null) {
@@ -46,6 +49,7 @@ public class Teoh extends AbstractSource<TeohModel> {
         });
     }
 
+    @Override
     public @NotNull CompletableFuture<@NotNull TeohModel> getRawResponse(@NotNull String ip) {
         return CompletableFuture.supplyAsync(() -> {
             if (!ValidationUtil.isValidIp(ip)) {

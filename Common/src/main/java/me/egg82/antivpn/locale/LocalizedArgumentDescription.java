@@ -45,10 +45,12 @@ public class LocalizedArgumentDescription implements ArgumentDescription {
         this.description = localizationManager.getText(key, placeholders);
     }
 
+    @Override
     public @NotNull String getDescription() {
         return description;
     }
 
+    @Override
     public boolean isEmpty() {
         return false;
     }

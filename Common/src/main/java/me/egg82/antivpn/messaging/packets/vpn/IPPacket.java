@@ -42,6 +42,7 @@ public class IPPacket extends AbstractPacket {
         this.consensus = consensus;
     }
 
+    @Override
     public void read(@NotNull ByteBuf buffer) {
         this.ip = readString(buffer);
         AlgorithmMethod method = AlgorithmMethod.values()[readVarInt(buffer)];
@@ -52,6 +53,7 @@ public class IPPacket extends AbstractPacket {
         }
     }
 
+    @Override
     public void write(@NotNull ByteBuf buffer) {
         writeString(this.ip, buffer);
         writeVarInt(this.type.ordinal(), buffer);

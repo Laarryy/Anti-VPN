@@ -27,14 +27,17 @@ public abstract class AbstractUpdater implements Updater {
         this.checkDelay = checkDelay.getMillis();
     }
 
+    @Override
     public @NotNull String getCurrentVersion() {
         return currentVersion;
     }
 
+    @Override
     public @NotNull CompletableFuture<@NotNull Boolean> isUpdateAvailable() {
         return getLatestVersion().thenApply(v -> updateAvailable);
     }
 
+    @Override
     public @NotNull CompletableFuture<@NotNull String> getLatestVersion() {
         return CompletableFuture.supplyAsync(() -> {
             long current = System.currentTimeMillis();

@@ -20,6 +20,7 @@ public class BungeeIPManager extends AbstractIPManager {
         super(sourceManager, cacheTime, cacheTimeUnit);
     }
 
+    @Override
     public boolean kickForVpn(@NotNull String playerName, @NotNull UUID playerUuid, @NotNull String ip) {
         CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
 
@@ -38,6 +39,7 @@ public class BungeeIPManager extends AbstractIPManager {
         return true;
     }
 
+    @Override
     public @Nullable String getVpnKickMessage(@NotNull String playerName, @NotNull UUID playerUuid, @NotNull String ip) {
         CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
 
@@ -47,6 +49,7 @@ public class BungeeIPManager extends AbstractIPManager {
         return null;
     }
 
+    @Override
     public @NotNull List<String> getVpnCommands(@NotNull String playerName, @NotNull UUID playerUuid, @NotNull String ip) {
         CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
 

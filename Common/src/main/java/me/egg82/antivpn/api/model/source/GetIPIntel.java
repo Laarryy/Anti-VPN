@@ -31,14 +31,17 @@ public class GetIPIntel extends AbstractSource<GetIPIntelModel> {
         super(GetIPIntelModel.class);
     }
 
+    @Override
     public @NotNull String getName() {
         return "getipintel";
     }
 
+    @Override
     public boolean isKeyRequired() {
         return false;
     }
 
+    @Override
     public @NotNull CompletableFuture<@NotNull Boolean> getResult(@NotNull String ip) {
         return getRawResponse(ip).thenApply(model -> {
             if (!"success".equalsIgnoreCase(model.getStatus()) || model.getResult() == null) {
@@ -58,6 +61,7 @@ public class GetIPIntel extends AbstractSource<GetIPIntelModel> {
         });
     }
 
+    @Override
     public @NotNull CompletableFuture<@NotNull GetIPIntelModel> getRawResponse(@NotNull String ip) {
         return CompletableFuture.supplyAsync(() -> {
             if (!ValidationUtil.isValidIp(ip)) {

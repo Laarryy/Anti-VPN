@@ -32,6 +32,7 @@ public class PlaceholderAPIHook implements PluginHook {
         PluginHooks.getHooks().add(this);
     }
 
+    @Override
     public void cancel() {
     }
 

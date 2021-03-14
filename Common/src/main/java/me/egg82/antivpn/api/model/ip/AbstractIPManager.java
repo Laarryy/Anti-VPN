@@ -58,6 +58,7 @@ public abstract class AbstractIPManager implements IPManager {
         return ipCache;
     }
 
+    @Override
     public @NotNull CompletableFuture<@Nullable IP> getIP(@NotNull String ip) {
         return CompletableFuture.supplyAsync(() -> {
             CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
@@ -76,6 +77,7 @@ public abstract class AbstractIPManager implements IPManager {
         });
     }
 
+    @Override
     public @NotNull CompletableFuture<Void> saveIP(@NotNull IP ip) {
         return CompletableFuture.runAsync(() -> {
             CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
@@ -96,6 +98,7 @@ public abstract class AbstractIPManager implements IPManager {
         });
     }
 
+    @Override
     public @NotNull CompletableFuture<Void> deleteIP(@NotNull String ip) {
         return CompletableFuture.runAsync(() -> {
             CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
@@ -113,6 +116,7 @@ public abstract class AbstractIPManager implements IPManager {
         });
     }
 
+    @Override
     public @NotNull CompletableFuture<@NotNull Set<@NotNull InetAddress>> getIPs() {
         return CompletableFuture.supplyAsync(() -> {
             CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
@@ -135,10 +139,12 @@ public abstract class AbstractIPManager implements IPManager {
         });
     }
 
+    @Override
     public @NotNull AlgorithmMethod getCurrentAlgorithmMethod() {
         return ConfigUtil.getCachedConfig().getVPNAlgorithmMethod();
     }
 
+    @Override
     public @NotNull CompletableFuture<@NotNull Boolean> cascade(@NotNull String ip, boolean useCache) {
         return CompletableFuture.supplyAsync(() -> {
             IPModel model;
@@ -164,6 +170,7 @@ public abstract class AbstractIPManager implements IPManager {
         });
     }
 
+    @Override
     public @NotNull CompletableFuture<@NotNull Double> consensus(@NotNull String ip, boolean useCache) {
         return CompletableFuture.supplyAsync(() -> {
             IPModel model;
@@ -189,6 +196,7 @@ public abstract class AbstractIPManager implements IPManager {
         });
     }
 
+    @Override
     public double getMinConsensusValue() {
         return ConfigUtil.getCachedConfig().getVPNAlgorithmConsensus();
     }

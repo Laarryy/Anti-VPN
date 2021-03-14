@@ -20,30 +20,37 @@ public abstract class AbstractLocalizedCommandSender<M extends AbstractLocalized
         this.localizationManager = localizationManager;
     }
 
+    @Override
     public @NotNull B getBase() {
         return base;
     }
 
+    @Override
     public @NotNull Audience getAudience() {
         return audience;
     }
 
+    @Override
     public void sendMessage(@NotNull String message) {
         getAudience().sendMessage(formatter.parse(localizationManager.getText(MessageKey.GENERAL__DECORATOR)).append(formatter.parse(message)));
     }
 
+    @Override
     public void sendMessage(@NotNull String message, String... placeholders) {
         getAudience().sendMessage(formatter.parse(localizationManager.getText(MessageKey.GENERAL__DECORATOR)).append(formatter.parse(message, placeholders)));
     }
 
+    @Override
     public void sendMessage(@NotNull String message, @NotNull Map<String, String> placeholders) {
         getAudience().sendMessage(formatter.parse(localizationManager.getText(MessageKey.GENERAL__DECORATOR)).append(formatter.parse(message, placeholders)));
     }
 
+    @Override
     public @NotNull Component getComponent(@NotNull String message) {
         return formatter.parse(localizationManager.getText(MessageKey.GENERAL__DECORATOR)).append(formatter.parse(message));
     }
 
+    @Override
     public @NotNull I18NManager getLocalizationManager() {
         return localizationManager;
     }

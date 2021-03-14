@@ -27,6 +27,7 @@ public class LocalePropertyResourceBundle extends PropertyResourceBundle {
         this.locale = locale;
     }
 
+    @Override
     public @NotNull Locale getLocale() {
         return locale;
     }

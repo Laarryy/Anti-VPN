@@ -12,10 +12,12 @@ import java.net.HttpURLConnection;
 import java.util.concurrent.CompletableFuture;
 
 public class VPNBlocker extends AbstractSource<VPNBlockerModel> {
+    @Override
     public @NotNull String getName() {
         return "vpnblocker";
     }
 
+    @Override
     public boolean isKeyRequired() {
         return false;
     }
@@ -24,6 +26,7 @@ public class VPNBlocker extends AbstractSource<VPNBlockerModel> {
         super(VPNBlockerModel.class);
     }
 
+    @Override
     public @NotNull CompletableFuture<@NotNull Boolean> getResult(@NotNull String ip) {
         return getRawResponse(ip).thenApply(model -> {
             if (!"success".equalsIgnoreCase(model.getStatus())) {
@@ -34,6 +37,7 @@ public class VPNBlocker extends AbstractSource<VPNBlockerModel> {
         });
     }
 
+    @Override
     public @NotNull CompletableFuture<@NotNull VPNBlockerModel> getRawResponse(@NotNull String ip) {
         return CompletableFuture.supplyAsync(() -> {
             if (!ValidationUtil.isValidIp(ip)) {

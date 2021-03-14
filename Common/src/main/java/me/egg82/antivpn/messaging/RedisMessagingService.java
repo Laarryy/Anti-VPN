@@ -42,6 +42,7 @@ public class RedisMessagingService extends AbstractMessagingService {
         super(name, packetDirectory);
     }
 
+    @Override
     public void close() {
         queueLock.writeLock().lock();
         try {
@@ -60,6 +61,7 @@ public class RedisMessagingService extends AbstractMessagingService {
         }
     }
 
+    @Override
     public boolean isClosed() {
         return closed || pool.isClosed();
     }
@@ -174,6 +176,7 @@ public class RedisMessagingService extends AbstractMessagingService {
             this.service = service;
         }
 
+        @Override
         public void onMessage(byte @NotNull [] c, byte @NotNull [] m) {
             String channel = new String(c, StandardCharsets.UTF_8);
             if (ConfigUtil.getDebugOrFalse()) {
@@ -252,6 +255,7 @@ public class RedisMessagingService extends AbstractMessagingService {
         }
     }
 
+    @Override
     public void sendPacket(@NotNull UUID messageId, @NotNull Packet packet) throws IOException {
         queueLock.readLock().lock();
         try (Jedis redis = pool.getResource()) {

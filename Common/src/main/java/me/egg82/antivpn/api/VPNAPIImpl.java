@@ -49,34 +49,42 @@ public class VPNAPIImpl implements VPNAPI {
         instance = this;
     }
 
+    @Override
     public @NotNull UUID getServerId() {
         return ConfigUtil.getCachedConfig().getServerId();
     }
 
+    @Override
     public @NotNull AbstractIPManager getIPManager() {
         return ipManager;
     }
 
+    @Override
     public @NotNull AbstractPlayerManager getPlayerManager() {
         return playerManager;
     }
 
+    @Override
     public @NotNull SourceManagerImpl getSourceManager() {
         return sourceManager;
     }
 
+    @Override
     public @NotNull Platform getPlatform() {
         return platform;
     }
 
+    @Override
     public @NotNull AbstractPluginMetadata getPluginMetadata() {
         return pluginMetadata;
     }
 
+    @Override
     public @NotNull CompletableFuture<Void> runUpdateTask() {
         return CompletableFuture.runAsync(PacketUtil::trySendQueue);
     }
 
+    @Override
     public @NotNull EventBus<VPNEvent> getEventBus() {
         return eventBus;
     }

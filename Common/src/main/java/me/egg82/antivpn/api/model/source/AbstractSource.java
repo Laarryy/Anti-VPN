@@ -20,6 +20,7 @@ public abstract class AbstractSource<T extends SourceModel> implements Source<T>
         this.modelClass = modelClass;
     }
 
+    @Override
     public @NotNull Class<T> getModelClass() {
         return modelClass;
     }

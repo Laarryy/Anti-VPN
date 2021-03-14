@@ -33,6 +33,7 @@ public class KickCommand extends AbstractCommand {
         this.plugin = plugin;
     }
 
+    @Override
     public void execute(@NonNull CommandContext<BukkitLocalizedCommandSender> commandContext) {
         commandManager.taskRecipe().begin(commandContext)
                 .synchronous(c -> {

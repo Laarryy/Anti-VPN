@@ -30,6 +30,7 @@ public class BukkitPlayerManager extends AbstractPlayerManager {
         this.plugin = plugin;
     }
 
+    @Override
     public @NotNull CompletableFuture<@Nullable Player> getPlayer(@NotNull UUID uniqueId) {
         return CompletableFuture.supplyAsync(() -> {
             CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
@@ -44,6 +45,7 @@ public class BukkitPlayerManager extends AbstractPlayerManager {
         });
     }
 
+    @Override
     public @NotNull CompletableFuture<@Nullable Player> getPlayer(@NotNull String username) {
         return PlayerLookup.get(username).thenApply(info -> {
             CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
@@ -58,6 +60,7 @@ public class BukkitPlayerManager extends AbstractPlayerManager {
         });
     }
 
+    @Override
     public boolean kickForMcLeaks(@NotNull String playerName, @NotNull UUID playerUuid, @NotNull String ip) {
         CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
 
@@ -82,6 +85,7 @@ public class BukkitPlayerManager extends AbstractPlayerManager {
         return true;
     }
 
+    @Override
     public @Nullable Component getMcLeaksKickMessage(@NotNull String playerName, @NotNull UUID playerUuid, @NotNull String ip) {
         CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
 
@@ -91,6 +95,7 @@ public class BukkitPlayerManager extends AbstractPlayerManager {
         return null;
     }
 
+    @Override
     public @NotNull List<@NotNull String> getMcLeaksCommands(@NotNull String playerName, @NotNull UUID playerUuid, @NotNull String ip) {
         CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
 

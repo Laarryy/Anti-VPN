@@ -23,30 +23,37 @@ public class GenericIP implements IP {
         this.hc = Objects.hash(ip);
     }
 
+    @Override
     public @NotNull InetAddress getIP() {
         return ip;
     }
 
+    @Override
     public @Nullable Boolean getCascade() {
         return cascade;
     }
 
+    @Override
     public void setCascade(@Nullable Boolean status) {
         this.cascade = status;
     }
 
+    @Override
     public @Nullable Double getConsensus() {
         return consensus;
     }
 
+    @Override
     public void setConsensus(@Nullable Double status) {
         this.consensus = status;
     }
 
+    @Override
     public @NotNull AlgorithmMethod getType() {
         return type;
     }
 
+    @Override
     public void setType(@NotNull AlgorithmMethod type) {
         this.type = type;
     }

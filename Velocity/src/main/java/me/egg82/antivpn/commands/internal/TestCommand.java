@@ -24,6 +24,7 @@ public class TestCommand extends AbstractCommand {
         this.ip = ip;
     }
 
+    @Override
     public void run() {
         issuer.sendInfo(MessageKey.TEST__BEGIN, "{ip}", ip);
 

@@ -56,6 +56,7 @@ public abstract class AbstractMessagingService implements MessagingService {
         this.receivedPacketDirectory = new File(packetDirectory, "received");
     }
 
+    @Override
     public @NotNull String getName() {
         return name;
     }

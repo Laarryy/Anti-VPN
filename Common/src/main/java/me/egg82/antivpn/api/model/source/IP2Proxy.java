@@ -12,10 +12,12 @@ import java.net.HttpURLConnection;
 import java.util.concurrent.CompletableFuture;
 
 public class IP2Proxy extends AbstractSource<IP2ProxyModel> {
+    @Override
     public @NotNull String getName() {
         return "ip2proxy";
     }
 
+    @Override
     public boolean isKeyRequired() {
         return true;
     }
@@ -24,6 +26,7 @@ public class IP2Proxy extends AbstractSource<IP2ProxyModel> {
         super(IP2ProxyModel.class);
     }
 
+    @Override
     public @NotNull CompletableFuture<@NotNull Boolean> getResult(@NotNull String ip) {
         return getRawResponse(ip).thenApply(model -> {
             if (!"OK".equalsIgnoreCase(model.getResponse())) {
@@ -34,6 +37,7 @@ public class IP2Proxy extends AbstractSource<IP2ProxyModel> {
         });
     }
 
+    @Override
     public @NotNull CompletableFuture<@NotNull IP2ProxyModel> getRawResponse(@NotNull String ip) {
         return CompletableFuture.supplyAsync(() -> {
             if (!ValidationUtil.isValidIp(ip)) {

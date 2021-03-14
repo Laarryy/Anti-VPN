@@ -43,6 +43,7 @@ public class UpdaterHook implements PluginHook {
         PluginHooks.getHooks().add(this);
     }
 
+    @Override
     public void cancel() {
         workPool.shutdown();
         try {

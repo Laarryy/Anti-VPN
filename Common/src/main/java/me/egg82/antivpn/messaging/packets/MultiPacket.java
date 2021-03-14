@@ -29,6 +29,7 @@ public class MultiPacket extends AbstractPacket {
         super(UUIDUtil.EMPTY_UUID);
     }
 
+    @Override
     public void read(@NotNull ByteBuf buffer) {
         this.packets.clear();
 
@@ -59,6 +60,7 @@ public class MultiPacket extends AbstractPacket {
         }
     }
 
+    @Override
     public void write(@NotNull ByteBuf buffer) {
         if (packets.isEmpty()) {
             buffer.writeByte((byte) 0x00); // End of multi-packet

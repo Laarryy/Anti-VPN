@@ -22,6 +22,7 @@ public class PaperPlayerInfo extends MojangPlayerInfo {
         super(name);
     }
 
+    @Override
     protected @NotNull String nameExpensive(@NotNull UUID uuid) throws IOException {
         // Currently-online lookup
         Player player = Bukkit.getPlayer(uuid);
@@ -47,6 +48,7 @@ public class PaperPlayerInfo extends MojangPlayerInfo {
         throw new IOException("Could not load player data from Mojang (rate-limited?)");
     }
 
+    @Override
     protected @NotNull UUID uuidExpensive(@NotNull String name) throws IOException {
         // Currently-online lookup
         Player player = Bukkit.getPlayer(name);
@@ -72,6 +74,7 @@ public class PaperPlayerInfo extends MojangPlayerInfo {
         throw new IOException("Could not load player data from Mojang (rate-limited?)");
     }
 
+    @Override
     protected @NotNull List<ProfileModel.@NotNull ProfilePropertyModel> propertiesExpensive(@NotNull UUID uuid) throws IOException {
         // Cached profile lookup
         PlayerProfile profile = Bukkit.createProfile(uuid);

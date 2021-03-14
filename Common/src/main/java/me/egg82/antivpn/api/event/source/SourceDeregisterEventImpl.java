@@ -16,6 +16,7 @@ public class SourceDeregisterEventImpl extends AbstractCancellable implements So
         this.source = source;
     }
 
+    @Override
     public @NotNull Source<? extends SourceModel> getSource() {
         return source;
     }

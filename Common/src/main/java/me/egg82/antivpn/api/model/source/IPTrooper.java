@@ -11,10 +11,12 @@ import java.net.HttpURLConnection;
 import java.util.concurrent.CompletableFuture;
 
 public class IPTrooper extends AbstractSource<IPTrooperModel> {
+    @Override
     public @NotNull String getName() {
         return "iptrooper";
     }
 
+    @Override
     public boolean isKeyRequired() {
         return false;
     }
@@ -23,6 +25,7 @@ public class IPTrooper extends AbstractSource<IPTrooperModel> {
         super(IPTrooperModel.class);
     }
 
+    @Override
     public @NotNull CompletableFuture<@NotNull Boolean> getResult(@NotNull String ip) {
         return getRawResponse(ip).thenApply(model -> {
             if (model.getCode() == 3) {
@@ -33,6 +36,7 @@ public class IPTrooper extends AbstractSource<IPTrooperModel> {
         });
     }
 
+    @Override
     public @NotNull CompletableFuture<@NotNull IPTrooperModel> getRawResponse(@NotNull String ip) {
         return CompletableFuture.supplyAsync(() -> {
             if (!ValidationUtil.isValidIp(ip)) {

@@ -35,6 +35,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         super(name);
     }
 
+    @Override
     public void close() {
         queueLock.writeLock().lock();
         try {
@@ -46,6 +47,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         }
     }
 
+    @Override
     public void storeModel(@NotNull BaseModel model) {
         queueLock.readLock().lock();
         try {
@@ -55,6 +57,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         }
     }
 
+    @Override
     public void storeModels(@NotNull Collection<@NotNull ? extends BaseModel> models) {
         queueLock.readLock().lock();
         try (Transaction tx = connection.beginTransaction()) {
@@ -67,6 +70,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         }
     }
 
+    @Override
     public void deleteModel(@NotNull BaseModel model) {
         BaseModel newModel = duplicateModel(model, true);
         if (newModel == null) {
@@ -81,6 +85,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         }
     }
 
+    @Override
     public @NotNull IPModel getOrCreateIpModel(@NotNull String ip, int type) {
         queueLock.readLock().lock();
         try {
@@ -110,6 +115,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         }
     }
 
+    @Override
     public @Nullable IPModel getIpModel(@NotNull String ip, long cacheTimeMillis) {
         queueLock.readLock().lock();
         try {
@@ -122,6 +128,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         }
     }
 
+    @Override
     public @Nullable IPModel getIpModel(long ipId, long cacheTimeMillis) {
         queueLock.readLock().lock();
         try {
@@ -134,6 +141,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         }
     }
 
+    @Override
     public @NotNull Set<@NotNull IPModel> getAllIps(long cacheTimeMillis) {
         queueLock.readLock().lock();
         try {
@@ -145,6 +153,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         }
     }
 
+    @Override
     public @NotNull Set<@NotNull IPModel> getAllIps(int start, int max) {
         queueLock.readLock().lock();
         try {
@@ -156,6 +165,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         }
     }
 
+    @Override
     public @NotNull PlayerModel getOrCreatePlayerModel(@NotNull UUID player, boolean isMcLeaks) {
         queueLock.readLock().lock();
         try {
@@ -185,6 +195,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         }
     }
 
+    @Override
     public @Nullable PlayerModel getPlayerModel(@NotNull UUID player, long cacheTimeMillis) {
         queueLock.readLock().lock();
         try {
@@ -197,6 +208,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         }
     }
 
+    @Override
     public @Nullable PlayerModel getPlayerModel(long playerId, long cacheTimeMillis) {
         queueLock.readLock().lock();
         try {
@@ -209,6 +221,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         }
     }
 
+    @Override
     public @NotNull Set<@NotNull PlayerModel> getAllPlayers(long cacheTimeMillis) {
         queueLock.readLock().lock();
         try {
@@ -220,6 +233,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         }
     }
 
+    @Override
     public @NotNull Set<@NotNull PlayerModel> getAllPlayers(int start, int max) {
         queueLock.readLock().lock();
         try {
@@ -231,6 +245,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         }
     }
 
+    @Override
     public @NotNull DataModel getOrCreateDataModel(@NotNull String key, String value) {
         queueLock.readLock().lock();
         try {
@@ -260,6 +275,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         }
     }
 
+    @Override
     public @Nullable DataModel getDataModel(@NotNull String key) {
         queueLock.readLock().lock();
         try {
@@ -271,6 +287,7 @@ public abstract class AbstractJDBCStorageService extends AbstractStorageService 
         }
     }
 
+    @Override
     public @Nullable DataModel getDataModel(long dataId) {
         queueLock.readLock().lock();
         try {

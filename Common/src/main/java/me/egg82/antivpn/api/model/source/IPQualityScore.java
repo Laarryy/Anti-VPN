@@ -12,10 +12,12 @@ import java.net.HttpURLConnection;
 import java.util.concurrent.CompletableFuture;
 
 public class IPQualityScore extends AbstractSource<IPQualityScoreModel> {
+    @Override
     public @NotNull String getName() {
         return "ipqualityscore";
     }
 
+    @Override
     public boolean isKeyRequired() {
         return true;
     }
@@ -24,6 +26,7 @@ public class IPQualityScore extends AbstractSource<IPQualityScoreModel> {
         super(IPQualityScoreModel.class);
     }
 
+    @Override
     public @NotNull CompletableFuture<@NotNull Boolean> getResult(@NotNull String ip) {
         return getRawResponse(ip).thenApply(model -> {
             if (!model.isSuccess()) {
@@ -49,6 +52,7 @@ public class IPQualityScore extends AbstractSource<IPQualityScoreModel> {
         });
     }
 
+    @Override
     public @NotNull CompletableFuture<@NotNull IPQualityScoreModel> getRawResponse(@NotNull String ip) {
         return CompletableFuture.supplyAsync(() -> {
             if (!ValidationUtil.isValidIp(ip)) {

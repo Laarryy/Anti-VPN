@@ -18,6 +18,7 @@ import me.egg82.antivpn.storage.models.PlayerModel;
 import org.jetbrains.annotations.NotNull;
 
 public class VPNMessagingHandler extends AbstractMessagingHandler {
+    @Override
     protected boolean handlePacket(@NotNull Packet packet) {
         if (packet instanceof IPPacket) {
             handleIp((IPPacket) packet);

@@ -97,14 +97,17 @@ public class MojangPlayerInfo implements PlayerInfo {
         }
     }
 
+    @Override
     public @NotNull UUID getUUID() {
         return uuid;
     }
 
+    @Override
     public @NotNull String getName() {
         return name;
     }
 
+    @Override
     public @NotNull List<ProfileModel.@NotNull ProfilePropertyModel> getProperties() {
         return ImmutableList.copyOf(properties);
     }

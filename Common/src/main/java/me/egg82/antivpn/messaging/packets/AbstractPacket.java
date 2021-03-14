@@ -20,6 +20,7 @@ public abstract class AbstractPacket implements Packet {
         this.sender = sender;
     }
 
+    @Override
     public @NotNull UUID getSender() {
         return sender;
     }
@@ -107,6 +108,7 @@ public abstract class AbstractPacket implements Packet {
         buf.writeBytes(b);
     }
 
+    @Override
     public boolean verifyFullRead(@NotNull ByteBuf buffer) {
         if (buffer.readableBytes() > 0) {
             logger.warn(buffer.readableBytes() + " bytes remain in the packet ByteBuf after being parsed.");

@@ -27,6 +27,7 @@ public class KickCommand extends AbstractCommand {
         this.type = type;
     }
 
+    @Override
     public void run() {
         CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
 

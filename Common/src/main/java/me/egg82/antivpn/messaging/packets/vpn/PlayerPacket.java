@@ -28,11 +28,13 @@ public class PlayerPacket extends AbstractPacket {
         this.value = value;
     }
 
+    @Override
     public void read(@NotNull ByteBuf buffer) {
         this.uuid = readUUID(buffer);
         this.value = buffer.readBoolean();
     }
 
+    @Override
     public void write(@NotNull ByteBuf buffer) {
         writeUUID(this.uuid, buffer);
         buffer.writeBoolean(this.value);

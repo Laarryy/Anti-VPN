@@ -16,6 +16,7 @@ public class SourceRegisterEventImpl extends AbstractCancellable implements Sour
         this.source = source;
     }
 
+    @Override
     public @NotNull Source<? extends SourceModel> getSource() {
         return source;
     }

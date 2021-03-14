@@ -42,6 +42,7 @@ public class MessagingHandlerImpl extends AbstractMessagingHandler implements Me
         }
     }
 
+    @Override
     public void handlePacket(@NotNull UUID messageId, @NotNull String fromService, @NotNull Packet packet) {
         if (CollectionProvider.isDuplicateMessage(messageId)) {
             return;
@@ -58,6 +59,7 @@ public class MessagingHandlerImpl extends AbstractMessagingHandler implements Me
         }
     }
 
+    @Override
     protected boolean handlePacket(@NotNull Packet packet) {
         if (packet instanceof MultiPacket) {
             handleMulti((MultiPacket) packet);

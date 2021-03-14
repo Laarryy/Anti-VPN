@@ -19,6 +19,7 @@ public class CheckCommand extends AbstractCommand {
         this.type = type;
     }
 
+    @Override
     public void run() {
         issuer.sendInfo(MessageKey.CHECK__BEGIN, "{type}", type);
 

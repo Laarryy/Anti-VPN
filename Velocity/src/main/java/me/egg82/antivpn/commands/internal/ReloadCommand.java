@@ -35,6 +35,7 @@ public class ReloadCommand extends AbstractCommand {
         this.console = console;
     }
 
+    @Override
     public void run() {
         issuer.sendInfo(MessageKey.RELOAD__BEGIN);
 

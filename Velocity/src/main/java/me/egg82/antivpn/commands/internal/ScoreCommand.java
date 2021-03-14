@@ -29,6 +29,7 @@ public class ScoreCommand extends AbstractCommand {
         this.sourceName = sourceName;
     }
 
+    @Override
     public void run() {
         issuer.sendInfo(MessageKey.SCORE__BEGIN, "{source}", sourceName);
 

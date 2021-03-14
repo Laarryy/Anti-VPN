@@ -38,6 +38,7 @@ public class ReloadCommand extends AbstractCommand {
         this.plugin = plugin;
     }
 
+    @Override
     public void execute(@NotNull CommandContext<BukkitLocalizedCommandSender> commandContext) {
         commandManager.taskRecipe().begin(commandContext)
                 .asynchronous(c -> {

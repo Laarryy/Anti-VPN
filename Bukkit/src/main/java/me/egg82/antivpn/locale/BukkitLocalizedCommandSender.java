@@ -33,10 +33,12 @@ public class BukkitLocalizedCommandSender extends AbstractLocalizedCommandSender
         return sender.getAudience();
     }
 
+    @Override
     public boolean isConsole() {
         return isConsole;
     }
 
+    @Override
     public boolean isUser() {
         return isUser;
     }

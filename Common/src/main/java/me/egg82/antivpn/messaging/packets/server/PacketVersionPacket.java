@@ -30,12 +30,14 @@ public class PacketVersionPacket extends AbstractPacket {
         this.packetVersion = protocolVersion;
     }
 
+    @Override
     public void read(@NotNull ByteBuf buffer) {
         this.intendedRecipient = readUUID(buffer);
         this.server = readUUID(buffer);
         this.packetVersion = buffer.readByte();
     }
 
+    @Override
     public void write(@NotNull ByteBuf buffer) {
         writeUUID(this.intendedRecipient, buffer);
         writeUUID(this.server, buffer);

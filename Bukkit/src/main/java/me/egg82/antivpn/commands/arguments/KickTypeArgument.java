@@ -52,12 +52,14 @@ public class KickTypeArgument<C> extends CommandArgument<C, KickType> {
             super(KickType.class, name);
         }
 
+        @Override
         public @NotNull KickTypeArgument<C> build() {
             return new KickTypeArgument<>(this.isRequired(), this.getName(), this.getDefaultValue(), this.getSuggestionsProvider(), this.getDefaultDescription());
         }
     }
 
     public static class KickTypeParser<C> implements ArgumentParser<C, KickType> {
+        @Override
         public @NotNull ArgumentParseResult<KickType> parse(@NotNull CommandContext<C> commandContext, @NotNull Queue<String> inputQueue) {
             System.out.println("kick parser inputQueue: \"" + Arrays.toString(inputQueue.toArray(new String[0])) + "\"");
             String arg = inputQueue.poll();
@@ -73,6 +75,7 @@ public class KickTypeArgument<C> extends CommandArgument<C, KickType> {
             return ArgumentParseResult.failure(new KickParseException(arg, commandContext));
         }
 
+        @Override
         public @NotNull List<String> suggestions(@NotNull CommandContext<C> commandContext, @NotNull String input) {
             if (input.isEmpty()) {
                 return ImmutableList.of("vpn", "mcleaks");
@@ -86,6 +89,7 @@ public class KickTypeArgument<C> extends CommandArgument<C, KickType> {
             return ImmutableList.of();
         }
 
+        @Override
         public boolean isContextFree() {
             return true;
         }

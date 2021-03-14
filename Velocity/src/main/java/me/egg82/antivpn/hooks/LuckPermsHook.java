@@ -20,6 +20,7 @@ public class LuckPermsHook implements PluginHook {
         this.console = console;
     }
 
+    @Override
     public void cancel() {
     }
 

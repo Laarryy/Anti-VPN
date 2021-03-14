@@ -20,6 +20,7 @@ public class SourceManagerImpl implements SourceManager {
     private final List<Source<? extends SourceModel>> sources = new CopyOnWriteArrayList<>();
     private final Object sourceLock = new Object();
 
+    @Override
     public @Nullable Source<? extends SourceModel> getSource(@NotNull String name) {
         for (Source<? extends SourceModel> source : sources) {
             if (source.getName().equals(name)) {
@@ -29,6 +30,7 @@ public class SourceManagerImpl implements SourceManager {
         return null;
     }
 
+    @Override
     public @Nullable <T extends SourceModel> Source<T> getSource(@NotNull String name, @NotNull Class<T> modelClass) {
         for (Source<? extends SourceModel> source : sources) {
             if (source.getName().equals(name) && source.getModelClass().isAssignableFrom(modelClass)) {
@@ -38,6 +40,7 @@ public class SourceManagerImpl implements SourceManager {
         return null;
     }
 
+    @Override
     public boolean registerSource(@NotNull Source<? extends SourceModel> source, int index) {
         synchronized (sourceLock) {
             for (Source<? extends SourceModel> s : sources) {
@@ -61,6 +64,7 @@ public class SourceManagerImpl implements SourceManager {
         }
     }
 
+    @Override
     public boolean deregisterSource(@NotNull Source<? extends SourceModel> source) {
         synchronized (sourceLock) {
             for (Iterator<Source<? extends SourceModel>> i = sources.iterator(); i.hasNext(); ) {
@@ -85,6 +89,7 @@ public class SourceManagerImpl implements SourceManager {
         }
     }
 
+    @Override
     public @NotNull List<@NotNull Source<? extends SourceModel>> getSources() {
         return ImmutableList.copyOf(sources);
     }

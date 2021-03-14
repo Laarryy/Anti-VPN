@@ -21,6 +21,7 @@ public class VelocityPlayer extends AbstractPlayer {
         this.proxy = proxy;
     }
 
+    @Override
     protected @NotNull CompletableFuture<String> fetchName(@NotNull UUID uuid) {
         return PlayerLookup.get(uuid, proxy).thenApply(PlayerInfo::getName);
     }

@@ -98,14 +98,17 @@ public class VelocityPlayerInfo implements PlayerInfo {
         }
     }
 
+    @Override
     public @NotNull UUID getUUID() {
         return uuid;
     }
 
+    @Override
     public @NotNull String getName() {
         return name;
     }
 
+    @Override
     public @NotNull ImmutableList<ProfileModel.ProfilePropertyModel> getProperties() {
         return ImmutableList.copyOf(properties);
     }

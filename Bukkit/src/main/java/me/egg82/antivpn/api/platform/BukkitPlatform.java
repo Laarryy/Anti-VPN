@@ -27,18 +27,22 @@ public class BukkitPlatform implements Platform {
         this.startTime = Instant.ofEpochMilli(startTime);
     }
 
+    @Override
     public @NotNull Type getType() {
         return Type.BUKKIT;
     }
 
+    @Override
     public @NotNull Set<@NotNull UUID> getUniquePlayers() {
         return ImmutableSet.copyOf(uniquePlayers);
     }
 
+    @Override
     public @NotNull Set<@NotNull InetAddress> getUniqueIPs() {
         return ImmutableSet.copyOf(uniqueIps);
     }
 
+    @Override
     public @NotNull Instant getStartTime() {
         return startTime;
     }

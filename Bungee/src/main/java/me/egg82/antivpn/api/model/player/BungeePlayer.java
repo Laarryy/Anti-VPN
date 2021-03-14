@@ -16,6 +16,7 @@ public class BungeePlayer extends AbstractPlayer {
         super(uuid, name, mcleaks);
     }
 
+    @Override
     protected @NotNull CompletableFuture<String> fetchName(@NotNull UUID uuid) {
         return PlayerLookup.get(uuid).thenApply(PlayerInfo::getName);
     }

@@ -53,6 +53,7 @@ public class VaultHook implements PluginHook {
         PluginHooks.getHooks().add(this);
     }
 
+    @Override
     public void cancel() {
     }
 
