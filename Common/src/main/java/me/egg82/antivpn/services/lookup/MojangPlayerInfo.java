@@ -4,6 +4,13 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.google.common.collect.ImmutableList;
 import flexjson.JSONDeserializer;
+import me.egg82.antivpn.services.lookup.models.PlayerNameModel;
+import me.egg82.antivpn.services.lookup.models.PlayerUUIDModel;
+import me.egg82.antivpn.services.lookup.models.ProfileModel;
+import me.egg82.antivpn.utils.TimeUtil;
+import me.egg82.antivpn.web.WebRequest;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -13,14 +20,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-
-import me.egg82.antivpn.services.lookup.models.PlayerNameModel;
-import me.egg82.antivpn.services.lookup.models.PlayerUUIDModel;
-import me.egg82.antivpn.services.lookup.models.ProfileModel;
-import me.egg82.antivpn.utils.TimeUtil;
-import me.egg82.antivpn.web.WebRequest;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public class MojangPlayerInfo implements PlayerInfo {
     private final UUID uuid;

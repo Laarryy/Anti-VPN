@@ -1,10 +1,10 @@
 package me.egg82.antivpn.locale;
 
-import java.util.Map;
-
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Map;
 
 public interface LocalizedCommandSender<M extends LocalizedCommandSender<M, B>, B> {
     @NotNull B getBase();

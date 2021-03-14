@@ -1,17 +1,16 @@
 package me.egg82.antivpn.config;
 
 import com.google.common.io.Files;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
-import java.util.concurrent.TimeUnit;
-
 import me.egg82.antivpn.utils.TimeUtil;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.configurate.CommentedConfigurationNode;
 import org.spongepowered.configurate.loader.ConfigurationLoader;
 import org.spongepowered.configurate.serialize.SerializationException;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 public class ConfigurationVersionUtil {
     private ConfigurationVersionUtil() { }

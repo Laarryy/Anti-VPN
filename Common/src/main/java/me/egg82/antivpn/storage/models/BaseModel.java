@@ -3,14 +3,13 @@ package me.egg82.antivpn.storage.models;
 import io.ebean.Model;
 import io.ebean.annotation.WhenCreated;
 import io.ebean.annotation.WhenModified;
+import org.jetbrains.annotations.Nullable;
 
-import java.io.Serializable;
-import java.time.Instant;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.Version;
-
-import org.jetbrains.annotations.Nullable;
+import java.io.Serializable;
+import java.time.Instant;
 
 @MappedSuperclass
 public abstract class BaseModel extends Model implements Serializable {

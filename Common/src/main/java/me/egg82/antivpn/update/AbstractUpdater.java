@@ -1,15 +1,15 @@
 package me.egg82.antivpn.update;
 
-import java.io.IOException;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.atomic.AtomicLong;
-
 import me.egg82.antivpn.logging.GELFLogger;
 import me.egg82.antivpn.utils.TimeUtil;
 import me.egg82.antivpn.utils.VersionUtil;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicLong;
 
 public abstract class AbstractUpdater implements Updater {
     protected final Logger logger = new GELFLogger(LoggerFactory.getLogger(getClass()));

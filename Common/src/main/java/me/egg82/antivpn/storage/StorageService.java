@@ -1,15 +1,15 @@
 package me.egg82.antivpn.storage;
 
-import java.util.Collection;
-import java.util.Set;
-import java.util.UUID;
-
 import me.egg82.antivpn.storage.models.BaseModel;
 import me.egg82.antivpn.storage.models.DataModel;
 import me.egg82.antivpn.storage.models.IPModel;
 import me.egg82.antivpn.storage.models.PlayerModel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Collection;
+import java.util.Set;
+import java.util.UUID;
 
 public interface StorageService {
     @NotNull String getName();

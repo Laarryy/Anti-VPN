@@ -1,11 +1,5 @@
 package me.egg82.antivpn.reflect;
 
-import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import me.egg82.antivpn.config.ConfigUtil;
 import me.egg82.antivpn.logging.GELFLogger;
 import org.jetbrains.annotations.NotNull;
@@ -19,6 +13,12 @@ import org.reflections8.util.ConfigurationBuilder;
 import org.reflections8.util.FilterBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class PackageFilter {
     private static final Logger logger = new GELFLogger(LoggerFactory.getLogger(PackageFilter.class));

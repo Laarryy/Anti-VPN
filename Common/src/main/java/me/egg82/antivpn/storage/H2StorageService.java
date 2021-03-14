@@ -2,13 +2,12 @@ package me.egg82.antivpn.storage;
 
 import com.zaxxer.hikari.HikariConfig;
 import io.ebean.config.dbplatform.h2.H2Platform;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.Properties;
-
-import org.jetbrains.annotations.NotNull;
 
 public class H2StorageService extends AbstractJDBCStorageService {
     private H2StorageService(@NotNull String name) {

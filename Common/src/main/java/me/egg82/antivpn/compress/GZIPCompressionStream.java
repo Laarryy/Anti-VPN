@@ -1,14 +1,13 @@
 package me.egg82.antivpn.compress;
 
 import com.google.common.io.ByteStreams;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
-
-import org.jetbrains.annotations.NotNull;
 
 public class GZIPCompressionStream extends AbstractCompressionStream {
     @Override

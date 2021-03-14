@@ -2,10 +2,9 @@ package me.egg82.antivpn.utils;
 
 import inet.ipaddr.AddressStringException;
 import inet.ipaddr.IPAddressString;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.regex.Pattern;
-
-import org.jetbrains.annotations.Nullable;
 
 public class ValidationUtil {
     /**

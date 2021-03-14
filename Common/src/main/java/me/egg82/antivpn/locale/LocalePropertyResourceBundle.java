@@ -1,13 +1,13 @@
 package me.egg82.antivpn.locale;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.Locale;
 import java.util.PropertyResourceBundle;
-
-import org.jetbrains.annotations.NotNull;
 
 public class LocalePropertyResourceBundle extends PropertyResourceBundle {
     private final Locale locale;

@@ -1,15 +1,15 @@
 package me.egg82.antivpn.locale;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Locale;
-import java.util.ResourceBundle;
-
 import me.egg82.antivpn.logging.GELFLogger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 public class LocaleUtil {
     private static final Logger logger = new GELFLogger(LoggerFactory.getLogger(LocaleUtil.class));

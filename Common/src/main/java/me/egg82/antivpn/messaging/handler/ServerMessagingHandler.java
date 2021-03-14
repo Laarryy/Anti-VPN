@@ -1,7 +1,5 @@
 package me.egg82.antivpn.messaging.handler;
 
-import java.util.UUID;
-
 import me.egg82.antivpn.config.ConfigUtil;
 import me.egg82.antivpn.messaging.packets.Packet;
 import me.egg82.antivpn.messaging.packets.server.InitializationPacket;
@@ -10,6 +8,8 @@ import me.egg82.antivpn.messaging.packets.server.ShutdownPacket;
 import me.egg82.antivpn.services.CollectionProvider;
 import me.egg82.antivpn.utils.PacketUtil;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.UUID;
 
 public class ServerMessagingHandler extends AbstractMessagingHandler {
     @Override

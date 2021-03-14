@@ -2,18 +2,17 @@ package me.egg82.antivpn.config;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import me.egg82.antivpn.api.model.ip.AlgorithmMethod;
+import me.egg82.antivpn.messaging.MessagingService;
+import me.egg82.antivpn.storage.StorageService;
+import me.egg82.antivpn.utils.TimeUtil;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-
-import me.egg82.antivpn.api.model.ip.AlgorithmMethod;
-import me.egg82.antivpn.messaging.MessagingService;
-import me.egg82.antivpn.storage.StorageService;
-import me.egg82.antivpn.utils.TimeUtil;
-import org.jetbrains.annotations.NotNull;
 
 public class CachedConfig {
     private CachedConfig() { }

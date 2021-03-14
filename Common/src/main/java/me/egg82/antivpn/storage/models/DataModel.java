@@ -1,10 +1,10 @@
 package me.egg82.antivpn.storage.models;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
-
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import javax.persistence.Entity;
+import javax.persistence.Table;
 
 @Entity
 @Table(name = "avpn_6_data")

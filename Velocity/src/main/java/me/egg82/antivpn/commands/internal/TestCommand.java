@@ -2,10 +2,6 @@ package me.egg82.antivpn.commands.internal;
 
 import co.aikar.commands.CommandIssuer;
 import com.velocitypowered.api.proxy.ProxyServer;
-
-import java.util.*;
-import java.util.concurrent.*;
-
 import me.egg82.antivpn.api.VPNAPIProvider;
 import me.egg82.antivpn.api.model.source.Source;
 import me.egg82.antivpn.api.model.source.SourceManager;
@@ -15,6 +11,9 @@ import me.egg82.antivpn.config.ConfigUtil;
 import me.egg82.antivpn.locale.MessageKey;
 import me.egg82.antivpn.utils.ExceptionUtil;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.*;
+import java.util.concurrent.*;
 
 public class TestCommand extends AbstractCommand {
     private final String ip;

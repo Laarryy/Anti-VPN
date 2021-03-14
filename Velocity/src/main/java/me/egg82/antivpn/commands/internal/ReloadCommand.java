@@ -2,9 +2,6 @@ package me.egg82.antivpn.commands.internal;
 
 import co.aikar.commands.CommandIssuer;
 import com.velocitypowered.api.proxy.ProxyServer;
-
-import java.io.File;
-
 import me.egg82.antivpn.api.APIRegistrationUtil;
 import me.egg82.antivpn.api.VPNAPI;
 import me.egg82.antivpn.api.VPNAPIImpl;
@@ -24,6 +21,8 @@ import me.egg82.antivpn.messaging.handler.MessagingHandlerImpl;
 import me.egg82.antivpn.storage.StorageService;
 import ninja.egg82.service.ServiceLocator;
 import org.jetbrains.annotations.NotNull;
+
+import java.io.File;
 
 public class ReloadCommand extends AbstractCommand {
     private final File dataFolder;

@@ -1,12 +1,12 @@
 package me.egg82.antivpn.locale;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.io.*;
 import java.nio.file.Files;
 import java.util.Locale;
 import java.util.ResourceBundle;
-
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public class LanguageFileUtil {
     private LanguageFileUtil() { }

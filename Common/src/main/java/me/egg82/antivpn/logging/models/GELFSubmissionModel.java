@@ -1,14 +1,13 @@
 package me.egg82.antivpn.logging.models;
 
 import flexjson.JSON;
+import me.egg82.antivpn.utils.UUIDUtil;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.Objects;
-
-import me.egg82.antivpn.utils.UUIDUtil;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public class GELFSubmissionModel implements Serializable {
     private String version = "1.1";

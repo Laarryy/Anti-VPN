@@ -2,19 +2,6 @@ package me.egg82.antivpn.logging;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import flexjson.JSONSerializer;
-
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
-import java.time.Instant;
-import java.util.UUID;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-
 import me.egg82.antivpn.api.platform.Platform;
 import me.egg82.antivpn.compress.GZIPCompressionStream;
 import me.egg82.antivpn.core.DoubleBuffer;
@@ -28,6 +15,18 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.time.Instant;
+import java.util.UUID;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class GELFLoggerUtil {
     private static final Logger logger = LoggerFactory.getLogger(GELFLoggerUtil.class);

@@ -1,13 +1,12 @@
 package me.egg82.antivpn.services.lookup;
 
 import com.velocitypowered.api.proxy.ProxyServer;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
-
-import org.jetbrains.annotations.NotNull;
 
 public class PlayerLookup {
     private PlayerLookup() { }

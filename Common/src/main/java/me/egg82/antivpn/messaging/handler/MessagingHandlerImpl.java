@@ -1,9 +1,5 @@
 package me.egg82.antivpn.messaging.handler;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
 import me.egg82.antivpn.config.ConfigUtil;
 import me.egg82.antivpn.logging.GELFLogger;
 import me.egg82.antivpn.messaging.packets.MultiPacket;
@@ -14,6 +10,10 @@ import me.egg82.antivpn.utils.PacketUtil;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 public class MessagingHandlerImpl extends AbstractMessagingHandler implements MessagingHandler {
     private static final Logger logger = new GELFLogger(LoggerFactory.getLogger(MessagingHandlerImpl.class));

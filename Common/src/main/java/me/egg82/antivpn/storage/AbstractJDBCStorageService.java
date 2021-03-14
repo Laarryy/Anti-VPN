@@ -7,12 +7,6 @@ import io.ebean.DatabaseFactory;
 import io.ebean.Transaction;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.config.dbplatform.DatabasePlatform;
-
-import java.io.File;
-import java.time.Instant;
-import java.util.*;
-import javax.persistence.PersistenceException;
-
 import me.egg82.antivpn.storage.models.BaseModel;
 import me.egg82.antivpn.storage.models.DataModel;
 import me.egg82.antivpn.storage.models.IPModel;
@@ -26,6 +20,11 @@ import org.jetbrains.annotations.Nullable;
 import org.reflections8.Reflections;
 import org.reflections8.ReflectionsException;
 import org.reflections8.scanners.ResourcesScanner;
+
+import javax.persistence.PersistenceException;
+import java.io.File;
+import java.time.Instant;
+import java.util.*;
 
 public abstract class AbstractJDBCStorageService extends AbstractStorageService {
     protected Database connection;

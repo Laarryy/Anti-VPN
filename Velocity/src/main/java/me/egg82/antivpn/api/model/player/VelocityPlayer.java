@@ -1,13 +1,12 @@
 package me.egg82.antivpn.api.model.player;
 
 import com.velocitypowered.api.proxy.ProxyServer;
-
-import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
-
 import me.egg82.antivpn.services.lookup.PlayerInfo;
 import me.egg82.antivpn.services.lookup.PlayerLookup;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 public class VelocityPlayer extends AbstractPlayer {
     private final ProxyServer proxy;

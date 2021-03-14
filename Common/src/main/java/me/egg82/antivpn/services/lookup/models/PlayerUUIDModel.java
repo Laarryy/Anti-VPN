@@ -1,9 +1,9 @@
 package me.egg82.antivpn.services.lookup.models;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.io.Serializable;
 import java.util.Objects;
-
-import org.jetbrains.annotations.Nullable;
 
 public class PlayerUUIDModel implements Serializable {
     private String name = null;

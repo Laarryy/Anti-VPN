@@ -2,12 +2,11 @@ package me.egg82.antivpn.storage.models;
 
 import io.ebean.annotation.Index;
 import io.ebean.annotation.Length;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.persistence.Entity;
 import javax.persistence.Table;
-
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 @Entity
 @Table(name = "avpn_6_ip")

@@ -1,11 +1,11 @@
 package me.egg82.antivpn.locale;
 
-import java.util.Map;
-
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Map;
 
 public abstract class AbstractLocalizedCommandSender<M extends AbstractLocalizedCommandSender<M, B>, B> implements LocalizedCommandSender<M, B> {
     protected static final MiniMessage formatter = MiniMessage.get();

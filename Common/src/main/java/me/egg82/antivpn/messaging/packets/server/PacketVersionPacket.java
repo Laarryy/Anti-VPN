@@ -1,13 +1,12 @@
 package me.egg82.antivpn.messaging.packets.server;
 
 import io.netty.buffer.ByteBuf;
-
-import java.util.Objects;
-import java.util.UUID;
-
 import me.egg82.antivpn.messaging.packets.AbstractPacket;
 import me.egg82.antivpn.utils.UUIDUtil;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Objects;
+import java.util.UUID;
 
 public class PacketVersionPacket extends AbstractPacket {
     private UUID intendedRecipient;

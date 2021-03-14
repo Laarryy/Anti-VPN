@@ -2,9 +2,6 @@ package me.egg82.antivpn.commands.internal;
 
 import co.aikar.commands.CommandIssuer;
 import com.velocitypowered.api.proxy.ProxyServer;
-
-import java.util.Set;
-
 import me.egg82.antivpn.config.CachedConfig;
 import me.egg82.antivpn.config.ConfigUtil;
 import me.egg82.antivpn.locale.MessageKey;
@@ -12,6 +9,8 @@ import me.egg82.antivpn.storage.StorageService;
 import me.egg82.antivpn.storage.models.IPModel;
 import me.egg82.antivpn.storage.models.PlayerModel;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Set;
 
 public class ImportCommand extends AbstractCommand {
     private final String masterName;

@@ -1,10 +1,9 @@
 package me.egg82.antivpn.locale;
 
 import cloud.commandframework.ArgumentDescription;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
-
-import org.jetbrains.annotations.NotNull;
 
 public class LocalizedArgumentDescription implements ArgumentDescription {
     public static ArgumentDescription of(@NotNull MessageKey key) { return new LocalizedArgumentDescription(LocaleUtil.getDefaultI18N(), key); }

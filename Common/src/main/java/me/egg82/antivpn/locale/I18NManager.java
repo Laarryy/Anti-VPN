@@ -1,15 +1,15 @@
 package me.egg82.antivpn.locale;
 
+import me.egg82.antivpn.logging.GELFLogger;
+import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-
-import me.egg82.antivpn.logging.GELFLogger;
-import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class I18NManager {
     private static final Logger logger = new GELFLogger(LoggerFactory.getLogger(I18NManager.class));

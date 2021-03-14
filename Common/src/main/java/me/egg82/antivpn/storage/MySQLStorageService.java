@@ -2,12 +2,11 @@ package me.egg82.antivpn.storage;
 
 import com.zaxxer.hikari.HikariConfig;
 import io.ebean.config.dbplatform.mysql.MySqlPlatform;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.Properties;
-
-import org.jetbrains.annotations.NotNull;
 
 public class MySQLStorageService extends AbstractJDBCStorageService {
     private MySQLStorageService(@NotNull String name) {

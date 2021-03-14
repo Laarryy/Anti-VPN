@@ -1,13 +1,12 @@
 package me.egg82.antivpn.storage.models;
 
 import io.ebean.annotation.Index;
-
-import java.util.UUID;
-import javax.persistence.Entity;
-import javax.persistence.Table;
-
 import me.egg82.antivpn.utils.UUIDUtil;
 import org.jetbrains.annotations.NotNull;
+
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import java.util.UUID;
 
 @Entity
 @Table(name = "avpn_6_player")
