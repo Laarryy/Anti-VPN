@@ -7,7 +7,7 @@ import me.egg82.antivpn.api.model.source.SourceManagerImpl;
 import me.egg82.antivpn.api.platform.Platform;
 import me.egg82.antivpn.config.ConfigUtil;
 import me.egg82.antivpn.utils.PacketUtil;
-import me.egg82.avpn.api.platform.AbstractPluginMetadata;
+import me.egg82.antivpn.api.platform.AbstractPluginMetadata;
 import net.kyori.event.EventBus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

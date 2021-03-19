@@ -2,10 +2,10 @@ package me.egg82.antivpn.api.platform;
 
 import org.jetbrains.annotations.NotNull;
 
-public class VelocityPluginMetadata extends AbstractPluginMetadata {
+public class BukkitPluginMetadata extends AbstractPluginMetadata {
     private final String pluginVersion;
 
-    public VelocityPluginMetadata(String pluginVersion) {
+    public BukkitPluginMetadata(@NotNull String pluginVersion) {
         this.pluginVersion = pluginVersion;
     }
 

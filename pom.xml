@@ -17,6 +17,7 @@
         <plugin.version>7.0.0</plugin.version>
         <api.version>3.0.0</api.version>
 
+        <spigot.version>1.16.5-R0.1-SNAPSHOT</spigot.version>
         <paper.version>1.16.5-R0.1-SNAPSHOT</paper.version>
         <waterfall.version>1.16-R0.4-SNAPSHOT</waterfall.version>
         <velocity.version>1.1.4</velocity.version>
@@ -187,7 +188,8 @@
     <modules>
         <module>API</module>
         <module>Common</module>
-        <module>Bukkit</module>
+        <module>Spigot</module>
+        <module>Paper</module>
         <!--<module>Bungee</module>
         <module>Velocity</module>-->
     </modules>

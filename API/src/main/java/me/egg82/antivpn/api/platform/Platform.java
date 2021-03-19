@@ -43,7 +43,8 @@ public interface Platform {
      * Represents a type of platform which Anti-VPN can run on.
      */
     enum Type {
-        BUKKIT("Bukkit"),
+        PAPER("Paper"),
+        SPIGOT("Spigot"),
         BUNGEECORD("BungeeCord"),
         VELOCITY("Velocity");
 
