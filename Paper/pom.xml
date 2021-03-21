@@ -96,8 +96,12 @@
                             <shadedPattern>me.egg82.antivpn.external.me.lucko.jarrelocator</shadedPattern>
                         </relocation>
                         <relocation>
-                            <pattern>ninja.egg82</pattern>
-                            <shadedPattern>me.egg82.antivpn.external.ninja.egg82</shadedPattern>
+                            <pattern>ninja.egg82.events</pattern>
+                            <shadedPattern>me.egg82.antivpn.external.ninja.egg82.events</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>ninja.egg82.mvn</pattern>
+                            <shadedPattern>me.egg82.antivpn.external.ninja.egg82.mvn</shadedPattern>
                         </relocation>
                         <relocation>
                             <pattern>org.bstats</pattern>
@@ -139,6 +143,10 @@
                                     <artifact>*:*</artifact>
                                     <excludes>
                                         <!-- included or useless -->
+                                        <exclude>licenses/**</exclude>
+                                        <exclude>*.html</exclude>
+                                        <exclude>*.xml</exclude>
+
                                         <exclude>LICENSE*</exclude>
                                         <exclude>NOTICE*</exclude>
                                         <exclude>README*</exclude>
@@ -148,10 +156,6 @@
                                         <exclude>META-INF/*.SF</exclude>
                                         <exclude>META-INF/*.DSA</exclude>
                                         <exclude>META-INF/*.RSA</exclude>
-                                        <exclude>junit/**</exclude>
-                                        <exclude>org/intellij/**</exclude>
-                                        <exclude>org/junit/**</exclude>
-                                        <exclude>org/hamcrest/**</exclude>
                                         <exclude>ebean.mf</exclude>
 
                                         <exclude>org/antlr/v4/runtime/**</exclude>
@@ -161,14 +165,14 @@
                                         <exclude>io/ebean/api/**</exclude>
                                         <exclude>io/ebeaninternal/**</exclude>
                                         <exclude>io/ebeanservice/**</exclude>
-
-                                        <exclude>javassist/**</exclude>
-
-                                        <exclude>redis/clients/jedis/**</exclude>
                                     </excludes>
                                 </filter>
                                 <filter>
-                                    <!-- prevent removal of things from API -->
+                                    <!-- prevent removal of things from common/API -->
+                                    <artifact>me.egg82:antivpn-common</artifact>
+                                    <includes>
+                                        <include>**</include>
+                                    </includes>
                                     <artifact>me.egg82:antivpn-api</artifact>
                                     <includes>
                                         <include>**</include>
@@ -260,7 +264,6 @@
             <groupId>ninja.egg82</groupId>
             <artifactId>event-chain-api</artifactId>
             <version>${eventchain.api.version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>ninja.egg82</groupId>

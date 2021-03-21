@@ -49,7 +49,7 @@
         <minimessage.version>4.1.0-SNAPSHOT</minimessage.version>
         <eventchain.api.version>2.1.0</eventchain.api.version>
         <eventchain.version>3.1.2</eventchain.version>
-        <mvn-loader.version>1.1.0</mvn-loader.version>
+        <mvn-loader.version>1.2.0</mvn-loader.version>
         <mvn.version>3.6.3</mvn.version>
         <relocator.version>1.4</relocator.version>
         <reflections.version>0.11.7</reflections.version>
@@ -186,8 +186,8 @@
     <modules>
         <module>API</module>
         <module>Common</module>
-        <module>Spigot</module>
         <module>Paper</module>
+        <!--<module>Spigot</module>-->
         <!--<module>Bungee</module>
         <module>Velocity</module>-->
     </modules>
