@@ -162,6 +162,8 @@
                                         <exclude>org/json/simple/**</exclude>
 
                                         <!-- dep injected (keep this to as few as possible) -->
+                                        <exclude>META-INF/maven/io.ebean/**</exclude>
+
                                         <exclude>io/ebean/api/**</exclude>
                                         <exclude>io/ebeaninternal/**</exclude>
                                         <exclude>io/ebeanservice/**</exclude>
