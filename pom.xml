@@ -34,25 +34,23 @@
         <nats.version>2.8.0</nats.version>
         <zstd.version>1.4.9-1</zstd.version>
         <guava.version>30.1-jre</guava.version>
-        <fastutil.version>8.2.2
-        </fastutil.version> <!-- keep updated with Paper: https://github.com/PaperMC/Paper/blob/master/Spigot-API-Patches/0002-Add-FastUtil-to-Bukkit.patch -->
+        <fastutil.version>8.2.2</fastutil.version> <!-- keep updated with Paper: https://github.com/PaperMC/Paper/blob/master/Spigot-API-Patches/0002-Add-FastUtil-to-Bukkit.patch -->
         <caffeine.version>2.9.0</caffeine.version> <!-- v3 is J11 only -->
         <ipaddress.version>5.3.3</ipaddress.version>
         <slf4j.version>1.7.30</slf4j.version>
-        <netty.version>4.1.50.Final
-        </netty.version> <!-- keep this updated with Paper: https://github.com/PaperMC/Paper/blob/d3dc24999e0a1e8f3e8d9d59a36f32261a52a498/Spigot-Server-Patches/0001-POM-Changes.patch -->
+        <netty.version>4.1.50.Final</netty.version> <!-- keep this updated with Paper: https://github.com/PaperMC/Paper/blob/d3dc24999e0a1e8f3e8d9d59a36f32261a52a498/Spigot-Server-Patches/0001-POM-Changes.patch -->
         <jetbrains.version>20.1.0</jetbrains.version>
         <junit.version>5.8.0-M1</junit.version>
 
         <cloud.version>1.4.0</cloud.version>
         <commodore.version>1.9</commodore.version>
-        <adventure.version>4.7.0
-        </adventure.version> <!-- keep updated with Paper: https://github.com/PaperMC/Paper/blob/master/Spigot-API-Patches/0005-Adventure.patch -->
+        <adventure.version>4.7.0</adventure.version> <!-- keep updated with Paper: https://github.com/PaperMC/Paper/blob/master/Spigot-API-Patches/0005-Adventure.patch -->
         <adventure.bukkit.version>4.0.0-SNAPSHOT</adventure.bukkit.version>
         <minimessage.version>4.1.0-SNAPSHOT</minimessage.version>
         <eventchain.api.version>2.1.0</eventchain.api.version>
-        <eventchain.version>3.1.1</eventchain.version>
-        <depdownloader.version>2.2.16</depdownloader.version>
+        <eventchain.version>3.1.2</eventchain.version>
+        <mvn-loader.version>1.1.0</mvn-loader.version>
+        <mvn.version>3.6.3</mvn.version>
         <relocator.version>1.4</relocator.version>
         <reflections.version>0.11.7</reflections.version>
         <javassist.version>3.27.0-GA</javassist.version>

@@ -34,10 +34,6 @@
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.8.1</version>
-                <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
-                </configuration>
             </plugin>
 
             <plugin>
@@ -64,28 +60,12 @@
                 <configuration>
                     <relocations>
                         <relocation>
-                            <pattern>co.aikar.commands</pattern>
-                            <shadedPattern>me.egg82.antivpn.external.co.aikar.commands</shadedPattern>
-                        </relocation>
-                        <relocation>
-                            <pattern>co.aikar.locales</pattern>
-                            <shadedPattern>me.egg82.antivpn.external.co.aikar.locales</shadedPattern>
-                        </relocation>
-                        <relocation>
-                            <pattern>co.aikar.taskchain</pattern>
-                            <shadedPattern>me.egg82.antivpn.external.co.aikar.taskchain</shadedPattern>
-                        </relocation>
-                        <relocation>
                             <pattern>com.github.benmanes.caffeine</pattern>
                             <shadedPattern>me.egg82.antivpn.external.com.github.benmanes.caffeine</shadedPattern>
                         </relocation>
                         <relocation>
                             <pattern>com.rabbitmq</pattern>
                             <shadedPattern>me.egg82.antivpn.external.com.rabbitmq</shadedPattern>
-                        </relocation>
-                        <relocation>
-                            <pattern>com.zaxxer.hikari</pattern>
-                            <shadedPattern>me.egg82.antivpn.external.com.zaxxer.hikari</shadedPattern>
                         </relocation>
                         <relocation>
                             <pattern>inet.ipaddr</pattern>
@@ -104,10 +84,6 @@
                             <shadedPattern>me.egg82.antivpn.external.io.ebeanservice</shadedPattern>
                         </relocation>
                         <relocation>
-                            <pattern>it.unimi.dsi.fastutil</pattern>
-                            <shadedPattern>me.egg82.antivpn.external.it.unimi.dsi.fastutil</shadedPattern>
-                        </relocation>
-                        <relocation>
                             <pattern>javassist</pattern>
                             <shadedPattern>me.egg82.antivpn.external.javassist</shadedPattern>
                         </relocation>
@@ -124,43 +100,12 @@
                             <shadedPattern>me.egg82.antivpn.external.ninja.egg82</shadedPattern>
                         </relocation>
                         <relocation>
-                            <pattern>okhttp</pattern>
-                            <shadedPattern>me.egg82.antivpn.external.okhttp</shadedPattern>
-                        </relocation>
-                        <relocation>
-                            <pattern>okio</pattern>
-                            <shadedPattern>me.egg82.antivpn.external.okio</shadedPattern>
-                        </relocation>
-                        <relocation>
                             <pattern>org.bstats</pattern>
                             <shadedPattern>me.egg82.antivpn.external.org.bstats</shadedPattern>
                         </relocation>
                         <relocation>
                             <pattern>org.objectweb.asm</pattern>
                             <shadedPattern>me.egg82.antivpn.external.org.objectweb.asm</shadedPattern>
-                        </relocation>
-                        <relocation>
-                            <pattern>ninja.egg82.maven</pattern>
-                            <shadedPattern>me.egg82.antivpn.external.ninja.egg82.maven</shadedPattern>
-                        </relocation>
-                        <relocation>
-                            <pattern>ninja.egg82.services</pattern>
-                            <shadedPattern>me.egg82.antivpn.external.ninja.egg82.services</shadedPattern>
-                            <includes>
-                                <include>ninja.egg82.services.ProxiedURLClassLoader*</include>
-                            </includes>
-                        </relocation>
-                        <relocation>
-                            <pattern>ninja.egg82.utils</pattern>
-                            <shadedPattern>me.egg82.antivpn.external.ninja.egg82.utils</shadedPattern>
-                            <includes>
-                                <include>ninja.egg82.utils.DocumentUtil</include>
-                                <include>ninja.egg82.utils.InjectUtil</include>
-                                <include>ninja.egg82.utils.HTTPUtil</include>
-                                <include>ninja.egg82.utils.DownloadUtil</include>
-                                <include>ninja.egg82.utils.MavenUtil</include>
-                                <include>ninja.egg82.utils.XMLUtil</include>
-                            </includes>
                         </relocation>
                         <relocation>
                             <pattern>org.spongepowered.configurate</pattern>
@@ -213,10 +158,8 @@
                                         <exclude>org/json/simple/**</exclude>
 
                                         <!-- dep injected (keep this to as few as possible) -->
-                                        <exclude>io/ebeaninternal/api/**</exclude>
-                                        <exclude>io/ebeaninternal/json/**</exclude>
-                                        <exclude>io/ebeaninternal/server/**</exclude>
-                                        <exclude>io/ebeaninternal/util/**</exclude>
+                                        <exclude>io/ebean/api/**</exclude>
+                                        <exclude>io/ebeaninternal/**</exclude>
                                         <exclude>io/ebeanservice/**</exclude>
 
                                         <exclude>javassist/**</exclude>
@@ -286,12 +229,6 @@
     </repositories>
 
     <dependencies>
-        <!--<dependency>
-            <groupId>org.bukkit</groupId>
-            <artifactId>bukkit</artifactId>
-            <version>1.8-R0.1-SNAPSHOT</version>
-            <scope>provided</scope>
-        </dependency>-->
         <dependency>
             <groupId>com.destroystokyo.paper</groupId>
             <artifactId>paper-api</artifactId>
@@ -333,8 +270,8 @@
 
         <dependency>
             <groupId>ninja.egg82</groupId>
-            <artifactId>dep-downloader</artifactId>
-            <version>${depdownloader.version}</version>
+            <artifactId>mvn-loader</artifactId>
+            <version>${mvn-loader.version}</version>
         </dependency>
         <dependency>
             <groupId>me.lucko</groupId>
@@ -383,45 +320,16 @@
 
         <!-- common -->
         <dependency>
-            <groupId>net.kyori</groupId>
-            <artifactId>adventure-text-minimessage</artifactId>
-            <version>${minimessage.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>net.oneandone.reflections8</groupId>
-            <artifactId>reflections8</artifactId>
-            <version>${reflections.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.spongepowered</groupId>
-            <artifactId>configurate-yaml</artifactId>
-            <version>${configurate.version}</version>
-        </dependency>
-        <dependency>
             <groupId>io.ebean</groupId>
             <artifactId>ebean-core</artifactId>
             <version>${ebean.version}</version>
         </dependency>
-        <dependency>
-            <groupId>io.ebean</groupId>
-            <artifactId>ebean-querybean</artifactId>
-            <version>${ebean.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.ebean</groupId>
-            <artifactId>querybean-generator</artifactId>
-            <version>${ebean.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.zaxxer</groupId>
-            <artifactId>HikariCP</artifactId>
-            <version>${hikari.version}</version>
-        </dependency>
+
         <dependency>
             <groupId>redis.clients</groupId>
             <artifactId>jedis</artifactId>
             <version>${jedis.version}</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.rabbitmq</groupId>
@@ -430,16 +338,12 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>io.nats</groupId>
-            <artifactId>jnats</artifactId>
-            <version>${nats.version}</version>
-        </dependency>
-        <dependency>
             <groupId>com.github.luben</groupId>
             <artifactId>zstd-jni</artifactId>
             <version>${zstd.version}</version>
             <scope>provided</scope>
         </dependency>
+
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
@@ -509,16 +413,6 @@
             <artifactId>annotations</artifactId>
             <version>${jetbrains.version}</version>
             <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>net.sf.flexjson</groupId>
-            <artifactId>flexjson</artifactId>
-            <version>${flexjson.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>net.kyori</groupId>
-            <artifactId>event-api</artifactId>
-            <version>${kyori-event.version}</version>
         </dependency>
 
         <!-- testing -->

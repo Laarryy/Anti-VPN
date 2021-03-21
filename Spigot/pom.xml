@@ -34,10 +34,6 @@
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.8.1</version>
-                <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
-                </configuration>
             </plugin>
 
             <plugin>
@@ -323,8 +319,8 @@
 
         <dependency>
             <groupId>ninja.egg82</groupId>
-            <artifactId>dep-downloader</artifactId>
-            <version>${depdownloader.version}</version>
+            <artifactId>mvn-loader</artifactId>
+            <version>${mvn-loader.version}</version>
         </dependency>
         <dependency>
             <groupId>me.lucko</groupId>
@@ -373,61 +369,14 @@
 
         <!-- common -->
         <dependency>
-            <groupId>net.kyori</groupId>
-            <artifactId>adventure-text-minimessage</artifactId>
-            <version>${minimessage.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>net.oneandone.reflections8</groupId>
-            <artifactId>reflections8</artifactId>
-            <version>${reflections.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.spongepowered</groupId>
-            <artifactId>configurate-yaml</artifactId>
-            <version>${configurate.version}</version>
-        </dependency>
-        <dependency>
             <groupId>io.ebean</groupId>
             <artifactId>ebean-core</artifactId>
             <version>${ebean.version}</version>
         </dependency>
         <dependency>
             <groupId>io.ebean</groupId>
-            <artifactId>ebean-querybean</artifactId>
-            <version>${ebean.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.ebean</groupId>
             <artifactId>querybean-generator</artifactId>
             <version>${ebean.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.zaxxer</groupId>
-            <artifactId>HikariCP</artifactId>
-            <version>${hikari.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>redis.clients</groupId>
-            <artifactId>jedis</artifactId>
-            <version>${jedis.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.rabbitmq</groupId>
-            <artifactId>amqp-client</artifactId>
-            <version>${rabbitmq.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.nats</groupId>
-            <artifactId>jnats</artifactId>
-            <version>${nats.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.github.luben</groupId>
-            <artifactId>zstd-jni</artifactId>
-            <version>${zstd.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -440,18 +389,6 @@
             <groupId>it.unimi.dsi</groupId>
             <artifactId>fastutil</artifactId>
             <version>${fastutil.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.github.ben-manes.caffeine</groupId>
-            <artifactId>caffeine</artifactId>
-            <version>${caffeine.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.github.seancfoley</groupId>
-            <artifactId>ipaddress</artifactId>
-            <version>${ipaddress.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
