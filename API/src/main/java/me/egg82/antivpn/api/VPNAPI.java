@@ -45,7 +45,8 @@ public interface VPNAPI {
      *
      * @return the server UUID
      */
-    @NotNull UUID getServerId();
+    @NotNull
+    UUID getServerId();
 
     /**
      * Gets the {@link IPManager}, responsible for managing
@@ -56,7 +57,8 @@ public interface VPNAPI {
      *
      * @return the IP manager
      */
-    @NotNull IPManager getIPManager();
+    @NotNull
+    IPManager getIPManager();
 
     /**
      * Gets the {@link PlayerManager}, responsible for managing
@@ -67,7 +69,8 @@ public interface VPNAPI {
      *
      * @return the player manager
      */
-    @NotNull PlayerManager getPlayerManager();
+    @NotNull
+    PlayerManager getPlayerManager();
 
     /**
      * Gets the {@link SourceManager}, responsible for managing
@@ -78,7 +81,8 @@ public interface VPNAPI {
      *
      * @return the source manager
      */
-    @NotNull SourceManager getSourceManager();
+    @NotNull
+    SourceManager getSourceManager();
 
     /**
      * Gets the {@link Platform}, which represents the server platform the
@@ -86,7 +90,8 @@ public interface VPNAPI {
      *
      * @return the platform
      */
-    @NotNull Platform getPlatform();
+    @NotNull
+    Platform getPlatform();
 
     /**
      * Gets the {@link PluginMetadata}, responsible for providing metadata about
@@ -94,7 +99,8 @@ public interface VPNAPI {
      *
      * @return the plugin metadata
      */
-    @NotNull PluginMetadata getPluginMetadata();
+    @NotNull
+    PluginMetadata getPluginMetadata();
 
     /**
      * Schedules the execution of an update task, and returns an encapsulation
@@ -108,7 +114,8 @@ public interface VPNAPI {
      *
      * @return a future
      */
-    @NotNull CompletableFuture<Void> runUpdateTask();
+    @NotNull
+    CompletableFuture<Void> runUpdateTask();
 
     /**
      * Gets the {@link EventBus}, used for subscribing to internal Anti-VPN
@@ -116,5 +123,6 @@ public interface VPNAPI {
      *
      * @return the event bus
      */
-    @NotNull EventBus<VPNEvent> getEventBus();
+    @NotNull
+    EventBus<VPNEvent> getEventBus();
 }

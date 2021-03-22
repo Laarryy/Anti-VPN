@@ -8,8 +8,8 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class DoubleBuffer<T> {
-    private volatile Queue<T> currentBuffer = new ConcurrentLinkedQueue<>();
-    private volatile Queue<T> backBuffer = new ConcurrentLinkedQueue<>();
+    private volatile @NotNull Queue<T> currentBuffer = new ConcurrentLinkedQueue<>();
+    private volatile @NotNull Queue<T> backBuffer = new ConcurrentLinkedQueue<>();
     private final ReadWriteLock lock = new ReentrantReadWriteLock();
 
     public @NotNull Queue<T> getReadBuffer() {

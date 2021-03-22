@@ -15,19 +15,22 @@ public interface APIReloadEvent extends VPNEvent {
      *
      * @return the new IP manager instance
      */
-    @NotNull IPManager getNewIPManager();
+    @NotNull
+    IPManager getNewIPManager();
 
     /**
      * Gets the new {@link PlayerManager} instance
      *
      * @return the new player manager instance
      */
-    @NotNull PlayerManager getNewPlayerManager();
+    @NotNull
+    PlayerManager getNewPlayerManager();
 
     /**
      * Gets the new {@link SourceManager} instance
      *
      * @return the new source manager instance
      */
-    @NotNull SourceManager getNewSourceManager();
+    @NotNull
+    SourceManager getNewSourceManager();
 }

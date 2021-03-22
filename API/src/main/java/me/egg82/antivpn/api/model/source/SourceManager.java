@@ -32,7 +32,8 @@ public interface SourceManager {
      *
      * @throws NullPointerException if the name is null
      */
-    @Nullable Source<? extends SourceModel> getSource(@NotNull String name);
+    @Nullable
+    Source<SourceModel> getSource(@NotNull String name);
 
     /**
      * Gets a source with a model type.
@@ -45,7 +46,8 @@ public interface SourceManager {
      * @throws NullPointerException if the name or model is null
      * @throws ClassCastException is the modelClass is incorrect for this source
      */
-    @Nullable <T extends SourceModel> Source<T> getSource(@NotNull String name, @NotNull Class<T> modelClass);
+    @Nullable
+    <T extends SourceModel> Source<T> getSource(@NotNull String name, @NotNull Class<T> modelClass);
 
     /**
      * Registers and enables a new, unique {@link Source}, replacing
@@ -62,9 +64,9 @@ public interface SourceManager {
      * @throws NullPointerException if the new source is null
      */
     default boolean replaceSource(@NotNull Source<? extends SourceModel> newSource) {
-        List<Source<? extends SourceModel>> sources = getSources();
+        List<Source<SourceModel>> sources = getSources();
         int index = -1;
-        Source<? extends SourceModel> removedSource = null;
+        Source<SourceModel> removedSource = null;
         for (int i = 0; i < sources.size(); i++) {
             if (sources.get(i).getName().equals(newSource.getName())) {
                 index = i;
@@ -139,9 +141,9 @@ public interface SourceManager {
      * @throws NullPointerException if the source name is null
      */
     default boolean deregisterSource(@NotNull String sourceName) {
-        List<Source<? extends SourceModel>> sources = getSources();
-        Source<? extends SourceModel> removedSource = null;
-        for (Source<? extends SourceModel> source : sources) {
+        List<Source<SourceModel>> sources = getSources();
+        Source<SourceModel> removedSource = null;
+        for (Source<SourceModel> source : sources) {
             if (source.getName().equals(sourceName)) {
                 removedSource = source;
                 break;
@@ -159,5 +161,6 @@ public interface SourceManager {
      *
      * @return a list of sources
      */
-    @NotNull List<@NotNull Source<? extends SourceModel>> getSources();
+    @NotNull
+    List<@NotNull Source<SourceModel>> getSources();
 }

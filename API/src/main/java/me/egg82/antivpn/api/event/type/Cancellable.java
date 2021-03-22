@@ -13,7 +13,8 @@ public interface Cancellable {
      *
      * @return the cancellation
      */
-    @NotNull AtomicBoolean cancellationState();
+    @NotNull
+    AtomicBoolean cancellationState();
 
     /**
      * Returns true if the event is currently cancelled.

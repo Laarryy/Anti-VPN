@@ -42,7 +42,8 @@ public interface IPManager {
      * @throws NullPointerException if ip is null
      * @throws IllegalArgumentException if the IP provided is invalid
      */
-    default @NotNull CompletableFuture<@Nullable IP> getIP(@NotNull InetAddress ip) { return getIP(ip.getHostAddress()); }
+    @NotNull
+    default CompletableFuture<@Nullable IP> getIP(@NotNull InetAddress ip) { return getIP(ip.getHostAddress()); }
 
     /**
      * Gets an IP object.
@@ -54,7 +55,8 @@ public interface IPManager {
      * @throws NullPointerException if ip is null
      * @throws IllegalArgumentException if the IP provided is invalid
      */
-    @NotNull CompletableFuture<@Nullable IP> getIP(@NotNull String ip);
+    @NotNull
+    CompletableFuture<@Nullable IP> getIP(@NotNull String ip);
 
     /**
      * Saves an IP back to the plugin's storage provider.
@@ -67,7 +69,8 @@ public interface IPManager {
      *
      * @throws NullPointerException if ip is null
      */
-    @NotNull CompletableFuture<Void> saveIP(@NotNull IP ip);
+    @NotNull
+    CompletableFuture<Void> saveIP(@NotNull IP ip);
 
     /**
      * Deletes any data about a given IP from the system.
@@ -78,7 +81,8 @@ public interface IPManager {
      *
      * @throws NullPointerException if ip is null
      */
-    default @NotNull CompletableFuture<Void> deleteIP(@NotNull IP ip) { return deleteIP(ip.getIP().getHostAddress()); }
+    @NotNull
+    default CompletableFuture<Void> deleteIP(@NotNull IP ip) { return deleteIP(ip.getIP().getHostAddress()); }
 
     /**
      * Deletes any data about a given IP from the system.
@@ -90,7 +94,8 @@ public interface IPManager {
      * @throws IllegalArgumentException if the IP provided is invalid
      * @throws NullPointerException if ip is null
      */
-    default @NotNull CompletableFuture<Void> deleteIP(@NotNull InetAddress ip) { return deleteIP(ip.getHostAddress()); }
+    @NotNull
+    default CompletableFuture<Void> deleteIP(@NotNull InetAddress ip) { return deleteIP(ip.getHostAddress()); }
 
     /**
      * Deletes any data about a given IP from the system.
@@ -102,14 +107,16 @@ public interface IPManager {
      * @throws IllegalArgumentException if the IP provided is invalid
      * @throws NullPointerException if ip is null
      */
-    @NotNull CompletableFuture<Void> deleteIP(@NotNull String ip);
+    @NotNull
+    CompletableFuture<Void> deleteIP(@NotNull String ip);
 
     /**
      * Gets a set of all known IPs.
      *
      * @return a {@link CompletableFuture} - a set of IPs
      */
-    @NotNull CompletableFuture<@NotNull Set<@NotNull InetAddress>> getIPs();
+    @NotNull
+    CompletableFuture<@NotNull Set<@NotNull InetAddress>> getIPs();
 
     /**
      * Gets the {@link AlgorithmMethod}, which represents the algorithm method
@@ -119,7 +126,8 @@ public interface IPManager {
      *
      * @throws IllegalStateException if the configuration could not be retrieved
      */
-    @NotNull AlgorithmMethod getCurrentAlgorithmMethod();
+    @NotNull
+    AlgorithmMethod getCurrentAlgorithmMethod();
 
     /**
      * Gets the cascade result from Anti-VPN using the configuration
@@ -137,7 +145,8 @@ public interface IPManager {
      * @throws NullPointerException if ip is null
      * @throws APIException in the result if a result could not be obtained
      */
-    default @NotNull CompletableFuture<@NotNull Boolean> cascade(@NotNull IP ip, boolean useCache) { return cascade(ip.getIP().getHostAddress(), useCache); }
+    @NotNull
+    default CompletableFuture<@NotNull Boolean> cascade(@NotNull IP ip, boolean useCache) { return cascade(ip.getIP().getHostAddress(), useCache); }
 
     /**
      * Gets the cascade result from Anti-VPN using the configuration
@@ -155,7 +164,8 @@ public interface IPManager {
      * @throws NullPointerException if ip is null
      * @throws APIException in the result if a result could not be obtained
      */
-    default @NotNull CompletableFuture<@NotNull Boolean> cascade(@NotNull InetAddress ip, boolean useCache) { return cascade(ip.getHostAddress(), useCache); }
+    @NotNull
+    default CompletableFuture<@NotNull Boolean> cascade(@NotNull InetAddress ip, boolean useCache) { return cascade(ip.getHostAddress(), useCache); }
 
     /**
      * Gets the cascade result from Anti-VPN using the configuration
@@ -173,7 +183,8 @@ public interface IPManager {
      * @throws NullPointerException if ip is null
      * @throws APIException in the result if a result could not be obtained
      */
-    @NotNull CompletableFuture<@NotNull Boolean> cascade(@NotNull String ip, boolean useCache);
+    @NotNull
+    CompletableFuture<@NotNull Boolean> cascade(@NotNull String ip, boolean useCache);
 
     /**
      * Gets the consensus result from Anti-VPN using the configuration
@@ -191,7 +202,8 @@ public interface IPManager {
      * @throws NullPointerException if ip is null
      * @throws APIException in the result if a result could not be obtained
      */
-    default @NotNull CompletableFuture<@NotNull Double> consensus(@NotNull IP ip, boolean useCache) { return consensus(ip.getIP().getHostAddress(), useCache); }
+    @NotNull
+    default CompletableFuture<@NotNull Double> consensus(@NotNull IP ip, boolean useCache) { return consensus(ip.getIP().getHostAddress(), useCache); }
 
     /**
      * Gets the consensus result from Anti-VPN using the configuration
@@ -209,7 +221,8 @@ public interface IPManager {
      * @throws NullPointerException if ip is null
      * @throws APIException in the result if a result could not be obtained
      */
-    default @NotNull CompletableFuture<@NotNull Double> consensus(@NotNull InetAddress ip, boolean useCache) { return consensus(ip.getHostAddress(), useCache); }
+    @NotNull
+    default CompletableFuture<@NotNull Double> consensus(@NotNull InetAddress ip, boolean useCache) { return consensus(ip.getHostAddress(), useCache); }
 
     /**
      * Gets the consensus result from Anti-VPN using the configuration
@@ -227,7 +240,8 @@ public interface IPManager {
      * @throws NullPointerException if ip is null
      * @throws APIException in the result if a result could not be obtained
      */
-    @NotNull CompletableFuture<@NotNull Double> consensus(@NotNull String ip, boolean useCache);
+    @NotNull
+    CompletableFuture<@NotNull Double> consensus(@NotNull String ip, boolean useCache);
 
     /**
      * Returns the minimum consensus value from
@@ -359,7 +373,8 @@ public interface IPManager {
      *
      * @throws NullPointerException if player is null, player.getName() is null, or ip is null
      */
-    default @Nullable Component getVpnKickMessage(@NotNull Player player, @NotNull IP ip) {
+    @Nullable
+    default Component getVpnKickMessage(@NotNull Player player, @NotNull IP ip) {
         return getVpnKickMessage(
                 Objects.requireNonNull(player.getName()),
                 player.getUuid(),
@@ -379,7 +394,8 @@ public interface IPManager {
      *
      * @throws NullPointerException if playerName, playerUuid, or ip is null
      */
-    default @Nullable Component getVpnKickMessage(@NotNull String playerName, @NotNull UUID playerUuid, @NotNull IP ip) {
+    @Nullable
+    default Component getVpnKickMessage(@NotNull String playerName, @NotNull UUID playerUuid, @NotNull IP ip) {
         return getVpnKickMessage(
                 playerName,
                 playerUuid,
@@ -399,7 +415,8 @@ public interface IPManager {
      *
      * @throws NullPointerException if player is null, player.getName() is null, or ip is null
      */
-    default @Nullable Component getVpnKickMessage(@NotNull Player player, @NotNull InetAddress ip) {
+    @Nullable
+    default Component getVpnKickMessage(@NotNull Player player, @NotNull InetAddress ip) {
         return getVpnKickMessage(
                 Objects.requireNonNull(player.getName()),
                 player.getUuid(),
@@ -418,7 +435,8 @@ public interface IPManager {
      *
      * @throws NullPointerException if player is null, player.getName() is null, or ip is null
      */
-    default @Nullable Component getVpnKickMessage(@NotNull Player player, @NotNull String ip) {
+    @Nullable
+    default Component getVpnKickMessage(@NotNull Player player, @NotNull String ip) {
         return getVpnKickMessage(
                 Objects.requireNonNull(player.getName()),
                 player.getUuid(),
@@ -438,7 +456,8 @@ public interface IPManager {
      *
      * @throws NullPointerException if playerName, playerUuid, or ip is null
      */
-    default @Nullable Component getVpnKickMessage(@NotNull String playerName, @NotNull UUID playerUuid, @NotNull InetAddress ip) {
+    @Nullable
+    default Component getVpnKickMessage(@NotNull String playerName, @NotNull UUID playerUuid, @NotNull InetAddress ip) {
         return getVpnKickMessage(
                 playerName,
                 playerUuid,
@@ -458,7 +477,8 @@ public interface IPManager {
      *
      * @throws NullPointerException if playerName, playerUuid, or ip is null
      */
-    @Nullable Component getVpnKickMessage(@NotNull String playerName, @NotNull UUID playerUuid, @NotNull String ip);
+    @Nullable
+    Component getVpnKickMessage(@NotNull String playerName, @NotNull UUID playerUuid, @NotNull String ip);
 
     /**
      * Returns the VPN commands as defined
@@ -471,7 +491,8 @@ public interface IPManager {
      *
      * @throws NullPointerException if player is null, player.getName() is null, or ip is null
      */
-    default @NotNull List<@NotNull String> getVpnCommands(@NotNull Player player, @NotNull IP ip) {
+    @Nullable
+    default List<@NotNull String> getVpnCommands(@NotNull Player player, @NotNull IP ip) {
         return getVpnCommands(
                 Objects.requireNonNull(player.getName()),
                 player.getUuid(),
@@ -491,7 +512,8 @@ public interface IPManager {
      *
      * @throws NullPointerException if playerName, playerUuid, or ip is null
      */
-    default @NotNull List<@NotNull String> getVpnCommands(@NotNull String playerName, @NotNull UUID playerUuid, @NotNull IP ip) {
+    @Nullable
+    default List<@NotNull String> getVpnCommands(@NotNull String playerName, @NotNull UUID playerUuid, @NotNull IP ip) {
         return getVpnCommands(
                 playerName,
                 playerUuid,
@@ -511,7 +533,8 @@ public interface IPManager {
      *
      * @throws NullPointerException if player is null, player.getName() is null, or ip is null
      */
-    default @NotNull List<@NotNull String> getVpnCommands(
+    @NotNull
+    default List<@NotNull String> getVpnCommands(
             @NotNull Player player,
             @NotNull InetAddress ip
     ) { return getVpnCommands(Objects.requireNonNull(player.getName()), player.getUuid(), ip.getHostAddress()); }
@@ -527,7 +550,8 @@ public interface IPManager {
      *
      * @throws NullPointerException if player is null, player.getName() is null, or ip is null
      */
-    default @NotNull List<@NotNull String> getVpnCommands(@NotNull Player player, @NotNull String ip) {
+    @NotNull
+    default List<@NotNull String> getVpnCommands(@NotNull Player player, @NotNull String ip) {
         return getVpnCommands(
                 Objects.requireNonNull(player.getName()),
                 player.getUuid(),
@@ -547,7 +571,8 @@ public interface IPManager {
      *
      * @throws NullPointerException if playerName, playerUuid, or ip is null
      */
-    default @NotNull List<@NotNull String> getVpnCommands(@NotNull String playerName, @NotNull UUID playerUuid, @NotNull InetAddress ip) {
+    @NotNull
+    default List<@NotNull String> getVpnCommands(@NotNull String playerName, @NotNull UUID playerUuid, @NotNull InetAddress ip) {
         return getVpnCommands(
                 playerName,
                 playerUuid,
@@ -567,5 +592,6 @@ public interface IPManager {
      *
      * @throws NullPointerException if playerName, playerUuid, or ip is null
      */
-    @NotNull List<@NotNull String> getVpnCommands(@NotNull String playerName, @NotNull UUID playerUuid, @NotNull String ip);
+    @NotNull
+    List<@NotNull String> getVpnCommands(@NotNull String playerName, @NotNull UUID playerUuid, @NotNull String ip);
 }

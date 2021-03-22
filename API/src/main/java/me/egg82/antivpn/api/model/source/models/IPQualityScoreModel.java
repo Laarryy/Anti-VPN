@@ -7,26 +7,26 @@ import java.util.Objects;
 
 public class IPQualityScoreModel implements SourceModel {
     private boolean success = false;
-    private String message = null;
+    private @Nullable String message = null;
     @JSON(name = "request_id")
-    private String requestId = null;
+    private @Nullable String requestId = null;
     @JSON(name = "ISP")
-    private String isp = null;
-    private String organization = null;
+    private @Nullable String isp = null;
+    private @Nullable String organization = null;
     @JSON(name = "ASN")
     private int asn = -1;
-    private String host = null;
+    private @Nullable String host = null;
     @JSON(name = "country_code")
-    private String countryCode = null;
-    private String city = null;
-    private String region = null;
+    private @Nullable String countryCode = null;
+    private @Nullable String city = null;
+    private @Nullable String region = null;
     @JSON(name = "is_crawler")
     private boolean crawler = false;
     @JSON(name = "connection_type")
-    private String connectionType = null;
+    private @Nullable String connectionType = null;
     private double latitude = -1.0d;
     private double longitude = -1.0d;
-    private String timezone = null;
+    private @Nullable String timezone = null;
     private boolean proxy = false;
     private boolean vpn = false;
     @JSON(name = "active_vpn")
@@ -39,11 +39,9 @@ public class IPQualityScoreModel implements SourceModel {
     @JSON(name = "bot_status")
     private boolean bot = false;
     @JSON(name = "abuse_velocity")
-    private String abuseVelocity = null;
+    private @Nullable String abuseVelocity = null;
     @JSON(name = "fraud_score")
     private int fraudScore = -1;
-
-    public IPQualityScoreModel() { }
 
     public boolean isSuccess() { return success; }
 
@@ -51,14 +49,16 @@ public class IPQualityScoreModel implements SourceModel {
         this.success = success;
     }
 
-    public @Nullable String getMessage() { return message; }
+    @Nullable
+    public String getMessage() { return message; }
 
     public void setMessage(@Nullable String message) {
         this.message = message;
     }
 
     @JSON(name = "request_id")
-    public @Nullable String getRequestId() { return requestId; }
+    @Nullable
+    public String getRequestId() { return requestId; }
 
     @JSON(name = "request_id")
     public void setRequestId(@Nullable String requestId) {
@@ -66,14 +66,16 @@ public class IPQualityScoreModel implements SourceModel {
     }
 
     @JSON(name = "ISP")
-    public @Nullable String getIsp() { return isp; }
+    @Nullable
+    public String getIsp() { return isp; }
 
     @JSON(name = "ISP")
     public void setIsp(@Nullable String isp) {
         this.isp = isp;
     }
 
-    public @Nullable String getOrganization() { return organization; }
+    @Nullable
+    public String getOrganization() { return organization; }
 
     public void setOrganization(@Nullable String organization) {
         this.organization = organization;
@@ -87,27 +89,31 @@ public class IPQualityScoreModel implements SourceModel {
         this.asn = asn;
     }
 
-    public @Nullable String getHost() { return host; }
+    @Nullable
+    public String getHost() { return host; }
 
     public void setHost(@Nullable String host) {
         this.host = host;
     }
 
     @JSON(name = "country_code")
-    public @Nullable String getCountryCode() { return countryCode; }
+    @Nullable
+    public String getCountryCode() { return countryCode; }
 
     @JSON(name = "country_code")
     public void setCountryCode(@Nullable String countryCode) {
         this.countryCode = countryCode;
     }
 
-    public @Nullable String getCity() { return city; }
+    @Nullable
+    public String getCity() { return city; }
 
     public void setCity(@Nullable String city) {
         this.city = city;
     }
 
-    public @Nullable String getRegion() { return region; }
+    @Nullable
+    public String getRegion() { return region; }
 
     public void setRegion(@Nullable String region) {
         this.region = region;
@@ -122,7 +128,8 @@ public class IPQualityScoreModel implements SourceModel {
     }
 
     @JSON(name = "connection_type")
-    public @Nullable String getConnectionType() { return connectionType; }
+    @Nullable
+    public String getConnectionType() { return connectionType; }
 
     @JSON(name = "connection_type")
     public void setConnectionType(@Nullable String connectionType) {
@@ -141,7 +148,8 @@ public class IPQualityScoreModel implements SourceModel {
         this.longitude = longitude;
     }
 
-    public @Nullable String getTimezone() { return timezone; }
+    @Nullable
+    public String getTimezone() { return timezone; }
 
     public void setTimezone(@Nullable String timezone) {
         this.timezone = timezone;
@@ -198,7 +206,8 @@ public class IPQualityScoreModel implements SourceModel {
     }
 
     @JSON(name = "abuse_velocity")
-    public @Nullable String getAbuseVelocity() { return abuseVelocity; }
+    @Nullable
+    public String getAbuseVelocity() { return abuseVelocity; }
 
     @JSON(name = "abuse_velocity")
     public void setAbuseVelocity(@Nullable String abuseVelocity) {

@@ -6,37 +6,39 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Objects;
 
 public class IPHubModel implements SourceModel {
-    private String error = null;
-    private String ip = null;
-    private String countryCode = null;
+    private @Nullable String error = null;
+    private @Nullable String ip = null;
+    private @Nullable String countryCode = null;
     @JSON(name = "countryName")
-    private String country = null;
+    private @Nullable String country = null;
     private int asn = -1;
-    private String isp = null;
+    private @Nullable String isp = null;
     private int block = -1;
 
-    public IPHubModel() { }
-
-    public @Nullable String getError() { return error; }
+    @Nullable
+    public String getError() { return error; }
 
     public void setError(@Nullable String error) {
         this.error = error;
     }
 
-    public @Nullable String getIp() { return ip; }
+    @Nullable
+    public String getIp() { return ip; }
 
     public void setIp(@Nullable String ip) {
         this.ip = ip;
     }
 
-    public @Nullable String getCountryCode() { return countryCode; }
+    @Nullable
+    public String getCountryCode() { return countryCode; }
 
     public void setCountryCode(@Nullable String countryCode) {
         this.countryCode = countryCode;
     }
 
     @JSON(name = "countryName")
-    public @Nullable String getCountry() { return country; }
+    @Nullable
+    public String getCountry() { return country; }
 
     @JSON(name = "countryName")
     public void setCountry(@Nullable String country) {
@@ -49,7 +51,8 @@ public class IPHubModel implements SourceModel {
         this.asn = asn;
     }
 
-    public @Nullable String getIsp() { return isp; }
+    @Nullable
+    public String getIsp() { return isp; }
 
     public void setIsp(@Nullable String isp) {
         this.isp = isp;

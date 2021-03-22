@@ -6,34 +6,35 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Objects;
 
 public class VPNBlockerModel implements SourceModel {
-    private String status = null;
-    private String msg = null;
+    private @Nullable String status = null;
+    private @Nullable String msg = null;
     @JSON(name = "package")
-    private String packageName = null;
+    private @Nullable String packageName = null;
     @JSON(name = "remaining_requests")
     private int requestsRemaining = -1;
     @JSON(name = "ipaddress")
-    private String ip = null;
+    private @Nullable String ip = null;
     @JSON(name = "host-ip")
     private boolean host = false;
-    private String org = null;
+    private @Nullable String org = null;
 
-    public VPNBlockerModel() { }
-
-    public @Nullable String getStatus() { return status; }
+    @Nullable
+    public String getStatus() { return status; }
 
     public void setStatus(@Nullable String status) {
         this.status = status;
     }
 
-    public @Nullable String getMsg() { return msg; }
+    @Nullable
+    public String getMsg() { return msg; }
 
     public void setMsg(@Nullable String msg) {
         this.msg = msg;
     }
 
     @JSON(name = "package")
-    public @Nullable String getPackageName() { return packageName; }
+    @Nullable
+    public String getPackageName() { return packageName; }
 
     @JSON(name = "package")
     public void setPackageName(@Nullable String packageName) {
@@ -49,7 +50,8 @@ public class VPNBlockerModel implements SourceModel {
     }
 
     @JSON(name = "ipaddress")
-    public @Nullable String getIp() { return ip; }
+    @Nullable
+    public String getIp() { return ip; }
 
     @JSON(name = "ipaddress")
     public void setIp(@Nullable String ip) {
@@ -64,7 +66,8 @@ public class VPNBlockerModel implements SourceModel {
         this.host = host;
     }
 
-    public @Nullable String getOrg() { return org; }
+    @Nullable
+    public String getOrg() { return org; }
 
     public void setOrg(@Nullable String org) {
         this.org = org;

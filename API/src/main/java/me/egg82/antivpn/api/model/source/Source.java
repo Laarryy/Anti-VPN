@@ -17,7 +17,8 @@ public interface Source<T extends SourceModel> {
      *
      * @return the source's name
      */
-    @NotNull String getName();
+    @NotNull
+    String getName();
 
     /**
      * Returns the source's reliance on a valid key to function.
@@ -36,7 +37,8 @@ public interface Source<T extends SourceModel> {
      * @throws NullPointerException if the IP is null
      * @throws APIException in the result if the source returned an error
      */
-    default @NotNull CompletableFuture<@NotNull Boolean> getResult(@NotNull IP ip) { return getResult(ip.getIP().getHostAddress()); }
+    @NotNull
+    default CompletableFuture<@NotNull Boolean> getResult(@NotNull IP ip) { return getResult(ip.getIP().getHostAddress()); }
 
     /**
      * Returns the result from the source given its configuration.
@@ -49,7 +51,8 @@ public interface Source<T extends SourceModel> {
      * @throws IllegalArgumentException if the IP provided is invalid
      * @throws APIException in the result if the source returned an error
      */
-    default @NotNull CompletableFuture<@NotNull Boolean> getResult(@NotNull InetAddress ip) { return getResult(ip.getHostAddress()); }
+    @NotNull
+    default CompletableFuture<@NotNull Boolean> getResult(@NotNull InetAddress ip) { return getResult(ip.getHostAddress()); }
 
     /**
      * Returns the result from the source given its configuration.
@@ -62,7 +65,8 @@ public interface Source<T extends SourceModel> {
      * @throws IllegalArgumentException if the IP provided is invalid
      * @throws APIException in the result if the source returned an error
      */
-    @NotNull CompletableFuture<@NotNull Boolean> getResult(@NotNull String ip);
+    @NotNull
+    CompletableFuture<@NotNull Boolean> getResult(@NotNull String ip);
 
     /**
      * Returns the raw response from the source given its configuration.
@@ -75,7 +79,8 @@ public interface Source<T extends SourceModel> {
      * @throws IllegalArgumentException if the IP provided is invalid
      * @throws APIException in the result if the source returned an error
      */
-    default @NotNull CompletableFuture<@NotNull T> getRawResponse(@NotNull IP ip) { return getRawResponse(ip.getIP().getHostAddress()); }
+    @NotNull
+    default CompletableFuture<@NotNull T> getRawResponse(@NotNull IP ip) { return getRawResponse(ip.getIP().getHostAddress()); }
 
     /**
      * Returns the raw response from the source given its configuration.
@@ -88,7 +93,8 @@ public interface Source<T extends SourceModel> {
      * @throws IllegalArgumentException if the IP provided is invalid
      * @throws APIException in the result if the source returned an error
      */
-    default @NotNull CompletableFuture<@NotNull T> getRawResponse(@NotNull InetAddress ip) { return getRawResponse(ip.getHostAddress()); }
+    @NotNull
+    default CompletableFuture<@NotNull T> getRawResponse(@NotNull InetAddress ip) { return getRawResponse(ip.getHostAddress()); }
 
     /**
      * Returns the raw response from the source given its configuration.
@@ -101,12 +107,14 @@ public interface Source<T extends SourceModel> {
      * @throws IllegalArgumentException if the IP provided is invalid
      * @throws APIException in the result if the source returned an error
      */
-    @NotNull CompletableFuture<@NotNull T> getRawResponse(@NotNull String ip);
+    @NotNull
+    CompletableFuture<@NotNull T> getRawResponse(@NotNull String ip);
 
     /**
      * Returns the class of the {@link SourceModel} used for this source.
      *
      * @return the class of the SourceModel for this source.
      */
-    @NotNull Class<T> getModelClass();
+    @NotNull
+    Class<T> getModelClass();
 }

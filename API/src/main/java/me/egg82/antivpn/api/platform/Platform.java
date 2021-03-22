@@ -16,28 +16,32 @@ public interface Platform {
      *
      * @return the type of platform Anti-VPN is running on
      */
-    @NotNull Platform.Type getType();
+    @NotNull
+    Platform.Type getType();
 
     /**
      * Gets the unique players which have connected to the server since it started.
      *
      * @return the unique players
      */
-    @NotNull Set<@NotNull UUID> getUniquePlayers();
+    @NotNull
+    Set<@NotNull UUID> getUniquePlayers();
 
     /**
      * Gets the unique IPs which have connected to the server since it started.
      *
      * @return the unique IPs
      */
-    @NotNull Set<@NotNull InetAddress> getUniqueIPs();
+    @NotNull
+    Set<@NotNull InetAddress> getUniqueIPs();
 
     /**
      * Gets the time when the plugin first started.
      *
      * @return the enable time
      */
-    @NotNull Instant getStartTime();
+    @NotNull
+    Instant getStartTime();
 
     /**
      * Represents a type of platform which Anti-VPN can run on.

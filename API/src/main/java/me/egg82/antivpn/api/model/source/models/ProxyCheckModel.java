@@ -6,25 +6,28 @@ import java.io.Serializable;
 import java.util.Objects;
 
 public class ProxyCheckModel implements SourceModel {
-    private String status = null;
-    private String message = null;
-    private ProxyCheckModel.IP ip = null;
+    private @Nullable String status = null;
+    private @Nullable String message = null;
+    private @Nullable ProxyCheckModel.IP ip = null;
 
     public ProxyCheckModel() { }
 
-    public @Nullable String getStatus() { return status; }
+    @Nullable
+    public String getStatus() { return status; }
 
     public void setStatus(@Nullable String status) {
         this.status = status;
     }
 
-    public @Nullable String getMessage() { return message; }
+    @Nullable
+    public String getMessage() { return message; }
 
     public void setMessage(@Nullable String message) {
         this.message = message;
     }
 
-    public @Nullable IP getIp() { return ip; }
+    @Nullable
+    public IP getIp() { return ip; }
 
     public void setIp(@Nullable IP ip) {
         this.ip = ip;
@@ -55,18 +58,18 @@ public class ProxyCheckModel implements SourceModel {
     }
 
     public static final class IP implements Serializable {
-        private String proxy = null;
-        private String type = null;
+        private @Nullable String proxy = null;
+        private @Nullable String type = null;
 
-        public IP() { }
-
-        public @Nullable String getProxy() { return proxy; }
+        @Nullable
+        public String getProxy() { return proxy; }
 
         public void setProxy(@Nullable String proxy) {
             this.proxy = proxy;
         }
 
-        public @Nullable String getType() { return type; }
+        @Nullable
+        public String getType() { return type; }
 
         public void setType(@Nullable String type) {
             this.type = type;

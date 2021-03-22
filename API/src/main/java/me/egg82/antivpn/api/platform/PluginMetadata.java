@@ -11,12 +11,14 @@ public interface PluginMetadata {
      *
      * @return the version of the plugin running on the platform
      */
-    @NotNull String getVersion();
+    @NotNull
+    String getVersion();
 
     /**
      * Gets the API version.
      *
      * @return the version of the API running on the platform
      */
-    @NotNull String getApiVersion();
+    @NotNull
+    String getApiVersion();
 }

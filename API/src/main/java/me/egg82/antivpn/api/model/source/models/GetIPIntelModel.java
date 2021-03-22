@@ -6,39 +6,41 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Objects;
 
 public class GetIPIntelModel implements SourceModel {
-    private String status = null;
-    private String result = null;
-    private String message = null;
+    private @Nullable String status = null;
+    private @Nullable String result = null;
+    private @Nullable String message = null;
     @JSON(name = "queryIP")
-    private String ip = null;
+    private @Nullable String ip = null;
     @JSON(name = "queryFlags")
-    private String flags = null;
+    private @Nullable String flags = null;
     @JSON(name = "queryFormat")
-    private String format = null;
-    private String contact = null;
+    private @Nullable String format = null;
+    private @Nullable String contact = null;
 
-    public GetIPIntelModel() { }
-
-    public @Nullable String getStatus() { return status; }
+    @Nullable
+    public String getStatus() { return status; }
 
     public void setStatus(@Nullable String status) {
         this.status = status;
     }
 
-    public @Nullable String getResult() { return result; }
+    @Nullable
+    public String getResult() { return result; }
 
     public void setResult(@Nullable String result) {
         this.result = result;
     }
 
-    public @Nullable String getMessage() { return message; }
+    @Nullable
+    public String getMessage() { return message; }
 
     public void setMessage(@Nullable String message) {
         this.message = message;
     }
 
     @JSON(name = "queryIP")
-    public @Nullable String getIp() { return ip; }
+    @Nullable
+    public String getIp() { return ip; }
 
     @JSON(name = "queryIP")
     public void setIp(@Nullable String ip) {
@@ -46,7 +48,8 @@ public class GetIPIntelModel implements SourceModel {
     }
 
     @JSON(name = "queryFlags")
-    public @Nullable String getFlags() { return flags; }
+    @Nullable
+    public String getFlags() { return flags; }
 
     @JSON(name = "queryFlags")
     public void setFlags(@Nullable String flags) {
@@ -54,14 +57,16 @@ public class GetIPIntelModel implements SourceModel {
     }
 
     @JSON(name = "queryFormat")
-    public @Nullable String getFormat() { return format; }
+    @Nullable
+    public String getFormat() { return format; }
 
     @JSON(name = "queryFormat")
     public void setFormat(@Nullable String format) {
         this.format = format;
     }
 
-    public @Nullable String getContact() { return contact; }
+    @Nullable
+    public String getContact() { return contact; }
 
     public void setContact(@Nullable String contact) {
         this.contact = contact;

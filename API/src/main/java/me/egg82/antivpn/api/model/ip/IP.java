@@ -15,14 +15,16 @@ public interface IP extends Serializable {
      *
      * @return the IP
      */
-    @NotNull InetAddress getIP();
+    @NotNull
+    InetAddress getIP();
 
     /**
      * Returns the IP's {@link AlgorithmMethod} type
      *
      * @return the AlgorithmMethod used for this IP
      */
-    @NotNull AlgorithmMethod getType();
+    @NotNull
+    AlgorithmMethod getType();
 
     /**
      * Sets the IP's {@link AlgorithmMethod} type
@@ -38,7 +40,8 @@ public interface IP extends Serializable {
      *
      * @return true if the cascade result returned positive (VPN/Proxy detected), false if not (no VPN/proxy detected), or null if not calculated
      */
-    @Nullable Boolean getCascade();
+    @Nullable
+    Boolean getCascade();
 
     /**
      * Sets the IP's cascade status.
@@ -54,7 +57,8 @@ public interface IP extends Serializable {
      *
      * @return a number between 0 and 1 determining the likelihood that an IP is a VPN/proxy, or null if not calculated
      */
-    @Nullable Double getConsensus();
+    @Nullable
+    Double getConsensus();
 
     /**
      * Sets the IP's consensus status.

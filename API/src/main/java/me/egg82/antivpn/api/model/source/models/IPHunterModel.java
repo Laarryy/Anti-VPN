@@ -7,25 +7,26 @@ import java.io.Serializable;
 import java.util.Objects;
 
 public class IPHunterModel implements SourceModel {
-    private String status = null;
-    private String code = null;
-    private Data data = null;
+    private @Nullable String status = null;
+    private @Nullable String code = null;
+    private @Nullable Data data = null;
 
-    public IPHunterModel() { }
-
-    public @Nullable String getStatus() { return status; }
+    @Nullable
+    public String getStatus() { return status; }
 
     public void setStatus(@Nullable String status) {
         this.status = status;
     }
 
-    public @Nullable String getCode() { return code; }
+    @Nullable
+    public String getCode() { return code; }
 
     public void setCode(@Nullable String code) {
         this.code = code;
     }
 
-    public @Nullable Data getData() { return data; }
+    @Nullable
+    public Data getData() { return data; }
 
     public void setData(@Nullable Data data) {
         this.data = data;
@@ -56,20 +57,19 @@ public class IPHunterModel implements SourceModel {
     }
 
     public static final class Data implements Serializable {
-        private String ip = null;
+        private @Nullable String ip = null;
         @JSON(name = "ip_num")
         private long ipNumber = -1L;
         @JSON(name = "country_code")
-        private String countryCode = null;
+        private @Nullable String countryCode = null;
         @JSON(name = "country_name")
-        private String country = null;
-        private String city = null;
-        private String isp = null;
+        private @Nullable String country = null;
+        private @Nullable String city = null;
+        private @Nullable String isp = null;
         private int block = -1;
 
-        public Data() { }
-
-        public @Nullable String getIp() { return ip; }
+        @Nullable
+        public String getIp() { return ip; }
 
         public void setIp(@Nullable String ip) {
             this.ip = ip;
@@ -84,7 +84,8 @@ public class IPHunterModel implements SourceModel {
         }
 
         @JSON(name = "country_code")
-        public @Nullable String getCountryCode() { return countryCode; }
+        @Nullable
+        public String getCountryCode() { return countryCode; }
 
         @JSON(name = "country_code")
         public void setCountryCode(@Nullable String countryCode) {
@@ -92,20 +93,23 @@ public class IPHunterModel implements SourceModel {
         }
 
         @JSON(name = "country_name")
-        public @Nullable String getCountry() { return country; }
+        @Nullable
+        public String getCountry() { return country; }
 
         @JSON(name = "country_name")
         public void setCountry(@Nullable String country) {
             this.country = country;
         }
 
-        public @Nullable String getCity() { return city; }
+        @Nullable
+        public String getCity() { return city; }
 
         public void setCity(@Nullable String city) {
             this.city = city;
         }
 
-        public @Nullable String getIsp() { return isp; }
+        @Nullable
+        public String getIsp() { return isp; }
 
         public void setIsp(@Nullable String isp) {
             this.isp = isp;

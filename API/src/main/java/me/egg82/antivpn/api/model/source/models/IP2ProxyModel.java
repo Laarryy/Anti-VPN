@@ -6,29 +6,30 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Objects;
 
 public class IP2ProxyModel implements SourceModel {
-    private String response = null;
-    private String countryCode = null;
+    private @Nullable String response = null;
+    private @Nullable String countryCode = null;
     @JSON(name = "countryName")
-    private String country = null;
+    private @Nullable String country = null;
     @JSON(name = "isProxy")
-    private String proxy = null;
+    private @Nullable String proxy = null;
 
-    public IP2ProxyModel() { }
-
-    public @Nullable String getResponse() { return response; }
+    @Nullable
+    public String getResponse() { return response; }
 
     public void setResponse(@Nullable String response) {
         this.response = response;
     }
 
-    public @Nullable String getCountryCode() { return countryCode; }
+    @Nullable
+    public String getCountryCode() { return countryCode; }
 
     public void setCountryCode(@Nullable String countryCode) {
         this.countryCode = countryCode;
     }
 
     @JSON(name = "countryName")
-    public @Nullable String getCountry() { return country; }
+    @Nullable
+    public String getCountry() { return country; }
 
     @JSON(name = "countryName")
     public void setCountry(@Nullable String country) {
@@ -36,7 +37,8 @@ public class IP2ProxyModel implements SourceModel {
     }
 
     @JSON(name = "isProxy")
-    public @Nullable String getProxy() { return proxy; }
+    @Nullable
+    public String getProxy() { return proxy; }
 
     @JSON(name = "isProxy")
     public void setProxy(@Nullable String proxy) {

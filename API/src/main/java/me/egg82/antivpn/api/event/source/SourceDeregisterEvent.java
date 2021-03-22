@@ -15,5 +15,6 @@ public interface SourceDeregisterEvent extends VPNEvent, Cancellable {
      *
      * @return the source to be removed
      */
-    @NotNull Source<? extends SourceModel> getSource();
+    @NotNull
+    Source<SourceModel> getSource();
 }

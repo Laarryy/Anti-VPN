@@ -15,5 +15,6 @@ public interface SourceRegisterEvent extends VPNEvent, Cancellable {
      *
      * @return the source to be added
      */
-    @NotNull Source<? extends SourceModel> getSource();
+    @NotNull
+    Source<SourceModel> getSource();
 }

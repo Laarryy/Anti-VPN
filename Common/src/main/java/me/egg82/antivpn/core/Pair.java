@@ -11,8 +11,8 @@ import java.util.Objects;
  * in this Pair won't be reflected in the hashCode.
  */
 public class Pair<T1, T2> {
-    private final T1 t1;
-    private final T2 t2;
+    private final @NotNull T1 t1;
+    private final @NotNull T2 t2;
 
     private final int hc;
 

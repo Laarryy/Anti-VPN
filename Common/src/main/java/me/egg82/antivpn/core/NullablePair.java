@@ -11,8 +11,8 @@ import java.util.Objects;
  * in this Pair won't be reflected in the hashCode.
  */
 public class NullablePair<T1, T2> {
-    private final T1 t1;
-    private final T2 t2;
+    private final @Nullable T1 t1;
+    private final @Nullable T2 t2;
 
     private final int hc;
 
@@ -40,7 +40,7 @@ public class NullablePair<T1, T2> {
     }
 
     @Override
-    public int hashCode() { return Objects.hash(t1, t2, hc); }
+    public int hashCode() { return hc; }
 
     @Override
     public String toString() {

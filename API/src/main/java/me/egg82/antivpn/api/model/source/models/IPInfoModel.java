@@ -7,13 +7,11 @@ import java.util.Objects;
 
 public class IPInfoModel implements SourceModel {
     private int status = -1;
-    private Error error = null;
+    private @Nullable Error error = null;
     private boolean vpn = false;
     private boolean proxy = false;
     private boolean tor = false;
     private boolean hosting = false;
-
-    public IPInfoModel() { }
 
     public int getStatus() { return status; }
 
@@ -21,7 +19,8 @@ public class IPInfoModel implements SourceModel {
         this.status = status;
     }
 
-    public @Nullable Error getError() { return error; }
+    @Nullable
+    public Error getError() { return error; }
 
     public void setError(@Nullable Error error) {
         this.error = error;
@@ -79,18 +78,18 @@ public class IPInfoModel implements SourceModel {
     }
 
     public static final class Error implements Serializable {
-        private String title = null;
-        private String message = null;
+        private @Nullable String title = null;
+        private @Nullable String message = null;
 
-        public Error() { }
-
-        public @Nullable String getTitle() { return title; }
+        @Nullable
+        public String getTitle() { return title; }
 
         public void setTitle(@Nullable String title) {
             this.title = title;
         }
 
-        public @Nullable String getMessage() { return message; }
+        @Nullable
+        public String getMessage() { return message; }
 
         public void setMessage(@Nullable String message) {
             this.message = message;

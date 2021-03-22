@@ -15,7 +15,8 @@ public interface Player extends Serializable {
      *
      * @return the player's UUID
      */
-    @NotNull UUID getUuid();
+    @NotNull
+    UUID getUuid();
 
     /**
      * Gets the player's username.
@@ -24,7 +25,8 @@ public interface Player extends Serializable {
      *
      * @return the player's username
      */
-    @Nullable String getName();
+    @Nullable
+    String getName();
 
     /**
      * Returns the player's MCLeaks status.

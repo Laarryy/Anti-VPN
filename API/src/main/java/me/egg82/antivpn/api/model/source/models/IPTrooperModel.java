@@ -8,13 +8,11 @@ import java.util.Objects;
 public class IPTrooperModel implements SourceModel {
     private int code = -1;
     private boolean bad = false;
-    private String asn = null;
+    private @Nullable String asn = null;
     @JSON(name = "country")
-    private String countryCode = null;
-    private String name = null;
-    private String type = null;
-
-    public IPTrooperModel() { }
+    private @Nullable String countryCode = null;
+    private @Nullable String name = null;
+    private @Nullable String type = null;
 
     public int getCode() { return code; }
 
@@ -28,27 +26,31 @@ public class IPTrooperModel implements SourceModel {
         this.bad = bad;
     }
 
-    public @Nullable String getAsn() { return asn; }
+    @Nullable
+    public String getAsn() { return asn; }
 
     public void setAsn(@Nullable String asn) {
         this.asn = asn;
     }
 
     @JSON(name = "country")
-    public @Nullable String getCountryCode() { return countryCode; }
+    @Nullable
+    public String getCountryCode() { return countryCode; }
 
     @JSON(name = "country")
     public void setCountryCode(@Nullable String countryCode) {
         this.countryCode = countryCode;
     }
 
-    public @Nullable String getName() { return name; }
+    @Nullable
+    public String getName() { return name; }
 
     public void setName(@Nullable String name) {
         this.name = name;
     }
 
-    public @Nullable String getType() { return type; }
+    @Nullable
+    public String getType() { return type; }
 
     public void setType(@Nullable String type) {
         this.type = type;

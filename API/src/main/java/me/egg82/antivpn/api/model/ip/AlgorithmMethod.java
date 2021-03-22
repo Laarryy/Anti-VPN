@@ -7,15 +7,17 @@ public enum AlgorithmMethod {
     CASCADE("cascade"),
     CONSESNSUS("consensus");
 
-    private final String name;
+    private final @NotNull String name;
 
     AlgorithmMethod(@NotNull String name) {
-        this.name = name.toLowerCase();
+        this.name = name;
     }
 
+    @NotNull
     public String getName() { return name; }
 
-    public static @Nullable AlgorithmMethod getByName(@NotNull String name) {
+    @Nullable
+    public static AlgorithmMethod getByName(@NotNull String name) {
         for (AlgorithmMethod value : values()) {
             if (value.name.equalsIgnoreCase(name)) {
                 return value;

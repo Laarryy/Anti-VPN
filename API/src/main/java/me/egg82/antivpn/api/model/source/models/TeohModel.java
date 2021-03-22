@@ -6,50 +6,54 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Objects;
 
 public class TeohModel implements SourceModel {
-    private String message = null;
-    private String ip = null;
-    private String organization = null;
-    private String asn = null;
-    private String type = null;
-    private String risk = null;
+    private @Nullable String message = null;
+    private @Nullable String ip = null;
+    private @Nullable String organization = null;
+    private @Nullable String asn = null;
+    private @Nullable String type = null;
+    private @Nullable String risk = null;
     @JSON(name = "is_hosting")
     private int hosting = -1;
     @JSON(name = "vpn_or_proxy")
-    private String vpnOrProxy = null;
+    private @Nullable String vpnOrProxy = null;
 
-    public TeohModel() { }
-
-    public @Nullable String getMessage() { return message; }
+    @Nullable
+    public String getMessage() { return message; }
 
     public void setMessage(@Nullable String message) {
         this.message = message;
     }
 
-    public @Nullable String getIp() { return ip; }
+    @Nullable
+    public String getIp() { return ip; }
 
     public void setIp(@Nullable String ip) {
         this.ip = ip;
     }
 
-    public @Nullable String getOrganization() { return organization; }
+    @Nullable
+    public String getOrganization() { return organization; }
 
     public void setOrganization(@Nullable String organization) {
         this.organization = organization;
     }
 
-    public @Nullable String getAsn() { return asn; }
+    @Nullable
+    public String getAsn() { return asn; }
 
     public void setAsn(@Nullable String asn) {
         this.asn = asn;
     }
 
-    public @Nullable String getType() { return type; }
+    @Nullable
+    public String getType() { return type; }
 
     public void setType(@Nullable String type) {
         this.type = type;
     }
 
-    public @Nullable String getRisk() { return risk; }
+    @Nullable
+    public String getRisk() { return risk; }
 
     public void setRisk(@Nullable String risk) {
         this.risk = risk;
@@ -64,7 +68,8 @@ public class TeohModel implements SourceModel {
     }
 
     @JSON(name = "vpn_or_proxy")
-    public @Nullable String getVpnOrProxy() { return vpnOrProxy; }
+    @Nullable
+    public String getVpnOrProxy() { return vpnOrProxy; }
 
     @JSON(name = "vpn_or_proxy")
     public void setVpnOrProxy(@Nullable String vpnOrProxy) {

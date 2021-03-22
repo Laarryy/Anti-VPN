@@ -12,12 +12,14 @@ public interface VPNEvent {
      *
      * @return the api instance
      */
-    @NotNull VPNAPI getApi();
+    @NotNull
+    VPNAPI getApi();
 
     /**
      * Gets the type of the event.
      *
      * @return the type of the event
      */
-    @NotNull Class<? extends VPNEvent> getEventType();
+    @NotNull
+    Class<? super VPNEvent> getEventType();
 }
