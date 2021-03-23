@@ -13,7 +13,8 @@ import java.util.concurrent.CompletableFuture;
 
 public class IPHunter extends AbstractSource<IPHunterModel> {
     @Override
-    public @NotNull String getName() { return "iphunter"; }
+    @NotNull
+    public String getName() { return "iphunter"; }
 
     @Override
     public boolean isKeyRequired() { return true; }
@@ -23,7 +24,8 @@ public class IPHunter extends AbstractSource<IPHunterModel> {
     }
 
     @Override
-    public @NotNull CompletableFuture<@NotNull Boolean> getResult(@NotNull String ip) {
+    @NotNull
+    public CompletableFuture<@NotNull Boolean> getResult(@NotNull String ip) {
         return getRawResponse(ip).thenApply(model -> {
             if (!"success".equalsIgnoreCase(model.getStatus())) {
                 throw new APIException(
@@ -37,7 +39,8 @@ public class IPHunter extends AbstractSource<IPHunterModel> {
     }
 
     @Override
-    public @NotNull CompletableFuture<@NotNull IPHunterModel> getRawResponse(@NotNull String ip) {
+    @NotNull
+    public CompletableFuture<@NotNull IPHunterModel> getRawResponse(@NotNull String ip) {
         return CompletableFuture.supplyAsync(() -> {
             if (!ValidationUtil.isValidIp(ip)) {
                 throw new IllegalArgumentException("ip is invalid.");

@@ -8,9 +8,9 @@ import me.egg82.antivpn.api.model.source.SourceManager;
 import org.jetbrains.annotations.NotNull;
 
 public class APIReloadEventImpl extends AbstractEvent implements APIReloadEvent {
-    private final IPManager newIpManager;
-    private final PlayerManager newPlayerManager;
-    private final SourceManager newSourceManager;
+    private final @NotNull IPManager newIpManager;
+    private final @NotNull PlayerManager newPlayerManager;
+    private final @NotNull SourceManager newSourceManager;
 
     public APIReloadEventImpl(@NotNull VPNAPI api, @NotNull IPManager newIpManager, @NotNull PlayerManager newPlayerManager, @NotNull SourceManager newSourceManager) {
         super(api);
@@ -20,13 +20,16 @@ public class APIReloadEventImpl extends AbstractEvent implements APIReloadEvent 
     }
 
     @Override
-    public @NotNull IPManager getNewIPManager() { return newIpManager; }
+    @NotNull
+    public IPManager getNewIPManager() { return newIpManager; }
 
     @Override
-    public @NotNull PlayerManager getNewPlayerManager() { return newPlayerManager; }
+    @NotNull
+    public PlayerManager getNewPlayerManager() { return newPlayerManager; }
 
     @Override
-    public @NotNull SourceManager getNewSourceManager() { return newSourceManager; }
+    @NotNull
+    public SourceManager getNewSourceManager() { return newSourceManager; }
 
     @Override
     public String toString() {

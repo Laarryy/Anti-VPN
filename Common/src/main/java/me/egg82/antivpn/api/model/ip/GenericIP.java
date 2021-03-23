@@ -7,10 +7,10 @@ import java.net.InetAddress;
 import java.util.Objects;
 
 public class GenericIP implements IP {
-    private final InetAddress ip;
-    private AlgorithmMethod type;
-    private Boolean cascade;
-    private Double consensus;
+    private final @NotNull InetAddress ip;
+    private @NotNull AlgorithmMethod type;
+    private @Nullable Boolean cascade;
+    private @Nullable Double consensus;
 
     private final int hc;
 
@@ -24,10 +24,12 @@ public class GenericIP implements IP {
     }
 
     @Override
-    public @NotNull InetAddress getIP() { return ip; }
+    @NotNull
+    public InetAddress getIP() { return ip; }
 
     @Override
-    public @Nullable Boolean getCascade() { return cascade; }
+    @Nullable
+    public Boolean getCascade() { return cascade; }
 
     @Override
     public void setCascade(@Nullable Boolean status) {
@@ -35,7 +37,8 @@ public class GenericIP implements IP {
     }
 
     @Override
-    public @Nullable Double getConsensus() { return consensus; }
+    @Nullable
+    public Double getConsensus() { return consensus; }
 
     @Override
     public void setConsensus(@Nullable Double status) {
@@ -43,7 +46,8 @@ public class GenericIP implements IP {
     }
 
     @Override
-    public @NotNull AlgorithmMethod getType() { return type; }
+    @NotNull
+    public AlgorithmMethod getType() { return type; }
 
     @Override
     public void setType(@NotNull AlgorithmMethod type) {

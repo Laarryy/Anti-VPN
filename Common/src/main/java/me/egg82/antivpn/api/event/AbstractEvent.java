@@ -4,17 +4,18 @@ import me.egg82.antivpn.api.VPNAPI;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class AbstractEvent implements VPNEvent {
-    protected final VPNAPI api;
-    private final Class<? extends VPNEvent> clazz;
+    protected final @NotNull VPNAPI api;
+    private final @NotNull Class<VPNEvent> clazz;
 
+    @SuppressWarnings("unchecked")
     protected AbstractEvent(@NotNull VPNAPI api) {
         this.api = api;
-        this.clazz = getClass();
+        this.clazz = (Class<VPNEvent>) getClass();
     }
 
     @Override
     public @NotNull VPNAPI getApi() { return api; }
 
     @Override
-    public @NotNull Class<? extends VPNEvent> getEventType() { return clazz; }
+    public @NotNull Class<VPNEvent> getEventType() { return clazz; }
 }

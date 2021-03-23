@@ -17,10 +17,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class GetIPIntel extends AbstractSource<GetIPIntelModel> {
-    private static final AtomicInteger hourlyRequests = new AtomicInteger(0);
-    private static final AtomicInteger minuteRequests = new AtomicInteger(0);
-    private static final ScheduledExecutorService threadPool = Executors.newSingleThreadScheduledExecutor(new ThreadFactoryBuilder().setNameFormat(
-            "Anti-VPN_GetIPIntel_%d").build());
+    private static final @NotNull AtomicInteger hourlyRequests = new AtomicInteger(0);
+    private static final @NotNull AtomicInteger minuteRequests = new AtomicInteger(0);
+    private static final @NotNull ScheduledExecutorService threadPool = Executors.newSingleThreadScheduledExecutor(new ThreadFactoryBuilder().setNameFormat("Anti-VPN_GetIPIntel_%d").build());
 
     static {
         threadPool.scheduleAtFixedRate(() -> hourlyRequests.set(0), 0L, 24L, TimeUnit.HOURS);
@@ -32,13 +31,15 @@ public class GetIPIntel extends AbstractSource<GetIPIntelModel> {
     }
 
     @Override
-    public @NotNull String getName() { return "getipintel"; }
+    @NotNull
+    public String getName() { return "getipintel"; }
 
     @Override
     public boolean isKeyRequired() { return false; }
 
     @Override
-    public @NotNull CompletableFuture<@NotNull Boolean> getResult(@NotNull String ip) {
+    @NotNull
+    public CompletableFuture<@NotNull Boolean> getResult(@NotNull String ip) {
         return getRawResponse(ip).thenApply(model -> {
             if (!"success".equalsIgnoreCase(model.getStatus()) || model.getResult() == null) {
                 boolean isHard = model.getResult() != null && ("-5".equals(model.getResult()) || "-6".equals(model.getResult()));
@@ -58,7 +59,8 @@ public class GetIPIntel extends AbstractSource<GetIPIntelModel> {
     }
 
     @Override
-    public @NotNull CompletableFuture<@NotNull GetIPIntelModel> getRawResponse(@NotNull String ip) {
+    @NotNull
+    public CompletableFuture<@NotNull GetIPIntelModel> getRawResponse(@NotNull String ip) {
         return CompletableFuture.supplyAsync(() -> {
             if (!ValidationUtil.isValidIp(ip)) {
                 throw new IllegalArgumentException("ip is invalid.");

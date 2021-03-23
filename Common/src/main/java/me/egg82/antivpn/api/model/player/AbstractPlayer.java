@@ -13,15 +13,15 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 public abstract class AbstractPlayer implements Player {
-    protected final transient Logger logger = new GELFLogger(LoggerFactory.getLogger(getClass()));
+    protected final transient @NotNull Logger logger = new GELFLogger(LoggerFactory.getLogger(getClass()));
 
-    private final UUID uuid;
-    private final String name;
+    private final @NotNull UUID uuid;
+    private final @Nullable String name;
     private boolean mcleaks;
 
     private final int hc;
 
-    protected AbstractPlayer(@NotNull UUID uuid, String name, boolean mcleaks) {
+    protected AbstractPlayer(@NotNull UUID uuid, @Nullable String name, boolean mcleaks) {
         this.uuid = uuid;
         if (name == null) {
             try {
@@ -39,10 +39,12 @@ public abstract class AbstractPlayer implements Player {
     }
 
     @Override
-    public @NotNull UUID getUuid() { return uuid; }
+    @NotNull
+    public UUID getUuid() { return uuid; }
 
     @Override
-    public @Nullable String getName() { return name; }
+    @Nullable
+    public String getName() { return name; }
 
     @Override
     public boolean isMcLeaks() { return mcleaks; }
@@ -52,7 +54,8 @@ public abstract class AbstractPlayer implements Player {
         this.mcleaks = status;
     }
 
-    protected abstract @NotNull CompletableFuture<@NotNull String> fetchName(@NotNull UUID uuid);
+    @NotNull
+    protected abstract CompletableFuture<@NotNull String> fetchName(@NotNull UUID uuid);
 
     @Override
     public boolean equals(Object o) {

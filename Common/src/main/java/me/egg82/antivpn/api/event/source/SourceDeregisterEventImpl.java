@@ -9,15 +9,16 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Objects;
 
 public class SourceDeregisterEventImpl extends AbstractCancellable implements SourceDeregisterEvent {
-    private final Source<? extends SourceModel> source;
+    private final @NotNull Source<SourceModel> source;
 
-    public SourceDeregisterEventImpl(@NotNull VPNAPI api, @NotNull Source<? extends SourceModel> source) {
+    public SourceDeregisterEventImpl(@NotNull VPNAPI api, @NotNull Source<SourceModel> source) {
         super(api);
         this.source = source;
     }
 
     @Override
-    public @NotNull Source<? extends SourceModel> getSource() { return source; }
+    @NotNull
+    public Source<SourceModel> getSource() { return source; }
 
     @Override
     public boolean equals(Object o) {

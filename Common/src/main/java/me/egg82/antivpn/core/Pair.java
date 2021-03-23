@@ -23,9 +23,11 @@ public class Pair<T1, T2> {
         this.hc = Objects.hash(t1, t2);
     }
 
-    public @NotNull T1 getT1() { return t1; }
+    @NotNull
+    public T1 getT1() { return t1; }
 
-    public @NotNull T2 getT2() { return t2; }
+    @NotNull
+    public T2 getT2() { return t2; }
 
     @Override
     public boolean equals(Object o) {

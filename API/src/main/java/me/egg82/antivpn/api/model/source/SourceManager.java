@@ -63,7 +63,7 @@ public interface SourceManager {
      *
      * @throws NullPointerException if the new source is null
      */
-    default boolean replaceSource(@NotNull Source<? extends SourceModel> newSource) {
+    default boolean replaceSource(@NotNull Source<SourceModel> newSource) {
         List<Source<SourceModel>> sources = getSources();
         int index = -1;
         Source<SourceModel> removedSource = null;
@@ -94,7 +94,7 @@ public interface SourceManager {
      *
      * @throws NullPointerException if the source is null
      */
-    default boolean registerSource(@NotNull Source<? extends SourceModel> source) { return registerSource(source, getSources().size()); }
+    default boolean registerSource(@NotNull Source<SourceModel> source) { return registerSource(source, getSources().size()); }
 
     /**
      * Registers and enables a new, unique {@link Source}, inserting
@@ -110,7 +110,7 @@ public interface SourceManager {
      *
      * @throws NullPointerException if the source is null
      */
-    boolean registerSource(@NotNull Source<? extends SourceModel> source, int index);
+    boolean registerSource(@NotNull Source<SourceModel> source, int index);
 
     /**
      * Deregisters, disables, and removes an existing source from
@@ -125,7 +125,7 @@ public interface SourceManager {
      *
      * @throws NullPointerException if the source is null
      */
-    boolean deregisterSource(@NotNull Source<? extends SourceModel> source);
+    boolean deregisterSource(@NotNull Source<SourceModel> source);
 
     /**
      * Deregisters, disables, and removes an existing source from

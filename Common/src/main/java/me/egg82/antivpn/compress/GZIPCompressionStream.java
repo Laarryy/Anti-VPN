@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
-public class GZIPCompressionStream extends AbstractCompressionStream {
+public class GZIPCompressionStream implements CompressionStream {
     @Override
     public byte @NotNull [] compress(byte @NotNull [] buf) throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream(buf.length);

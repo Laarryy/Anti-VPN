@@ -10,9 +10,10 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 public class DoubleBuffer<T> {
     private volatile @NotNull Queue<T> currentBuffer = new ConcurrentLinkedQueue<>();
     private volatile @NotNull Queue<T> backBuffer = new ConcurrentLinkedQueue<>();
-    private final ReadWriteLock lock = new ReentrantReadWriteLock();
+    private final @NotNull ReadWriteLock lock = new ReentrantReadWriteLock();
 
-    public @NotNull Queue<T> getReadBuffer() {
+    @NotNull
+    public Queue<T> getReadBuffer() {
         lock.readLock().lock();
         try {
             return backBuffer;
@@ -21,7 +22,8 @@ public class DoubleBuffer<T> {
         }
     }
 
-    public @NotNull Queue<T> getWriteBuffer() {
+    @NotNull
+    public Queue<T> getWriteBuffer() {
         lock.readLock().lock();
         try {
             return currentBuffer;

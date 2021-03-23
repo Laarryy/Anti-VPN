@@ -13,7 +13,8 @@ import java.util.concurrent.CompletableFuture;
 
 public class VPNBlocker extends AbstractSource<VPNBlockerModel> {
     @Override
-    public @NotNull String getName() { return "vpnblocker"; }
+    @NotNull
+    public String getName() { return "vpnblocker"; }
 
     @Override
     public boolean isKeyRequired() { return false; }
@@ -23,7 +24,8 @@ public class VPNBlocker extends AbstractSource<VPNBlockerModel> {
     }
 
     @Override
-    public @NotNull CompletableFuture<@NotNull Boolean> getResult(@NotNull String ip) {
+    @NotNull
+    public CompletableFuture<@NotNull Boolean> getResult(@NotNull String ip) {
         return getRawResponse(ip).thenApply(model -> {
             if (!"success".equalsIgnoreCase(model.getStatus())) {
                 throw new APIException(model.getMsg() != null && model.getMsg().contains("key"), "Could not get result from " + getName() + " (" + model.getMsg() + ")");
@@ -34,7 +36,8 @@ public class VPNBlocker extends AbstractSource<VPNBlockerModel> {
     }
 
     @Override
-    public @NotNull CompletableFuture<@NotNull VPNBlockerModel> getRawResponse(@NotNull String ip) {
+    @NotNull
+    public CompletableFuture<@NotNull VPNBlockerModel> getRawResponse(@NotNull String ip) {
         return CompletableFuture.supplyAsync(() -> {
             if (!ValidationUtil.isValidIp(ip)) {
                 throw new IllegalArgumentException("ip is invalid.");
@@ -44,9 +47,7 @@ public class VPNBlocker extends AbstractSource<VPNBlockerModel> {
 
             String key = sourceConfigNode.node("key").getString();
 
-            WebRequest.Builder builder = getDefaultBuilder("http" + ((key != null && !key.isEmpty())
-                                                                     ? "s"
-                                                                     : "") + "://api.vpnblocker.net/v2/json/" + ip + ((key != null && !key.isEmpty()) ? "/" + key : ""));
+            WebRequest.Builder builder = getDefaultBuilder("http" + ((key != null && !key.isEmpty()) ? "s" : "") + "://api.vpnblocker.net/v2/json/" + ip + ((key != null && !key.isEmpty()) ? "/" + key : ""));
             HttpURLConnection conn = getConnection(builder.build());
             JSONDeserializer<VPNBlockerModel> modelDeserializer = new JSONDeserializer<>();
             return modelDeserializer.deserialize(getString(conn), VPNBlockerModel.class);

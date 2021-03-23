@@ -30,12 +30,12 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicLong;
 
 public abstract class AbstractIPManager implements IPManager {
-    protected final Logger logger = new GELFLogger(LoggerFactory.getLogger(getClass()));
+    protected final @NotNull Logger logger = new GELFLogger(LoggerFactory.getLogger(getClass()));
 
-    private final LoadingCache<Pair<String, AlgorithmMethod>, IPModel> ipCache;
-    private final LoadingCache<String, Boolean> sourceInvalidationCache;
+    private final @NotNull LoadingCache<Pair<String, AlgorithmMethod>, IPModel> ipCache;
+    private final @NotNull LoadingCache<String, Boolean> sourceInvalidationCache;
 
-    private final SourceManager sourceManager;
+    private final @NotNull SourceManager sourceManager;
 
     protected AbstractIPManager(@NotNull SourceManager sourceManager, @NotNull TimeUtil.Time cacheTime) {
         this.sourceManager = sourceManager;
@@ -47,10 +47,12 @@ public abstract class AbstractIPManager implements IPManager {
         sourceInvalidationCache = Caffeine.newBuilder().expireAfterWrite(1L, TimeUnit.MINUTES).build(k -> Boolean.FALSE);
     }
 
+    @NotNull
     public LoadingCache<Pair<String, AlgorithmMethod>, IPModel> getIpCache() { return ipCache; }
 
     @Override
-    public @NotNull CompletableFuture<@Nullable IP> getIP(@NotNull String ip) {
+    @NotNull
+    public CompletableFuture<@Nullable IP> getIP(@NotNull String ip) {
         return CompletableFuture.supplyAsync(() -> {
             CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
 
@@ -69,7 +71,8 @@ public abstract class AbstractIPManager implements IPManager {
     }
 
     @Override
-    public @NotNull CompletableFuture<Void> saveIP(@NotNull IP ip) {
+    @NotNull
+    public CompletableFuture<Void> saveIP(@NotNull IP ip) {
         return CompletableFuture.runAsync(() -> {
             CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
 
@@ -90,7 +93,8 @@ public abstract class AbstractIPManager implements IPManager {
     }
 
     @Override
-    public @NotNull CompletableFuture<Void> deleteIP(@NotNull String ip) {
+    @NotNull
+    public CompletableFuture<Void> deleteIP(@NotNull String ip) {
         return CompletableFuture.runAsync(() -> {
             CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
 
@@ -108,7 +112,8 @@ public abstract class AbstractIPManager implements IPManager {
     }
 
     @Override
-    public @NotNull CompletableFuture<@NotNull Set<@NotNull InetAddress>> getIPs() {
+    @NotNull
+    public CompletableFuture<@NotNull Set<@NotNull InetAddress>> getIPs() {
         return CompletableFuture.supplyAsync(() -> {
             CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
 
@@ -131,10 +136,12 @@ public abstract class AbstractIPManager implements IPManager {
     }
 
     @Override
-    public @NotNull AlgorithmMethod getCurrentAlgorithmMethod() { return ConfigUtil.getCachedConfig().getVPNAlgorithmMethod(); }
+    @NotNull
+    public AlgorithmMethod getCurrentAlgorithmMethod() { return ConfigUtil.getCachedConfig().getVPNAlgorithmMethod(); }
 
     @Override
-    public @NotNull CompletableFuture<@NotNull Boolean> cascade(@NotNull String ip, boolean useCache) {
+    @NotNull
+    public CompletableFuture<@NotNull Boolean> cascade(@NotNull String ip, boolean useCache) {
         return CompletableFuture.supplyAsync(() -> {
             IPModel model;
             if (useCache) {
@@ -160,7 +167,8 @@ public abstract class AbstractIPManager implements IPManager {
     }
 
     @Override
-    public @NotNull CompletableFuture<@NotNull Double> consensus(@NotNull String ip, boolean useCache) {
+    @NotNull
+    public CompletableFuture<@NotNull Double> consensus(@NotNull String ip, boolean useCache) {
         return CompletableFuture.supplyAsync(() -> {
             IPModel model;
             if (useCache) {
@@ -188,7 +196,8 @@ public abstract class AbstractIPManager implements IPManager {
     @Override
     public double getMinConsensusValue() { return ConfigUtil.getCachedConfig().getVPNAlgorithmConsensus(); }
 
-    private @NotNull IPModel calculateIpResult(@NotNull String ip, @NotNull AlgorithmMethod method, boolean useCache) throws APIException {
+    @NotNull
+    private IPModel calculateIpResult(@NotNull String ip, @NotNull AlgorithmMethod method, boolean useCache) throws APIException {
         CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
 
         if (useCache) {
@@ -213,11 +222,11 @@ public abstract class AbstractIPManager implements IPManager {
 
         if (method == AlgorithmMethod.CONSESNSUS) {
             ExecutorService pool = Executors.newWorkStealingPool(cachedConfig.getThreads());
-            List<Source<? extends SourceModel>> sources = sourceManager.getSources();
+            List<Source<SourceModel>> sources = sourceManager.getSources();
             CountDownLatch latch = new CountDownLatch(sources.size());
             AtomicLong results = new AtomicLong(0L);
             AtomicLong totalSources = new AtomicLong(0L);
-            for (Source<? extends SourceModel> source : sources) {
+            for (Source<SourceModel> source : sources) {
                 pool.submit(() -> {
                     if (Boolean.TRUE.equals(sourceInvalidationCache.get(source.getName()))) {
                         if (cachedConfig.getDebug()) {
@@ -264,7 +273,7 @@ public abstract class AbstractIPManager implements IPManager {
                 return retVal;
             }
         } else {
-            for (Source<? extends SourceModel> source : sourceManager.getSources()) {
+            for (Source<SourceModel> source : sourceManager.getSources()) {
                 if (Boolean.TRUE.equals(sourceInvalidationCache.get(source.getName()))) {
                     if (cachedConfig.getDebug()) {
                         logger.info("Skipping source " + source.getName() + " due to recent failure.");

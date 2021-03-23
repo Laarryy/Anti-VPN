@@ -17,13 +17,15 @@ import java.util.concurrent.TimeUnit;
 public class CachedConfig {
     private CachedConfig() { }
 
-    private ImmutableList<StorageService> storage = ImmutableList.of();
+    private @NotNull ImmutableList<@NotNull StorageService> storage = ImmutableList.of();
 
-    public @NotNull ImmutableList<@NotNull StorageService> getStorage() { return storage; }
+    @NotNull
+    public ImmutableList<@NotNull StorageService> getStorage() { return storage; }
 
-    private ImmutableList<MessagingService> messaging = ImmutableList.of();
+    private @NotNull ImmutableList<@NotNull MessagingService> messaging = ImmutableList.of();
 
-    public @NotNull ImmutableList<@NotNull MessagingService> getMessaging() { return messaging; }
+    @NotNull
+    public ImmutableList<@NotNull MessagingService> getMessaging() { return messaging; }
 
     private long sourceCacheTime = new TimeUtil.Time(6L, TimeUnit.HOURS).getMillis();
 
@@ -33,21 +35,24 @@ public class CachedConfig {
 
     public long getMCLeaksCacheTime() { return mcleaksCacheTime; }
 
-    private ImmutableSet<String> ignoredIps = ImmutableSet.of();
+    private @NotNull ImmutableSet<@NotNull String> ignoredIps = ImmutableSet.of();
 
-    public @NotNull ImmutableSet<@NotNull String> getIgnoredIps() { return ignoredIps; }
+    @NotNull
+    public ImmutableSet<@NotNull String> getIgnoredIps() { return ignoredIps; }
 
-    private TimeUtil.Time cacheTime = new TimeUtil.Time(1L, TimeUnit.MINUTES);
+    private @NotNull TimeUtil.Time cacheTime = new TimeUtil.Time(1L, TimeUnit.MINUTES);
 
-    public @NotNull TimeUtil.Time getCacheTime() { return cacheTime; }
+    @NotNull
+    public TimeUtil.Time getCacheTime() { return cacheTime; }
 
     private boolean debug = false;
 
     public boolean getDebug() { return debug; }
 
-    private Locale language = Locale.US;
+    private @NotNull Locale language = Locale.US;
 
-    public @NotNull Locale getLanguage() { return language; }
+    @NotNull
+    public Locale getLanguage() { return language; }
 
     private int threads = 4;
 
@@ -57,78 +62,94 @@ public class CachedConfig {
 
     public long getTimeout() { return timeout; }
 
-    private String vpnKickMessage = "<red>Please disconnect from your proxy or VPN before re-joining!</red>";
+    private @NotNull String vpnKickMessage = "<red>Please disconnect from your proxy or VPN before re-joining!</red>";
 
-    public @NotNull String getVPNKickMessage() { return vpnKickMessage; }
+    @NotNull
+    public String getVPNKickMessage() { return vpnKickMessage; }
 
-    private ImmutableList<String> vpnActionCommands = ImmutableList.of();
+    private @NotNull ImmutableList<@NotNull String> vpnActionCommands = ImmutableList.of();
 
-    public @NotNull ImmutableList<@NotNull String> getVPNActionCommands() { return vpnActionCommands; }
+    @NotNull
+    public ImmutableList<@NotNull String> getVPNActionCommands() { return vpnActionCommands; }
 
-    private String mcleaksKickMessage = "<red>Please discontinue your use of an MCLeaks account!</red>";
+    private @NotNull String mcleaksKickMessage = "<red>Please discontinue your use of an MCLeaks account!</red>";
 
-    public @NotNull String getMCLeaksKickMessage() { return mcleaksKickMessage; }
+    @NotNull
+    public String getMCLeaksKickMessage() { return mcleaksKickMessage; }
 
-    private ImmutableList<String> mcleaksActionCommands = ImmutableList.of();
+    private @NotNull ImmutableList<@NotNull String> mcleaksActionCommands = ImmutableList.of();
 
-    public @NotNull ImmutableList<@NotNull String> getMCLeaksActionCommands() { return mcleaksActionCommands; }
+    @NotNull
+    public ImmutableList<@NotNull String> getMCLeaksActionCommands() { return mcleaksActionCommands; }
 
-    private AlgorithmMethod algorithmMethod = AlgorithmMethod.CASCADE;
+    private @NotNull AlgorithmMethod algorithmMethod = AlgorithmMethod.CASCADE;
 
-    public @NotNull AlgorithmMethod getVPNAlgorithmMethod() { return algorithmMethod; }
+    @NotNull
+    public AlgorithmMethod getVPNAlgorithmMethod() { return algorithmMethod; }
 
     private double vpnAlgorithmConsensus = 0.6d;
 
     public double getVPNAlgorithmConsensus() { return vpnAlgorithmConsensus; }
 
-    private String mcleaksKey = "";
+    private @NotNull String mcleaksKey = "";
 
-    public @NotNull String getMcLeaksKey() { return mcleaksKey; }
+    @NotNull
+    public String getMcLeaksKey() { return mcleaksKey; }
 
-    private String adminPermissionNode = "avpn.admin";
+    private @NotNull String adminPermissionNode = "avpn.admin";
 
-    public @NotNull String getAdminPermissionNode() { return adminPermissionNode; }
+    @NotNull
+    public String getAdminPermissionNode() { return adminPermissionNode; }
 
-    private String bypassPermissionNode = "avpn.bypass";
+    private @NotNull String bypassPermissionNode = "avpn.bypass";
 
-    public @NotNull String getBypassPermissionNode() { return bypassPermissionNode; }
+    @NotNull
+    public String getBypassPermissionNode() { return bypassPermissionNode; }
 
-    private UUID serverId = UUID.randomUUID();
+    private @NotNull UUID serverId = UUID.randomUUID();
 
-    public @NotNull UUID getServerId() { return serverId; }
+    @NotNull
+    public UUID getServerId() { return serverId; }
 
-    private String serverIdString = serverId.toString();
+    private @NotNull String serverIdString = serverId.toString();
 
-    public @NotNull String getServerIdString() { return serverIdString; }
+    @NotNull
+    public String getServerIdString() { return serverIdString; }
 
-    public static @NotNull CachedConfig.Builder builder() { return new CachedConfig.Builder(); }
+    @NotNull
+    public static CachedConfig.Builder builder() { return new CachedConfig.Builder(); }
 
     public static class Builder {
-        private final CachedConfig values = new CachedConfig();
+        private final @NotNull CachedConfig values = new CachedConfig();
 
         private Builder() { }
 
-        public @NotNull CachedConfig.Builder debug(boolean value) {
+        @NotNull
+        public CachedConfig.Builder debug(boolean value) {
             values.debug = value;
             return this;
         }
 
-        public @NotNull CachedConfig.Builder language(@NotNull Locale value) {
+        @NotNull
+        public CachedConfig.Builder language(@NotNull Locale value) {
             values.language = value;
             return this;
         }
 
-        public @NotNull CachedConfig.Builder storage(@NotNull List<@NotNull StorageService> value) {
+        @NotNull
+        public CachedConfig.Builder storage(@NotNull List<@NotNull StorageService> value) {
             values.storage = ImmutableList.copyOf(value);
             return this;
         }
 
-        public @NotNull CachedConfig.Builder messaging(@NotNull List<@NotNull MessagingService> value) {
+        @NotNull
+        public CachedConfig.Builder messaging(@NotNull List<@NotNull MessagingService> value) {
             values.messaging = ImmutableList.copyOf(value);
             return this;
         }
 
-        public @NotNull CachedConfig.Builder sourceCacheTime(@NotNull TimeUtil.Time value) {
+        @NotNull
+        public CachedConfig.Builder sourceCacheTime(@NotNull TimeUtil.Time value) {
             if (value.getMillis() <= 0L) {
                 throw new IllegalArgumentException("value cannot be <= 0.");
             }
@@ -137,7 +158,8 @@ public class CachedConfig {
             return this;
         }
 
-        public @NotNull CachedConfig.Builder mcleaksCacheTime(@NotNull TimeUtil.Time value) {
+        @NotNull
+        public CachedConfig.Builder mcleaksCacheTime(@NotNull TimeUtil.Time value) {
             if (value.getMillis() <= 0L) {
                 throw new IllegalArgumentException("value cannot be <= 0.");
             }
@@ -146,12 +168,14 @@ public class CachedConfig {
             return this;
         }
 
-        public @NotNull CachedConfig.Builder ignoredIps(@NotNull Collection<@NotNull String> value) {
+        @NotNull
+        public CachedConfig.Builder ignoredIps(@NotNull Collection<@NotNull String> value) {
             values.ignoredIps = ImmutableSet.copyOf(value);
             return this;
         }
 
-        public @NotNull CachedConfig.Builder cacheTime(@NotNull TimeUtil.Time value) {
+        @NotNull
+        public CachedConfig.Builder cacheTime(@NotNull TimeUtil.Time value) {
             if (value.getMillis() <= 0L) {
                 throw new IllegalArgumentException("value cannot be <= 0.");
             }
@@ -160,7 +184,8 @@ public class CachedConfig {
             return this;
         }
 
-        public @NotNull CachedConfig.Builder threads(int value) {
+        @NotNull
+        public CachedConfig.Builder threads(int value) {
             if (value <= 1) {
                 throw new IllegalArgumentException("value cannot be <= 1.");
             }
@@ -169,7 +194,8 @@ public class CachedConfig {
             return this;
         }
 
-        public @NotNull CachedConfig.Builder timeout(long value) {
+        @NotNull
+        public CachedConfig.Builder timeout(long value) {
             if (value <= 0L) {
                 throw new IllegalArgumentException("value cannot be <= 0.");
             }
@@ -178,32 +204,38 @@ public class CachedConfig {
             return this;
         }
 
-        public @NotNull CachedConfig.Builder vpnKickMessage(@NotNull String value) {
+        @NotNull
+        public CachedConfig.Builder vpnKickMessage(@NotNull String value) {
             values.vpnKickMessage = value;
             return this;
         }
 
-        public @NotNull CachedConfig.Builder vpnActionCommands(@NotNull Collection<@NotNull String> value) {
+        @NotNull
+        public CachedConfig.Builder vpnActionCommands(@NotNull Collection<@NotNull String> value) {
             values.vpnActionCommands = ImmutableList.copyOf(value);
             return this;
         }
 
-        public @NotNull CachedConfig.Builder mcleaksKickMessage(@NotNull String value) {
+        @NotNull
+        public CachedConfig.Builder mcleaksKickMessage(@NotNull String value) {
             values.mcleaksKickMessage = value;
             return this;
         }
 
-        public @NotNull CachedConfig.Builder mcleaksActionCommands(@NotNull Collection<@NotNull String> value) {
+        @NotNull
+        public CachedConfig.Builder mcleaksActionCommands(@NotNull Collection<@NotNull String> value) {
             values.mcleaksActionCommands = ImmutableList.copyOf(value);
             return this;
         }
 
-        public @NotNull CachedConfig.Builder vpnAlgorithmMethod(@NotNull AlgorithmMethod value) {
+        @NotNull
+        public CachedConfig.Builder vpnAlgorithmMethod(@NotNull AlgorithmMethod value) {
             values.algorithmMethod = value;
             return this;
         }
 
-        public @NotNull CachedConfig.Builder vpnAlgorithmConsensus(double value) {
+        @NotNull
+        public CachedConfig.Builder vpnAlgorithmConsensus(double value) {
             if (value < 0.0d) {
                 throw new IllegalArgumentException("value cannot be < 0.");
             }
@@ -214,27 +246,32 @@ public class CachedConfig {
             return this;
         }
 
-        public @NotNull CachedConfig.Builder mcleaksKey(@NotNull String value) {
+        @NotNull
+        public CachedConfig.Builder mcleaksKey(@NotNull String value) {
             values.mcleaksKey = value;
             return this;
         }
 
-        public @NotNull CachedConfig.Builder adminPermissionNode(@NotNull String value) {
+        @NotNull
+        public CachedConfig.Builder adminPermissionNode(@NotNull String value) {
             values.adminPermissionNode = value;
             return this;
         }
 
-        public @NotNull CachedConfig.Builder bypassPermissionNode(@NotNull String value) {
+        @NotNull
+        public CachedConfig.Builder bypassPermissionNode(@NotNull String value) {
             values.bypassPermissionNode = value;
             return this;
         }
 
-        public @NotNull CachedConfig.Builder serverId(@NotNull UUID value) {
+        @NotNull
+        public CachedConfig.Builder serverId(@NotNull UUID value) {
             values.serverId = value;
             values.serverIdString = value.toString();
             return this;
         }
 
-        public @NotNull CachedConfig build() { return values; }
+        @NotNull
+        public CachedConfig build() { return values; }
     }
 }

@@ -13,7 +13,8 @@ import java.util.concurrent.CompletableFuture;
 
 public class IPInfo extends AbstractSource<IPInfoModel> {
     @Override
-    public @NotNull String getName() { return "ipinfo"; }
+    @NotNull
+    public String getName() { return "ipinfo"; }
 
     @Override
     public boolean isKeyRequired() { return true; }
@@ -23,7 +24,8 @@ public class IPInfo extends AbstractSource<IPInfoModel> {
     }
 
     @Override
-    public @NotNull CompletableFuture<@NotNull Boolean> getResult(@NotNull String ip) {
+    @NotNull
+    public CompletableFuture<@NotNull Boolean> getResult(@NotNull String ip) {
         return getRawResponse(ip).thenApply(model -> {
             if (model.getError() != null) {
                 throw new APIException(
@@ -43,7 +45,8 @@ public class IPInfo extends AbstractSource<IPInfoModel> {
     }
 
     @Override
-    public @NotNull CompletableFuture<@NotNull IPInfoModel> getRawResponse(@NotNull String ip) {
+    @NotNull
+    public CompletableFuture<@NotNull IPInfoModel> getRawResponse(@NotNull String ip) {
         return CompletableFuture.supplyAsync(() -> {
             if (!ValidationUtil.isValidIp(ip)) {
                 throw new IllegalArgumentException("ip is invalid.");

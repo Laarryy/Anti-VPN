@@ -8,9 +8,9 @@ import org.jetbrains.annotations.Nullable;
 import org.spongepowered.configurate.ConfigurationNode;
 
 public class ConfigUtil {
-    private static ConfigurationNode config = null;
-    private static CachedConfig cachedConfig = null;
-    private static HiddenConfig hiddenConfig = null;
+    private static @Nullable ConfigurationNode config = null;
+    private static @Nullable CachedConfig cachedConfig = null;
+    private static @Nullable HiddenConfig hiddenConfig = null;
 
     private ConfigUtil() { }
 
@@ -20,7 +20,8 @@ public class ConfigUtil {
         ConfigUtil.hiddenConfig = hiddenConfig;
     }
 
-    public static @NotNull ConfigurationNode getConfig() {
+    @NotNull
+    public static ConfigurationNode getConfig() {
         ConfigurationNode c = config; // Thread-safe reference
         if (c == null) {
             I18NManager defaultI18N = LocaleUtil.getDefaultI18N();
@@ -29,7 +30,8 @@ public class ConfigUtil {
         return c;
     }
 
-    public static @NotNull CachedConfig getCachedConfig() {
+    @NotNull
+    public static CachedConfig getCachedConfig() {
         CachedConfig c = cachedConfig; // Thread-safe reference
         if (c == null) {
             I18NManager defaultI18N = LocaleUtil.getDefaultI18N();
@@ -38,7 +40,8 @@ public class ConfigUtil {
         return c;
     }
 
-    public static @NotNull HiddenConfig getHiddenConfig() {
+    @NotNull
+    public static HiddenConfig getHiddenConfig() {
         HiddenConfig c = hiddenConfig; // Thread-safe reference
         if (c == null) {
             I18NManager defaultI18N = LocaleUtil.getDefaultI18N();

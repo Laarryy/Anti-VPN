@@ -14,18 +14,21 @@ import java.net.URL;
 import java.util.concurrent.TimeUnit;
 
 public abstract class AbstractSource<T extends SourceModel> implements Source<T> {
-    private final Class<T> modelClass;
+    private final @NotNull Class<T> modelClass;
 
     protected AbstractSource(@NotNull Class<T> modelClass) {
         this.modelClass = modelClass;
     }
 
     @Override
-    public @NotNull Class<T> getModelClass() { return modelClass; }
+    @NotNull
+    public Class<T> getModelClass() { return modelClass; }
 
-    protected final @NotNull ConfigurationNode getSourceConfigNode() { return ConfigUtil.getConfig().node("sources", getName()); }
+    @NotNull
+    protected final ConfigurationNode getSourceConfigNode() { return ConfigUtil.getConfig().node("sources", getName()); }
 
-    protected final @NotNull WebRequest.Builder getDefaultBuilder(@NotNull String url) throws APIException {
+    @NotNull
+    protected final WebRequest.Builder getDefaultBuilder(@NotNull String url) throws APIException {
         try {
             return WebRequest.builder(new URL(url))
                     .timeout(new TimeUtil.Time(ConfigUtil.getCachedConfig().getTimeout(), TimeUnit.MILLISECONDS))
@@ -37,7 +40,8 @@ public abstract class AbstractSource<T extends SourceModel> implements Source<T>
         }
     }
 
-    protected final @NotNull HttpURLConnection getConnection(@NotNull WebRequest request) throws APIException {
+    @NotNull
+    protected final HttpURLConnection getConnection(@NotNull WebRequest request) throws APIException {
         try {
             HttpURLConnection conn = request.getConnection();
             int status = conn.getResponseCode();
@@ -65,7 +69,8 @@ public abstract class AbstractSource<T extends SourceModel> implements Source<T>
         }
     }
 
-    protected final @NotNull String getString(HttpURLConnection conn) throws APIException {
+    @NotNull
+    protected final String getString(HttpURLConnection conn) throws APIException {
         try {
             return WebRequest.getString(conn);
         } catch (IOException ex) {

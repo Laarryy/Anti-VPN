@@ -15,7 +15,8 @@ import java.util.concurrent.CompletableFuture;
 
 public class ProxyCheck extends AbstractSource<ProxyCheckModel> {
     @Override
-    public @NotNull String getName() { return "proxycheck"; }
+    @NotNull
+    public String getName() { return "proxycheck"; }
 
     @Override
     public boolean isKeyRequired() { return false; }
@@ -25,7 +26,8 @@ public class ProxyCheck extends AbstractSource<ProxyCheckModel> {
     }
 
     @Override
-    public @NotNull CompletableFuture<@NotNull Boolean> getResult(@NotNull String ip) {
+    @NotNull
+    public CompletableFuture<@NotNull Boolean> getResult(@NotNull String ip) {
         return getRawResponse(ip).thenApply(model -> {
             if (!"ok".equalsIgnoreCase(model.getStatus())) {
                 throw new APIException(
@@ -39,7 +41,8 @@ public class ProxyCheck extends AbstractSource<ProxyCheckModel> {
     }
 
     @Override
-    public @NotNull CompletableFuture<@NotNull ProxyCheckModel> getRawResponse(@NotNull String ip) {
+    @NotNull
+    public CompletableFuture<@NotNull ProxyCheckModel> getRawResponse(@NotNull String ip) {
         return CompletableFuture.supplyAsync(() -> {
             if (!ValidationUtil.isValidIp(ip)) {
                 throw new IllegalArgumentException("ip is invalid.");

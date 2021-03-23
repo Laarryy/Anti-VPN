@@ -31,10 +31,10 @@ import java.util.concurrent.CompletionException;
 import java.util.concurrent.TimeUnit;
 
 public abstract class AbstractPlayerManager implements PlayerManager {
-    protected final Logger logger = new GELFLogger(LoggerFactory.getLogger(getClass()));
+    protected final @NotNull Logger logger = new GELFLogger(LoggerFactory.getLogger(getClass()));
 
-    protected final LoadingCache<UUID, PlayerModel> playerCache;
-    private final String mcleaksKey;
+    protected final @NotNull LoadingCache<UUID, PlayerModel> playerCache;
+    private final @Nullable String mcleaksKey;
 
     protected AbstractPlayerManager(@NotNull TimeUtil.Time cacheTime, @Nullable String mcleaksKey) {
         playerCache = Caffeine.newBuilder()
@@ -44,10 +44,12 @@ public abstract class AbstractPlayerManager implements PlayerManager {
         this.mcleaksKey = mcleaksKey;
     }
 
+    @NotNull
     public LoadingCache<UUID, PlayerModel> getPlayerCache() { return playerCache; }
 
     @Override
-    public @NotNull CompletableFuture<Void> savePlayer(@NotNull Player player) {
+    @NotNull
+    public CompletableFuture<Void> savePlayer(@NotNull Player player) {
         return CompletableFuture.runAsync(() -> {
             CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
 
@@ -64,7 +66,8 @@ public abstract class AbstractPlayerManager implements PlayerManager {
     }
 
     @Override
-    public @NotNull CompletableFuture<Void> deletePlayer(@NotNull UUID uniqueId) {
+    @NotNull
+    public CompletableFuture<Void> deletePlayer(@NotNull UUID uniqueId) {
         return CompletableFuture.runAsync(() -> {
             CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
 
@@ -82,7 +85,8 @@ public abstract class AbstractPlayerManager implements PlayerManager {
     }
 
     @Override
-    public @NotNull CompletableFuture<@NotNull Set<@NotNull UUID>> getPlayers() {
+    @NotNull
+    public CompletableFuture<@NotNull Set<@NotNull UUID>> getPlayers() {
         return CompletableFuture.supplyAsync(() -> {
             CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
 
@@ -101,7 +105,8 @@ public abstract class AbstractPlayerManager implements PlayerManager {
     }
 
     @Override
-    public @NotNull CompletableFuture<@NotNull Boolean> checkMcLeaks(@NotNull UUID uniqueId, boolean useCache) throws APIException {
+    @NotNull
+    public CompletableFuture<@NotNull Boolean> checkMcLeaks(@NotNull UUID uniqueId, boolean useCache) throws APIException {
         return CompletableFuture.supplyAsync(() -> {
             PlayerModel model;
             if (useCache) {
@@ -126,7 +131,8 @@ public abstract class AbstractPlayerManager implements PlayerManager {
         });
     }
 
-    private @NotNull PlayerModel calculatePlayerResult(@NotNull UUID uuid, boolean useCache) throws APIException {
+    @NotNull
+    private PlayerModel calculatePlayerResult(@NotNull UUID uuid, boolean useCache) throws APIException {
         CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
 
         if (useCache) {

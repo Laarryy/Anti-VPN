@@ -10,10 +10,10 @@ import java.lang.reflect.Method;
 
 // https://github.com/lucko/LuckPerms/blob/master/common/src/main/java/me/lucko/luckperms/common/api/ApiRegistrationUtil.java
 public class APIRegistrationUtil {
-    private static final Logger logger = new GELFLogger(LoggerFactory.getLogger(APIRegistrationUtil.class));
+    private static final @NotNull Logger logger = new GELFLogger(LoggerFactory.getLogger(APIRegistrationUtil.class));
 
-    private static final Method REGISTER;
-    private static final Method DEREGISTER;
+    private static final @NotNull Method REGISTER;
+    private static final @NotNull Method DEREGISTER;
 
     static {
         try {

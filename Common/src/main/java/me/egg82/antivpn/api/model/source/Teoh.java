@@ -17,14 +17,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class Teoh extends AbstractSource<TeohModel> {
     @Override
-    public @NotNull String getName() { return "teoh"; }
+    @NotNull
+    public String getName() { return "teoh"; }
 
     @Override
     public boolean isKeyRequired() { return false; }
 
-    private static final AtomicInteger requests = new AtomicInteger(0);
-    private static final ScheduledExecutorService threadPool = Executors.newSingleThreadScheduledExecutor(new ThreadFactoryBuilder().setNameFormat("Anti-VPN_TeohAPI_%d")
-                                                                                                                  .build());
+    private static final @NotNull AtomicInteger requests = new AtomicInteger(0);
+    private static final @NotNull ScheduledExecutorService threadPool = Executors.newSingleThreadScheduledExecutor(new ThreadFactoryBuilder().setNameFormat("Anti-VPN_TeohAPI_%d").build());
 
     static {
         threadPool.scheduleAtFixedRate(() -> requests.set(0), 0L, 24L, TimeUnit.HOURS);
@@ -35,7 +35,8 @@ public class Teoh extends AbstractSource<TeohModel> {
     }
 
     @Override
-    public @NotNull CompletableFuture<@NotNull Boolean> getResult(@NotNull String ip) {
+    @NotNull
+    public CompletableFuture<@NotNull Boolean> getResult(@NotNull String ip) {
         return getRawResponse(ip).thenApply(model -> {
             if (model.getMessage() != null) {
                 throw new APIException(false, "Could not get result from " + getName() + " (" + model.getMessage() + ")");
@@ -46,7 +47,8 @@ public class Teoh extends AbstractSource<TeohModel> {
     }
 
     @Override
-    public @NotNull CompletableFuture<@NotNull TeohModel> getRawResponse(@NotNull String ip) {
+    @NotNull
+    public CompletableFuture<@NotNull TeohModel> getRawResponse(@NotNull String ip) {
         return CompletableFuture.supplyAsync(() -> {
             if (!ValidationUtil.isValidIp(ip)) {
                 throw new IllegalArgumentException("ip is invalid.");

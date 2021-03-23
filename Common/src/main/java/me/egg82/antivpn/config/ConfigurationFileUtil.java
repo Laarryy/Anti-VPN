@@ -40,7 +40,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 public class ConfigurationFileUtil {
-    private static final Logger logger = new GELFLogger(LoggerFactory.getLogger(ConfigurationFileUtil.class));
+    private static final @NotNull Logger logger = new GELFLogger(LoggerFactory.getLogger(ConfigurationFileUtil.class));
 
     private ConfigurationFileUtil() { }
 
@@ -56,7 +56,8 @@ public class ConfigurationFileUtil {
         return config.node("stats", "errors").getBoolean(true);
     }
 
-    public static <M extends LocalizedCommandSender<M, B>, B> @NotNull Locale getConsoleLocale(
+    @NotNull
+    public static <M extends LocalizedCommandSender<M, B>, B> Locale getConsoleLocale(
             @NotNull File dataDirectory,
             @NotNull LocalizedCommandSender<M, B> console
     ) {
@@ -150,7 +151,8 @@ public class ConfigurationFileUtil {
         }
     }
 
-    private static <M extends LocalizedCommandSender<M, B>, B> @NotNull Locale getLanguage(
+    @NotNull
+    private static <M extends LocalizedCommandSender<M, B>, B> Locale getLanguage(
             @NotNull ConfigurationNode config,
             boolean debug,
             @NotNull LocalizedCommandSender<M, B> console
@@ -193,13 +195,14 @@ public class ConfigurationFileUtil {
         return retVal;
     }
 
-    private static <M extends LocalizedCommandSender<M, B>, B> @NotNull List<StorageService> getStorage(
+    @NotNull
+    private static <M extends LocalizedCommandSender<M, B>, B> List<@NotNull StorageService> getStorage(
             @NotNull ConfigurationNode config,
             @NotNull File dataDirectory,
             boolean debug,
             @NotNull LocalizedCommandSender<M, B> console
     ) {
-        List<StorageService> retVal = new ArrayList<>();
+        List<@NotNull StorageService> retVal = new ArrayList<>();
 
         PoolSettings poolSettings = new PoolSettings(config.node("storage", "settings"));
         for (Map.Entry<Object, ? extends ConfigurationNode> kvp : config.node("storage", "engines").childrenMap().entrySet()) {
@@ -217,7 +220,8 @@ public class ConfigurationFileUtil {
         return retVal;
     }
 
-    private static <M extends LocalizedCommandSender<M, B>, B> @Nullable StorageService getStorageOf(
+    @Nullable
+    private static <M extends LocalizedCommandSender<M, B>, B> StorageService getStorageOf(
             @NotNull String name,
             @NotNull ConfigurationNode engineNode,
             @NotNull File dataDirectory,
@@ -399,7 +403,8 @@ public class ConfigurationFileUtil {
         return null;
     }
 
-    private static <M extends LocalizedCommandSender<M, B>, B> @NotNull List<MessagingService> getMessaging(
+    @NotNull
+    private static <M extends LocalizedCommandSender<M, B>, B> List<@NotNull MessagingService> getMessaging(
             @NotNull ConfigurationNode config,
             @NotNull UUID serverId,
             @NotNull MessagingHandler handler,
@@ -407,7 +412,7 @@ public class ConfigurationFileUtil {
             boolean debug,
             @NotNull LocalizedCommandSender<M, B> console
     ) {
-        List<MessagingService> retVal = new ArrayList<>();
+        List<@NotNull MessagingService> retVal = new ArrayList<>();
 
         PoolSettings poolSettings = new PoolSettings(config.node("messaging", "settings"));
         for (Map.Entry<Object, ? extends ConfigurationNode> kvp : config.node("messaging", "engines").childrenMap().entrySet()) {
@@ -425,7 +430,8 @@ public class ConfigurationFileUtil {
         return retVal;
     }
 
-    private static <M extends LocalizedCommandSender<M, B>, B> @Nullable MessagingService getMessagingOf(
+    @Nullable
+    private static <M extends LocalizedCommandSender<M, B>, B> MessagingService getMessagingOf(
             @NotNull String name,
             @NotNull ConfigurationNode engineNode,
             @NotNull UUID serverId,
@@ -507,6 +513,7 @@ public class ConfigurationFileUtil {
         return null;
     }
 
+    @NotNull
     private static <M extends LocalizedCommandSender<M, B>, B> TimeUtil.Time getSourceCacheTime(
             @NotNull ConfigurationNode config,
             boolean debug,
@@ -524,6 +531,7 @@ public class ConfigurationFileUtil {
         return retVal;
     }
 
+    @NotNull
     private static <M extends LocalizedCommandSender<M, B>, B> TimeUtil.Time getMcLeaksCacheTime(
             @NotNull ConfigurationNode config,
             boolean debug,
@@ -541,6 +549,7 @@ public class ConfigurationFileUtil {
         return retVal;
     }
 
+    @NotNull
     private static <M extends LocalizedCommandSender<M, B>, B> TimeUtil.Time getCacheTime(
             @NotNull ConfigurationNode config,
             boolean debug,
@@ -558,7 +567,8 @@ public class ConfigurationFileUtil {
         return retVal;
     }
 
-    private static <M extends LocalizedCommandSender<M, B>, B> @NotNull Set<String> getIgnoredIps(
+    @NotNull
+    private static <M extends LocalizedCommandSender<M, B>, B> Set<@NotNull String> getIgnoredIps(
             @NotNull ConfigurationNode config,
             boolean debug,
             @NotNull LocalizedCommandSender<M, B> console
@@ -588,7 +598,8 @@ public class ConfigurationFileUtil {
         return retVal;
     }
 
-    private static <M extends LocalizedCommandSender<M, B>, B> @NotNull Set<String> getVpnActionCommands(
+    @NotNull
+    private static <M extends LocalizedCommandSender<M, B>, B> Set<@NotNull String> getVpnActionCommands(
             @NotNull ConfigurationNode config,
             boolean debug,
             @NotNull LocalizedCommandSender<M, B> console
@@ -613,7 +624,8 @@ public class ConfigurationFileUtil {
         return retVal;
     }
 
-    private static <M extends LocalizedCommandSender<M, B>, B> @NotNull Set<String> getMcLeaksActionCommands(
+    @NotNull
+    private static <M extends LocalizedCommandSender<M, B>, B> Set<@NotNull String> getMcLeaksActionCommands(
             @NotNull ConfigurationNode config,
             boolean debug,
             @NotNull LocalizedCommandSender<M, B> console
@@ -672,13 +684,14 @@ public class ConfigurationFileUtil {
         return retVal;
     }
 
+    @SuppressWarnings("unchecked")
     private static <M extends LocalizedCommandSender<M, B>, B> void setSources(
             @NotNull ConfigurationNode config,
             boolean debug,
             @NotNull LocalizedCommandSender<M, B> console,
             @NotNull SourceManager sourceManager
     ) {
-        Map<String, Source<? extends SourceModel>> initializedSources = new HashMap<>();
+        Map<String, Source<SourceModel>> initializedSources = new HashMap<>();
 
         List<Class<Source>> sourceClasses = PackageFilter.getClasses(Source.class, "me.egg82.antivpn.api.model.source", false, false, false);
         for (Class<Source> clazz : sourceClasses) {
@@ -687,7 +700,7 @@ public class ConfigurationFileUtil {
             }
 
             try {
-                Source<? extends SourceModel> source = (Source<? extends SourceModel>) clazz.newInstance();
+                Source<SourceModel> source = clazz.newInstance();
                 initializedSources.put(source.getName(), source);
             } catch (InstantiationException | IllegalAccessException | ClassCastException ex) {
                 logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex);
@@ -713,7 +726,7 @@ public class ConfigurationFileUtil {
                 continue;
             }
 
-            Source<? extends SourceModel> source = initializedSources.get(s);
+            Source<SourceModel> source = initializedSources.get(s);
             if (source == null) {
                 if (debug) {
                     console.sendMessage("<c9>Source " + s + " was not found. Removing.</c9>");
@@ -745,7 +758,7 @@ public class ConfigurationFileUtil {
 
         for (int i = 0; i < order.size(); i++) {
             String s = order.get(i);
-            Source<? extends SourceModel> source = initializedSources.get(s);
+            Source<SourceModel> source = initializedSources.get(s);
             sourceManager.deregisterSource(s);
             sourceManager.registerSource(source, i);
             if (debug) {
@@ -754,7 +767,8 @@ public class ConfigurationFileUtil {
         }
     }
 
-    private static <M extends LocalizedCommandSender<M, B>, B> @NotNull CommentedConfigurationNode getConfigSimple(
+    @NotNull
+    private static <M extends LocalizedCommandSender<M, B>, B> CommentedConfigurationNode getConfigSimple(
             @NotNull String resourcePath,
             @NotNull File fileOnDisk,
             @Nullable LocalizedCommandSender<M, B> console
@@ -790,7 +804,8 @@ public class ConfigurationFileUtil {
         return loader.load(ConfigurationOptions.defaults().header(LocaleUtil.getDefaultI18N().getText(MessageKey.CONFIG__COMMENTS_GONE)));
     }
 
-    private static <M extends LocalizedCommandSender<M, B>, B> @NotNull CommentedConfigurationNode getConfig(
+    @NotNull
+    private static <M extends LocalizedCommandSender<M, B>, B> CommentedConfigurationNode getConfig(
             @NotNull String resourcePath,
             @NotNull File fileOnDisk,
             @NotNull LocalizedCommandSender<M, B> console
@@ -802,7 +817,7 @@ public class ConfigurationFileUtil {
     }
 
     private static class AddressPort {
-        private final String address;
+        private final @NotNull String address;
         private final int port;
 
         public <M extends LocalizedCommandSender<M, B>, B> AddressPort(
@@ -826,7 +841,8 @@ public class ConfigurationFileUtil {
             this.port = p;
         }
 
-        public @NotNull String getAddress() { return address; }
+        @NotNull
+        public String getAddress() { return address; }
 
         public int getPort() { return port; }
     }

@@ -23,9 +23,11 @@ public class NullablePair<T1, T2> {
         this.hc = Objects.hash(t1, t2);
     }
 
-    public @Nullable T1 getT1() { return t1; }
+    @Nullable
+    public T1 getT1() { return t1; }
 
-    public @Nullable T2 getT2() { return t2; }
+    @Nullable
+    public T2 getT2() { return t2; }
 
     @Override
     public boolean equals(Object o) {

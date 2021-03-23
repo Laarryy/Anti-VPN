@@ -13,7 +13,8 @@ import java.util.concurrent.CompletableFuture;
 
 public class Shodan extends AbstractSource<ShodanModel> {
     @Override
-    public @NotNull String getName() { return "shodan"; }
+    @NotNull
+    public String getName() { return "shodan"; }
 
     @Override
     public boolean isKeyRequired() { return true; }
@@ -23,7 +24,8 @@ public class Shodan extends AbstractSource<ShodanModel> {
     }
 
     @Override
-    public @NotNull CompletableFuture<@NotNull Boolean> getResult(@NotNull String ip) {
+    @NotNull
+    public CompletableFuture<@NotNull Boolean> getResult(@NotNull String ip) {
         return getRawResponse(ip).thenApply(model -> {
             if (model.getError() != null) {
                 throw new APIException(model.getError().contains("key"), "Could not get result from " + getName() + " (" + model.getError() + ")");
@@ -43,7 +45,8 @@ public class Shodan extends AbstractSource<ShodanModel> {
     }
 
     @Override
-    public @NotNull CompletableFuture<@NotNull ShodanModel> getRawResponse(@NotNull String ip) {
+    @NotNull
+    public CompletableFuture<@NotNull ShodanModel> getRawResponse(@NotNull String ip) {
         return CompletableFuture.supplyAsync(() -> {
             if (!ValidationUtil.isValidIp(ip)) {
                 throw new IllegalArgumentException("ip is invalid.");

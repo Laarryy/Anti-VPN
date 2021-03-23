@@ -12,7 +12,8 @@ import java.util.concurrent.CompletableFuture;
 
 public class IPTrooper extends AbstractSource<IPTrooperModel> {
     @Override
-    public @NotNull String getName() { return "iptrooper"; }
+    @NotNull
+    public String getName() { return "iptrooper"; }
 
     @Override
     public boolean isKeyRequired() { return false; }
@@ -22,7 +23,8 @@ public class IPTrooper extends AbstractSource<IPTrooperModel> {
     }
 
     @Override
-    public @NotNull CompletableFuture<@NotNull Boolean> getResult(@NotNull String ip) {
+    @NotNull
+    public CompletableFuture<@NotNull Boolean> getResult(@NotNull String ip) {
         return getRawResponse(ip).thenApply(model -> {
             if (model.getCode() == 3) {
                 throw new APIException(false, "Could not get result from " + getName() + " (Request limit reached)");
@@ -33,7 +35,8 @@ public class IPTrooper extends AbstractSource<IPTrooperModel> {
     }
 
     @Override
-    public @NotNull CompletableFuture<@NotNull IPTrooperModel> getRawResponse(@NotNull String ip) {
+    @NotNull
+    public CompletableFuture<@NotNull IPTrooperModel> getRawResponse(@NotNull String ip) {
         return CompletableFuture.supplyAsync(() -> {
             if (!ValidationUtil.isValidIp(ip)) {
                 throw new IllegalArgumentException("ip is invalid.");

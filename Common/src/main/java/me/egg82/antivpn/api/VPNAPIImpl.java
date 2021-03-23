@@ -16,15 +16,15 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 public class VPNAPIImpl implements VPNAPI {
-    private final Platform platform;
-    private final AbstractPluginMetadata pluginMetadata;
+    private final @NotNull Platform platform;
+    private final @NotNull AbstractPluginMetadata pluginMetadata;
 
-    private final AbstractIPManager ipManager;
-    private final AbstractPlayerManager playerManager;
-    private final SourceManagerImpl sourceManager;
-    private final EventBus<VPNEvent> eventBus;
+    private final @NotNull AbstractIPManager ipManager;
+    private final @NotNull AbstractPlayerManager playerManager;
+    private final @NotNull SourceManagerImpl sourceManager;
+    private final @NotNull EventBus<VPNEvent> eventBus;
 
-    private static VPNAPIImpl instance = null;
+    private static @Nullable VPNAPIImpl instance = null;
 
     public static @Nullable VPNAPIImpl get() { return instance; }
 
@@ -48,26 +48,34 @@ public class VPNAPIImpl implements VPNAPI {
     }
 
     @Override
-    public @NotNull UUID getServerId() { return ConfigUtil.getCachedConfig().getServerId(); }
+    @NotNull
+    public UUID getServerId() { return ConfigUtil.getCachedConfig().getServerId(); }
 
     @Override
-    public @NotNull AbstractIPManager getIPManager() { return ipManager; }
+    @NotNull
+    public AbstractIPManager getIPManager() { return ipManager; }
 
     @Override
-    public @NotNull AbstractPlayerManager getPlayerManager() { return playerManager; }
+    @NotNull
+    public AbstractPlayerManager getPlayerManager() { return playerManager; }
 
     @Override
-    public @NotNull SourceManagerImpl getSourceManager() { return sourceManager; }
+    @NotNull
+    public SourceManagerImpl getSourceManager() { return sourceManager; }
 
     @Override
-    public @NotNull Platform getPlatform() { return platform; }
+    @NotNull
+    public Platform getPlatform() { return platform; }
 
     @Override
-    public @NotNull AbstractPluginMetadata getPluginMetadata() { return pluginMetadata; }
+    @NotNull
+    public AbstractPluginMetadata getPluginMetadata() { return pluginMetadata; }
 
     @Override
-    public @NotNull CompletableFuture<Void> runUpdateTask() { return CompletableFuture.runAsync(PacketUtil::trySendQueue); }
+    @NotNull
+    public CompletableFuture<Void> runUpdateTask() { return CompletableFuture.runAsync(PacketUtil::trySendQueue); }
 
     @Override
-    public @NotNull EventBus<VPNEvent> getEventBus() { return eventBus; }
+    @NotNull
+    public EventBus<VPNEvent> getEventBus() { return eventBus; }
 }

@@ -3,13 +3,16 @@ package me.egg82.antivpn.json.transformers;
 import flexjson.ObjectBinder;
 import flexjson.ObjectFactory;
 import flexjson.transformer.AbstractTransformer;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Type;
 import java.time.Instant;
 
 public class InstantTransformer extends AbstractTransformer implements ObjectFactory {
     @Override
-    public Object instantiate(ObjectBinder context, Object value, Type targetType, Class targetClass) {
+    @Nullable
+    public Object instantiate(@NotNull ObjectBinder context, @Nullable Object value, @NotNull Type targetType, @NotNull Class targetClass) {
         if (value instanceof Instant) {
             return value.toString();
         } else if (value instanceof CharSequence) {
@@ -21,7 +24,7 @@ public class InstantTransformer extends AbstractTransformer implements ObjectFac
     }
 
     @Override
-    public void transform(Object object) {
+    public void transform(@Nullable Object object) {
         if (object != null) {
             getContext().writeQuoted(object.toString());
         } else {

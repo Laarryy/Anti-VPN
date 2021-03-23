@@ -8,11 +8,11 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Map;
 
 public abstract class AbstractLocalizedCommandSender<M extends AbstractLocalizedCommandSender<M, B>, B> implements LocalizedCommandSender<M, B> {
-    protected static final MiniMessage formatter = MiniMessage.get();
+    protected static final @NotNull MiniMessage formatter = MiniMessage.get();
 
-    protected final B base;
-    protected final Audience audience;
-    protected final I18NManager localizationManager;
+    protected final @NotNull B base;
+    protected final @NotNull Audience audience;
+    protected final @NotNull I18NManager localizationManager;
 
     protected AbstractLocalizedCommandSender(@NotNull B base, @NotNull Audience audience, @NotNull I18NManager localizationManager) {
         this.base = base;
@@ -21,10 +21,12 @@ public abstract class AbstractLocalizedCommandSender<M extends AbstractLocalized
     }
 
     @Override
-    public @NotNull B getBase() { return base; }
+    @NotNull
+    public B getBase() { return base; }
 
     @Override
-    public @NotNull Audience getAudience() { return audience; }
+    @NotNull
+    public Audience getAudience() { return audience; }
 
     @Override
     public void sendMessage(@NotNull String message) {
@@ -42,11 +44,13 @@ public abstract class AbstractLocalizedCommandSender<M extends AbstractLocalized
     }
 
     @Override
-    public @NotNull Component getComponent(@NotNull String message) {
+    @NotNull
+    public Component getComponent(@NotNull String message) {
         return formatter.parse(localizationManager.getText(MessageKey.GENERAL__DECORATOR))
                 .append(formatter.parse(message));
     }
 
     @Override
-    public @NotNull I18NManager getLocalizationManager() { return localizationManager; }
+    @NotNull
+    public I18NManager getLocalizationManager() { return localizationManager; }
 }
