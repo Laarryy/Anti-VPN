@@ -58,7 +58,7 @@ public class Teoh extends AbstractSource<TeohModel> {
                 throw new APIException(false, "API calls to " + getName() + " have been limited to 1,000/day as per request.");
             }
 
-            WebRequest.Builder builder = getDefaultBuilder("https://ip.teoh.io/api/vpn/" + ip);
+            WebRequest.Builder builder = getDefaultBuilder("https://vpnapi.io/api/" + ip);
             HttpURLConnection conn = getConnection(builder.build());
             JSONDeserializer<TeohModel> modelDeserializer = new JSONDeserializer<>();
             return modelDeserializer.deserialize(getString(conn), TeohModel.class);
