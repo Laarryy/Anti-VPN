@@ -44,7 +44,7 @@
 
         <cloud.version>1.4.0</cloud.version>
         <commodore.version>1.9</commodore.version>
-        <adventure.version>4.7.0</adventure.version> <!-- keep updated with Paper: https://github.com/PaperMC/Paper/blob/master/Spigot-API-Patches/0005-Adventure.patch -->
+        <adventure.version>4.8.1</adventure.version> <!-- keep updated with Paper: https://github.com/PaperMC/Paper/blob/master/Spigot-API-Patches/0005-Adventure.patch -->
         <adventure.bukkit.version>4.0.0-SNAPSHOT</adventure.bukkit.version>
         <minimessage.version>4.1.0-SNAPSHOT</minimessage.version>
         <eventchain.api.version>2.1.0</eventchain.api.version>

@@ -123,6 +123,10 @@
                             <pattern>redis.clients.jedis</pattern>
                             <shadedPattern>me.egg82.antivpn.external.redis.clients.jedis</shadedPattern>
                         </relocation>
+                        <relocation>
+                            <pattern>net.kyori</pattern>
+                            <shadedPattern>me.egg82.antivpn.external.net.kyori</shadedPattern>
+                        </relocation>
                     </relocations>
                 </configuration>
                 <executions>
