@@ -33,7 +33,7 @@ class TestAPI {
     void testSources() {
         Assertions.assertDoesNotThrow(() -> VPNAPIProvider.getInstance().getSourceManager().getSources());
 
-        List<Source<? extends SourceModel>> sources = VPNAPIProvider.getInstance().getSourceManager().getSources();
+        List<Source<SourceModel>> sources = VPNAPIProvider.getInstance().getSourceManager().getSources();
         for (Source<? extends SourceModel> source : sources) {
             Assertions.assertDoesNotThrow(() -> source.getResult("8.8.8.8").get());
             Assertions.assertDoesNotThrow(() -> source.getRawResponse("8.8.8.8").get());
