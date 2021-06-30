@@ -123,6 +123,10 @@
                             <pattern>redis.clients.jedis</pattern>
                             <shadedPattern>me.egg82.antivpn.external.redis.clients.jedis</shadedPattern>
                         </relocation>
+                        <relocation>
+                            <pattern>it.unimi.dsi</pattern>
+                            <shadedPattern>me.egg82.antivpn.external.it.unimi.dsi</shadedPattern>
+                        </relocation>
                     </relocations>
                 </configuration>
                 <executions>
@@ -216,10 +220,6 @@
             <url>https://raw.github.com/rjenkinsjr/maven2/repo</url>
         </repository>
         <repository>
-            <id>plan</id>
-            <url>https://dl.bintray.com/rsl1122/Plan-repository</url>
-        </repository>
-        <repository>
             <id>CodeMC</id>
             <url>https://repo.codemc.org/repository/maven-public</url>
         </repository>
@@ -290,10 +290,9 @@
             <version>${bstats.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.djrapitops</groupId>
-            <artifactId>Plan-api</artifactId>
+            <groupId>com.github.plan-player-analytics</groupId>
+            <artifactId>Plan</artifactId>
             <version>${plan.version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>me.clip</groupId>
