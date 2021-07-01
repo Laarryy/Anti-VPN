@@ -84,7 +84,7 @@ public class BStatsHook implements PluginHook {
         }));
         metrics.addCustomChart(new AdvancedPie("sources", () -> {
             Map<String, Integer> retVal = new HashMap<>();
-            List<Source<? extends SourceModel>> sources = VPNAPIProvider.getInstance().getSourceManager().getSources();
+            @NotNull List<@NotNull Source<SourceModel>> sources = VPNAPIProvider.getInstance().getSourceManager().getSources();
             for (Source<? extends SourceModel> source : sources) {
                 retVal.compute(source.getName(), (k, v) -> {
                     if (v == null) {
