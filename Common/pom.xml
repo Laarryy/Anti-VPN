@@ -88,10 +88,6 @@
             <id>egg82-nexus</id>
             <url>https://nexus.egg82.me/repository/maven-releases/</url>
         </repository>
-        <repository> <!-- for development builds -->
-            <id>sonatype-oss-snapshots</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
-        </repository>
         <repository>
             <id>sponge</id>
             <url>https://repo.spongepowered.org/repository/maven-public/</url>
