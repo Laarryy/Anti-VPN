@@ -123,10 +123,6 @@
                             <pattern>redis.clients.jedis</pattern>
                             <shadedPattern>me.egg82.antivpn.external.redis.clients.jedis</shadedPattern>
                         </relocation>
-                        <relocation>
-                            <pattern>it.unimi.dsi</pattern>
-                            <shadedPattern>me.egg82.antivpn.external.it.unimi.dsi</shadedPattern>
-                        </relocation>
                     </relocations>
                 </configuration>
                 <executions>
@@ -197,6 +193,10 @@
             <id>papermc</id>
             <url>https://papermc.io/repo/repository/maven-public/</url>
         </repository>
+        <repository> <!-- for development builds -->
+            <id>sonatype-oss-snapshots</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+        </repository>
         <!--<repository>
             <id>spigot-repo</id>
             <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
@@ -241,7 +241,6 @@
             <version>${paper.version}</version>
             <scope>provided</scope>
         </dependency>
-
         <dependency>
             <groupId>cloud.commandframework</groupId>
             <artifactId>cloud-paper</artifactId>
