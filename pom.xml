@@ -56,7 +56,7 @@
         <relocator.version>1.4</relocator.version>
         <reflections.version>0.11.7</reflections.version>
         <javassist.version>3.27.0-GA</javassist.version>
-        <depdownloader.version>2.2.16</depdownloader.version>
+        <depdownloader.version>2.2.16</depdownloader.version> <!-- Must be compiled manually and installed to local repo: https://github.com/egg82/DepDownloader -->
         <acf.version>0.5.1-SNAPSHOT</acf.version> <!-- Must be compiled manually and installed to local repo: https://github.com/aikar/commands -->
 
         <plan.version>5.4.1330</plan.version>
