@@ -6,6 +6,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.PooledByteBufAllocator;
 import me.egg82.antivpn.config.ConfigUtil;
+import me.egg82.antivpn.core.Pair;
 import me.egg82.antivpn.locale.LocaleUtil;
 import me.egg82.antivpn.locale.MessageKey;
 import me.egg82.antivpn.logging.GELFLogger;
@@ -14,6 +15,7 @@ import me.egg82.antivpn.messaging.packets.MultiPacket;
 import me.egg82.antivpn.messaging.packets.Packet;
 import me.egg82.antivpn.messaging.packets.server.InitializationPacket;
 import me.egg82.antivpn.messaging.packets.server.PacketVersionPacket;
+import me.egg82.antivpn.services.CollectionProvider;
 import me.egg82.antivpn.utils.MathUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -26,6 +28,8 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.text.DecimalFormat;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
@@ -49,14 +53,27 @@ public abstract class AbstractMessagingService implements MessagingService {
     protected final File sentPacketDirectory;
     protected final File receivedPacketDirectory;
 
-    protected AbstractMessagingService(@NotNull String name, @NotNull File packetDirectory) {
+    protected final long startupDelay;
+
+    protected AbstractMessagingService(@NotNull String name, long startupDelay, @NotNull File packetDirectory) {
         this.name = name;
         this.sentPacketDirectory = new File(packetDirectory, "sent");
         this.receivedPacketDirectory = new File(packetDirectory, "received");
+        this.startupDelay = startupDelay;
     }
 
     @Override
     public @NotNull String getName() { return name; }
+
+    @Override
+    public void flushPacketQueue(@NotNull UUID forServer) {
+        CollectionProvider.getPacketProcessingQueue().computeIfPresent(forServer, (k, v) -> {
+            for (Pair<UUID, Packet> p : v) {
+                handler.handlePacket(p.getT1(), name, p.getT2());
+            }
+            return null;
+        });
+    }
 
     private static final double TOLERANCE = 1.1; // Compression ratio tolerance. Determines when compression should happen
 
@@ -89,14 +106,14 @@ public abstract class AbstractMessagingService implements MessagingService {
                 nd.readBytes(out, 1, uncompressedBytes);
 
                 if (ConfigUtil.getDebugOrFalse()) {
-                    logger.info("Sent (no) compression: " + out.length + "/" + uncompressedBytes + " (" + ratioFormat.format((double) uncompressedBytes / (double) out.length) + ")");
+                    logger.debug("Sent (no) compression: " + out.length + "/" + uncompressedBytes + " (" + ratioFormat.format((double) uncompressedBytes / (double) out.length) + ")");
                 }
 
                 return out;
             }
 
             if (ConfigUtil.getDebugOrFalse()) {
-                logger.info("Sent compression: " + (compressedBytes + 5) + "/" + uncompressedBytes + " (" + ratioFormat.format((double) uncompressedBytes / (double) (compressedBytes + 5)) + ")");
+                logger.debug("Sent compression: " + (compressedBytes + 5) + "/" + uncompressedBytes + " (" + ratioFormat.format((double) uncompressedBytes / (double) (compressedBytes + 5)) + ")");
             }
 
             dest.put(0, (byte) 0x01);
@@ -126,7 +143,7 @@ public abstract class AbstractMessagingService implements MessagingService {
             data.readBytes(retVal);
 
             if (ConfigUtil.getDebugOrFalse()) {
-                logger.info("Received (no) compression: " + compressedBytes + "/" + (compressedBytes - 1) + " (" + ratioFormat.format((double) (compressedBytes - 1) / (double) compressedBytes) + ")");
+                logger.debug("Received (no) compression: " + compressedBytes + "/" + (compressedBytes - 1) + " (" + ratioFormat.format((double) (compressedBytes - 1) / (double) compressedBytes) + ")");
             }
 
             return retVal;
@@ -147,7 +164,7 @@ public abstract class AbstractMessagingService implements MessagingService {
             }
 
             if (ConfigUtil.getDebugOrFalse()) {
-                logger.info("Received compression: " + compressedBytes + "/" + uncompressedBytes + " (" + ratioFormat.format((double) uncompressedBytes / (double) compressedBytes) + ")");
+                logger.debug("Received compression: " + compressedBytes + "/" + uncompressedBytes + " (" + ratioFormat.format((double) uncompressedBytes / (double) compressedBytes) + ")");
             }
 
             dest.rewind();
@@ -278,15 +295,38 @@ public abstract class AbstractMessagingService implements MessagingService {
             return true;
         }
 
+        int i = 0;
         if (packet instanceof MultiPacket) {
             MultiPacket mult = (MultiPacket) packet;
             for (Packet p : mult.getPackets()) {
                 if (p instanceof InitializationPacket || p instanceof PacketVersionPacket) {
+                    if (i > 0) {
+                        reorder(mult);
+                    }
                     return true;
                 }
+                i++;
             }
         }
         return false;
+    }
+
+    private static void reorder(@NotNull MultiPacket packet) {
+        // TODO: There is definitely a more efficient way to do this, probably using streams
+
+        Set<Packet> removedPackets = new LinkedHashSet<>();
+        Set<Packet> keptPackets = new LinkedHashSet<>();
+
+        for (Packet p : packet.getPackets()) {
+            if (p instanceof InitializationPacket || p instanceof PacketVersionPacket) {
+                removedPackets.add(p);
+            } else {
+                keptPackets.add(p);
+            }
+        }
+
+        removedPackets.addAll(keptPackets);
+        packet.setPackets(removedPackets);
     }
 
     private void printBytes(@NotNull ByteBuf buffer) {

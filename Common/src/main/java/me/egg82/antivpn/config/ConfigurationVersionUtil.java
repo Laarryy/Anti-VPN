@@ -76,6 +76,9 @@ public class ConfigurationVersionUtil {
         if (config.node("version").getDouble() == 5.1d) {
             to52(config);
         }
+        if (config.node("version").getDouble() == 5.2d) {
+            to53(config);
+        }
 
         if (config.node("version").getDouble() != oldVersion) {
             File backupFile = new File(fileOnDisk.getParent(), fileOnDisk.getName() + ".bak");
@@ -714,5 +717,15 @@ public class ConfigurationVersionUtil {
 
         // Version
         config.node("version").set(5.2d);
+    }
+
+    private static void to53(@NotNull CommentedConfigurationNode config) throws SerializationException {
+        // Add messaging->settings->delay
+        config.node("messaging", "settings", "delay").set("1second");
+        // Add messaging->settings->redundancy
+        config.node("messaging", "settings", "redundancy").set(Boolean.TRUE);
+
+        // Version
+        config.node("version").set(5.3d);
     }
 }

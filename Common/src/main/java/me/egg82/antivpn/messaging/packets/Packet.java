@@ -7,7 +7,7 @@ import java.io.Serializable;
 import java.util.UUID;
 
 public interface Packet extends Serializable {
-    byte VERSION = (byte) 3;
+    byte VERSION = (byte) 4;
 
     void read(@NotNull ByteBuf buffer);
 

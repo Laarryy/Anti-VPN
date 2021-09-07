@@ -49,6 +49,8 @@ public class MessagingHandlerImpl extends AbstractMessagingHandler implements Me
             return;
         }
 
+        logger.debug("Handling " + packet.getClass().getSimpleName() + " from " + fromService);
+
         try {
             if (!handlePacket(packet)) {
                 logger.warn("Did not handle packet: " + packet.getClass().getName());
@@ -56,7 +58,9 @@ public class MessagingHandlerImpl extends AbstractMessagingHandler implements Me
         } catch (Exception ex) {
             logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex);
         } finally {
-            PacketUtil.repeatPacket(messageId, packet, fromService);
+            if (ConfigUtil.getCachedConfig().getMessagingRedundancy()) {
+                PacketUtil.repeatPacket(messageId, packet, fromService);
+            }
         }
     }
 
@@ -78,7 +82,7 @@ public class MessagingHandlerImpl extends AbstractMessagingHandler implements Me
 
     private void handleMulti(@NotNull MultiPacket packet) {
         if (ConfigUtil.getDebugOrFalse()) {
-            logger.info("Handling multi-packet.");
+            logger.debug("Handling multi-packet.");
         }
 
         for (Packet p : packet.getPackets()) {

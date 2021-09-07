@@ -3,11 +3,15 @@ package me.egg82.antivpn.messaging;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.netty.buffer.ByteBuf;
 import me.egg82.antivpn.config.ConfigUtil;
+import me.egg82.antivpn.core.Pair;
 import me.egg82.antivpn.locale.LocaleUtil;
 import me.egg82.antivpn.locale.MessageKey;
 import me.egg82.antivpn.messaging.handler.MessagingHandler;
 import me.egg82.antivpn.messaging.packets.Packet;
+import me.egg82.antivpn.messaging.packets.server.KeepAlivePacket;
+import me.egg82.antivpn.messaging.packets.server.PacketVersionRequestPacket;
 import me.egg82.antivpn.services.CollectionProvider;
+import me.egg82.antivpn.utils.PacketUtil;
 import org.jetbrains.annotations.NotNull;
 import redis.clients.jedis.BinaryJedisPubSub;
 import redis.clients.jedis.Jedis;
@@ -19,6 +23,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -37,8 +42,8 @@ public class RedisMessagingService extends AbstractMessagingService {
     private static final String CHANNEL_NAME = "avpn-data";
     private static final byte[] CHANNEL_NAME_BYTES = CHANNEL_NAME.getBytes(StandardCharsets.UTF_8);
 
-    private RedisMessagingService(@NotNull String name, @NotNull File packetDirectory) {
-        super(name, packetDirectory);
+    private RedisMessagingService(@NotNull String name, long startupDelay, @NotNull File packetDirectory) {
+        super(name, startupDelay, packetDirectory);
     }
 
     @Override
@@ -67,8 +72,9 @@ public class RedisMessagingService extends AbstractMessagingService {
             @NotNull String name,
             @NotNull UUID serverId,
             @NotNull MessagingHandler handler,
+            long startupDelay,
             @NotNull File packetDirectory
-    ) { return new Builder(name, serverId, handler, packetDirectory); }
+    ) { return new Builder(name, serverId, handler, startupDelay, packetDirectory); }
 
     public static class Builder {
         private final RedisMessagingService service;
@@ -79,8 +85,8 @@ public class RedisMessagingService extends AbstractMessagingService {
         private int timeout = 5000;
         private String pass = "";
 
-        public Builder(@NotNull String name, @NotNull UUID serverId, @NotNull MessagingHandler handler, @NotNull File packetDirectory) {
-            service = new RedisMessagingService(name, packetDirectory);
+        public Builder(@NotNull String name, @NotNull UUID serverId, @NotNull MessagingHandler handler, long startupDelay, @NotNull File packetDirectory) {
+            service = new RedisMessagingService(name, startupDelay, packetDirectory);
             service.serverId = serverId;
             service.serverIdString = serverId.toString();
             ByteBuf buffer = alloc.buffer(16, 16);
@@ -136,6 +142,15 @@ public class RedisMessagingService extends AbstractMessagingService {
 
         private void subscribe() {
             service.workPool.execute(() -> {
+                if (service.startupDelay > 0) {
+                    try {
+                        Thread.sleep(service.startupDelay);
+                    } catch (InterruptedException ex) {
+                        service.logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex);
+                        Thread.currentThread().interrupt();
+                    }
+                }
+
                 while (!service.isClosed()) {
                     try (Jedis redis = service.pool.getResource()) {
                         redis.subscribe(
@@ -172,15 +187,13 @@ public class RedisMessagingService extends AbstractMessagingService {
     private static class PubSub extends BinaryJedisPubSub {
         private final RedisMessagingService service;
 
-        private PubSub(@NotNull RedisMessagingService service) {
-            this.service = service;
-        }
+        private PubSub(@NotNull RedisMessagingService service) { this.service = service; }
 
         @Override
         public void onMessage(byte @NotNull [] c, byte @NotNull [] m) {
             String channel = new String(c, StandardCharsets.UTF_8);
             if (ConfigUtil.getDebugOrFalse()) {
-                service.logger.info("Got message from channel: " + channel);
+                service.logger.debug("Got message from channel: " + channel);
             }
 
             try {
@@ -201,7 +214,7 @@ public class RedisMessagingService extends AbstractMessagingService {
                 b.writeBytes(body);
                 data = service.decompressData(b);
 
-                if (ConfigUtil.getHiddenConfig().doPacketDump()) {
+                if (ConfigUtil.getHiddenConfig() != null && ConfigUtil.getHiddenConfig().doPacketDump()) {
                     service.dumpReceivedPacket(data);
                 }
 
@@ -238,8 +251,33 @@ public class RedisMessagingService extends AbstractMessagingService {
                     return;
                 }
 
+                if (packetVersion == -1 && packet instanceof KeepAlivePacket) {
+                    // Don't send warning
+                    return;
+                }
+
                 if (packetVersion == -1 && !hasVersion(packet)) {
                     service.logger.warn("Server " + sender + " packet version is unknown, and packet type is of " + packet.getClass().getName() + ". Skipping packet.");
+                    // There's a potential race condition here with double-sending a request, but it doesn't really matter
+                    ByteBuf finalData = data;
+                    CollectionProvider.getPacketProcessingQueue().compute(sender, (k, v) -> {
+                        if (v == null) {
+                            v = new CopyOnWriteArrayList<>();
+                        }
+
+                        if (v.isEmpty()) {
+                            if (packet.verifyFullRead(finalData)) {
+                                v.add(new Pair<>(messageId, packet));
+                            }
+                            PacketUtil.queuePacket(new PacketVersionRequestPacket(sender, service.serverId));
+                        } else {
+                            if (packet.verifyFullRead(finalData)) {
+                                v.add(new Pair<>(messageId, packet));
+                            }
+                        }
+
+                        return v;
+                    });
                     return;
                 }
 

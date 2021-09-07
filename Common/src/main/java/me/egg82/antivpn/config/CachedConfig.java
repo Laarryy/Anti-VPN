@@ -29,6 +29,10 @@ public class CachedConfig {
 
     private long sourceCacheTime = new TimeUtil.Time(6L, TimeUnit.HOURS).getMillis();
 
+    private boolean messagingRedundancy = true;
+
+    public boolean getMessagingRedundancy() { return messagingRedundancy; }
+
     public long getSourceCacheTime() { return sourceCacheTime; }
 
     private long mcleaksCacheTime = new TimeUtil.Time(1L, TimeUnit.DAYS).getMillis();
@@ -145,6 +149,11 @@ public class CachedConfig {
         @NotNull
         public CachedConfig.Builder messaging(@NotNull List<@NotNull MessagingService> value) {
             values.messaging = ImmutableList.copyOf(value);
+            return this;
+        }
+
+        public @NotNull CachedConfig.Builder messagingRedundancy(boolean value) {
+            values.messagingRedundancy = value;
             return this;
         }
 

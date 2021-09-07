@@ -15,4 +15,6 @@ public interface MessagingService {
     boolean isClosed();
 
     void sendPacket(@NotNull UUID messageId, @NotNull Packet packet) throws IOException, TimeoutException;
+
+    void flushPacketQueue(@NotNull UUID forServer);
 }
