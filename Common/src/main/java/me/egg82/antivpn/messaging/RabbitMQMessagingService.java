@@ -3,11 +3,15 @@ package me.egg82.antivpn.messaging;
 import com.rabbitmq.client.*;
 import io.netty.buffer.ByteBuf;
 import me.egg82.antivpn.config.ConfigUtil;
+import me.egg82.antivpn.core.Pair;
 import me.egg82.antivpn.locale.LocaleUtil;
 import me.egg82.antivpn.locale.MessageKey;
 import me.egg82.antivpn.messaging.handler.MessagingHandler;
 import me.egg82.antivpn.messaging.packets.Packet;
+import me.egg82.antivpn.messaging.packets.server.KeepAlivePacket;
+import me.egg82.antivpn.messaging.packets.server.PacketVersionRequestPacket;
 import me.egg82.antivpn.services.CollectionProvider;
+import me.egg82.antivpn.utils.PacketUtil;
 import me.egg82.antivpn.utils.ValidationUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -17,6 +21,9 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -33,8 +40,8 @@ public class RabbitMQMessagingService extends AbstractMessagingService {
 
     private static final String EXCHANGE_NAME = "avpn-data";
 
-    private RabbitMQMessagingService(@NotNull String name, @NotNull File packetDirectory) {
-        super(name, packetDirectory);
+    private RabbitMQMessagingService(@NotNull String name, long startupDelay, @NotNull File packetDirectory) {
+        super(name, startupDelay, packetDirectory);
     }
 
     @Override
@@ -58,15 +65,16 @@ public class RabbitMQMessagingService extends AbstractMessagingService {
             @NotNull String name,
             @NotNull UUID serverId,
             @NotNull MessagingHandler handler,
+            long startupDelay,
             @NotNull File packetDirectory
-    ) { return new Builder(name, serverId, handler, packetDirectory); }
+    ) { return new Builder(name, serverId, handler, startupDelay, packetDirectory); }
 
     public static class Builder {
         private final RabbitMQMessagingService service;
         private final ConnectionFactory config = new ConnectionFactory();
 
-        public Builder(@NotNull String name, @NotNull UUID serverId, @NotNull MessagingHandler handler, @NotNull File packetDirectory) {
-            service = new RabbitMQMessagingService(name, packetDirectory);
+        public Builder(@NotNull String name, @NotNull UUID serverId, @NotNull MessagingHandler handler, long startupDelay, @NotNull File packetDirectory) {
+            service = new RabbitMQMessagingService(name, startupDelay, packetDirectory);
             service.serverId = serverId;
             service.serverIdString = serverId.toString();
             ByteBuf buffer = alloc.buffer(16, 16);
@@ -110,7 +118,25 @@ public class RabbitMQMessagingService extends AbstractMessagingService {
         public @NotNull RabbitMQMessagingService build() throws IOException, TimeoutException {
             service.factory = config;
             service.connection = service.getConnection();
-            service.bind();
+            if (service.startupDelay == 0L) {
+                service.bind();
+            } else {
+                CompletableFuture.runAsync(() -> {
+                    try {
+                        Thread.sleep(service.startupDelay);
+                    } catch (InterruptedException ex) {
+                        service.logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex);
+                        Thread.currentThread().interrupt();
+                    }
+                }).thenRun(() -> {
+                    try {
+                        service.bind();
+                    } catch (IOException ex) {
+                        service.logger.error(ex.getClass().getName() + ": " + ex.getMessage(), ex);
+                        throw new CompletionException(ex);
+                    }
+                });
+            }
             return service;
         }
     }
@@ -124,7 +150,7 @@ public class RabbitMQMessagingService extends AbstractMessagingService {
             @Override
             public void handleDelivery(String tag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
                 if (ConfigUtil.getDebugOrFalse()) {
-                    logger.info("Got message from exchange: " + envelope.getExchange());
+                    logger.debug("Got message from exchange: " + envelope.getExchange());
                 }
 
                 UUID sender = validateProperties(properties);
@@ -168,8 +194,33 @@ public class RabbitMQMessagingService extends AbstractMessagingService {
                         return;
                     }
 
+                    if (packetVersion == -1 && packet instanceof KeepAlivePacket) {
+                        // Don't send warning
+                        return;
+                    }
+
                     if (packetVersion == -1 && !hasVersion(packet)) {
                         logger.warn("Server " + sender + " packet version is unknown, and packet type is of " + packet.getClass().getName() + ". Skipping packet.");
+                        // There's a potential race condition here with double-sending a request, but it doesn't really matter
+                        ByteBuf finalData = data;
+                        CollectionProvider.getPacketProcessingQueue().compute(sender, (k, v) -> {
+                            if (v == null) {
+                                v = new CopyOnWriteArrayList<>();
+                            }
+
+                            if (v.isEmpty()) {
+                                if (packet.verifyFullRead(finalData)) {
+                                    v.add(new Pair<>(UUID.fromString(properties.getMessageId()), packet));
+                                }
+                                PacketUtil.queuePacket(new PacketVersionRequestPacket(sender, serverId));
+                            } else {
+                                if (packet.verifyFullRead(finalData)) {
+                                    v.add(new Pair<>(UUID.fromString(properties.getMessageId()), packet));
+                                }
+                            }
+
+                            return v;
+                        });
                         return;
                     }
 
@@ -267,9 +318,7 @@ public class RabbitMQMessagingService extends AbstractMessagingService {
 
         private final int mode;
 
-        DeliveryMode(int mode) {
-            this.mode = mode;
-        }
+        DeliveryMode(int mode) { this.mode = mode; }
 
         public int getMode() { return mode; }
     }
@@ -282,9 +331,7 @@ public class RabbitMQMessagingService extends AbstractMessagingService {
 
         private final String type;
 
-        ExchangeType(@NotNull String type) {
-            this.type = type;
-        }
+        ExchangeType(@NotNull String type) { this.type = type; }
 
         public @NotNull String getType() { return type; }
     }

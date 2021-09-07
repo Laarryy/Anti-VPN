@@ -62,7 +62,7 @@ public class MultiPacket extends AbstractPacket {
     @Override
     public void write(@NotNull ByteBuf buffer) {
         if (packets.isEmpty()) {
-            buffer.writeByte((byte) 0x00); // End of multi-packet
+            buffer.writeByte(0x00); // End of multi-packet
             return;
         }
 
@@ -78,14 +78,12 @@ public class MultiPacket extends AbstractPacket {
             buffer.setInt(start, buffer.writerIndex() - start - 4); // Write the packet length to the int at the head
         }
 
-        buffer.writeByte((byte) 0x00); // End of multi-packet
+        buffer.writeByte(0x00); // End of multi-packet
     }
 
     public @NotNull Set<@NotNull Packet> getPackets() { return packets; }
 
-    public void setPackets(@NotNull Set<@NotNull Packet> packets) {
-        this.packets = packets;
-    }
+    public void setPackets(@NotNull Set<@NotNull Packet> packets) { this.packets = packets; }
 
     @Override
     public boolean equals(Object o) {
@@ -105,8 +103,7 @@ public class MultiPacket extends AbstractPacket {
     @Override
     public String toString() {
         return "MultiPacket{" +
-                "sender=" + sender +
-                ", packets=" + packets +
+                "packets=" + packets +
                 '}';
     }
 }

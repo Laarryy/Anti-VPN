@@ -17,10 +17,15 @@ import me.egg82.antivpn.locale.*;
 import me.egg82.antivpn.messaging.MessagingService;
 import me.egg82.antivpn.messaging.handler.MessagingHandler;
 import me.egg82.antivpn.messaging.handler.MessagingHandlerImpl;
+import me.egg82.antivpn.messaging.packets.Packet;
+import me.egg82.antivpn.messaging.packets.server.InitializationPacket;
 import me.egg82.antivpn.storage.StorageService;
 import me.egg82.antivpn.utils.EventUtil;
+import me.egg82.antivpn.utils.PacketUtil;
+import me.egg82.antivpn.utils.TimeUtil;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
+import org.spongepowered.configurate.serialize.SerializationException;
 
 import java.io.File;
 
@@ -64,6 +69,28 @@ public class ReloadCommand extends AbstractCommand {
 
                     APIRegistrationUtil.register(api);
                     EventUtil.post(new APILoadedEventImpl(api), api.getEventBus());
+
+                    String delayString;
+                    try {
+                        delayString = ConfigUtil.getConfig().node("messaging", "settings", "delay").get(String.class);
+                    } catch (SerializationException ignored) {
+                        delayString = null;
+                    }
+                    TimeUtil.Time delay = delayString == null ? null : TimeUtil.getTime(delayString);
+
+                    if (delay != null && delay.getTime() > 0) {
+                        CachedConfig finalCachedConfig = cachedConfig;
+                        new Thread(() -> {
+                            try {
+                                Thread.sleep(delay.getMillis() + 500L);
+                            } catch (InterruptedException ignored) {
+                                Thread.currentThread().interrupt();
+                            }
+                            PacketUtil.queuePacket(new InitializationPacket(finalCachedConfig.getServerId(), Packet.VERSION));
+                        }).start();
+                    } else {
+                        PacketUtil.queuePacket(new InitializationPacket(cachedConfig.getServerId(), Packet.VERSION));
+                    }
 
                     c.getSender().sendMessage(MessageKey.COMMAND__RELOAD__END);
                 })

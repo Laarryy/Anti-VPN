@@ -28,7 +28,7 @@ public class PacketManager {
             throw new IllegalStateException("Packet " + clazz.getName() + " has already been registered.");
         }
 
-        int id = currentId.getAndIncrement();
+        int id = currentId.incrementAndGet(); // A packet ID should never be 0, as that's the "id" assigned to an end-of-stream on a MultiPacket
         packetsById.put(id, clazz);
         packets.put(clazz, id);
         suppliersById.put(id, supplier);

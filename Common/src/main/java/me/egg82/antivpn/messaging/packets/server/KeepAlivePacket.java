@@ -8,19 +8,19 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Objects;
 import java.util.UUID;
 
-public class ShutdownPacket extends AbstractPacket {
+public class KeepAlivePacket extends AbstractPacket {
     private UUID server;
 
-    public ShutdownPacket(@NotNull UUID sender, @NotNull ByteBuf data) {
+    public KeepAlivePacket(@NotNull UUID sender, @NotNull ByteBuf data) {
         super(sender);
         read(data);
     }
 
-    public ShutdownPacket() {
+    public KeepAlivePacket() {
         super(UUIDUtil.EMPTY_UUID);
     }
 
-    public ShutdownPacket(@NotNull UUID server) {
+    public KeepAlivePacket(@NotNull UUID server) {
         super(UUIDUtil.EMPTY_UUID);
         this.server = server;
     }
@@ -44,10 +44,10 @@ public class ShutdownPacket extends AbstractPacket {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof ShutdownPacket)) {
+        if (!(o instanceof KeepAlivePacket)) {
             return false;
         }
-        ShutdownPacket that = (ShutdownPacket) o;
+        KeepAlivePacket that = (KeepAlivePacket) o;
         return server.equals(that.server);
     }
 
@@ -56,7 +56,7 @@ public class ShutdownPacket extends AbstractPacket {
 
     @Override
     public String toString() {
-        return "ShutdownPacket{" +
+        return "KeepAlivePacket{" +
                 "server=" + server +
                 ", sender=" + sender +
                 '}';

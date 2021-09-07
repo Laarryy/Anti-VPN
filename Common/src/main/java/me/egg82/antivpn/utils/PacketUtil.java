@@ -22,11 +22,14 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class PacketUtil {
     private static final Logger logger = new GELFLogger(LoggerFactory.getLogger(PacketUtil.class));
 
     private static ExecutorService workPool = Executors.newFixedThreadPool(4, new ThreadFactoryBuilder().setNameFormat("Anti-VPN_Messaging_%d").build());
+
+    private static AtomicInteger currentIndex = new AtomicInteger(-1);
 
     private PacketUtil() { }
 
@@ -63,9 +66,7 @@ public class PacketUtil {
         requiresSending.set(true);
     }
 
-    public static void repeatPacket(@NotNull UUID messageId, @NotNull Packet packet, @NotNull String fromService) {
-        sendPacket(messageId, packet, fromService);
-    }
+    public static void repeatPacket(@NotNull UUID messageId, @NotNull Packet packet, @NotNull String fromService) { sendPacket(messageId, packet, fromService); }
 
     public static void trySendQueue() {
         if (!requiresSending.compareAndSet(true, false)) {
@@ -100,18 +101,56 @@ public class PacketUtil {
     private static void sendPacket(@NotNull UUID messageId, @NotNull Packet packet, @Nullable String fromService) {
         CachedConfig cachedConfig = ConfigUtil.getCachedConfig();
 
-        for (MessagingService service : cachedConfig.getMessaging()) {
-            if (service.getName().equals(fromService)) {
-                continue;
+        if (cachedConfig.getMessagingRedundancy()) {
+            for (MessagingService service : cachedConfig.getMessaging()) {
+                if (service.getName().equals(fromService)) {
+                    continue;
+                }
+
+                workPool.execute(() -> {
+                    try {
+                        logger.debug("Sending " + packet.getClass().getSimpleName() + " through " + service.getName());
+                        service.sendPacket(messageId, packet);
+                    } catch (IOException | TimeoutException ex) {
+                        logger.warn("Could not broadcast packet " + packet.getClass().getSimpleName() + " through " + service.getName(), ex);
+                    }
+                });
+            }
+        } else {
+            if (fromService != null) {
+                return;
             }
 
-            workPool.execute(() -> {
+            int index = getNextService(cachedConfig);
+            int initialIndex = index;
+            boolean sent = false;
+
+            do {
+                MessagingService service = cachedConfig.getMessaging().get(index);
+
                 try {
+                    logger.debug("Sending " + packet.getClass().getSimpleName() + " through " + service.getName());
                     service.sendPacket(messageId, packet);
+                    sent = true;
+                    break;
                 } catch (IOException | TimeoutException ex) {
                     logger.warn("Could not broadcast packet " + packet.getClass().getSimpleName() + " through " + service.getName(), ex);
+                    index = getNextService(cachedConfig);
                 }
-            });
+            } while (index != initialIndex); // This will be true if we've run through all of our services and wrapped around to the start again
+
+            if (!sent) {
+                logger.error("Could not broadcast packet " + packet.getClass().getSimpleName() + " through any available messaging service.");
+            }
         }
+    }
+
+    private static int getNextService(CachedConfig cachedConfig) {
+        return currentIndex.updateAndGet(v -> {
+            if (v >= cachedConfig.getMessaging().size() - 1) {
+                return 0;
+            }
+            return v + 1;
+        });
     }
 }

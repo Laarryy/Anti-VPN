@@ -121,6 +121,16 @@ messaging:
     max-lifetime: '30minutes'
     # The maximum amount of time that the plugin will wait for a new connection from the pool before timing out
     timeout: '5seconds'
+    # The delay at which to load messaging services
+    # 0 is instant, anything else will allow other plugins to startup before messaging begins
+    delay: '1second'
+    # Whether or not the messaging systems should be redundant
+    # With redundancy on, backend packets will be passed to all messaging services
+    # With redundancy off, backend packets will be rotated through each messaging system in a round-robin manner
+    # Note: If a backend packet fails on a non-redundant configuration, another messaging system will be chosen automatically
+    #  However, a backend packet will not be re-broadcasted to any other messaging systems connected to this service
+    #  This means that if redundancy is turned off you will need to ensure each server has exactly the same messaging systems
+    redundancy: true
 
 # Where VPN-checking sources are defined
 # Beware the more sources that are included (and fail) the worse the performance and the more the lag
@@ -413,4 +423,4 @@ update:
   notify: true
 
 # Config version, no touchy plz
-version: 5.2
+version: 5.3

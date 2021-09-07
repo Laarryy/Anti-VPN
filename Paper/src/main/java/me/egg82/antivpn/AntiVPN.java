@@ -35,6 +35,8 @@ import me.egg82.antivpn.messaging.handler.MessagingHandlerImpl;
 import me.egg82.antivpn.messaging.packets.MultiPacket;
 import me.egg82.antivpn.messaging.packets.Packet;
 import me.egg82.antivpn.messaging.packets.server.InitializationPacket;
+import me.egg82.antivpn.messaging.packets.server.PacketVersionPacket;
+import me.egg82.antivpn.messaging.packets.server.PacketVersionRequestPacket;
 import me.egg82.antivpn.messaging.packets.server.ShutdownPacket;
 import me.egg82.antivpn.messaging.packets.vpn.DeleteIPPacket;
 import me.egg82.antivpn.messaging.packets.vpn.DeletePlayerPacket;
@@ -43,6 +45,7 @@ import me.egg82.antivpn.messaging.packets.vpn.PlayerPacket;
 import me.egg82.antivpn.storage.StorageService;
 import me.egg82.antivpn.utils.EventUtil;
 import me.egg82.antivpn.utils.PacketUtil;
+import me.egg82.antivpn.utils.TimeUtil;
 import me.egg82.antivpn.utils.VersionUtil;
 import me.egg82.antivpn.api.platform.AbstractPluginMetadata;
 import net.kyori.event.SimpleEventBus;
@@ -56,6 +59,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.spongepowered.configurate.serialize.SerializationException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -148,8 +152,10 @@ public class AntiVPN {
     }
 
     private void loadPackets() {
-        PacketManager.register(InitializationPacket.class, InitializationPacket::new); // Ensure InitializationPacket always has a packet ID of 1
-        PacketManager.register(MultiPacket.class, MultiPacket::new); // Ensure MultiPacket always has a packet ID of 2
+        PacketManager.register(InitializationPacket.class, InitializationPacket::new); // Ensure InitializationPacket always has a packet ID of 1 (NOT 0)
+        PacketManager.register(PacketVersionPacket.class, PacketVersionPacket::new); // Ensure PacketVersionPacket always has a packet ID of 2
+        PacketManager.register(MultiPacket.class, MultiPacket::new); // Ensure MultiPacket always has a packet ID of 3
+        PacketManager.register(PacketVersionRequestPacket.class, PacketVersionRequestPacket::new); // Ensure PacketVersionRequestPacket always has a packet ID of 4
 
         PacketManager.register(ShutdownPacket.class, ShutdownPacket::new);
 
@@ -177,7 +183,26 @@ public class AntiVPN {
         APIRegistrationUtil.register(api);
         EventUtil.post(new APILoadedEventImpl(api), api.getEventBus());
 
-        PacketUtil.queuePacket(new InitializationPacket(ConfigUtil.getCachedConfig().getServerId(), Packet.VERSION));
+        String delayString;
+        try {
+            delayString = ConfigUtil.getConfig().node("messaging", "settings", "delay").get(String.class);
+        } catch (SerializationException ignored) {
+            delayString = null;
+        }
+        TimeUtil.Time delay = delayString == null ? null : TimeUtil.getTime(delayString);
+
+        if (delay != null && delay.getTime() > 0) {
+            new Thread(() -> {
+                try {
+                    Thread.sleep(delay.getMillis() + 500L);
+                } catch (InterruptedException ignored) {
+                    Thread.currentThread().interrupt();
+                }
+                PacketUtil.queuePacket(new InitializationPacket(cachedConfig.getServerId(), Packet.VERSION));
+            }).start();
+        } else {
+            PacketUtil.queuePacket(new InitializationPacket(cachedConfig.getServerId(), Packet.VERSION));
+        }
     }
 
     private void loadCommands() {

@@ -105,11 +105,17 @@ public class ConfigurationFileUtil {
 
         AlgorithmMethod vpnAlgorithmMethod = getVpnAlgorithmMethod(config, debug, console);
 
+        boolean messagingRedundancy = config.node("messaging", "settings", "redundancy").getBoolean(true);
+        if (debug) {
+            console.sendMessage("<c2>Messaging systems are redundant:</c2> <c1>" + messagingRedundancy + "</c1>");
+        }
+
         CachedConfig cachedConfig = CachedConfig.builder()
                 .debug(debug)
                 .language(language)
                 .storage(getStorage(config, dataDirectory, debug, console))
                 .messaging(getMessaging(config, serverId, messagingHandler, new File(dataDirectory, "packets"), debug, console))
+                .messagingRedundancy(messagingRedundancy)
                 .sourceCacheTime(getSourceCacheTime(config, debug, console))
                 .mcleaksCacheTime(getMcLeaksCacheTime(config, debug, console))
                 .cacheTime(getCacheTime(config, debug, console))
@@ -459,7 +465,7 @@ public class ConfigurationFileUtil {
                             .getString("/") + "</c1>");
                 }
                 try {
-                    return RabbitMQMessagingService.builder(name, serverId, handler, packetDirectory)
+                    return RabbitMQMessagingService.builder(name, serverId, handler, poolSettings.delay, packetDirectory)
                             .url(url.address, url.port, connectionNode.node("v-host").getString("/"))
                             .credentials(connectionNode.node("username").getString("guest"), connectionNode.node("password").getString("guest"))
                             .timeout((int) poolSettings.timeout)
@@ -475,7 +481,7 @@ public class ConfigurationFileUtil {
                     console.sendMessage("<c2>Creating engine</c2> <c1>" + name + "</c1> <c2>of type redis with address</c2> <c1>" + url.getAddress() + ":" + url.getPort() + "</c1>");
                 }
                 try {
-                    return RedisMessagingService.builder(name, serverId, handler, packetDirectory)
+                    return RedisMessagingService.builder(name, serverId, handler, poolSettings.delay, packetDirectory)
                             .url(url.address, url.port)
                             .credentials(connectionNode.node("password").getString(""))
                             .poolSize(poolSettings.minPoolSize, poolSettings.maxPoolSize)
@@ -492,7 +498,7 @@ public class ConfigurationFileUtil {
                     console.sendMessage("<c2>Creating engine</c2> <c1>" + name + "</c1> <c2>of type NATS with address</c2> <c1>" + url.getAddress() + ":" + url.getPort() + "</c1>");
                 }
                 try {
-                    return NATSMessagingService.builder(name, serverId, handler, packetDirectory)
+                    return NATSMessagingService.builder(name, serverId, handler, poolSettings.delay, packetDirectory)
                             .url(url.address, url.port)
                             .credentials(connectionNode.node("file").getString(""))
                             .life((int) poolSettings.timeout)
@@ -817,7 +823,7 @@ public class ConfigurationFileUtil {
     }
 
     private static class AddressPort {
-        private final @NotNull String address;
+        private final String address;
         private final int port;
 
         public <M extends LocalizedCommandSender<M, B>, B> AddressPort(
@@ -841,8 +847,7 @@ public class ConfigurationFileUtil {
             this.port = p;
         }
 
-        @NotNull
-        public String getAddress() { return address; }
+        public @NotNull String getAddress() { return address; }
 
         public int getPort() { return port; }
     }
@@ -852,6 +857,7 @@ public class ConfigurationFileUtil {
         private final int maxPoolSize;
         private final long maxLifetime;
         private final long timeout;
+        private final long delay;
 
         public PoolSettings(ConfigurationNode settingsNode) {
             minPoolSize = settingsNode.node("min-idle").getInt();
@@ -868,6 +874,13 @@ public class ConfigurationFileUtil {
                 t = new TimeUtil.Time(5L, TimeUnit.SECONDS);
             }
             timeout = t.getMillis();
+
+            String delayStr = settingsNode.node("delay").getString("1second");
+            t = delayStr.trim().equals("0") ? new TimeUtil.Time(0L, TimeUnit.SECONDS) : TimeUtil.getTime(delayStr);
+            if (t == null) {
+                t = new TimeUtil.Time(1L, TimeUnit.SECONDS);
+            }
+            delay = t.getMillis();
         }
 
         public int getMinPoolSize() { return minPoolSize; }
@@ -877,5 +890,7 @@ public class ConfigurationFileUtil {
         public long getMaxLifetime() { return maxLifetime; }
 
         public long getTimeout() { return timeout; }
+
+        public long getDelay() { return delay; }
     }
 }

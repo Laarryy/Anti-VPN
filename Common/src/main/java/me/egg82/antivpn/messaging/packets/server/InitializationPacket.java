@@ -41,15 +41,11 @@ public class InitializationPacket extends AbstractPacket {
 
     public @NotNull UUID getServer() { return server; }
 
-    public void setServer(@NotNull UUID server) {
-        this.server = server;
-    }
+    public void setServer(@NotNull UUID server) { this.server = server; }
 
     public byte getPacketVersion() { return packetVersion; }
 
-    public void setPacketVersion(byte packetVersion) {
-        this.packetVersion = packetVersion;
-    }
+    public void setPacketVersion(byte packetVersion) { this.packetVersion = packetVersion; }
 
     @Override
     public boolean equals(Object o) {
