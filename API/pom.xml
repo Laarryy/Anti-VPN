@@ -77,10 +77,6 @@
         </plugins>
     </build>
 
-    <repositories>
-
-    </repositories>
-
     <dependencies>
         <dependency>
             <groupId>org.checkerframework</groupId>

@@ -105,21 +105,6 @@
         </plugins>
     </build>
 
-    <repositories>
-        <repository>
-            <id>egg82-nexus</id>
-            <url>https://nexus.egg82.me/repository/maven-releases/</url>
-        </repository>
-        <repository>
-            <id>sponge</id>
-            <url>https://repo.spongepowered.org/maven/</url>
-        </repository>
-        <repository>
-            <id>aikar</id>
-            <url>https://repo.aikar.co/content/groups/aikar/</url>
-        </repository>
-    </repositories>
-
     <dependencies>
         <dependency>
             <groupId>ninja.egg82</groupId>
